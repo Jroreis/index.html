@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,278 +10,322 @@
   <meta name="description" content="VoltCalc Pro - Calculadora elétrica profissional com Lei de Ohm e Queda de Tensão conforme NBR 5410" />
   <meta name="keywords" content="calculadora elétrica, lei de ohm, queda de tensão, nbr 5410, eletricista" />
 </head>
-<body class="bg-zinc-950 text-white transition-colors duration-300" id="body">  <!-- HEADER -->  <header class="border-b border-zinc-800 sticky top-0 bg-zinc-950/90 backdrop-blur z-50">
+<body class="bg-zinc-950 text-white transition-colors duration-300" id="body">
+
+  <!-- HEADER -->
+  <header class="border-b border-zinc-800 sticky top-0 bg-zinc-950/90 backdrop-blur z-50">
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-      <h1 class="text-2xl font-bold">⚡ VoltCalc Pro</h1><nav class="hidden md:flex gap-6 text-zinc-300">
-    <button onclick="toggleTheme()" class="bg-zinc-800 px-4 py-2 rounded-xl hover:bg-zinc-700 transition">
-      🌙 Tema
-    </button>
-    <a href="#ohm" class="hover:text-yellow-400">Lei de Ohm</a>
-    <a href="#queda" class="hover:text-yellow-400">Queda de Tensão</a>
-    <a href="#tabelas" class="hover:text-yellow-400">Tabelas</a>
-  </nav>
-</div>
+      <h1 class="text-2xl font-bold">⚡ VoltCalc Pro</h1>
 
-  </header>  <!-- HERO -->  <section class="px-6 py-20">
-    <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center"><div>
-    <h2 class="text-5xl md:text-6xl font-bold leading-tight">
-      Calculadora Elétrica Profissional
-    </h2>
-
-    <p class="mt-6 text-zinc-400 text-lg leading-relaxed">
-      Plataforma moderna para engenheiros, eletricistas e técnicos realizarem
-      cálculos elétricos rápidos e precisos conforme NBR 5410.
-    </p>
-
-    <div class="mt-8 flex gap-4 flex-wrap">
-      <button onclick="installPWA()" class="bg-green-500 hover:bg-green-400 text-black px-6 py-3 rounded-2xl font-bold transition">
-        📲 Instalar App
-      </button>
-      <a href="#ohm" class="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 rounded-2xl font-bold transition">
-        Usar Agora
-      </a>
-
-      <button class="border border-zinc-700 px-6 py-3 rounded-2xl hover:border-zinc-500 transition">
-        Baixar APK
-      </button>
+      <nav class="hidden md:flex gap-6 text-zinc-300">
+        <button onclick="toggleTheme()" class="bg-zinc-800 px-4 py-2 rounded-xl hover:bg-zinc-700 transition">
+          🌙 Tema
+        </button>
+        <a href="#ohm" class="hover:text-yellow-400">Lei de Ohm</a>
+        <a href="#queda" class="hover:text-yellow-400">Queda de Tensão</a>
+        <a href="#tabelas" class="hover:text-yellow-400">Tabelas</a>
+      </nav>
     </div>
-  </div>
+  </header>
 
-  <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl">
-    <h3 class="text-3xl font-bold">⚡ VoltCalc Pro</h3>
+  <!-- HERO -->
+  <section class="px-6 py-20">
+    <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
 
-    <div class="grid grid-cols-2 gap-4 mt-8">
-      <div class="bg-zinc-800 rounded-2xl p-5">
-        <p class="text-3xl font-bold">NBR 5410</p>
-        <p class="text-zinc-400 mt-2 text-sm">
-          Normas brasileiras.
+      <div>
+        <h2 class="text-5xl md:text-6xl font-bold leading-tight">
+          Calculadora Elétrica Profissional
+        </h2>
+
+        <p class="mt-6 text-zinc-400 text-lg leading-relaxed">
+          Plataforma moderna para engenheiros, eletricistas e técnicos realizarem
+          cálculos elétricos rápidos e precisos conforme NBR 5410.
         </p>
+
+        <div class="mt-8 flex gap-4 flex-wrap">
+          <button onclick="installPWA()" class="bg-green-500 hover:bg-green-400 text-black px-6 py-3 rounded-2xl font-bold transition">
+            📲 Instalar App
+          </button>
+          <a href="#ohm" class="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 rounded-2xl font-bold transition">
+            Usar Agora
+          </a>
+
+          <button class="border border-zinc-700 px-6 py-3 rounded-2xl hover:border-zinc-500 transition">
+            Baixar APK
+          </button>
+        </div>
       </div>
 
-      <div class="bg-zinc-800 rounded-2xl p-5">
-        <p class="text-3xl font-bold">100%</p>
-        <p class="text-zinc-400 mt-2 text-sm">
-          Responsivo.
-        </p>
+      <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl">
+        <h3 class="text-3xl font-bold">⚡ VoltCalc Pro</h3>
+
+        <div class="grid grid-cols-2 gap-4 mt-8">
+          <div class="bg-zinc-800 rounded-2xl p-5">
+            <p class="text-3xl font-bold">NBR 5410</p>
+            <p class="text-zinc-400 mt-2 text-sm">
+              Normas brasileiras.
+            </p>
+          </div>
+
+          <div class="bg-zinc-800 rounded-2xl p-5">
+            <p class="text-3xl font-bold">100%</p>
+            <p class="text-zinc-400 mt-2 text-sm">
+              Responsivo.
+            </p>
+          </div>
+
+          <div class="bg-zinc-800 rounded-2xl p-5">
+            <p class="text-3xl font-bold">PWA</p>
+            <p class="text-zinc-400 mt-2 text-sm">
+              Instalável.
+            </p>
+          </div>
+
+          <div class="bg-zinc-800 rounded-2xl p-5">
+            <p class="text-3xl font-bold">SEO</p>
+            <p class="text-zinc-400 mt-2 text-sm">
+              Google otimizado.
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div class="bg-zinc-800 rounded-2xl p-5">
-        <p class="text-3xl font-bold">PWA</p>
-        <p class="text-zinc-400 mt-2 text-sm">
-          Instalável.
-        </p>
-      </div>
-
-      <div class="bg-zinc-800 rounded-2xl p-5">
-        <p class="text-3xl font-bold">SEO</p>
-        <p class="text-zinc-400 mt-2 text-sm">
-          Google otimizado.
-        </p>
-      </div>
     </div>
-  </div>
+  </section>
 
-</div>
-
-  </section>  <!-- LEI DE OHM -->  <section id="ohm" class="px-6 py-20 bg-zinc-900 border-t border-zinc-800">
+  <!-- LEI DE OHM -->
+  <section id="ohm" class="px-6 py-20 bg-zinc-900 border-t border-zinc-800">
     <div class="max-w-4xl mx-auto">
       <h2 class="text-4xl font-bold text-center">
         ⚡ Calculadora Lei de Ohm
-      </h2><div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8 mt-12">
+      </h2>
 
-    <div class="grid md:grid-cols-2 gap-5">
-      <input id="voltage" type="number" placeholder="Tensão (V)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
+      <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8 mt-12">
 
-      <input id="current" type="number" placeholder="Corrente (A)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
+        <div class="grid md:grid-cols-2 gap-5">
+          <input id="voltage" type="number" placeholder="Tensão (V)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
 
-      <input id="resistance" type="number" placeholder="Resistência (Ω)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
+          <input id="current" type="number" placeholder="Corrente (A)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
 
-      <input id="power" type="number" placeholder="Potência (W)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-    </div>
+          <input id="resistance" type="number" placeholder="Resistência (Ω)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
 
-    <button onclick="calculateOhm()" class="w-full mt-6 bg-yellow-500 hover:bg-yellow-400 text-black py-4 rounded-2xl font-bold text-lg transition">
-      Calcular
-    </button>
+          <input id="power" type="number" placeholder="Potência (W)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
+        </div>
 
-    <div id="ohmResult" class="mt-8 hidden bg-zinc-900 border border-zinc-700 rounded-2xl p-6">
-      <button onclick="saveHistory()" class="mb-5 bg-yellow-500 text-black px-4 py-2 rounded-xl font-bold hover:bg-yellow-400 transition">
-        💾 Salvar Histórico
-      </button>
-      <h3 class="text-2xl font-bold mb-5">Resultado</h3>
+        <button onclick="calculateOhm()" class="w-full mt-6 bg-yellow-500 hover:bg-yellow-400 text-black py-4 rounded-2xl font-bold text-lg transition">
+          Calcular
+        </button>
 
-      <div class="space-y-3 text-lg">
-        <p id="resultVoltage"></p>
-        <p id="resultCurrent"></p>
-        <p id="resultResistance"></p>
-        <p id="resultPower"></p>
+        <div id="ohmResult" class="mt-8 hidden bg-zinc-900 border border-zinc-700 rounded-2xl p-6">
+          <button onclick="saveHistory()" class="mb-5 bg-yellow-500 text-black px-4 py-2 rounded-xl font-bold hover:bg-yellow-400 transition">
+            💾 Salvar Histórico
+          </button>
+          <h3 class="text-2xl font-bold mb-5">Resultado</h3>
+
+          <div class="space-y-3 text-lg">
+            <p id="resultVoltage"></p>
+            <p id="resultCurrent"></p>
+            <p id="resultResistance"></p>
+            <p id="resultPower"></p>
+          </div>
+        </div>
+
       </div>
     </div>
+  </section>
 
-  </div>
-</div>
+  <!-- QUEDA DE TENSAO -->
+  <section id="queda" class="px-6 py-20">
+    <div class="max-w-4xl mx-auto">
 
-  </section>  <!-- QUEDA DE TENSAO -->  <section id="queda" class="px-6 py-20">
-    <div class="max-w-4xl mx-auto"><h2 class="text-4xl font-bold text-center">
-    📉 Queda de Tensão
-  </h2>
+      <h2 class="text-4xl font-bold text-center">
+        📉 Queda de Tensão
+      </h2>
 
-  <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 mt-12">
+      <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 mt-12">
 
-    <div class="grid md:grid-cols-2 gap-5">
-      <input id="qtVoltage" type="number" placeholder="Tensão (V)" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
+        <div class="grid md:grid-cols-2 gap-5">
+          <input id="qtVoltage" type="number" placeholder="Tensão (V)" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
 
-      <input id="qtCurrent" type="number" placeholder="Corrente (A)" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
+          <input id="qtCurrent" type="number" placeholder="Corrente (A)" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
 
-      <input id="qtDistance" type="number" placeholder="Distância (m)" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
+          <input id="qtDistance" type="number" placeholder="Distância (m)" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
 
-      <input id="qtSection" type="number" placeholder="Bitola do Cabo (mm²)" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-    </div>
+          <input id="qtSection" type="number" placeholder="Bitola do Cabo (mm²)" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
+        </div>
 
-    <button onclick="calculateVoltageDrop()" class="w-full mt-6 bg-yellow-500 hover:bg-yellow-400 text-black py-4 rounded-2xl font-bold text-lg transition">
-      Calcular Queda
-    </button>
+        <button onclick="calculateVoltageDrop()" class="w-full mt-6 bg-yellow-500 hover:bg-yellow-400 text-black py-4 rounded-2xl font-bold text-lg transition">
+          Calcular Queda
+        </button>
 
-    <div id="dropResult" class="mt-8 hidden bg-zinc-950 border border-zinc-700 rounded-2xl p-6">
-      <h3 class="text-2xl font-bold mb-5">Resultado</h3>
+        <div id="dropResult" class="mt-8 hidden bg-zinc-950 border border-zinc-700 rounded-2xl p-6">
+          <h3 class="text-2xl font-bold mb-5">Resultado</h3>
 
-      <div class="space-y-3 text-lg">
-        <p id="dropVoltage"></p>
-        <p id="dropPercent"></p>
-        <p id="dropFinal"></p>
+          <div class="space-y-3 text-lg">
+            <p id="dropVoltage"></p>
+            <p id="dropPercent"></p>
+            <p id="dropFinal"></p>
+          </div>
+        </div>
+
       </div>
     </div>
+  </section>
 
-  </div>
-</div>
+  <!-- TABELAS -->
+  <section id="tabelas" class="px-6 py-20 bg-zinc-900 border-t border-zinc-800">
+    <div class="max-w-6xl mx-auto">
 
-  </section>  <!-- TABELAS -->  <section id="tabelas" class="px-6 py-20 bg-zinc-900 border-t border-zinc-800">
-    <div class="max-w-6xl mx-auto"><h2 class="text-4xl font-bold text-center">
-    📚 Tabelas Técnicas
-  </h2>
+      <h2 class="text-4xl font-bold text-center">
+        📚 Tabelas Técnicas
+      </h2>
 
-  <div class="overflow-x-auto mt-12 rounded-3xl border border-zinc-800">
-    <table class="w-full text-left">
-      <thead class="bg-zinc-950">
-        <tr>
-          <th class="p-5">Bitola</th>
-          <th class="p-5">Corrente Máxima</th>
-          <th class="p-5">Disjuntor</th>
-        </tr>
-      </thead>
+      <div class="overflow-x-auto mt-12 rounded-3xl border border-zinc-800">
+        <table class="w-full text-left">
+          <thead class="bg-zinc-950">
+            <tr>
+              <th class="p-5">Bitola</th>
+              <th class="p-5">Corrente Máxima</th>
+              <th class="p-5">Disjuntor</th>
+            </tr>
+          </thead>
 
-      <tbody class="bg-zinc-900">
-        <tr class="border-t border-zinc-800">
-          <td class="p-5">1.5 mm²</td>
-          <td class="p-5">15A</td>
-          <td class="p-5">10A</td>
-        </tr>
+          <tbody class="bg-zinc-900">
+            <tr class="border-t border-zinc-800">
+              <td class="p-5">1.5 mm²</td>
+              <td class="p-5">15A</td>
+              <td class="p-5">10A</td>
+            </tr>
 
-        <tr class="border-t border-zinc-800">
-          <td class="p-5">2.5 mm²</td>
-          <td class="p-5">21A</td>
-          <td class="p-5">20A</td>
-        </tr>
+            <tr class="border-t border-zinc-800">
+              <td class="p-5">2.5 mm²</td>
+              <td class="p-5">21A</td>
+              <td class="p-5">20A</td>
+            </tr>
 
-        <tr class="border-t border-zinc-800">
-          <td class="p-5">4 mm²</td>
-          <td class="p-5">28A</td>
-          <td class="p-5">25A</td>
-        </tr>
+            <tr class="border-t border-zinc-800">
+              <td class="p-5">4 mm²</td>
+              <td class="p-5">28A</td>
+              <td class="p-5">25A</td>
+            </tr>
 
-        <tr class="border-t border-zinc-800">
-          <td class="p-5">6 mm²</td>
-          <td class="p-5">36A</td>
-          <td class="p-5">32A</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+            <tr class="border-t border-zinc-800">
+              <td class="p-5">6 mm²</td>
+              <td class="p-5">36A</td>
+              <td class="p-5">32A</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-</div>
+    </div>
+  </section>
 
-  </section>  <!-- PREMIUM -->  <section class="px-6 py-20">
-    <div class="max-w-5xl mx-auto bg-gradient-to-r from-yellow-500 to-yellow-300 rounded-3xl p-10 text-black"><h2 class="text-5xl font-bold">
-    VoltCalc Pro Premium
-  </h2>
+  <!-- PREMIUM -->
+  <section class="px-6 py-20">
+    <div class="max-w-5xl mx-auto bg-gradient-to-r from-yellow-500 to-yellow-300 rounded-3xl p-10 text-black">
 
-  <p class="mt-6 text-lg max-w-3xl leading-relaxed">
-    Tenha acesso ao histórico ilimitado, remoção de anúncios,
-    relatórios avançados, exportação PDF e recursos profissionais.
-  </p>
+      <h2 class="text-5xl font-bold">
+        VoltCalc Pro Premium
+      </h2>
 
-  <div class="mt-8 flex gap-4 flex-wrap">
-    <button class="bg-black text-white px-6 py-3 rounded-2xl font-bold">
-      Assinar Premium
-    </button>
+      <p class="mt-6 text-lg max-w-3xl leading-relaxed">
+        Tenha acesso ao histórico ilimitado, remoção de anúncios,
+        relatórios avançados, exportação PDF e recursos profissionais.
+      </p>
 
-    <button class="border border-black px-6 py-3 rounded-2xl font-bold">
-      Saiba Mais
-    </button>
-  </div>
+      <div class="mt-8 flex gap-4 flex-wrap">
+        <button class="bg-black text-white px-6 py-3 rounded-2xl font-bold">
+          Assinar Premium
+        </button>
 
-</div>
+        <button class="border border-black px-6 py-3 rounded-2xl font-bold">
+          Saiba Mais
+        </button>
+      </div>
 
-  </section>  <!-- FOOTER -->  <!-- DASHBOARD -->  <section class="px-6 py-20">
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <!-- DASHBOARD -->
+  <section class="px-6 py-20">
     <div class="max-w-6xl mx-auto">
       <h2 class="text-4xl font-bold text-center mb-12">
         📊 Dashboard Profissional
-      </h2><div class="grid md:grid-cols-4 gap-6">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-      <p class="text-zinc-400">Usuários</p>
-      <h3 id="usersCount" class="text-4xl font-bold mt-3">0</h3>
-    </div>
+      </h2>
 
-    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-      <p class="text-zinc-400">Cálculos</p>
-      <h3 id="calcCount" class="text-4xl font-bold mt-3">0</h3>
-    </div>
+      <div class="grid md:grid-cols-4 gap-6">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+          <p class="text-zinc-400">Usuários</p>
+          <h3 id="usersCount" class="text-4xl font-bold mt-3">0</h3>
+        </div>
 
-    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-      <p class="text-zinc-400">Premium</p>
-      <h3 id="premiumCount" class="text-4xl font-bold mt-3">0</h3>
-    </div>
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+          <p class="text-zinc-400">Cálculos</p>
+          <h3 id="calcCount" class="text-4xl font-bold mt-3">0</h3>
+        </div>
 
-    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-      <p class="text-zinc-400">Online</p>
-      <h3 class="text-4xl font-bold mt-3">🟢</h3>
-    </div>
-  </div>
-</div>
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+          <p class="text-zinc-400">Premium</p>
+          <h3 id="premiumCount" class="text-4xl font-bold mt-3">0</h3>
+        </div>
 
-  </section>  <!-- LOGIN -->  <section class="px-6 py-20 bg-zinc-900 border-t border-zinc-800">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+          <p class="text-zinc-400">Online</p>
+          <h3 class="text-4xl font-bold mt-3">🟢</h3>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOGIN -->
+  <section class="px-6 py-20 bg-zinc-900 border-t border-zinc-800">
     <div class="max-w-3xl mx-auto text-center">
       <h2 class="text-4xl font-bold mb-8">
         🔐 Área do Usuário
-      </h2><button onclick="googleLogin()" class="bg-white text-black px-6 py-4 rounded-2xl font-bold hover:scale-105 transition">
-    Entrar com Google
-  </button>
+      </h2>
 
-  <div id="userInfo" class="mt-8"></div>
-</div>
+      <button onclick="googleLogin()" class="bg-white text-black px-6 py-4 rounded-2xl font-bold hover:scale-105 transition">
+        Entrar com Google
+      </button>
 
-  </section>  <!-- ADSENSE -->  <section class="px-6 py-10">
+      <div id="userInfo" class="mt-8"></div>
+    </div>
+  </section>
+
+  <!-- ADSENSE -->
+  <section class="px-6 py-10">
     <div class="max-w-5xl mx-auto bg-zinc-900 border border-zinc-800 rounded-3xl p-10 text-center">
       <p class="text-zinc-400 mb-4">Espaço Google AdSense</p>
       <div class="bg-zinc-800 rounded-2xl p-10">
         📢 Área de anúncio profissional
       </div>
     </div>
-  </section>  <footer class="border-t border-zinc-800 py-10 text-center text-zinc-500 px-6">
+  </section>
+
+  <footer class="border-t border-zinc-800 py-10 text-center text-zinc-500 px-6">
     <p>© 2026 VoltCalc Pro — Todos os direitos reservados.</p>
-  </footer>  <!-- HISTÓRICO -->  <section class="px-6 py-20 bg-zinc-900 border-t border-zinc-800">
+  </footer>
+
+  <!-- HISTÓRICO -->
+  <section class="px-6 py-20 bg-zinc-900 border-t border-zinc-800">
     <div class="max-w-5xl mx-auto">
       <h2 class="text-4xl font-bold text-center mb-12">
         📜 Histórico de Cálculos
-      </h2><div class="flex justify-end mb-4">
-    <button onclick="exportHistory()" class="bg-yellow-500 hover:bg-yellow-400 text-black px-5 py-3 rounded-2xl font-bold transition">
-      📄 Exportar Histórico
-    </button>
-  </div>
+      </h2>
 
-  <div id="historyContainer" class="space-y-4"></div>
-</div>
+      <div class="flex justify-end mb-4">
+        <button onclick="exportHistory()" class="bg-yellow-500 hover:bg-yellow-400 text-black px-5 py-3 rounded-2xl font-bold transition">
+          📄 Exportar Histórico
+        </button>
+      </div>
 
-  </section>  <script>
+      <div id="historyContainer" class="space-y-4"></div>
+    </div>
+  </section>
+
+  <script>
 
     const firebaseConfig = {
       apiKey: "SUA_API_KEY",
@@ -519,5 +564,7 @@
       document.getElementById('dropFinal').innerHTML = `🔌 Tensão Final: ${finalVoltage.toFixed(2)} V`;
     }
 
-  </script></body>
+  </script>
+
+</body>
 </html>
