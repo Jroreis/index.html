@@ -280,7 +280,7 @@
   <div id="historyContainer" class="space-y-4"></div>
 </div>
 
-  </section>  <script type="module">
+  </section>  <script>
 
     const firebaseConfig = {
       apiKey: "SUA_API_KEY",
@@ -291,7 +291,7 @@
       appId: "SEU_APP_ID"
     };
 
-    function googleLogin() {
+    window.googleLogin = function googleLogin() {
       const fakeUser = {
         name: 'Usuário VoltCalc',
         email: 'usuario@voltcalc.com',
@@ -330,7 +330,7 @@
     renderUser();
     updateStats();
 
-    function toggleTheme() {
+    window.toggleTheme = function toggleTheme() {
       const body = document.getElementById('body');
 
       if(body.classList.contains('bg-zinc-950')) {
@@ -353,7 +353,7 @@
       }
     }
 
-    function saveHistory() {
+    window.saveHistory = function saveHistory() {
       const result = {
         voltage: document.getElementById('resultVoltage').innerText,
         current: document.getElementById('resultCurrent').innerText,
@@ -407,7 +407,7 @@
       deferredPrompt = e;
     });
 
-    async function installPWA() {
+    window.installPWA = async function installPWA() {
       if (deferredPrompt) {
         deferredPrompt.prompt();
         await deferredPrompt.userChoice;
@@ -417,7 +417,7 @@
       }
     }
 
-    function exportHistory() {
+    window.exportHistory = function exportHistory() {
       const history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
 
       if(history.length === 0) {
@@ -456,7 +456,7 @@
       URL.revokeObjectURL(url);
     }
 
-    function calculateOhm() {
+    window.calculateOhm = function calculateOhm() {
       const V = parseFloat(document.getElementById('voltage').value);
       const I = parseFloat(document.getElementById('current').value);
       const R = parseFloat(document.getElementById('resistance').value);
@@ -498,7 +498,7 @@
       document.getElementById('resultPower').innerHTML = `🔥 Potência: ${power ? power.toFixed(2) : '-'} W`;
     }
 
-    function calculateVoltageDrop() {
+    window.calculateVoltageDrop = function calculateVoltageDrop() {
       const voltage = parseFloat(document.getElementById('qtVoltage').value);
       const current = parseFloat(document.getElementById('qtCurrent').value);
       const distance = parseFloat(document.getElementById('qtDistance').value);
