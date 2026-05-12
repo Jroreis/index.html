@@ -112,12 +112,12 @@
           <input id="power" type="number" placeholder="Potência (W)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
         </div>
 
-        <button onclick="calculateOhm()" class="w-full mt-6 bg-yellow-500 hover:bg-yellow-400 text-black py-4 rounded-2xl font-bold text-lg transition">
+        <button id="btnOhm" type="button" class="w-full mt-6 bg-yellow-500 hover:bg-yellow-400 text-black py-4 rounded-2xl font-bold text-lg transition">
           Calcular
         </button>
 
         <div id="ohmResult" class="mt-8 hidden bg-zinc-900 border border-zinc-700 rounded-2xl p-6">
-          <button onclick="saveHistory()" class="mb-5 bg-yellow-500 text-black px-4 py-2 rounded-xl font-bold hover:bg-yellow-400 transition">
+          <button id="btnSaveHistory" type="button" class="mb-5 bg-yellow-500 text-black px-4 py-2 rounded-xl font-bold hover:bg-yellow-400 transition">
             💾 Salvar Histórico
           </button>
           <h3 class="text-2xl font-bold mb-5">Resultado</h3>
@@ -127,6 +127,15 @@
             <p id="resultCurrent"></p>
             <p id="resultResistance"></p>
             <p id="resultPower"></p>
+            <hr class="border-zinc-700 my-4">
+            <p id="resultCableMin"></p>
+            <p id="resultBreakerMin"></p>
+            <p id="resultCableMax"></p>
+            <p id="resultBreakerMax"></p>
+            <p id="resultDistance"></p>
+            <p class="text-yellow-400 text-sm mt-4">
+              Referência técnica baseada na NBR 5410.
+            </p>
           </div>
         </div>
 
@@ -154,7 +163,7 @@
           <input id="qtSection" type="number" placeholder="Bitola do Cabo (mm²)" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
         </div>
 
-        <button onclick="calculateVoltageDrop()" class="w-full mt-6 bg-yellow-500 hover:bg-yellow-400 text-black py-4 rounded-2xl font-bold text-lg transition">
+        <button id="btnDrop" type="button" class="w-full mt-6 bg-yellow-500 hover:bg-yellow-400 text-black py-4 rounded-2xl font-bold text-lg transition">
           Calcular Queda
         </button>
 
@@ -165,6 +174,13 @@
             <p id="dropVoltage"></p>
             <p id="dropPercent"></p>
             <p id="dropFinal"></p>
+            <hr class="border-zinc-700 my-4">
+            <p id="dropCable"></p>
+            <p id="dropBreaker"></p>
+            <p id="dropStatus"></p>
+            <p class="text-yellow-400 text-sm mt-4">
+              Cálculo orientado pela NBR 5410 (queda máxima recomendada de 4%).
+            </p>
           </div>
         </div>
 
@@ -328,6 +344,22 @@
   <script>
 
 window.onload = function () {
+  const btnOhm = document.getElementById('btnOhm');
+  const btnDrop = document.getElementById('btnDrop');
+  const btnSaveHistory = document.getElementById('btnSaveHistory');
+
+  if(btnOhm){
+    btnOhm.addEventListener('click', calculateOhm);
+  }
+
+  if(btnDrop){
+    btnDrop.addEventListener('click', calculateVoltageDrop);
+  }
+
+  if(btnSaveHistory){
+    btnSaveHistory.addEventListener('click', saveHistory);
+  }
+
   renderHistory();
   loadTheme();
   updateStats();
@@ -359,12 +391,41 @@ window.calculateOhm = function () {
     power = voltage * I;
   }
 
+  const table = [
+    { cable: '1.5 mm²', maxCurrent: 15, breaker: '10A' },
+    { cable: '2.5 mm²', maxCurrent: 21, breaker: '20A' },
+    { cable: '4 mm²', maxCurrent: 28, breaker: '25A' },
+    { cable: '6 mm²', maxCurrent: 36, breaker: '32A' },
+    { cable: '10 mm²', maxCurrent: 50, breaker: '50A' },
+    { cable: '16 mm²', maxCurrent: 68, breaker: '63A' }
+  ];
+
+  let minRecommendation = table[0];
+  let maxRecommendation = table[table.length - 1];
+
+  for (let item of table) {
+    if (current <= item.maxCurrent) {
+      minRecommendation = item;
+      break;
+    }
+  }
+
+  const maxDistance = ((0.04 * voltage * parseFloat(minRecommendation.cable)) / (2 * 0.0172 * current)).toFixed(2);
+
   document.getElementById('ohmResult').classList.remove('hidden');
 
   document.getElementById('resultVoltage').innerHTML = '⚡ Tensão: ' + voltage.toFixed(2) + ' V';
   document.getElementById('resultCurrent').innerHTML = '🔌 Corrente: ' + current.toFixed(2) + ' A';
   document.getElementById('resultResistance').innerHTML = '🧠 Resistência: ' + resistance.toFixed(2) + ' Ω';
   document.getElementById('resultPower').innerHTML = '🔥 Potência: ' + power.toFixed(2) + ' W';
+
+  document.getElementById('resultCableMin').innerHTML = '🧵 Bitola mínima recomendada: ' + minRecommendation.cable;
+  document.getElementById('resultBreakerMin').innerHTML = '🛡️ Disjuntor mínimo recomendado: ' + minRecommendation.breaker;
+
+  document.getElementById('resultCableMax').innerHTML = '🧵 Bitola máxima recomendada: ' + maxRecommendation.cable;
+  document.getElementById('resultBreakerMax').innerHTML = '🛡️ Disjuntor máximo recomendado: ' + maxRecommendation.breaker;
+
+  document.getElementById('resultDistance').innerHTML = '📏 Distância máxima estimada (4% queda): ' + maxDistance + ' m';
 };
 
 window.calculateVoltageDrop = function () {
@@ -379,11 +440,28 @@ window.calculateVoltageDrop = function () {
   const percent = (drop / voltage) * 100;
   const finalVoltage = voltage - drop;
 
+  let breaker = '10A';
+
+  if(current > 10) breaker = '20A';
+  if(current > 20) breaker = '32A';
+  if(current > 32) breaker = '50A';
+  if(current > 50) breaker = '63A';
+
+  let status = '✅ Dentro da NBR 5410';
+
+  if(percent > 4) {
+    status = '⚠️ Acima da queda máxima recomendada pela NBR 5410';
+  }
+
   document.getElementById('dropResult').classList.remove('hidden');
 
   document.getElementById('dropVoltage').innerHTML = '⚡ Queda de Tensão: ' + drop.toFixed(2) + ' V';
   document.getElementById('dropPercent').innerHTML = '📉 Percentual: ' + percent.toFixed(2) + ' %';
   document.getElementById('dropFinal').innerHTML = '🔌 Tensão Final: ' + finalVoltage.toFixed(2) + ' V';
+
+  document.getElementById('dropCable').innerHTML = '🧵 Bitola analisada: ' + section + ' mm²';
+  document.getElementById('dropBreaker').innerHTML = '🛡️ Disjuntor recomendado: ' + breaker;
+  document.getElementById('dropStatus').innerHTML = status;
 };
 
 window.saveHistory = function () {
