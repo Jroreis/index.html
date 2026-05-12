@@ -6,6 +6,8 @@
   <meta name="theme-color" content="#18181b" />
   <link rel="manifest" href="manifest.json" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="description" content="VoltCalc Pro - Calculadora elétrica profissional com Lei de Ohm e Queda de Tensão conforme NBR 5410" />
+  <meta name="keywords" content="calculadora elétrica, lei de ohm, queda de tensão, nbr 5410, eletricista" />
 </head>
 <body class="bg-zinc-950 text-white transition-colors duration-300" id="body">  <!-- HEADER -->  <header class="border-b border-zinc-800 sticky top-0 bg-zinc-950/90 backdrop-blur z-50">
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
@@ -31,6 +33,9 @@
     </p>
 
     <div class="mt-8 flex gap-4 flex-wrap">
+      <button onclick="installPWA()" class="bg-green-500 hover:bg-green-400 text-black px-6 py-3 rounded-2xl font-bold transition">
+        📲 Instalar App
+      </button>
       <a href="#ohm" class="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 rounded-2xl font-bold transition">
         Usar Agora
       </a>
@@ -221,7 +226,13 @@
     <div class="max-w-5xl mx-auto">
       <h2 class="text-4xl font-bold text-center mb-12">
         📜 Histórico de Cálculos
-      </h2><div id="historyContainer" class="space-y-4"></div>
+      </h2><div class="flex justify-end mb-4">
+    <button onclick="exportHistory()" class="bg-yellow-500 hover:bg-yellow-400 text-black px-5 py-3 rounded-2xl font-bold transition">
+      📄 Exportar Histórico
+    </button>
+  </div>
+
+  <div id="historyContainer" class="space-y-4"></div>
 </div>
 
   </section>  <script>
@@ -296,6 +307,62 @@
     loadTheme();
     renderHistory();
 
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    async function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+      } else {
+        alert('Seu navegador já suporta instalação ou o app já está instalado.');
+      }
+    }
+
+    function exportHistory() {
+      const history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
+
+      if(history.length === 0) {
+        alert('Nenhum histórico encontrado.');
+        return;
+      }
+
+      let content = 'VOLT CALC PRO - HISTÓRICO DE CÁLCULOS
+
+';
+
+      history.forEach((item, index) => {
+        content += `CÁLCULO ${index + 1}
+`;
+        content += `${item.date}
+`;
+        content += `${item.voltage}
+`;
+        content += `${item.current}
+`;
+        content += `${item.resistance}
+`;
+        content += `${item.power}
+
+`;
+      });
+
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'voltcalc-historico.txt';
+      a.click();
+
+      URL.revokeObjectURL(url);
+    }
+
     function calculateOhm() {
       const V = parseFloat(document.getElementById('voltage').value);
       const I = parseFloat(document.getElementById('current').value);
@@ -360,4 +427,4 @@
     }
 
   </script></body>
-  </html>
+</html>
