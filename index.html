@@ -220,7 +220,52 @@
 
 </div>
 
-  </section>  <!-- FOOTER -->  <footer class="border-t border-zinc-800 py-10 text-center text-zinc-500 px-6">
+  </section>  <!-- FOOTER -->  <!-- DASHBOARD -->  <section class="px-6 py-20">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-4xl font-bold text-center mb-12">
+        📊 Dashboard Profissional
+      </h2><div class="grid md:grid-cols-4 gap-6">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+      <p class="text-zinc-400">Usuários</p>
+      <h3 id="usersCount" class="text-4xl font-bold mt-3">0</h3>
+    </div>
+
+    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+      <p class="text-zinc-400">Cálculos</p>
+      <h3 id="calcCount" class="text-4xl font-bold mt-3">0</h3>
+    </div>
+
+    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+      <p class="text-zinc-400">Premium</p>
+      <h3 id="premiumCount" class="text-4xl font-bold mt-3">0</h3>
+    </div>
+
+    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
+      <p class="text-zinc-400">Online</p>
+      <h3 class="text-4xl font-bold mt-3">🟢</h3>
+    </div>
+  </div>
+</div>
+
+  </section>  <!-- LOGIN -->  <section class="px-6 py-20 bg-zinc-900 border-t border-zinc-800">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="text-4xl font-bold mb-8">
+        🔐 Área do Usuário
+      </h2><button onclick="googleLogin()" class="bg-white text-black px-6 py-4 rounded-2xl font-bold hover:scale-105 transition">
+    Entrar com Google
+  </button>
+
+  <div id="userInfo" class="mt-8"></div>
+</div>
+
+  </section>  <!-- ADSENSE -->  <section class="px-6 py-10">
+    <div class="max-w-5xl mx-auto bg-zinc-900 border border-zinc-800 rounded-3xl p-10 text-center">
+      <p class="text-zinc-400 mb-4">Espaço Google AdSense</p>
+      <div class="bg-zinc-800 rounded-2xl p-10">
+        📢 Área de anúncio profissional
+      </div>
+    </div>
+  </section>  <footer class="border-t border-zinc-800 py-10 text-center text-zinc-500 px-6">
     <p>© 2026 VoltCalc Pro — Todos os direitos reservados.</p>
   </footer>  <!-- HISTÓRICO -->  <section class="px-6 py-20 bg-zinc-900 border-t border-zinc-800">
     <div class="max-w-5xl mx-auto">
@@ -235,7 +280,55 @@
   <div id="historyContainer" class="space-y-4"></div>
 </div>
 
-  </section>  <script>
+  </section>  <script type="module">
+
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_DOMINIO.firebaseapp.com",
+      projectId: "SEU_PROJETO",
+      storageBucket: "SEU_BUCKET",
+      messagingSenderId: "SEU_ID",
+      appId: "SEU_APP_ID"
+    };
+
+    function googleLogin() {
+      const fakeUser = {
+        name: 'Usuário VoltCalc',
+        email: 'usuario@voltcalc.com',
+        premium: true
+      };
+
+      localStorage.setItem('voltcalc_user', JSON.stringify(fakeUser));
+
+      renderUser();
+    }
+
+    function renderUser() {
+      const user = JSON.parse(localStorage.getItem('voltcalc_user'));
+
+      if(!user) return;
+
+      document.getElementById('userInfo').innerHTML = `
+        <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8 text-left">
+          <h3 class="text-2xl font-bold">👤 ${user.name}</h3>
+          <p class="text-zinc-400 mt-3">${user.email}</p>
+          <p class="mt-4 text-green-400 font-bold">
+            ${user.premium ? '⭐ Conta Premium Ativa' : 'Plano Gratuito'}
+          </p>
+        </div>
+      `;
+
+      document.getElementById('usersCount').innerText = '1';
+      document.getElementById('premiumCount').innerText = user.premium ? '1' : '0';
+    }
+
+    function updateStats() {
+      const history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
+      document.getElementById('calcCount').innerText = history.length;
+    }
+
+    renderUser();
+    updateStats();
 
     function toggleTheme() {
       const body = document.getElementById('body');
