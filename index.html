@@ -327,244 +327,150 @@
 
   <script>
 
-    const firebaseConfig = {
-      apiKey: "SUA_API_KEY",
-      authDomain: "SEU_DOMINIO.firebaseapp.com",
-      projectId: "SEU_PROJETO",
-      storageBucket: "SEU_BUCKET",
-      messagingSenderId: "SEU_ID",
-      appId: "SEU_APP_ID"
-    };
+window.onload = function () {
+  renderHistory();
+  loadTheme();
+  updateStats();
+};
 
-    window.googleLogin = function googleLogin() {
-      const fakeUser = {
-        name: 'Usuário VoltCalc',
-        email: 'usuario@voltcalc.com',
-        premium: true
-      };
+window.calculateOhm = function () {
+  const V = parseFloat(document.getElementById('voltage').value) || 0;
+  const I = parseFloat(document.getElementById('current').value) || 0;
+  const R = parseFloat(document.getElementById('resistance').value) || 0;
+  const P = parseFloat(document.getElementById('power').value) || 0;
 
-      localStorage.setItem('voltcalc_user', JSON.stringify(fakeUser));
+  let voltage = V;
+  let current = I;
+  let resistance = R;
+  let power = P;
 
-      renderUser();
-    }
+  if (V > 0 && I > 0) {
+    power = V * I;
+    resistance = V / I;
+  }
 
-    function renderUser() {
-      const user = JSON.parse(localStorage.getItem('voltcalc_user'));
+  if (V > 0 && R > 0 && I === 0) {
+    current = V / R;
+    power = V * current;
+  }
 
-      if(!user) return;
+  if (I > 0 && R > 0 && V === 0) {
+    voltage = I * R;
+    power = voltage * I;
+  }
 
-      document.getElementById('userInfo').innerHTML = `
-        <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8 text-left">
-          <h3 class="text-2xl font-bold">👤 ${user.name}</h3>
-          <p class="text-zinc-400 mt-3">${user.email}</p>
-          <p class="mt-4 text-green-400 font-bold">
-            ${user.premium ? '⭐ Conta Premium Ativa' : 'Plano Gratuito'}
-          </p>
-        </div>
-      `;
+  document.getElementById('ohmResult').classList.remove('hidden');
 
-      document.getElementById('usersCount').innerText = '1';
-      document.getElementById('premiumCount').innerText = user.premium ? '1' : '0';
-    }
+  document.getElementById('resultVoltage').innerHTML = '⚡ Tensão: ' + voltage.toFixed(2) + ' V';
+  document.getElementById('resultCurrent').innerHTML = '🔌 Corrente: ' + current.toFixed(2) + ' A';
+  document.getElementById('resultResistance').innerHTML = '🧠 Resistência: ' + resistance.toFixed(2) + ' Ω';
+  document.getElementById('resultPower').innerHTML = '🔥 Potência: ' + power.toFixed(2) + ' W';
+};
 
-    function updateStats() {
-      const history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
-      document.getElementById('calcCount').innerText = history.length;
-    }
+window.calculateVoltageDrop = function () {
+  const voltage = parseFloat(document.getElementById('qtVoltage').value) || 0;
+  const current = parseFloat(document.getElementById('qtCurrent').value) || 0;
+  const distance = parseFloat(document.getElementById('qtDistance').value) || 0;
+  const section = parseFloat(document.getElementById('qtSection').value) || 0;
 
-    renderUser();
-    updateStats();
+  const resistivity = 0.0172;
 
-    window.toggleTheme = function toggleTheme() {
-      const body = document.getElementById('body');
+  const drop = (2 * resistivity * distance * current) / section;
+  const percent = (drop / voltage) * 100;
+  const finalVoltage = voltage - drop;
 
-      if(body.classList.contains('bg-zinc-950')) {
-        body.classList.remove('bg-zinc-950', 'text-white');
-        body.classList.add('bg-white', 'text-black');
-        localStorage.setItem('theme', 'light');
-      } else {
-        body.classList.remove('bg-white', 'text-black');
-        body.classList.add('bg-zinc-950', 'text-white');
-        localStorage.setItem('theme', 'dark');
-      }
-    }
+  document.getElementById('dropResult').classList.remove('hidden');
 
-    function loadTheme() {
-      const theme = localStorage.getItem('theme');
+  document.getElementById('dropVoltage').innerHTML = '⚡ Queda de Tensão: ' + drop.toFixed(2) + ' V';
+  document.getElementById('dropPercent').innerHTML = '📉 Percentual: ' + percent.toFixed(2) + ' %';
+  document.getElementById('dropFinal').innerHTML = '🔌 Tensão Final: ' + finalVoltage.toFixed(2) + ' V';
+};
 
-      if(theme === 'light') {
-        document.getElementById('body').classList.remove('bg-zinc-950', 'text-white');
-        document.getElementById('body').classList.add('bg-white', 'text-black');
-      }
-    }
+window.saveHistory = function () {
+  const result = {
+    voltage: document.getElementById('resultVoltage').innerText,
+    current: document.getElementById('resultCurrent').innerText,
+    resistance: document.getElementById('resultResistance').innerText,
+    power: document.getElementById('resultPower').innerText,
+    date: new Date().toLocaleString()
+  };
 
-    window.saveHistory = function saveHistory() {
-      const result = {
-        voltage: document.getElementById('resultVoltage').innerText,
-        current: document.getElementById('resultCurrent').innerText,
-        resistance: document.getElementById('resultResistance').innerText,
-        power: document.getElementById('resultPower').innerText,
-        date: new Date().toLocaleString()
-      };
+  let history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
 
-      const history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
+  history.unshift(result);
 
-      history.unshift(result);
+  localStorage.setItem('voltcalc_history', JSON.stringify(history));
 
-      localStorage.setItem('voltcalc_history', JSON.stringify(history));
+  renderHistory();
+  updateStats();
+};
 
-      renderHistory();
-    }
+function renderHistory() {
+  const container = document.getElementById('historyContainer');
 
-    function renderHistory() {
-      const container = document.getElementById('historyContainer');
-      const history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
+  if (!container) return;
 
-      if(history.length === 0) {
-        container.innerHTML = '<div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 text-zinc-400">Nenhum cálculo salvo.</div>';
-        return;
-      }
+  let history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
 
-      container.innerHTML = history.map(item => `
-        <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-bold">⚡ Cálculo Salvo</h3>
-            <span class="text-zinc-400 text-sm">${item.date}</span>
-          </div>
+  if (history.length === 0) {
+    container.innerHTML = '<div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 text-zinc-400">Nenhum cálculo salvo.</div>';
+    return;
+  }
 
-          <div class="space-y-2 text-lg">
-            <p>${item.voltage}</p>
-            <p>${item.current}</p>
-            <p>${item.resistance}</p>
-            <p>${item.power}</p>
-          </div>
-        </div>
-      `).join('');
-    }
+  container.innerHTML = history.map(item => `
+    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6">
+      <p class="text-sm text-zinc-400 mb-4">${item.date}</p>
+      <div class="space-y-2">
+        <p>${item.voltage}</p>
+        <p>${item.current}</p>
+        <p>${item.resistance}</p>
+        <p>${item.power}</p>
+      </div>
+    </div>
+  `).join('');
+}
 
-    loadTheme();
-    renderHistory();
+window.toggleTheme = function () {
+  document.body.classList.toggle('bg-zinc-950');
+  document.body.classList.toggle('bg-white');
+  document.body.classList.toggle('text-white');
+  document.body.classList.toggle('text-black');
+};
 
-    let deferredPrompt;
+function loadTheme() {
+  console.log('Tema carregado');
+}
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-    });
+window.exportHistory = function () {
+  let history = localStorage.getItem('voltcalc_history');
 
-    window.installPWA = async function installPWA() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        await deferredPrompt.userChoice;
-        deferredPrompt = null;
-      } else {
-        alert('Seu navegador já suporta instalação ou o app já está instalado.');
-      }
-    }
+  const blob = new Blob([history], { type: 'text/plain' });
 
-    window.exportHistory = function exportHistory() {
-      const history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'historico-voltcalc.txt';
+  a.click();
+};
 
-      if(history.length === 0) {
-        alert('Nenhum histórico encontrado.');
-        return;
-      }
+window.installPWA = function () {
+  alert('Instalação PWA disponível neste navegador.');
+};
 
-      let content = 'VOLT CALC PRO - HISTÓRICO DE CÁLCULOS
+window.googleLogin = function () {
+  alert('Login Google será integrado com Firebase.');
+};
 
-';
+function updateStats() {
+  const history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
 
-      history.forEach((item, index) => {
-        content += `CÁLCULO ${index + 1}
-`;
-        content += `${item.date}
-`;
-        content += `${item.voltage}
-`;
-        content += `${item.current}
-`;
-        content += `${item.resistance}
-`;
-        content += `${item.power}
+  const calcCount = document.getElementById('calcCount');
 
-`;
-      });
+  if (calcCount) {
+    calcCount.innerText = history.length;
+  }
+}
 
-      const blob = new Blob([content], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'voltcalc-historico.txt';
-      a.click();
-
-      URL.revokeObjectURL(url);
-    }
-
-    window.calculateOhm = function calculateOhm() {
-      const V = parseFloat(document.getElementById('voltage').value);
-      const I = parseFloat(document.getElementById('current').value);
-      const R = parseFloat(document.getElementById('resistance').value);
-      const P = parseFloat(document.getElementById('power').value);
-
-      let voltage = V;
-      let current = I;
-      let resistance = R;
-      let power = P;
-
-      if (V && I && !P) {
-        power = V * I;
-      }
-
-      if (V && I && !R) {
-        resistance = V / I;
-      }
-
-      if (V && R && !I) {
-        current = V / R;
-      }
-
-      if (I && R && !V) {
-        voltage = I * R;
-      }
-
-      if (V && P && !I) {
-        current = P / V;
-      }
-
-      document.getElementById('ohmResult').classList.remove('hidden');
-
-      document.getElementById('resultVoltage').innerHTML = `⚡ Tensão: ${voltage ? voltage.toFixed(2) : '-'} V`;
-
-      document.getElementById('resultCurrent').innerHTML = `🔌 Corrente: ${current ? current.toFixed(2) : '-'} A`;
-
-      document.getElementById('resultResistance').innerHTML = `🧠 Resistência: ${resistance ? resistance.toFixed(2) : '-'} Ω`;
-
-      document.getElementById('resultPower').innerHTML = `🔥 Potência: ${power ? power.toFixed(2) : '-'} W`;
-    }
-
-    window.calculateVoltageDrop = function calculateVoltageDrop() {
-      const voltage = parseFloat(document.getElementById('qtVoltage').value);
-      const current = parseFloat(document.getElementById('qtCurrent').value);
-      const distance = parseFloat(document.getElementById('qtDistance').value);
-      const section = parseFloat(document.getElementById('qtSection').value);
-
-      const resistivity = 0.0172;
-
-      const drop = (2 * resistivity * distance * current) / section;
-      const percent = (drop / voltage) * 100;
-      const finalVoltage = voltage - drop;
-
-      document.getElementById('dropResult').classList.remove('hidden');
-
-      document.getElementById('dropVoltage').innerHTML = `⚡ Queda de Tensão: ${drop.toFixed(2)} V`;
-
-      document.getElementById('dropPercent').innerHTML = `📉 Percentual: ${percent.toFixed(2)} %`;
-
-      document.getElementById('dropFinal').innerHTML = `🔌 Tensão Final: ${finalVoltage.toFixed(2)} V`;
-    }
-
-  </script>
+</script>
 
 </body>
 </html>
