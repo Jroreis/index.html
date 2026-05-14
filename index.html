@@ -560,16 +560,6 @@ window.saveHistory = async function () {
 
 };
 
-  let history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
-
-  history.unshift(result);
-
-  localStorage.setItem('voltcalc_history', JSON.stringify(history));
-
-  renderHistory();
-  updateStats();
-};
-
 function renderHistory() {
   const container = document.getElementById('historyContainer');
 
