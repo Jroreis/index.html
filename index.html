@@ -526,8 +526,8 @@ window.calculateVoltageDrop = function () {
   document.getElementById('dropBreaker').innerHTML = '🛡️ Disjuntor recomendado: ' + breaker;
   document.getElementById('dropStatus').innerHTML = status + '<br><br>' + installationInfo + '<br>⚡ Sistema: ' + systemType.toUpperCase() + '<br>🧮 FP: ' + powerFactor + '<br>🧵 Material: ' + (cableMaterial === 'copper' ? 'Cobre' : 'Alumínio');
 };
+window.saveHistory = async function () {
 
-window.saveHistory = function () {
   const result = {
     voltage: document.getElementById('resultVoltage').innerText,
     current: document.getElementById('resultCurrent').innerText,
@@ -535,6 +535,30 @@ window.saveHistory = function () {
     power: document.getElementById('resultPower').innerText,
     date: new Date().toLocaleString()
   };
+
+  let history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
+
+  history.unshift(result);
+
+  localStorage.setItem('voltcalc_history', JSON.stringify(history));
+
+  try {
+
+    await saveHistoryCloud(result);
+
+    console.log('Histórico salvo no Firebase');
+
+  } catch(error){
+
+    console.error(error);
+
+  }
+
+  renderHistory();
+
+  updateStats();
+
+};
 
   let history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
 
