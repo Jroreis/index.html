@@ -1,1 +1,35 @@
-{ "name": "VoltCalc Pro", "short_name": "VoltCalc", "description": "Calculadora elétrica profissional com Lei de Ohm e Queda de Tensão conforme NBR 5410", "start_url": "/index.html", "scope": "/", "display": "standalone", "background_color": "#18181b", "theme_color": "#18181b", "orientation": "portrait", "lang": "pt-BR", "icons": [ { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }, { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" } ], "categories": ["utilities", "productivity", "education"], "prefer_related_applications": false }
+{
+  "name": "VoltCalc Pro",
+  "short_name": "VoltCalc",
+  "description": "Calculadora elétrica profissional com Lei de Ohm e Queda de Tensão conforme NBR 5410",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#18181b",
+  "theme_color": "#18181b",
+  "orientation": "portrait-primary",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "categories": ["utilities", "productivity", "education"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
