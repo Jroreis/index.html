@@ -1,807 +1,142 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <link rel="manifest" href="manifest.json">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>VoltCalc Pro</title>
-  <meta name="theme-color" content="#18181b" />
-  <link rel="manifest" href="manifest.json" />
+
+  <link rel="manifest" href="manifest.json">
+
   <script src="https://cdn.tailwindcss.com"></script>
-  <meta name="description" content="VoltCalc Pro - Calculadora elétrica profissional com Lei de Ohm e Queda de Tensão conforme NBR 5410" />
-  <meta name="keywords" content="calculadora elétrica, lei de ohm, queda de tensão, nbr 5410, eletricista" />
 </head>
-<body class="bg-zinc-950 text-white transition-colors duration-300" id="body">
 
-  <!-- HEADER -->
-  <header class="border-b border-zinc-800 sticky top-0 bg-zinc-950/90 backdrop-blur z-50">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-      <h1 class="text-2xl font-bold">⚡ VoltCalc Pro</h1>
+<body class="bg-zinc-950 text-white">
 
-      <nav class="hidden md:flex gap-6 text-zinc-300">
-        <button onclick="toggleTheme()" class="bg-zinc-800 px-4 py-2 rounded-xl hover:bg-zinc-700 transition">
-          🌙 Tema
-        </button>
-        <a href="#ohm" class="hover:text-yellow-400">Lei de Ohm</a>
-        <a href="#queda" class="hover:text-yellow-400">Queda de Tensão</a>
-        <a href="#tabelas" class="hover:text-yellow-400">Tabelas</a>
-      </nav>
-    </div>
-  </header>
+<header class="p-4 text-xl font-bold">⚡ VoltCalc Pro</header>
 
-  <!-- HERO -->
-  <section class="px-6 py-20">
-    <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+<!-- ================= LOGIN ================= -->
+<section class="p-4">
+  <button onclick="login()" class="bg-white text-black px-4 py-2 rounded-xl">
+    Entrar com Google
+  </button>
+</section>
 
-      <div>
-        <h2 class="text-5xl md:text-6xl font-bold leading-tight">
-          Calculadora Elétrica Profissional
-        </h2>
+<!-- ================= OHM ================= -->
+<section class="p-4">
+  <h2 class="text-2xl mb-3">Lei de Ohm</h2>
 
-        <p class="mt-6 text-zinc-400 text-lg leading-relaxed">
-          Plataforma moderna para engenheiros, eletricistas e técnicos realizarem
-          cálculos elétricos rápidos e precisos conforme NBR 5410.
-        </p>
+  <input id="V" placeholder="Tensão (V)" class="p-2 text-black w-full mb-2">
+  <input id="I" placeholder="Corrente (A)" class="p-2 text-black w-full mb-2">
+  <input id="R" placeholder="Resistência (Ω)" class="p-2 text-black w-full mb-2">
+  <input id="P" placeholder="Potência (W)" class="p-2 text-black w-full mb-2">
 
-        <div class="mt-8 flex gap-4 flex-wrap">
-          <button onclick="installPWA()" class="bg-green-500 hover:bg-green-400 text-black px-6 py-3 rounded-2xl font-bold transition">
-            📲 Instalar App
-          </button>
-          <a href="#ohm" class="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 rounded-2xl font-bold transition">
-            Usar Agora
-          </a>
+  <button onclick="calcOhm()" class="bg-yellow-500 text-black px-4 py-2 w-full">
+    Calcular
+  </button>
 
-          <button class="border border-zinc-700 px-6 py-3 rounded-2xl hover:border-zinc-500 transition">
-            Baixar APK
-          </button>
-        </div>
-      </div>
+  <div id="result" class="mt-4"></div>
+</section>
 
-      <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl">
-        <h3 class="text-3xl font-bold">⚡ VoltCalc Pro</h3>
+<!-- ================= HISTÓRICO ================= -->
+<section class="p-4">
+  <h2 class="text-xl mb-2">Histórico</h2>
+  <div id="history"></div>
+</section>
 
-        <div class="grid grid-cols-2 gap-4 mt-8">
-          <div class="bg-zinc-800 rounded-2xl p-5">
-            <p class="text-3xl font-bold">NBR 5410</p>
-            <p class="text-zinc-400 mt-2 text-sm">
-              Normas brasileiras.
-            </p>
-          </div>
-
-          <div class="bg-zinc-800 rounded-2xl p-5">
-            <p class="text-3xl font-bold">100%</p>
-            <p class="text-zinc-400 mt-2 text-sm">
-              Responsivo.
-            </p>
-          </div>
-
-          <div class="bg-zinc-800 rounded-2xl p-5">
-            <p class="text-3xl font-bold">PWA</p>
-            <p class="text-zinc-400 mt-2 text-sm">
-              Instalável.
-            </p>
-          </div>
-
-          <div class="bg-zinc-800 rounded-2xl p-5">
-            <p class="text-3xl font-bold">SEO</p>
-            <p class="text-zinc-400 mt-2 text-sm">
-              Google otimizado.
-            </p>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- LEI DE OHM -->
-  <section id="ohm" class="px-6 py-20 bg-zinc-900 border-t border-zinc-800">
-    <div class="max-w-4xl mx-auto">
-      <h2 class="text-4xl font-bold text-center">
-        ⚡ Calculadora Lei de Ohm
-      </h2>
-
-      <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8 mt-12">
-
-        <div class="grid md:grid-cols-2 gap-5">
-          <select id="ohmSystem" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-            <option value="mono">Monofásico</option>
-            <option value="bi">Bifásico</option>
-            <option value="tri">Trifásico</option>
-          </select>
-
-          <select id="ohmMaterial" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-            <option value="copper">Cobre</option>
-            <option value="aluminum">Alumínio</option>
-          </select>
-
-          <input id="distanceOhm" type="number" placeholder="Distância (m)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-
-          <input id="voltage" type="number" placeholder="Tensão (V)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-
-          <input id="current" type="number" placeholder="Corrente (A)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-
-          <input id="resistance" type="number" placeholder="Resistência (Ω)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-
-          <input id="power" type="number" placeholder="Potência (W)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-        </div>
-
-        <button id="btnOhm" type="button" class="w-full mt-6 bg-yellow-500 hover:bg-yellow-400 text-black py-4 rounded-2xl font-bold text-lg transition">
-          Calcular
-        </button>
-
-        <div id="ohmResult" class="mt-8 hidden bg-zinc-900 border border-zinc-700 rounded-2xl p-6">
-          <button id="btnSaveHistory" type="button" class="mb-5 bg-yellow-500 text-black px-4 py-2 rounded-xl font-bold hover:bg-yellow-400 transition">
-            💾 Salvar Histórico
-          </button>
-          <h3 class="text-2xl font-bold mb-5">Resultado</h3>
-
-          <div class="space-y-3 text-lg">
-            <p id="resultVoltage"></p>
-            <p id="resultCurrent"></p>
-            <p id="resultResistance"></p>
-            <p id="resultPower"></p>
-            <hr class="border-zinc-700 my-4">
-            <p id="resultCableMin"></p>
-            <p id="resultBreakerMin"></p>
-            <p id="resultCableMax"></p>
-            <p id="resultBreakerMax"></p>
-            <p id="resultDistance"></p>
-            <p class="text-yellow-400 text-sm mt-4">
-              Referência técnica baseada na NBR 5410.
-            </p>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- QUEDA DE TENSAO -->
-  <section id="queda" class="px-6 py-20">
-    <div class="max-w-4xl mx-auto">
-
-      <h2 class="text-4xl font-bold text-center">
-        📉 Queda de Tensão
-      </h2>
-
-      <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 mt-12">
-
-        <div class="grid md:grid-cols-2 gap-5">
-          <select id="systemType" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-            <option value="mono">Monofásico</option>
-            <option value="bi">Bifásico</option>
-            <option value="tri">Trifásico</option>
-          </select>
-
-          <select id="cableMaterial" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-            <option value="copper">Cobre</option>
-            <option value="aluminum">Alumínio</option>
-          </select>
-
-          <select id="installationMethod" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-            <option value="embedded">Eletroduto Embutido</option>
-            <option value="tray">Bandeja</option>
-            <option value="underground">Subterrâneo</option>
-          </select>
-
-          <input id="powerFactor" type="number" step="0.01" value="0.92" placeholder="Fator de Potência" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-
-          <input id="qtVoltage" type="number" placeholder="Tensão (V)" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-
-          <input id="qtCurrent" type="number" placeholder="Corrente (A)" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-
-          <input id="qtDistance" type="number" placeholder="Distância (m)" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-
-          <input id="qtSection" type="number" placeholder="Bitola do Cabo (mm²)" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
-        </div>
-
-        <button id="btnDrop" type="button" class="w-full mt-6 bg-yellow-500 hover:bg-yellow-400 text-black py-4 rounded-2xl font-bold text-lg transition">
-          Calcular Queda
-        </button>
-
-        <div id="dropResult" class="mt-8 hidden bg-zinc-950 border border-zinc-700 rounded-2xl p-6">
-          <h3 class="text-2xl font-bold mb-5">Resultado</h3>
-
-          <div class="space-y-3 text-lg">
-            <p id="dropVoltage"></p>
-            <p id="dropPercent"></p>
-            <p id="dropFinal"></p>
-            <hr class="border-zinc-700 my-4">
-            <p id="dropCable"></p>
-            <p id="dropBreaker"></p>
-            <p id="dropStatus"></p>
-            <p class="text-yellow-400 text-sm mt-4">
-              Cálculo orientado pela NBR 5410 (queda máxima recomendada de 4%).
-            </p>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- TABELAS -->
-  <section id="tabelas" class="px-6 py-20 bg-zinc-900 border-t border-zinc-800">
-    <div class="max-w-6xl mx-auto">
-
-      <h2 class="text-4xl font-bold text-center">
-        📚 Tabelas Técnicas
-      </h2>
-
-      <div class="overflow-x-auto mt-12 rounded-3xl border border-zinc-800">
-        <table class="w-full text-left">
-          <thead class="bg-zinc-950">
-            <tr>
-              <th class="p-5">Bitola</th>
-              <th class="p-5">Corrente Máxima</th>
-              <th class="p-5">Disjuntor</th>
-            </tr>
-          </thead>
-
-          <tbody class="bg-zinc-900">
-            <tr class="border-t border-zinc-800">
-              <td class="p-5">1.5 mm²</td>
-              <td class="p-5">15A</td>
-              <td class="p-5">10A</td>
-            </tr>
-
-            <tr class="border-t border-zinc-800">
-              <td class="p-5">2.5 mm²</td>
-              <td class="p-5">21A</td>
-              <td class="p-5">20A</td>
-            </tr>
-
-            <tr class="border-t border-zinc-800">
-              <td class="p-5">4 mm²</td>
-              <td class="p-5">28A</td>
-              <td class="p-5">25A</td>
-            </tr>
-
-            <tr class="border-t border-zinc-800">
-              <td class="p-5">6 mm²</td>
-              <td class="p-5">36A</td>
-              <td class="p-5">32A</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- PREMIUM -->
-  <section class="px-6 py-20">
-    <div class="max-w-5xl mx-auto bg-gradient-to-r from-yellow-500 to-yellow-300 rounded-3xl p-10 text-black">
-
-      <h2 class="text-5xl font-bold">
-        VoltCalc Pro Premium
-      </h2>
-
-      <p class="mt-6 text-lg max-w-3xl leading-relaxed">
-        Tenha acesso ao histórico ilimitado, remoção de anúncios,
-        relatórios avançados, exportação PDF e recursos profissionais.
-      </p>
-
-      <div class="mt-8 flex gap-4 flex-wrap">
-        <button class="bg-black text-white px-6 py-3 rounded-2xl font-bold">
-          Assinar Premium
-        </button>
-
-        <button class="border border-black px-6 py-3 rounded-2xl font-bold">
-          Saiba Mais
-        </button>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <!-- DASHBOARD -->
-  <section class="px-6 py-20">
-    <div class="max-w-6xl mx-auto">
-      <h2 class="text-4xl font-bold text-center mb-12">
-        📊 Dashboard Profissional
-      </h2>
-
-      <div class="grid md:grid-cols-4 gap-6">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-          <p class="text-zinc-400">Usuários</p>
-          <h3 id="usersCount" class="text-4xl font-bold mt-3">0</h3>
-        </div>
-
-        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-          <p class="text-zinc-400">Cálculos</p>
-          <h3 id="calcCount" class="text-4xl font-bold mt-3">0</h3>
-        </div>
-
-        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-          <p class="text-zinc-400">Premium</p>
-          <h3 id="premiumCount" class="text-4xl font-bold mt-3">0</h3>
-        </div>
-
-        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-          <p class="text-zinc-400">Online</p>
-          <h3 class="text-4xl font-bold mt-3">🟢</h3>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- LOGIN -->
-  <section class="px-6 py-20 bg-zinc-900 border-t border-zinc-800">
-    <div class="max-w-3xl mx-auto text-center">
-      <h2 class="text-4xl font-bold mb-8">
-        🔐 Área do Usuário
-      </h2>
-
-      <button onclick="googleLogin()" class="bg-white text-black px-6 py-4 rounded-2xl font-bold hover:scale-105 transition">
-        Entrar com Google
-      </button>
-
-      <div id="userInfo" class="mt-8"></div>
-    </div>
-  </section>
-
-  <!-- ADSENSE -->
-  <section class="px-6 py-10">
-    <div class="max-w-5xl mx-auto bg-zinc-900 border border-zinc-800 rounded-3xl p-10 text-center">
-      <p class="text-zinc-400 mb-4">Espaço Google AdSense</p>
-      <div class="bg-zinc-800 rounded-2xl p-10">
-        📢 Área de anúncio profissional
-      </div>
-    </div>
-  </section>
-
-  <footer class="border-t border-zinc-800 py-10 text-center text-zinc-500 px-6">
-    <p>© 2026 VoltCalc Pro — Todos os direitos reservados.</p>
-  </footer>
-
-  <!-- HISTÓRICO -->
-  <section class="px-6 py-20 bg-zinc-900 border-t border-zinc-800">
-    <div class="max-w-5xl mx-auto">
-      <h2 class="text-4xl font-bold text-center mb-12">
-        📜 Histórico de Cálculos
-      </h2>
-
-      <div class="flex justify-end mb-4">
-        <button onclick="exportHistory()" class="bg-yellow-500 hover:bg-yellow-400 text-black px-5 py-3 rounded-2xl font-bold transition">
-          📄 Exportar Histórico
-        </button>
-      </div>
-
-      <div id="historyContainer" class="space-y-4"></div>
-    </div>
-  </section>
-
-  <script>
-
-window.onload = function () {
-  const btnOhm = document.getElementById('btnOhm');
-  const btnDrop = document.getElementById('btnDrop');
-  const btnSaveHistory = document.getElementById('btnSaveHistory');
-
-  if(btnOhm){
-    btnOhm.addEventListener('click', calculateOhm);
-  }
-
-  if(btnDrop){
-    btnDrop.addEventListener('click', calculateVoltageDrop);
-  }
-
-  if(btnSaveHistory){
-    btnSaveHistory.addEventListener('click', saveHistory);
-  }
-
-  renderHistory();
-  loadTheme();
-  updateStats();
-};
-
-window.calculateOhm = function () {
-  const ohmSystem = document.getElementById('ohmSystem').value;
-  const ohmMaterial = document.getElementById('ohmMaterial').value;
-  const distanceOhm = parseFloat(document.getElementById('distanceOhm').value) || 0;
-  const V = parseFloat(document.getElementById('voltage').value) || 0;
-  const I = parseFloat(document.getElementById('current').value) || 0;
-  const R = parseFloat(document.getElementById('resistance').value) || 0;
-  const P = parseFloat(document.getElementById('power').value) || 0;
-
-  let voltage = V;
-  let current = I;
-  let resistance = R;
-  let power = P;
-
-  if (V > 0 && I > 0) {
-    power = V * I;
-    resistance = V / I;
-  }
-
-  if (V > 0 && I > 0) {
-  power = V * I;
-  resistance = V / I;
-}
-
-else if (V > 0 && R > 0) {
-  current = V / R;
-  power = V * current;
-}
-
-else if (I > 0 && R > 0) {
-  voltage = I * R;
-  power = voltage * I;
-}
-
-else if (P > 0 && V > 0) {
-  current = P / V;
-  resistance = V / current;
-}
-
-else if (P > 0 && I > 0) {
-  voltage = P / I;
-  resistance = voltage / I;
-}
-
-else {
-  alert('Informe pelo menos dois valores válidos.');
-  return;
-}
-
-   const table = [
-  { cable: '1.5 mm²', section: 1.5, maxCurrent: 15, breaker: '10A' },
-  { cable: '2.5 mm²', section: 2.5, maxCurrent: 21, breaker: '20A' },
-  { cable: '4 mm²', section: 4, maxCurrent: 28, breaker: '25A' },
-  { cable: '6 mm²', section: 6, maxCurrent: 36, breaker: '32A' },
-  { cable: '10 mm²', section: 10, maxCurrent: 50, breaker: '50A' },
-  { cable: '16 mm²', section: 16, maxCurrent: 68, breaker: '63A' }
-];
-
-  let minRecommendation = table[0];
-  let maxRecommendation = table[table.length - 1];
-
-  for (let item of table) {
-    if (current <= item.maxCurrent) {
-      minRecommendation = item;
-      break;
-    }
-  }
-
-  const cableSize = minRecommendation.section;
-
-const maxDistance = current > 0
-  ? ((0.04 * voltage * cableSize) / (2 * 0.0172 * current)).toFixed(2)
-  : 0;
-
-  document.getElementById('ohmResult').classList.remove('hidden');
-
-  document.getElementById('resultVoltage').innerHTML = '⚡ Tensão: ' + voltage.toFixed(2) + ' V';
-  document.getElementById('resultCurrent').innerHTML = '🔌 Corrente: ' + current.toFixed(2) + ' A';
-  document.getElementById('resultResistance').innerHTML = '🧠 Resistência: ' + resistance.toFixed(2) + ' Ω';
-  document.getElementById('resultPower').innerHTML = '🔥 Potência: ' + power.toFixed(2) + ' W';
-
-  document.getElementById('resultCableMin').innerHTML = '🧵 Bitola mínima recomendada: ' + minRecommendation.cable;
-  document.getElementById('resultBreakerMin').innerHTML = '🛡️ Disjuntor mínimo recomendado: ' + minRecommendation.breaker;
-
-  document.getElementById('resultCableMax').innerHTML = '🧵 Bitola máxima recomendada: ' + maxRecommendation.cable;
-  document.getElementById('resultBreakerMax').innerHTML = '🛡️ Disjuntor máximo recomendado: ' + maxRecommendation.breaker;
-
-  document.getElementById('resultDistance').innerHTML = '📏 Distância máxima estimada (4% queda): ' + maxDistance + ' m';
-};
-
-window.calculateVoltageDrop = function () {
-  const systemType = document.getElementById('systemType').value;
-  const cableMaterial = document.getElementById('cableMaterial').value;
-  const installationMethod = document.getElementById('installationMethod').value;
-  const powerFactor = parseFloat(document.getElementById('powerFactor').value) || 0.92;
-  const voltage = parseFloat(document.getElementById('qtVoltage').value) || 0;
-  const current = parseFloat(document.getElementById('qtCurrent').value) || 0;
-  const distance = parseFloat(document.getElementById('qtDistance').value) || 0;
-  const section = parseFloat(document.getElementById('qtSection').value) || 1;
-  let resistivity = 0.0172;
-
-  if(cableMaterial === 'aluminum') {
-    resistivity = 0.0282;
-  }
-
-  let drop = 0;
-
-  if(systemType === 'tri') {
-    drop = (1.732 * resistivity * distance * current * powerFactor) / section;
-  } else {
-    drop = (2 * resistivity * distance * current) / section;
-  }
-  const percent = (drop / voltage) * 100;
-  const finalVoltage = voltage - drop;
-  if (voltage <= 0 || current <= 0 || distance <= 0 || section <= 0) {
-  alert('Preencha todos os campos corretamente.');
-  return;
-}
-
-  let breaker = '10A';
-
-  if(current > 10) breaker = '20A';
-  if(current > 20) breaker = '32A';
-  if(current > 32) breaker = '50A';
-  if(current > 50) breaker = '63A';
-
-  let status = '✅ Dentro da NBR 5410';
-
-  let installationInfo = '📦 Método de instalação: ';
-
-  if(installationMethod === 'embedded') {
-    installationInfo += 'Eletroduto Embutido';
-  }
-
-  if(installationMethod === 'tray') {
-    installationInfo += 'Bandeja';
-  }
-
-  if(installationMethod === 'underground') {
-    installationInfo += 'Subterrâneo';
-  }
-
-  if(percent > 4) {
-    status = '⚠️ Acima da queda máxima recomendada pela NBR 5410';
-  }
-
-  document.getElementById('dropResult').classList.remove('hidden');
-
-  document.getElementById('dropVoltage').innerHTML = '⚡ Queda de Tensão: ' + drop.toFixed(2) + ' V';
-  document.getElementById('dropPercent').innerHTML = '📉 Percentual: ' + percent.toFixed(2) + ' %';
-  document.getElementById('dropFinal').innerHTML = '🔌 Tensão Final: ' + finalVoltage.toFixed(2) + ' V';
-
-  document.getElementById('dropCable').innerHTML = '🧵 Bitola analisada: ' + section + ' mm²';
-  document.getElementById('dropBreaker').innerHTML = '🛡️ Disjuntor recomendado: ' + breaker;
-  document.getElementById('dropStatus').innerHTML = status + '<br><br>' + installationInfo + '<br>⚡ Sistema: ' + systemType.toUpperCase() + '<br>🧮 FP: ' + powerFactor + '<br>🧵 Material: ' + (cableMaterial === 'copper' ? 'Cobre' : 'Alumínio');
-};
-window.saveHistory = async function () {
-
-  const result = {
-    voltage: document.getElementById('resultVoltage').innerText,
-    current: document.getElementById('resultCurrent').innerText,
-    resistance: document.getElementById('resultResistance').innerText,
-    power: document.getElementById('resultPower').innerText,
-    date: new Date().toLocaleString()
-  };
-
-  let history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
-
-  history.unshift(result);
-  history = history.slice(0, 50);
-  localStorage.setItem('voltcalc_history', JSON.stringify(history));
-
-  try {
-
-    await saveHistoryCloud(result);
-
-    console.log('Histórico salvo no Firebase');
-
-  } catch(error){
-
-    console.error(error);
-
-  }
-
-  renderHistory();
-
-  updateStats();
-
-};
-
-function renderHistory() {
-  const container = document.getElementById('historyContainer');
-
-  if (!container) return;
-
-  let history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
-
-  if (history.length === 0) {
-    container.innerHTML = '<div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 text-zinc-400">Nenhum cálculo salvo.</div>';
-    return;
-  }
-
-  container.innerHTML = history.map(item => `
-    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6">
-      <p class="text-sm text-zinc-400 mb-4">${item.date}</p>
-      <div class="space-y-2">
-        <p>${item.voltage}</p>
-        <p>${item.current}</p>
-        <p>${item.resistance}</p>
-        <p>${item.power}</p>
-      </div>
-    </div>
-  `).join('');
-}
-
-window.toggleTheme = function () {
-  document.body.classList.toggle('bg-zinc-950');
-  document.body.classList.toggle('bg-white');
-  document.body.classList.toggle('text-white');
-  document.body.classList.toggle('text-black');
-};
-
-function loadTheme() {
-
-  const theme = localStorage.getItem('theme');
-
-  if(theme === 'light') {
-
-    document.body.classList.remove('bg-zinc-950', 'text-white');
-
-    document.body.classList.add('bg-white', 'text-black');
-  }
-}
-
-window.exportHistory = function () {
-
-  let history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
-
-  let text = history.map(item => {
-
-    return `
-${item.date}
-${item.voltage}
-${item.current}
-${item.resistance}
-${item.power}
--------------------------
-`;
-
-  }).join('
-');
-
-  const blob = new Blob([text], { type: 'text/plain' });
-
-  const a = document.createElement('a');
-
-  a.href = URL.createObjectURL(blob);
-
-  a.download = 'historico-voltcalc.txt';
-
-  a.click();
-};
-
-let deferredPrompt;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-});
-
-window.installPWA = async function () {
-
-  if(deferredPrompt) {
-
-    deferredPrompt.prompt();
-
-    await deferredPrompt.userChoice;
-
-    deferredPrompt = null;
-
-  } else {
-
-    alert('Instalação não disponível neste navegador.');
-  }
-};
-
-window.googleLogin = function () {
-  alert('Login Google será integrado com Firebase.');
-};
-
-function updateStats() {
-  const history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
-
-  const calcCount = document.getElementById('calcCount');
-
-  if (calcCount) {
-    calcCount.innerText = history.length;
-  }
-}
-
-</script>
-
+<!-- ================= FIREBASE ================= -->
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
-  authDomain: "voltcalc-pro.firebaseapp.com",
-  projectId: "voltcalc-pro",
-  storageBucket: "voltcalc-pro.firebasestorage.app",
-  messagingSenderId: "411208955318",
-  appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17",
-  measurementId: "G-491LK8FWBM"
+  apiKey: "SUA_API",
+  authDomain: "SEU_AUTH",
+  projectId: "SEU_PROJECT"
 };
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
-
+const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-const db = getFirestore(app);
+window.auth = auth;
+window.db = db;
 
-window.googleLogin = async function () {
+/* LOGIN */
+window.login = async () => {
+  await signInWithPopup(auth, provider);
+};
 
-  try {
+/* SALVAR */
+window.save = async (data) => {
+  const user = auth.currentUser;
+  if (!user) return;
 
-    const result = await signInWithPopup(auth, provider);
+  await addDoc(collection(db, "history"), {
+    ...data,
+    userId: user.uid
+  });
+};
 
-    const user = result.user;
+/* HISTÓRICO */
+window.loadHistory = async () => {
+  const snap = await getDocs(collection(db, "history"));
+  const el = document.getElementById("history");
 
-    document.getElementById("userInfo").innerHTML = `
-      <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6">
-        <h3 class="text-2xl font-bold">
-          👤 ${user.displayName}
-        </h3>
+  el.innerHTML = "";
 
-        <p class="text-zinc-400 mt-2">
-          ${user.email}
-        </p>
-
-        <button onclick="logout()" class="mt-5 bg-red-600 px-4 py-2 rounded-xl">
-          Sair
-        </button>
+  snap.forEach(d => {
+    const x = d.data();
+    el.innerHTML += `
+      <div class="p-2 border-b border-zinc-700">
+        ⚡ ${x.voltage}V | 🔌 ${x.current}A | 🔥 ${x.power}W
       </div>
     `;
+  });
+};
 
-  } catch (error) {
+window.loadHistory();
+</script>
 
-    console.error(error);
+<!-- ================= LÓGICA ================= -->
+<script>
+function calcOhm() {
 
-    alert("Erro no login");
+  let V = +document.getElementById("V").value;
+  let I = +document.getElementById("I").value;
+  let R = +document.getElementById("R").value;
+  let P = +document.getElementById("P").value;
 
+  if (V && I) {
+    R = V / I;
+    P = V * I;
+  } else if (V && R) {
+    I = V / R;
+    P = V * I;
+  } else if (I && R) {
+    V = I * R;
+    P = V * I;
+  } else {
+    alert("Preencha 2 campos");
+    return;
   }
 
-};
+  document.getElementById("result").innerHTML =
+    `V: ${V} | I: ${I} | R: ${R} | P: ${P}`;
 
-window.logout = async function(){
+  save({ voltage: V, current: I, resistance: R, power: P });
+  loadHistory();
+}
+</script>
 
-  await signOut(auth);
-
-  location.reload();
-
-};
-
-window.saveHistoryCloud = async function(data){
-
-  try {
-
-    await addDoc(collection(db, "history"), data);
-
-    console.log("Histórico salvo");
-
-  } catch(error){
-
-    console.error(error);
-
-  }
-
-};
-
+<!-- ================= PWA ================= -->
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js");
+}
 </script>
 
 </body>
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .then(() => console.log('Service Worker registrado'))
-    .catch(err => console.log(err));
-}
-</script>
 </html>
