@@ -610,6 +610,101 @@ function updateStats() {
     calcCount.innerText = history.length;
   }
 }
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
+  authDomain: "voltcalc-pro.firebaseapp.com",
+  projectId: "voltcalc-pro",
+  storageBucket: "voltcalc-pro.firebasestorage.app",
+  messagingSenderId: "411208955318",
+  appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17",
+  measurementId: "G-491LK8FWBM"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const provider = new GoogleAuthProvider();
+
+const db = getFirestore(app);
+
+window.googleLogin = async function () {
+
+  try {
+
+    const result = await signInWithPopup(auth, provider);
+
+    const user = result.user;
+
+    document.getElementById("userInfo").innerHTML = `
+      <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-6">
+        <h3 class="text-2xl font-bold">
+          👤 ${user.displayName}
+        </h3>
+
+        <p class="text-zinc-400 mt-2">
+          ${user.email}
+        </p>
+
+        <button onclick="logout()" class="mt-5 bg-red-600 px-4 py-2 rounded-xl">
+          Sair
+        </button>
+      </div>
+    `;
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert("Erro no login");
+
+  }
+
+};
+
+window.logout = async function(){
+
+  await signOut(auth);
+
+  location.reload();
+
+};
+
+window.saveHistoryCloud = async function(data){
+
+  try {
+
+    await addDoc(collection(db, "history"), data);
+
+    console.log("Histórico salvo");
+
+  } catch(error){
+
+    console.error(error);
+
+  }
+
+};
+
+</script>
 
 </script>
 
