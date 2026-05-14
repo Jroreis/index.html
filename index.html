@@ -445,7 +445,11 @@ window.calculateOhm = function () {
     }
   }
 
-  const maxDistance = ((0.04 * voltage * parseFloat(minRecommendation.cable)) / (2 * 0.0172 * current)).toFixed(2);
+  const cableSize = parseFloat(minRecommendation.cable);
+
+const maxDistance = current > 0
+  ? ((0.04 * voltage * cableSize) / (2 * 0.0172 * current)).toFixed(2)
+  : 0;
 
   document.getElementById('ohmResult').classList.remove('hidden');
 
@@ -471,8 +475,7 @@ window.calculateVoltageDrop = function () {
   const voltage = parseFloat(document.getElementById('qtVoltage').value) || 0;
   const current = parseFloat(document.getElementById('qtCurrent').value) || 0;
   const distance = parseFloat(document.getElementById('qtDistance').value) || 0;
-  const section = parseFloat(document.getElementById('qtSection').value) || 0;
-
+  const section = parseFloat(document.getElementById('qtSection').value) || 1;
   let resistivity = 0.0172;
 
   if(cableMaterial === 'aluminum') {
