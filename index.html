@@ -416,24 +416,44 @@ window.calculateOhm = function () {
     resistance = V / I;
   }
 
-  if (V > 0 && R > 0 && I === 0) {
-    current = V / R;
-    power = V * current;
-  }
+  if (V > 0 && I > 0) {
+  power = V * I;
+  resistance = V / I;
+}
 
-  if (I > 0 && R > 0 && V === 0) {
-    voltage = I * R;
-    power = voltage * I;
-  }
+else if (V > 0 && R > 0) {
+  current = V / R;
+  power = V * current;
+}
 
-  const table = [
-    { cable: '1.5 mm²', maxCurrent: 15, breaker: '10A' },
-    { cable: '2.5 mm²', maxCurrent: 21, breaker: '20A' },
-    { cable: '4 mm²', maxCurrent: 28, breaker: '25A' },
-    { cable: '6 mm²', maxCurrent: 36, breaker: '32A' },
-    { cable: '10 mm²', maxCurrent: 50, breaker: '50A' },
-    { cable: '16 mm²', maxCurrent: 68, breaker: '63A' }
-  ];
+else if (I > 0 && R > 0) {
+  voltage = I * R;
+  power = voltage * I;
+}
+
+else if (P > 0 && V > 0) {
+  current = P / V;
+  resistance = V / current;
+}
+
+else if (P > 0 && I > 0) {
+  voltage = P / I;
+  resistance = voltage / I;
+}
+
+else {
+  alert('Informe pelo menos dois valores válidos.');
+  return;
+}
+
+   const table = [
+  { cable: '1.5 mm²', section: 1.5, maxCurrent: 15, breaker: '10A' },
+  { cable: '2.5 mm²', section: 2.5, maxCurrent: 21, breaker: '20A' },
+  { cable: '4 mm²', section: 4, maxCurrent: 28, breaker: '25A' },
+  { cable: '6 mm²', section: 6, maxCurrent: 36, breaker: '32A' },
+  { cable: '10 mm²', section: 10, maxCurrent: 50, breaker: '50A' },
+  { cable: '16 mm²', section: 16, maxCurrent: 68, breaker: '63A' }
+];
 
   let minRecommendation = table[0];
   let maxRecommendation = table[table.length - 1];
@@ -445,7 +465,7 @@ window.calculateOhm = function () {
     }
   }
 
-  const cableSize = parseFloat(minRecommendation.cable);
+  const cableSize = minRecommendation.section;
 
 const maxDistance = current > 0
   ? ((0.04 * voltage * cableSize) / (2 * 0.0172 * current)).toFixed(2)
@@ -491,6 +511,10 @@ window.calculateVoltageDrop = function () {
   }
   const percent = (drop / voltage) * 100;
   const finalVoltage = voltage - drop;
+  if (voltage <= 0 || current <= 0 || distance <= 0 || section <= 0) {
+  alert('Preencha todos os campos corretamente.');
+  return;
+}
 
   let breaker = '10A';
 
@@ -542,7 +566,7 @@ window.saveHistory = async function () {
   let history = JSON.parse(localStorage.getItem('voltcalc_history') || '[]');
 
   history.unshift(result);
-
+  history = history.slice(0, 50);
   localStorage.setItem('voltcalc_history', JSON.stringify(history));
 
   try {
@@ -596,7 +620,15 @@ window.toggleTheme = function () {
 };
 
 function loadTheme() {
-  console.log('Tema carregado');
+
+  const theme = localStorage.getItem('theme');
+
+  if(theme === 'light') {
+
+    document.body.classList.remove('bg-zinc-950', 'text-white');
+
+    document.body.classList.add('bg-white', 'text-black');
+  }
 }
 
 window.exportHistory = function () {
@@ -727,4 +759,11 @@ window.saveHistoryCloud = async function(data){
 </script>
 
 </body>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+    .then(() => console.log('Service Worker registrado'))
+    .catch(err => console.log(err));
+}
+</script>
 </html>
