@@ -103,6 +103,19 @@
       <div class="bg-zinc-950 border border-zinc-800 rounded-3xl p-8 mt-12">
 
         <div class="grid md:grid-cols-2 gap-5">
+          <select id="ohmSystem" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
+            <option value="mono">Monofásico</option>
+            <option value="bi">Bifásico</option>
+            <option value="tri">Trifásico</option>
+          </select>
+
+          <select id="ohmMaterial" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
+            <option value="copper">Cobre</option>
+            <option value="aluminum">Alumínio</option>
+          </select>
+
+          <input id="distanceOhm" type="number" placeholder="Distância (m)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
+
           <input id="voltage" type="number" placeholder="Tensão (V)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
 
           <input id="current" type="number" placeholder="Corrente (A)" class="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
@@ -154,6 +167,25 @@
       <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 mt-12">
 
         <div class="grid md:grid-cols-2 gap-5">
+          <select id="systemType" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
+            <option value="mono">Monofásico</option>
+            <option value="bi">Bifásico</option>
+            <option value="tri">Trifásico</option>
+          </select>
+
+          <select id="cableMaterial" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
+            <option value="copper">Cobre</option>
+            <option value="aluminum">Alumínio</option>
+          </select>
+
+          <select id="installationMethod" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
+            <option value="embedded">Eletroduto Embutido</option>
+            <option value="tray">Bandeja</option>
+            <option value="underground">Subterrâneo</option>
+          </select>
+
+          <input id="powerFactor" type="number" step="0.01" value="0.92" placeholder="Fator de Potência" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
+
           <input id="qtVoltage" type="number" placeholder="Tensão (V)" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
 
           <input id="qtCurrent" type="number" placeholder="Corrente (A)" class="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 outline-none">
@@ -366,6 +398,9 @@ window.onload = function () {
 };
 
 window.calculateOhm = function () {
+  const ohmSystem = document.getElementById('ohmSystem').value;
+  const ohmMaterial = document.getElementById('ohmMaterial').value;
+  const distanceOhm = parseFloat(document.getElementById('distanceOhm').value) || 0;
   const V = parseFloat(document.getElementById('voltage').value) || 0;
   const I = parseFloat(document.getElementById('current').value) || 0;
   const R = parseFloat(document.getElementById('resistance').value) || 0;
@@ -429,14 +464,28 @@ window.calculateOhm = function () {
 };
 
 window.calculateVoltageDrop = function () {
+  const systemType = document.getElementById('systemType').value;
+  const cableMaterial = document.getElementById('cableMaterial').value;
+  const installationMethod = document.getElementById('installationMethod').value;
+  const powerFactor = parseFloat(document.getElementById('powerFactor').value) || 0.92;
   const voltage = parseFloat(document.getElementById('qtVoltage').value) || 0;
   const current = parseFloat(document.getElementById('qtCurrent').value) || 0;
   const distance = parseFloat(document.getElementById('qtDistance').value) || 0;
   const section = parseFloat(document.getElementById('qtSection').value) || 0;
 
-  const resistivity = 0.0172;
+  let resistivity = 0.0172;
 
-  const drop = (2 * resistivity * distance * current) / section;
+  if(cableMaterial === 'aluminum') {
+    resistivity = 0.0282;
+  }
+
+  let drop = 0;
+
+  if(systemType === 'tri') {
+    drop = (1.732 * resistivity * distance * current) / section;
+  } else {
+    drop = (2 * resistivity * distance * current) / section;
+  }
   const percent = (drop / voltage) * 100;
   const finalVoltage = voltage - drop;
 
@@ -448,6 +497,20 @@ window.calculateVoltageDrop = function () {
   if(current > 50) breaker = '63A';
 
   let status = '✅ Dentro da NBR 5410';
+
+  let installationInfo = '📦 Método de instalação: ';
+
+  if(installationMethod === 'embedded') {
+    installationInfo += 'Eletroduto Embutido';
+  }
+
+  if(installationMethod === 'tray') {
+    installationInfo += 'Bandeja';
+  }
+
+  if(installationMethod === 'underground') {
+    installationInfo += 'Subterrâneo';
+  }
 
   if(percent > 4) {
     status = '⚠️ Acima da queda máxima recomendada pela NBR 5410';
@@ -461,7 +524,7 @@ window.calculateVoltageDrop = function () {
 
   document.getElementById('dropCable').innerHTML = '🧵 Bitola analisada: ' + section + ' mm²';
   document.getElementById('dropBreaker').innerHTML = '🛡️ Disjuntor recomendado: ' + breaker;
-  document.getElementById('dropStatus').innerHTML = status;
+  document.getElementById('dropStatus').innerHTML = status + '<br><br>' + installationInfo + '<br>⚡ Sistema: ' + systemType.toUpperCase() + '<br>🧮 FP: ' + powerFactor + '<br>🧵 Material: ' + (cableMaterial === 'copper' ? 'Cobre' : 'Alumínio');
 };
 
 window.saveHistory = function () {
