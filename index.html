@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu App</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8f9fa;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .screen {
+      width: 100%;
+      max-width: 400px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 30px 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    .title {
+      font-size: 26px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 25px;
+      color: #212529;
+    }
+    .input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 12px;
+      border: 1px solid #dee2e6;
+      border-radius: 10px;
+      font-size: 16px;
+      background: #fff;
+      display: block;
+    }
+    .btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 5px;
+      display: block;
+    }
+    .btn-primary { background: #4361ee; }
+    .btn-success { background: #2ec4b6; }
+    .btn:active { opacity: 0.8; }
+    .link {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 14px;
+      color: #4361ee;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .error-msg {
+      color: #e63946;
+      text-align: center;
+      margin-top: 10px;
+      font-size: 13px;
+      min-height: 18px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .greeting { font-size: 18px; font-weight: 600; color: #212529; }
+    .btn-logout {
+      color: #e63946;
+      font-weight: 600;
+      background: none;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .item {
+      background: #f8f9fa;
+      padding: 14px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #e9ecef;
+    }
+    .item-content { flex: 1; }
+    .item-title { font-size: 15px; font-weight: 600; color: #212529; }
+    .item-desc { font-size: 13px; color: #6c757d; margin-top: 3px; }
+    .item-date { font-size: 11px; color: #adb5bd; margin-top: 4px; }
+    .btn-delete {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 5px;
+    }
+    .empty { text-align: center; color: #adb5bd; margin-top: 30px; font-size: 15px; }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div class="screen" id="loginScreen">
+    <h1 class="title">Entrar</h1>
+    <input class="input" type="email" id="loginEmail" placeholder="Email" autocomplete="email">
+    <input class="input" type="password" id="loginPassword" placeholder="Senha" autocomplete="current-password">
+    <button class="btn btn-primary" id="loginBtn">Entrar</button>
+    <p class="link" id="goToSignup">Não tem conta? Cadastre-se</p>
+    <p class="error-msg" id="loginError"></p>
+  </div>
+
+  <!-- CADASTRO -->
+  <div class="screen" id="signupScreen" style="display:none;">
+    <h1 class="title">Cadastro</h1>
+    <input class="input" type="text" id="signupName" placeholder="Nome">
+    <input class="input" type="email" id="signupEmail" placeholder="Email" autocomplete="email">
+    <input class="input" type="password" id="signupPassword" placeholder="Senha (mínimo 6 caracteres)" autocomplete="new-password">
+    <button class="btn btn-success" id="signupBtn">Cadastrar</button>
+    <p class="link" id="goToLogin" style="color:#2ec4b6;">Já tem conta? Faça login</p>
+    <p class="error-msg" id="signupError"></p>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen" id="homeScreen" style="display:none;">
+    <div class="header">
+      <span class="greeting" id="greetingText">Olá!</span>
+      <button class="btn-logout" id="logoutBtn">Sair</button>
+    </div>
+    <input class="input" type="text" id="itemTitle" placeholder="Título">
+    <input class="input" type="text" id="itemDesc" placeholder="Descrição (opcional)">
+    <button class="btn btn-primary" id="addItemBtn">Adicionar</button>
+    <div id="itemsList" style="margin-top:20px;"></div>
+    <p class="empty" id="emptyMsg">Nenhum item. Adicione um acima!</p>
+  </div>
+
+  <script>
+    // ============ STORAGE ============
+    const STORAGE_USERS = 'app_users';
+    const STORAGE_LOGGED = 'app_loggedUser';
+    const STORAGE_ITEMS = 'app_items';
+
+    function getUsers() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_USERS)) || []; }
+      catch(e) { return []; }
+    }
+    function saveUsers(users) { localStorage.setItem(STORAGE_USERS, JSON.stringify(users)); }
+    function getLoggedUser() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_LOGGED)); }
+      catch(e) { return null; }
+    }
+    function saveLoggedUser(user) { localStorage.setItem(STORAGE_LOGGED, JSON.stringify(user)); }
+    function getItems() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_ITEMS)) || []; }
+      catch(e) { return []; }
+    }
+    function saveItems(items) { localStorage.setItem(STORAGE_ITEMS, JSON.stringify(items)); }
+
+    // ============ TELAS ============
+    const $login = document.getElementById('loginScreen');
+    const $signup = document.getElementById('signupScreen');
+    const $home = document.getElementById('homeScreen');
+
+    function show(screen) {
+      $login.style.display = 'none';
+      $signup.style.display = 'none';
+      $home.style.display = 'none';
+      screen.style.display = 'block';
+    }
+
+    // ============ LOGIN ============
+    document.getElementById('loginBtn').onclick = function() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const err = document.getElementById('loginError');
+      err.textContent = '';
+
+      if (!email || !password) { err.textContent = 'Preencha todos os campos'; return; }
+
+      const users = getUsers();
+      console.log('Usuários cadastrados:', users); // debug
+      console.log('Tentando login:', email, password); // debug
+
+      const user = users.find(u => u.email === email && u.password === password);
+
+      if (!user) {
+        err.textContent = 'Email ou senha inválidos. Já se cadastrou?';
+        console.log('Login FALHOU');
+        return;
+      }
+
+      console.log('Login OK:', user);
+      saveLoggedUser({ id: user.id, name: user.name, email: user.email });
+      document.getElementById('loginEmail').value = '';
+      document.getElementById('loginPassword').value = '';
+      loadHome();
+      show($home);
+    };
+
+    document.getElementById('goToSignup').onclick = function() {
+      document.getElementById('loginError').textContent = '';
+      document.getElementById('loginEmail').value = '';
+      document.getElementById('loginPassword').value = '';
+      show($signup);
+    };
+
+    // ============ CADASTRO ============
+    document.getElementById('signupBtn').onclick = function() {
+      const name = document.getElementById('signupName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const password = document.getElementById('signupPassword').value;
+      const err = document.getElementById('signupError');
+      err.textContent = '';
+
+      if (!name || !email || !password) { err.textContent = 'Preencha todos os campos'; return; }
+      if (password.length < 6) { err.textContent = 'Senha deve ter pelo menos 6 caracteres'; return; }
+
+      const users = getUsers();
+      if (users.find(u => u.email === email)) { err.textContent = 'Este email já está cadastrado'; return; }
+
+      const newUser = { id: Date.now().toString(), name, email, password };
+      users.push(newUser);
+      saveUsers(users);
+      console.log('Usuário cadastrado:', newUser);
+      console.log('Todos os usuários agora:', getUsers());
+
+      saveLoggedUser({ id: newUser.id, name, email });
+
+      document.getElementById('signupName').value = '';
+      document.getElementById('signupEmail').value = '';
+      document.getElementById('signupPassword').value = '';
+      loadHome();
+      show($home);
+    };
+
+    document.getElementById('goToLogin').onclick = function() {
+      document.getElementById('signupError').textContent = '';
+      document.getElementById('signupName').value = '';
+      document.getElementById('signupEmail').value = '';
+      document.getElementById('signupPassword').value = '';
+      show($login);
+    };
+
+    // ============ HOME ============
+    function loadHome() {
+      const user = getLoggedUser();
+      document.getElementById('greetingText').textContent = 'Olá, ' + (user ? user.name : '...');
+      renderItems();
+    }
+
+    function renderItems() {
+      const user = getLoggedUser();
+      if (!user) return;
+      const allItems = getItems();
+      const userItems = allItems.filter(i => i.user_id === user.id).reverse();
+      const listEl = document.getElementById('itemsList');
+      const emptyMsg = document.getElementById('emptyMsg');
+
+      if (userItems.length === 0) {
+        listEl.innerHTML = '';
+        emptyMsg.style.display = 'block';
+        return;
+      }
+
+      emptyMsg.style.display = 'none';
+      listEl.innerHTML = userItems.map(item => {
+        const title = item.title.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const desc = item.description ? item.description.replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+        return '<div class="item">' +
+          '<div class="item-content">' +
+            '<div class="item-title">' + title + '</div>' +
+            (desc ? '<div class="item-desc">' + desc + '</div>' : '') +
+            '<div class="item-date">' + item.created_at + '</div>' +
+          '</div>' +
+          '<button class="btn-delete" data-id="' + item.id + '">🗑️</button>' +
+        '</div>';
+      }).join('');
+
+      listEl.querySelectorAll('.btn-delete').forEach(function(btn) {
+        btn.onclick = function() {
+          if (confirm('Excluir este item?')) {
+            const itemId = this.getAttribute('data-id');
+            const items = getItems().filter(function(i) { return i.id !== itemId; });
+            saveItems(items);
+            renderItems();
+          }
+        };
+      });
+    }
+
+    document.getElementById('addItemBtn').onclick = function() {
+      const title = document.getElementById('itemTitle').value.trim();
+      const description = document.getElementById('itemDesc').value.trim();
+      if (!title) { alert('Digite um título'); return; }
+
+      const user = getLoggedUser();
+      if (!user) return;
+      const items = getItems();
+      items.push({
+        id: Date.now().toString(),
+        user_id: user.id,
+        title: title,
+        description: description,
+        created_at: new Date().toLocaleString('pt-BR'),
+      });
+      saveItems(items);
+      document.getElementById('itemTitle').value = '';
+      document.getElementById('itemDesc').value = '';
+      renderItems();
+    };
+
+    document.getElementById('logoutBtn').onclick = function() {
+      if (confirm('Deseja sair?')) {
+        localStorage.removeItem(STORAGE_LOGGED);
+        show($login);
+      }
+    };
+
+    // ============ INICIAR ============
+    (function() {
+      const user = getLoggedUser();
+      if (user) {
+        console.log('Usuário logado encontrado:', user);
+        loadHome();
+        show($home);
+      } else {
+        console.log('Nenhum usuário logado. Mostrando login.');
+        show($login);
+      }
+    })();
+  </script>
+</body>
+</html>
