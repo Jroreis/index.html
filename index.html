@@ -15,6 +15,7 @@
       --success: #10b981;
       --danger: #ef4444;
       --warning: #f59e0b;
+      --premium: #8b5cf6;
       --bg: #f1f5f9;
       --card: #ffffff;
       --text: #1e293b;
@@ -31,7 +32,6 @@
       display: flex; justify-content: center; align-items: center;
       min-height: 100vh; padding: 20px;
     }
-    /* Telas */
     .screen {
       display: none; background: var(--card); border-radius: var(--radius);
       box-shadow: var(--shadow-lg); padding: 32px 28px;
@@ -67,6 +67,8 @@
     .btn-google { background: #fff; color: var(--text); border: 1.5px solid var(--border); }
     .btn-google:hover { background: #f8fafc; }
     .btn-sm { padding: 8px 16px; font-size: 13px; width: auto; }
+    .btn-premium { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; font-weight: 700; }
+    .btn-premium:hover { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
     .error { background: #fef2f2; color: #dc2626; padding: 10px 14px; border-radius: 8px; margin-top: 10px; font-size: 13px; display: none; }
     .error.visible { display: block; }
     .link { display: block; text-align: center; margin-top: 16px; color: var(--primary); cursor: pointer; font-size: 13px; }
@@ -78,6 +80,11 @@
     .home-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     .home-header .user-info { display: flex; align-items: center; gap: 10px; }
     .home-header .user-name { font-weight: 600; color: var(--text); font-size: 15px; }
+    .home-header .badge-plan {
+      font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px;
+    }
+    .badge-gratuito { background: #e2e8f0; color: #475569; }
+    .badge-premium { background: #ede9fe; color: #5b21b6; }
     .home-header .btn-logout { background: #fee2e2; color: var(--danger); border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 13px; }
     .home-header .btn-logout:hover { background: #fecaca; }
     /* Tabs */
@@ -102,6 +109,13 @@
     .result-item .value { font-weight: 600; color: var(--text); }
     .result-highlight { background: #eef2ff; border-radius: 8px; padding: 12px; margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--primary-dark); text-align: center; }
     .result-highlight.danger { background: #fef2f2; color: #dc2626; }
+    .premium-lock {
+      display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 40px 20px;
+      background: #f8fafc; border: 2px dashed var(--premium); border-radius: var(--radius);
+      text-align: center; margin-top: 20px;
+    }
+    .premium-lock h3 { color: var(--premium); font-size: 18px; }
+    .premium-lock p { color: var(--text-secondary); font-size: 14px; }
     /* History */
     .history-item {
       background: #f8fafc; border: 1px solid var(--border); border-radius: 8px;
@@ -122,6 +136,17 @@
       border-radius: 50%; width: 32px; height: 32px; animation: spin 0.7s linear infinite; margin: 20px auto;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+    /* Upgrade banner */
+    .upgrade-banner {
+      background: linear-gradient(135deg, #ede9fe, #f3e8ff);
+      border: 1px solid #c4b5fd;
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 10px;
+    }
+    .upgrade-banner p { color: #4c1d95; font-weight: 500; font-size: 14px; }
     @media (max-width: 500px) {
       .screen { padding: 24px 16px; }
       .tabs { gap: 0; }
@@ -156,12 +181,22 @@
     <span class="link" id="linkLogin">Já tem conta? Entrar</span>
   </div>
 
-  <!-- ============ TELA HOME (APÓS LOGIN) ============ -->
+  <!-- ============ TELA HOME ============ -->
   <div class="screen" id="homeScreen" style="max-width: 600px;">
     <div class="home-header">
-      <div class="user-info"><span class="user-name" id="nomeUsuario">Olá!</span></div>
+      <div class="user-info">
+        <span class="user-name" id="nomeUsuario">Olá!</span>
+        <span id="planBadge" class="badge-plan badge-gratuito">Gratuito</span>
+      </div>
       <button class="btn-logout" id="btnSair">Sair</button>
     </div>
+
+    <!-- Banner upgrade (visível apenas para gratuito) -->
+    <div class="upgrade-banner" id="upgradeBanner" style="display:none;">
+      <p>⭐ Libere todos os recursos e histórico ilimitado</p>
+      <button class="btn btn-premium btn-sm" id="btnUpgradeBanner">Assinar Premium</button>
+    </div>
+
     <!-- Abas -->
     <div class="tabs" id="tabsContainer">
       <button class="tab active" data-tab="corrente">⚡ Corrente</button>
@@ -169,6 +204,7 @@
       <button class="tab" data-tab="disjuntor">🛡️ Disjuntor</button>
       <button class="tab" data-tab="queda">📉 Queda Tensão</button>
       <button class="tab" data-tab="historico">📚 Histórico</button>
+      <button class="tab" data-tab="premium">⭐ Premium</button>
     </div>
 
     <!-- Aba: Corrente / Potência -->
@@ -253,6 +289,12 @@
       <h2>Histórico de Cálculos</h2>
       <div id="historicoContainer"><div class="spinner"></div></div>
     </div>
+
+    <!-- Aba: Premium -->
+    <div class="tab-content" id="tab-premium">
+      <h2>⭐ VoltCalc Premium</h2>
+      <div id="premiumContent"></div>
+    </div>
   </div>
 
   <script>
@@ -269,11 +311,17 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    // ==================== VARIÁVEIS GLOBAIS ====================
+    let userPlan = 'gratuito'; // 'gratuito' ou 'premium'
+    let currentUser = null;
+
     // ==================== AUTENTICAÇÃO ====================
     async function cadastrar(nome, email, senha) {
       try {
         const cred = await auth.createUserWithEmailAndPassword(email, senha);
         await db.collection('users').doc(cred.user.uid).set({ nome, email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        // Criar assinatura gratuita por padrão
+        await db.collection('subscriptions').doc(cred.user.uid).set({ plan: 'gratuito', features: ['corrente', 'condutor', 'disjuntor', 'queda'], historyLimit: 5, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
         return { success: true };
       } catch (e) {
         const msgs = { 'auth/email-already-in-use': 'Email já cadastrado.', 'auth/weak-password': 'Senha muito fraca (mín. 6).', 'auth/invalid-email': 'Email inválido.' };
@@ -291,7 +339,14 @@
       try {
         const provider = new firebase.auth.GoogleAuthProvider();
         const result = await auth.signInWithPopup(provider);
-        await db.collection('users').doc(result.user.uid).set({ nome: result.user.displayName, email: result.user.email, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+        const userRef = db.collection('users').doc(result.user.uid);
+        const userDoc = await userRef.get();
+        if (!userDoc.exists) {
+          await userRef.set({ nome: result.user.displayName, email: result.user.email, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+          await db.collection('subscriptions').doc(result.user.uid).set({ plan: 'gratuito', features: ['corrente', 'condutor', 'disjuntor', 'queda'], historyLimit: 5, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        } else {
+          await userRef.update({ updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        }
         return { success: true };
       } catch (e) {
         if (e.code === 'auth/popup-closed-by-user') return { success: false, message: 'Login cancelado.' };
@@ -300,12 +355,55 @@
     }
     function logout() { return auth.signOut(); }
 
+    // ==================== GERENCIAMENTO DE PLANO ====================
+    async function carregarPlano(uid) {
+      try {
+        const doc = await db.collection('subscriptions').doc(uid).get();
+        if (doc.exists) {
+          userPlan = doc.data().plan;
+          return doc.data();
+        } else {
+          // Criar plano gratuito se não existir
+          await db.collection('subscriptions').doc(uid).set({ plan: 'gratuito', features: ['corrente', 'condutor', 'disjuntor', 'queda'], historyLimit: 5, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+          userPlan = 'gratuito';
+          return { plan: 'gratuito', features: ['corrente', 'condutor', 'disjuntor', 'queda'], historyLimit: 5 };
+        }
+      } catch (e) {
+        console.error('Erro ao carregar plano:', e);
+        return { plan: 'gratuito', features: ['corrente', 'condutor', 'disjuntor', 'queda'], historyLimit: 5 };
+      }
+    }
+
+    async function upgradeParaPremium() {
+      if (!currentUser) return;
+      try {
+        // Simulação de pagamento - aqui você integraria com gateway real
+        if (confirm('Simulação: deseja assinar o plano Premium por R$19,90/mês?')) {
+          await db.collection('subscriptions').doc(currentUser.uid).update({
+            plan: 'premium',
+            features: firebase.firestore.FieldValue.arrayUnion('eletrodutos', 'curto-circuito', 'pdf', 'ilimitado'),
+            historyLimit: 9999,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          userPlan = 'premium';
+          atualizarInterfacePlano();
+          alert('✅ Assinatura Premium ativada com sucesso!');
+          fecharTodasAbas(); // recarregar visual
+        }
+      } catch (e) {
+        alert('Erro ao processar assinatura. Tente novamente.');
+        console.error(e);
+      }
+    }
+
+    function isPremium() { return userPlan === 'premium'; }
+
     // ==================== UI ====================
     const $loginScr = document.getElementById('loginScreen');
     const $cadScr = document.getElementById('cadastroScreen');
     const $homeScr = document.getElementById('homeScreen');
     function show(scr) { [$loginScr, $cadScr, $homeScr].forEach(s => s.classList.remove('active')); scr.classList.add('active'); }
-    // Navegação entre telas
+    // Navegação
     document.getElementById('linkCadastro').onclick = () => { document.getElementById('erroLogin').classList.remove('visible'); show($cadScr); };
     document.getElementById('linkLogin').onclick = () => { document.getElementById('erroCadastro').classList.remove('visible'); show($loginScr); };
     // Login
@@ -328,9 +426,7 @@
     };
     // Cadastro
     document.getElementById('btnCadastro').onclick = async () => {
-      const n = document.getElementById('cadNome').value.trim();
-      const e = document.getElementById('cadEmail').value.trim();
-      const s = document.getElementById('cadSenha').value;
+      const n = document.getElementById('cadNome').value.trim(), e = document.getElementById('cadEmail').value.trim(), s = document.getElementById('cadSenha').value;
       const err = document.getElementById('erroCadastro'); err.classList.remove('visible');
       if (!n || !e || !s) { err.textContent = 'Preencha todos os campos.'; err.classList.add('visible'); return; }
       if (s.length < 6) { err.textContent = 'Senha mínima 6 caracteres.'; err.classList.add('visible'); return; }
@@ -341,44 +437,66 @@
     };
     // Logout
     document.getElementById('btnSair').onclick = () => logout();
+    // Banner upgrade
+    document.getElementById('btnUpgradeBanner').onclick = () => {
+      // Ativar aba premium
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector('.tab[data-tab="premium"]').classList.add('active');
+      document.getElementById('tab-premium').classList.add('active');
+      renderizarTelaPremium();
+    };
 
     // ==================== ABAS ====================
+    function fecharTodasAbas() {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      // Ativar primeira aba (corrente)
+      document.querySelector('.tab[data-tab="corrente"]').classList.add('active');
+      document.getElementById('tab-corrente').classList.add('active');
+    }
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         tab.classList.add('active');
-        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        const content = document.getElementById('tab-' + tab.dataset.tab);
+        if (content) content.classList.add('active');
         if (tab.dataset.tab === 'historico') carregarHistorico();
+        if (tab.dataset.tab === 'premium') renderizarTelaPremium();
       });
     });
 
-    // ==================== TABELAS NBR 5410 SIMPLIFICADAS ====================
-    // Capacidade de condução (A) para cabos de cobre, 2 condutores carregados, PVC 70°C, temp amb 30°C
+    // ==================== TABELAS NBR 5410 ====================
     const tabelaCondutores = {
       'PVC': { '1.5': 17.5, '2.5': 24, '4': 32, '6': 41, '10': 57, '16': 76, '25': 99, '35': 125, '50': 151, '70': 192, '95': 232, '120': 269 },
       'EPR': { '1.5': 22, '2.5': 30, '4': 40, '6': 52, '10': 72, '16': 96, '25': 125, '35': 155, '50': 188, '70': 238, '95': 288, '120': 334 }
     };
-    // Fatores de correção para temperatura (simplificado)
     const fatorTemperatura = { PVC: { 25: 1.06, 30: 1.00, 35: 0.94, 40: 0.87, 45: 0.79 }, EPR: { 25: 1.04, 30: 1.00, 35: 0.96, 40: 0.91, 45: 0.87 } };
-    // Disjuntores comerciais
     const disjuntores = [2, 4, 6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 150, 175, 200, 225, 250];
-    // Queda de tensão unitária (V/A.km) para FP=0.92
     const quedaUnitaria = { cobre: { 1.5: 23.0, 2.5: 14.0, 4: 8.7, 6: 5.8, 10: 3.5, 16: 2.2, 25: 1.4 }, aluminio: { 16: 3.6, 25: 2.3, 35: 1.6 } };
 
-    // ==================== SALVAR HISTÓRICO ====================
+    // ==================== SALVAR HISTÓRICO (com limite gratuito) ====================
     async function salvarCalculo(tipo, parametros, resultado) {
-      const user = auth.currentUser;
-      if (!user) return;
+      if (!currentUser) return;
       try {
+        // Verificar limite de histórico para gratuito
+        if (!isPremium()) {
+          const countSnap = await db.collection('calculos').where('userId', '==', currentUser.uid).get();
+          if (countSnap.size >= 5) {
+            alert('Você atingiu o limite de 5 cálculos no histórico. Assine o Premium para histórico ilimitado.');
+            return;
+          }
+        }
         await db.collection('calculos').add({
-          userId: user.uid, tipo, parametros, resultado,
+          userId: currentUser.uid, tipo, parametros, resultado,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
       } catch (e) { console.error('Erro ao salvar histórico:', e); }
     }
 
-    // ==================== CÁLCULO DE CORRENTE ====================
+    // ==================== CÁLCULOS ====================
+    // Corrente
     document.getElementById('btnCalcularCorrente').addEventListener('click', async () => {
       const V = parseFloat(document.getElementById('corrTensao').value) || 220;
       const P = parseFloat(document.getElementById('corrPotencia').value);
@@ -398,7 +516,7 @@
       await salvarCalculo('Corrente', { V, P, tipo, fp }, { corrente: I.toFixed(2) });
     });
 
-    // ==================== DIMENSIONAMENTO DE CONDUTOR ====================
+    // Condutor
     document.getElementById('btnCalcularCondutor').addEventListener('click', async () => {
       const Ib = parseFloat(document.getElementById('condCorrente').value);
       const metodo = document.getElementById('condMetodo').value;
@@ -409,7 +527,6 @@
       const tabela = tabelaCondutores[isolacao];
       const ft = (fatorTemperatura[isolacao] && fatorTemperatura[isolacao][temp]) ? fatorTemperatura[isolacao][temp] : (temp >= 35 ? 0.94 : 1.00);
       const fatorAgrupamento = nCarregados === 3 ? 0.8 : 1.0;
-      const IzMin = Ib / (ft * fatorAgrupamento);
       let secaoEscolhida = null, IzFinal = 0;
       for (const [secao, capacidade] of Object.entries(tabela)) {
         if (capacidade * ft * fatorAgrupamento >= Ib) { secaoEscolhida = secao; IzFinal = capacidade * ft * fatorAgrupamento; break; }
@@ -425,7 +542,7 @@
       await salvarCalculo('Condutor', { Ib, metodo, isolacao, temp }, { secao: secaoEscolhida, Iz: IzFinal.toFixed(1) });
     });
 
-    // ==================== DIMENSIONAMENTO DE DISJUNTOR ====================
+    // Disjuntor
     document.getElementById('btnCalcularDisjuntor').addEventListener('click', async () => {
       const Ib = parseFloat(document.getElementById('disjIb').value);
       const secao = document.getElementById('disjSecao').value;
@@ -448,7 +565,7 @@
       await salvarCalculo('Disjuntor', { Ib, secao, Iz }, { disjuntor: In });
     });
 
-    // ==================== QUEDA DE TENSÃO ====================
+    // Queda de Tensão
     document.getElementById('btnCalcularQueda').addEventListener('click', async () => {
       const V = parseFloat(document.getElementById('qdTensao').value) || 220;
       const I = parseFloat(document.getElementById('qdCorrente').value);
@@ -459,12 +576,12 @@
       if (!I || !L || I <= 0 || L <= 0) { document.getElementById('resultadoQueda').innerHTML = '<div class="error visible">Preencha corrente e distância.</div>'; return; }
       const tabelaQ = quedaUnitaria[material];
       if (!tabelaQ || !tabelaQ[S]) { document.getElementById('resultadoQueda').innerHTML = '<div class="error visible">Seção não disponível para este material.</div>'; return; }
-      const Vu = tabelaQ[S]; // V/A.km
+      const Vu = tabelaQ[S];
       let deltaV;
       if (tipo === 1) deltaV = 2 * I * (L / 1000) * Vu;
       else deltaV = Math.sqrt(3) * I * (L / 1000) * Vu;
       const percentual = (deltaV / V) * 100;
-      const limite = tipo === 1 ? 4 : 5; // 4% mono, 5% tri
+      const limite = tipo === 1 ? 4 : 5;
       const aprovado = percentual <= limite;
       const html = `<div class="result-card"><h3>Resultado</h3>
         <div class="result-item"><span class="label">Tensão</span><span class="value">${V} V</span></div>
@@ -482,11 +599,12 @@
     // ==================== HISTÓRICO ====================
     async function carregarHistorico() {
       const container = document.getElementById('historicoContainer');
-      const user = auth.currentUser;
-      if (!user) { container.innerHTML = '<div class="empty-state">Faça login para ver o histórico.</div>'; return; }
+      if (!currentUser) { container.innerHTML = '<div class="empty-state">Faça login para ver o histórico.</div>'; return; }
       container.innerHTML = '<div class="spinner"></div>';
       try {
-        const snap = await db.collection('calculos').where('userId', '==', user.uid).orderBy('createdAt', 'desc').limit(50).get();
+        let query = db.collection('calculos').where('userId', '==', currentUser.uid).orderBy('createdAt', 'desc');
+        if (!isPremium()) query = query.limit(5); // limite gratuito
+        const snap = await query.get();
         if (snap.empty) { container.innerHTML = '<div class="empty-state">📭 Nenhum cálculo salvo ainda.</div>'; return; }
         let html = '';
         snap.forEach(doc => {
@@ -500,13 +618,75 @@
             <div class="date">${date}</div>
           </div>`;
         });
+        if (!isPremium()) {
+          html += `<div style="text-align:center; margin-top:16px;"><p style="color:var(--text-secondary);">Apenas os últimos 5 cálculos. <span class="link" onclick="document.querySelector('.tab[data-tab=\\'premium\\']').click()">Assine Premium</span></p></div>`;
+        }
         container.innerHTML = html;
       } catch (e) { container.innerHTML = '<div class="error visible">Erro ao carregar histórico.</div>'; }
+    }
+
+    // ==================== TELA PREMIUM ====================
+    function renderizarTelaPremium() {
+      const container = document.getElementById('premiumContent');
+      if (isPremium()) {
+        container.innerHTML = `
+          <div class="result-card" style="border-color: #c4b5fd;">
+            <h3>⭐ Você já é Premium!</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 16px;">Aproveite todos os recursos ilimitados:</p>
+            <ul style="list-style: none; padding: 0;">
+              <li>✅ Histórico ilimitado</li>
+              <li>✅ Dimensionamento de eletrodutos</li>
+              <li>✅ Cálculo de curto-circuito</li>
+              <li>✅ Relatórios em PDF</li>
+              <li>✅ Suporte prioritário</li>
+            </ul>
+          </div>`;
+      } else {
+        container.innerHTML = `
+          <div class="premium-lock">
+            <h3>⭐ Upgrade para Premium</h3>
+            <p>Libere todos os recursos e potencialize seus cálculos elétricos</p>
+            <div style="text-align: left; width: 100%; max-width: 300px;">
+              <div class="result-item"><span>Histórico ilimitado</span><span>✅</span></div>
+              <div class="result-item"><span>Dimensionamento de eletrodutos</span><span>✅</span></div>
+              <div class="result-item"><span>Cálculo de curto-circuito</span><span>✅</span></div>
+              <div class="result-item"><span>Relatórios em PDF</span><span>✅</span></div>
+              <div class="result-item"><span>Sem anúncios</span><span>✅</span></div>
+              <div class="result-item"><span>Suporte prioritário</span><span>✅</span></div>
+            </div>
+            <div style="display: flex; gap: 10px; width: 100%;">
+              <button class="btn btn-outline" style="flex:1;">Mensal R$19,90</button>
+              <button class="btn btn-premium" id="btnAssinarPremium" style="flex:1;">Anual R$99,90</button>
+            </div>
+            <p style="font-size:12px; color: var(--text-secondary);">Cobrança simulada. Integração real em breve.</p>
+          </div>`;
+        document.getElementById('btnAssinarPremium').addEventListener('click', upgradeParaPremium);
+      }
+    }
+
+    // ==================== ATUALIZAR INTERFACE COM PLANO ====================
+    function atualizarInterfacePlano() {
+      const badge = document.getElementById('planBadge');
+      const banner = document.getElementById('upgradeBanner');
+      if (isPremium()) {
+        badge.textContent = 'Premium';
+        badge.className = 'badge-plan badge-premium';
+        banner.style.display = 'none';
+      } else {
+        badge.textContent = 'Gratuito';
+        badge.className = 'badge-plan badge-gratuito';
+        banner.style.display = 'flex';
+      }
     }
 
     // ==================== OBSERVADOR DE AUTENTICAÇÃO ====================
     auth.onAuthStateChanged(async (user) => {
       if (user) {
+        currentUser = user;
+        // Carregar plano
+        await carregarPlano(user.uid);
+        atualizarInterfacePlano();
+        // Nome
         let nome = user.email;
         try {
           const snap = await db.collection('users').doc(user.uid).get();
@@ -514,9 +694,13 @@
         } catch (e) {}
         document.getElementById('nomeUsuario').textContent = '👋 ' + nome;
         show($homeScr);
-        // Limpar campos de login/cadastro
+        // Limpar campos
         ['loginEmail','loginSenha','cadNome','cadEmail','cadSenha'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+        // Se estiver na tela premium, renderizar
+        if (document.getElementById('tab-premium').classList.contains('active')) renderizarTelaPremium();
       } else {
+        currentUser = null;
+        userPlan = 'gratuito';
         show($loginScr);
       }
     });
