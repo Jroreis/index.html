@@ -20,9 +20,11 @@
       padding: 30px;
       border-radius: 12px;
       width: 100%;
-      max-width: 380px;
+      max-width: 400px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: none;
     }
+    .screen.active { display: block; }
     h1 { text-align: center; margin-bottom: 25px; color: #1a1a1a; font-size: 24px; }
     input {
       width: 100%;
@@ -47,6 +49,7 @@
     button.green { background: #10b981; }
     button.red { background: #ef4444; width: auto; padding: 8px 16px; font-size: 14px; }
     button:active { opacity: 0.85; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
     .link {
       display: block;
       text-align: center;
@@ -56,6 +59,7 @@
       font-size: 14px;
       text-decoration: underline;
     }
+    .link-green { color: #10b981; }
     .error {
       color: #ef4444;
       text-align: center;
@@ -84,12 +88,17 @@
     .card-date { font-size: 11px; color: #9ca3af; margin-top: 4px; }
     .empty-text { text-align: center; color: #9ca3af; margin-top: 30px; }
     #itemsContainer { margin-top: 16px; }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #6b7280;
+    }
   </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<div class="screen" id="loginScreen">
+<div class="screen active" id="loginScreen">
   <h1>🔐 Entrar</h1>
   <input type="email" id="loginEmail" placeholder="Email">
   <input type="password" id="loginPassword" placeholder="Senha">
@@ -99,18 +108,18 @@
 </div>
 
 <!-- CADASTRO -->
-<div class="screen" id="signupScreen" style="display:none">
+<div class="screen" id="signupScreen">
   <h1>📝 Cadastro</h1>
   <input type="text" id="signupName" placeholder="Nome">
   <input type="email" id="signupEmail" placeholder="Email">
   <input type="password" id="signupPassword" placeholder="Senha (mínimo 6)">
   <button class="green" id="signupBtn">Cadastrar</button>
-  <span class="link" id="showLogin" style="color:#10b981">Já tem conta? Entrar</span>
+  <span class="link link-green" id="showLogin">Já tem conta? Entrar</span>
   <div class="error" id="signupError"></div>
 </div>
 
 <!-- HOME -->
-<div class="screen" id="homeScreen" style="display:none">
+<div class="screen" id="homeScreen">
   <div class="header">
     <span id="userName">Olá!</span>
     <button class="red" id="logoutBtn">Sair</button>
@@ -122,204 +131,261 @@
   <div class="empty-text" id="emptyMsg">Nenhum item adicionado</div>
 </div>
 
-<script>
-// ============ ESTADO GLOBAL (em memória) ============
-let currentUser = null;
-let users = [];
-let items = [];
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// Salvar no localStorage como backup
-function saveToStorage() {
-  try {
-    localStorage.setItem('app_users', JSON.stringify(users));
-    localStorage.setItem('app_items', JSON.stringify(items));
-    if (currentUser) {
-      localStorage.setItem('app_currentUser', JSON.stringify(currentUser));
-    }
-  } catch(e) {
-    // Ignora erros de localStorage
-  }
-}
-
-function loadFromStorage() {
-  try {
-    const u = localStorage.getItem('app_users');
-    const i = localStorage.getItem('app_items');
-    const c = localStorage.getItem('app_currentUser');
-    if (u) users = JSON.parse(u);
-    if (i) items = JSON.parse(i);
-    if (c) currentUser = JSON.parse(c);
-  } catch(e) {
-    users = [];
-    items = [];
-    currentUser = null;
-  }
-}
-
-// ============ TELAS ============
-function showScreen(id) {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('signupScreen').style.display = 'none';
-  document.getElementById('homeScreen').style.display = 'none';
-  document.getElementById(id).style.display = 'block';
-}
-
-// ============ LOGIN ============
-document.getElementById('loginBtn').addEventListener('click', function() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass = document.getElementById('loginPassword').value;
-  const err = document.getElementById('loginError');
-  err.textContent = '';
-
-  if (!email || !pass) {
-    err.textContent = 'Preencha todos os campos';
-    return;
-  }
-
-  const found = users.find(u => u.email === email && u.password === pass);
-  if (!found) {
-    err.textContent = 'Email ou senha incorretos';
-    return;
-  }
-
-  currentUser = { id: found.id, name: found.name, email: found.email };
-  saveToStorage();
-  document.getElementById('loginEmail').value = '';
-  document.getElementById('loginPassword').value = '';
-  renderHome();
-  showScreen('homeScreen');
-});
-
-document.getElementById('showSignup').addEventListener('click', function() {
-  document.getElementById('loginError').textContent = '';
-  showScreen('signupScreen');
-});
-
-// ============ CADASTRO ============
-document.getElementById('signupBtn').addEventListener('click', function() {
-  const name = document.getElementById('signupName').value.trim();
-  const email = document.getElementById('signupEmail').value.trim();
-  const pass = document.getElementById('signupPassword').value;
-  const err = document.getElementById('signupError');
-  err.textContent = '';
-
-  if (!name || !email || !pass) {
-    err.textContent = 'Preencha todos os campos';
-    return;
-  }
-  if (pass.length < 6) {
-    err.textContent = 'A senha precisa de pelo menos 6 caracteres';
-    return;
-  }
-  if (users.find(u => u.email === email)) {
-    err.textContent = 'Este email já está cadastrado';
-    return;
-  }
-
-  const newUser = {
-    id: Date.now().toString(),
-    name: name,
-    email: email,
-    password: pass
+  // Configuração Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
+    authDomain: "voltcalc-pro.firebaseapp.com",
+    projectId: "voltcalc-pro",
+    storageBucket: "voltcalc-pro.firebasestorage.app",
+    messagingSenderId: "411208955318",
+    appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
   };
-  users.push(newUser);
-  currentUser = { id: newUser.id, name: newUser.name, email: newUser.email };
-  saveToStorage();
 
-  document.getElementById('signupName').value = '';
-  document.getElementById('signupEmail').value = '';
-  document.getElementById('signupPassword').value = '';
-  renderHome();
-  showScreen('homeScreen');
-});
+  // Inicializar Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-document.getElementById('showLogin').addEventListener('click', function() {
-  document.getElementById('signupError').textContent = '';
-  showScreen('loginScreen');
-});
+  // Elementos da tela
+  const loginScreen = document.getElementById('loginScreen');
+  const signupScreen = document.getElementById('signupScreen');
+  const homeScreen = document.getElementById('homeScreen');
 
-// ============ HOME ============
-function renderHome() {
-  if (!currentUser) return;
-  document.getElementById('userName').textContent = '👋 Olá, ' + currentUser.name;
-
-  const userItems = items.filter(i => i.userId === currentUser.id).reverse();
-  const container = document.getElementById('itemsContainer');
-  const empty = document.getElementById('emptyMsg');
-
-  if (userItems.length === 0) {
-    container.innerHTML = '';
-    empty.style.display = 'block';
-    return;
+  function showScreen(screen) {
+    loginScreen.classList.remove('active');
+    signupScreen.classList.remove('active');
+    homeScreen.classList.remove('active');
+    screen.classList.add('active');
   }
 
-  empty.style.display = 'none';
-  container.innerHTML = userItems.map(item => {
-    return `
-      <div class="card">
-        <div>
-          <div class="card-title">${escapeHtml(item.title)}</div>
-          ${item.description ? `<div class="card-desc">${escapeHtml(item.description)}</div>` : ''}
-          <div class="card-date">${item.date}</div>
-        </div>
-        <button class="red" data-id="${item.id}" style="padding:6px 12px;font-size:13px">🗑</button>
-      </div>
-    `;
-  }).join('');
+  // ============ AUTENTICAÇÃO ============
 
-  // Eventos de deletar
-  container.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', function() {
-      if (confirm('Excluir este item?')) {
-        const id = this.getAttribute('data-id');
-        items = items.filter(i => i.id !== id);
-        saveToStorage();
-        renderHome();
+  // Cadastro
+  document.getElementById('signupBtn').addEventListener('click', async () => {
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const errorEl = document.getElementById('signupError');
+    const btn = document.getElementById('signupBtn');
+    errorEl.textContent = '';
+
+    if (!name || !email || !password) {
+      errorEl.textContent = 'Preencha todos os campos';
+      return;
+    }
+    if (password.length < 6) {
+      errorEl.textContent = 'Senha deve ter pelo menos 6 caracteres';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Cadastrando...';
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // Salvar nome no Firestore
+      await addDoc(collection(db, 'users'), {
+        uid: userCredential.user.uid,
+        name: name,
+        email: email,
+        createdAt: serverTimestamp()
+      });
+      // Limpar campos
+      document.getElementById('signupName').value = '';
+      document.getElementById('signupEmail').value = '';
+      document.getElementById('signupPassword').value = '';
+      errorEl.textContent = '';
+      // Auth state listener vai redirecionar para Home
+    } catch (error) {
+      console.error('Erro cadastro:', error);
+      if (error.code === 'auth/email-already-in-use') {
+        errorEl.textContent = 'Este email já está cadastrado';
+      } else {
+        errorEl.textContent = 'Erro ao cadastrar: ' + error.message;
       }
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Cadastrar';
+    }
+  });
+
+  // Login
+  document.getElementById('loginBtn').addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+    const btn = document.getElementById('loginBtn');
+    errorEl.textContent = '';
+
+    if (!email || !password) {
+      errorEl.textContent = 'Preencha todos os campos';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Entrando...';
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      document.getElementById('loginEmail').value = '';
+      document.getElementById('loginPassword').value = '';
+      errorEl.textContent = '';
+      // Auth state listener vai redirecionar para Home
+    } catch (error) {
+      console.error('Erro login:', error);
+      if (error.code === 'auth/invalid-credential') {
+        errorEl.textContent = 'Email ou senha incorretos';
+      } else {
+        errorEl.textContent = 'Erro ao entrar: ' + error.message;
+      }
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Entrar';
+    }
+  });
+
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Erro ao sair:', error);
+    }
+  });
+
+  // Navegação entre telas
+  document.getElementById('showSignup').addEventListener('click', () => {
+    document.getElementById('loginError').textContent = '';
+    showScreen(signupScreen);
+  });
+
+  document.getElementById('showLogin').addEventListener('click', () => {
+    document.getElementById('signupError').textContent = '';
+    showScreen(loginScreen);
+  });
+
+  // ============ FIRESTORE (ITENS) ============
+  let itemsUnsubscribe = null;
+
+  function loadItems(userId) {
+    // Limpar listener anterior
+    if (itemsUnsubscribe) itemsUnsubscribe();
+
+    const itemsRef = collection(db, 'items');
+    const q = query(
+      itemsRef,
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc')
+    );
+
+    itemsUnsubscribe = onSnapshot(q, (snapshot) => {
+      const container = document.getElementById('itemsContainer');
+      const empty = document.getElementById('emptyMsg');
+
+      if (snapshot.empty) {
+        container.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+
+      empty.style.display = 'none';
+      container.innerHTML = '';
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div>
+            <div class="card-title">${escapeHtml(data.title)}</div>
+            ${data.description ? `<div class="card-desc">${escapeHtml(data.description)}</div>` : ''}
+            <div class="card-date">${data.createdAt ? new Date(data.createdAt.toDate()).toLocaleString('pt-BR') : ''}</div>
+          </div>
+          <button class="red" style="padding:6px 12px;font-size:13px">🗑</button>
+        `;
+        card.querySelector('button').addEventListener('click', async () => {
+          if (confirm('Excluir este item?')) {
+            try {
+              await deleteDoc(doc(db, 'items', docSnap.id));
+            } catch (error) {
+              console.error('Erro ao excluir:', error);
+            }
+          }
+        });
+        container.appendChild(card);
+      });
+    }, (error) => {
+      console.error('Erro ao carregar itens:', error);
     });
-  });
-}
-
-function escapeHtml(text) {
-  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-document.getElementById('addItemBtn').addEventListener('click', function() {
-  const title = document.getElementById('itemTitle').value.trim();
-  const desc = document.getElementById('itemDesc').value.trim();
-  if (!title) {
-    alert('Digite um título para o item');
-    return;
   }
-  items.push({
-    id: Date.now().toString(),
-    userId: currentUser.id,
-    title: title,
-    description: desc,
-    date: new Date().toLocaleString('pt-BR')
-  });
-  saveToStorage();
-  document.getElementById('itemTitle').value = '';
-  document.getElementById('itemDesc').value = '';
-  renderHome();
-});
 
-document.getElementById('logoutBtn').addEventListener('click', function() {
-  if (confirm('Tem certeza que deseja sair?')) {
-    currentUser = null;
-    localStorage.removeItem('app_currentUser');
-    showScreen('loginScreen');
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
-});
 
-// ============ INICIALIZAÇÃO ============
-loadFromStorage();
-if (currentUser) {
-  renderHome();
-  showScreen('homeScreen');
-} else {
-  showScreen('loginScreen');
-}
+  // Adicionar item
+  document.getElementById('addItemBtn').addEventListener('click', async () => {
+    const title = document.getElementById('itemTitle').value.trim();
+    const description = document.getElementById('itemDesc').value.trim();
+    const user = auth.currentUser;
+
+    if (!title) {
+      alert('Digite um título para o item');
+      return;
+    }
+    if (!user) return;
+
+    try {
+      await addDoc(collection(db, 'items'), {
+        userId: user.uid,
+        title: title,
+        description: description,
+        createdAt: serverTimestamp()
+      });
+      document.getElementById('itemTitle').value = '';
+      document.getElementById('itemDesc').value = '';
+    } catch (error) {
+      console.error('Erro ao adicionar item:', error);
+      alert('Erro ao adicionar item');
+    }
+  });
+
+  // ============ OBSERVADOR DE AUTENTICAÇÃO ============
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // Buscar nome do usuário
+      try {
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('uid', '==', user.uid));
+        const snapshot = await new Promise((resolve) => {
+          const unsubscribe = onSnapshot(q, (snap) => {
+            unsubscribe();
+            resolve(snap);
+          });
+        });
+        let name = user.email;
+        if (!snapshot.empty) {
+          name = snapshot.docs[0].data().name;
+        }
+        document.getElementById('userName').textContent = '👋 Olá, ' + name;
+      } catch (e) {
+        document.getElementById('userName').textContent = '👋 Olá, ' + user.email;
+      }
+
+      loadItems(user.uid);
+      showScreen(homeScreen);
+    } else {
+      if (itemsUnsubscribe) itemsUnsubscribe();
+      showScreen(loginScreen);
+    }
+  });
 </script>
 
 </body>
