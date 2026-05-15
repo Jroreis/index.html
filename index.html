@@ -4,239 +4,354 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VoltCalc Pro</title>
-  <link rel="stylesheet" href="css/style.css">
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .tela {
+      display: none;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 420px;
+      animation: fadeIn 0.3s ease;
+    }
+    .tela.ativa { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1 { text-align: center; margin-bottom: 8px; color: #1a1a2e; font-size: 24px; }
+    .subtitulo { text-align: center; color: #6b7280; margin-bottom: 24px; font-size: 14px; }
+    .campo { margin-bottom: 16px; }
+    .campo label { display: block; margin-bottom: 6px; font-weight: 500; color: #374151; font-size: 14px; }
+    .campo input {
+      width: 100%; padding: 12px 14px; border: 1.5px solid #d1d5db;
+      border-radius: 8px; font-size: 15px; transition: border-color 0.2s;
+    }
+    .campo input:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+    .btn {
+      width: 100%; padding: 13px; border: none; border-radius: 8px;
+      font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-primario { background: #4f46e5; color: white; }
+    .btn-primario:hover { background: #4338ca; }
+    .btn-google {
+      background: white; color: #374151; border: 1.5px solid #d1d5db;
+      margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-google:hover { background: #f9fafb; }
+    .btn-google img { width: 20px; height: 20px; }
+    .btn-sair { background: #ef4444; color: white; padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
+    .link { display: block; text-align: center; margin-top: 18px; color: #4f46e5; cursor: pointer; font-size: 14px; text-decoration: none; }
+    .link:hover { text-decoration: underline; }
+    .divisor { display: flex; align-items: center; margin: 20px 0; color: #9ca3af; font-size: 13px; }
+    .divisor::before, .divisor::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
+    .divisor span { padding: 0 12px; }
+    .erro { background: #fef2f2; color: #dc2626; padding: 10px 14px; border-radius: 8px; margin-top: 12px; font-size: 13px; text-align: center; display: none; }
+    .erro.visivel { display: block; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .header .nome-usuario { font-size: 18px; font-weight: 600; color: #1a1a2e; }
+    .loading { text-align: center; padding: 20px; color: #6b7280; }
+    .spinner { border: 3px solid #e5e7eb; border-top: 3px solid #4f46e5; border-radius: 50%; width: 40px; height: 40px; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
 
-  <!-- ============ TELA DE LOGIN ============ -->
+  <!-- Tela de Login -->
   <div class="tela ativa" id="telaLogin">
     <h1>⚡ VoltCalc Pro</h1>
     <p class="subtitulo">Cálculos elétricos baseados na NBR 5410</p>
-    
     <div class="campo">
       <label for="loginEmail">Email</label>
       <input type="email" id="loginEmail" placeholder="seu@email.com">
     </div>
-    
     <div class="campo">
       <label for="loginSenha">Senha</label>
       <input type="password" id="loginSenha" placeholder="••••••">
     </div>
-    
     <button class="btn btn-primario" id="btnLogin">Entrar</button>
-    
     <div class="erro" id="erroLogin"></div>
-    
     <div class="divisor"><span>ou</span></div>
-    
     <button class="btn btn-google" id="btnGoogle">
       <img src="https://www.google.com/favicon.ico" alt="Google">
       Entrar com Google
     </button>
-    
     <span class="link" id="linkCadastro">Não tem conta? Cadastre-se</span>
   </div>
 
-  <!-- ============ TELA DE CADASTRO ============ -->
+  <!-- Tela de Cadastro -->
   <div class="tela" id="telaCadastro">
     <h1>📝 Criar Conta</h1>
     <p class="subtitulo">Preencha os dados para se cadastrar</p>
-    
     <div class="campo">
       <label for="cadastroNome">Nome</label>
       <input type="text" id="cadastroNome" placeholder="Seu nome">
     </div>
-    
     <div class="campo">
       <label for="cadastroEmail">Email</label>
       <input type="email" id="cadastroEmail" placeholder="seu@email.com">
     </div>
-    
     <div class="campo">
       <label for="cadastroSenha">Senha</label>
       <input type="password" id="cadastroSenha" placeholder="Mínimo 6 caracteres">
     </div>
-    
     <button class="btn btn-primario" id="btnCadastro">Cadastrar</button>
-    
     <div class="erro" id="erroCadastro"></div>
-    
     <span class="link" id="linkLogin">Já tem conta? Entrar</span>
   </div>
 
-  <!-- ============ TELA HOME ============ -->
+  <!-- Tela Home -->
   <div class="tela" id="telaHome">
     <div class="header">
       <span class="nome-usuario" id="nomeUsuario">Olá!</span>
       <button class="btn-sair" id="btnSair">Sair</button>
     </div>
-    
     <div class="loading" id="loadingHome">
       <div class="spinner"></div>
       <p>Carregando...</p>
     </div>
-    
     <div id="conteudoHome" style="display:none;">
       <p style="text-align:center;color:#6b7280;">✅ Login realizado com sucesso!</p>
       <p style="text-align:center;color:#6b7280;margin-top:12px;">Em breve: calculadora NBR 5410</p>
     </div>
   </div>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  
-  <!-- Configuração Firebase -->
-  <script src="js/firebase-config.js"></script>
-  
-  <!-- Lógica de Autenticação -->
-  <script src="js/auth.js"></script>
-  
-  <!-- App Principal -->
   <script>
-    // ============ ELEMENTOS ============
+    // ============ Configuração do Firebase ============
+    const firebaseConfig = {
+      apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
+      authDomain: "voltcalc-pro.firebaseapp.com",
+      projectId: "voltcalc-pro",
+      storageBucket: "voltcalc-pro.firebasestorage.app",
+      messagingSenderId: "411208955318",
+      appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // ============ Funções de Autenticação ============
+    async function cadastrarUsuario(nome, email, senha) {
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
+        await db.collection('users').doc(userCredential.user.uid).set({
+          nome: nome,
+          email: email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        return { success: true, user: userCredential.user };
+      } catch (error) {
+        console.error('Erro ao cadastrar:', error);
+        let mensagem = 'Erro ao cadastrar.';
+        switch (error.code) {
+          case 'auth/email-already-in-use': mensagem = 'Este email já está cadastrado.'; break;
+          case 'auth/weak-password': mensagem = 'A senha deve ter pelo menos 6 caracteres.'; break;
+          case 'auth/invalid-email': mensagem = 'Email inválido.'; break;
+          default: mensagem = 'Erro ao cadastrar. Tente novamente.';
+        }
+        return { success: false, message: mensagem };
+      }
+    }
+
+    async function loginUsuario(email, senha) {
+      try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, senha);
+        return { success: true, user: userCredential.user };
+      } catch (error) {
+        console.error('Erro ao fazer login:', error);
+        let mensagem = 'Erro ao fazer login.';
+        switch (error.code) {
+          case 'auth/invalid-credential': mensagem = 'Email ou senha incorretos.'; break;
+          case 'auth/user-not-found': mensagem = 'Usuário não encontrado.'; break;
+          case 'auth/wrong-password': mensagem = 'Senha incorreta.'; break;
+          case 'auth/invalid-email': mensagem = 'Email inválido.'; break;
+          case 'auth/too-many-requests': mensagem = 'Muitas tentativas. Aguarde um momento.'; break;
+          default: mensagem = 'Erro ao fazer login. Tente novamente.';
+        }
+        return { success: false, message: mensagem };
+      }
+    }
+
+    async function loginComGoogle() {
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        const result = await auth.signInWithPopup(provider);
+        await db.collection('users').doc(result.user.uid).set({
+          nome: result.user.displayName,
+          email: result.user.email,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        return { success: true, user: result.user };
+      } catch (error) {
+        console.error('Erro ao fazer login com Google:', error);
+        if (error.code === 'auth/popup-closed-by-user') {
+          return { success: false, message: 'Login cancelado.' };
+        }
+        return { success: false, message: 'Erro ao fazer login com Google.' };
+      }
+    }
+
+    async function logoutUsuario() {
+      try {
+        await auth.signOut();
+        return { success: true };
+      } catch (error) {
+        return { success: false, message: 'Erro ao sair.' };
+      }
+    }
+
+    async function buscarDadosUsuario(uid) {
+      try {
+        const doc = await db.collection('users').doc(uid).get();
+        if (doc.exists) return doc.data();
+        return null;
+      } catch (error) {
+        console.error('Erro ao buscar dados:', error);
+        return null;
+      }
+    }
+
+    function observarAutenticacao(callback) {
+      auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          const dados = await buscarDadosUsuario(user.uid);
+          callback({ logado: true, user: user, dados: dados });
+        } else {
+          callback({ logado: false, user: null, dados: null });
+        }
+      });
+    }
+
+    // ============ Lógica da Interface ============
     const telaLogin = document.getElementById('telaLogin');
     const telaCadastro = document.getElementById('telaCadastro');
     const telaHome = document.getElementById('telaHome');
-    
     const erroLogin = document.getElementById('erroLogin');
     const erroCadastro = document.getElementById('erroCadastro');
-    
     const loadingHome = document.getElementById('loadingHome');
     const conteudoHome = document.getElementById('conteudoHome');
-    
-    // ============ NAVEGAÇÃO ============
+
     function mostrarTela(tela) {
       telaLogin.classList.remove('ativa');
       telaCadastro.classList.remove('ativa');
       telaHome.classList.remove('ativa');
       tela.classList.add('ativa');
     }
-    
+
     document.getElementById('linkCadastro').addEventListener('click', () => {
       erroLogin.classList.remove('visivel');
       mostrarTela(telaCadastro);
     });
-    
+
     document.getElementById('linkLogin').addEventListener('click', () => {
       erroCadastro.classList.remove('visivel');
       mostrarTela(telaLogin);
     });
-    
-    // ============ LOGIN EMAIL/SENHA ============
+
     document.getElementById('btnLogin').addEventListener('click', async () => {
       const email = document.getElementById('loginEmail').value.trim();
       const senha = document.getElementById('loginSenha').value;
-      
       erroLogin.classList.remove('visivel');
-      
       if (!email || !senha) {
         erroLogin.textContent = 'Preencha todos os campos.';
         erroLogin.classList.add('visivel');
         return;
       }
-      
       const btn = document.getElementById('btnLogin');
       btn.disabled = true;
       btn.textContent = 'Entrando...';
-      
       const resultado = await loginUsuario(email, senha);
-      
       btn.disabled = false;
       btn.textContent = 'Entrar';
-      
       if (!resultado.success) {
         erroLogin.textContent = resultado.message;
         erroLogin.classList.add('visivel');
       }
     });
-    
-    // ============ LOGIN GOOGLE ============
+
     document.getElementById('btnGoogle').addEventListener('click', async () => {
       erroLogin.classList.remove('visivel');
-      
       const btn = document.getElementById('btnGoogle');
       btn.disabled = true;
       btn.textContent = 'Conectando...';
-      
       const resultado = await loginComGoogle();
-      
       btn.disabled = false;
       btn.innerHTML = '<img src="https://www.google.com/favicon.ico" alt="Google"> Entrar com Google';
-      
       if (!resultado.success) {
         erroLogin.textContent = resultado.message;
         erroLogin.classList.add('visivel');
       }
     });
-    
-    // ============ CADASTRO ============
+
     document.getElementById('btnCadastro').addEventListener('click', async () => {
       const nome = document.getElementById('cadastroNome').value.trim();
       const email = document.getElementById('cadastroEmail').value.trim();
       const senha = document.getElementById('cadastroSenha').value;
-      
       erroCadastro.classList.remove('visivel');
-      
       if (!nome || !email || !senha) {
         erroCadastro.textContent = 'Preencha todos os campos.';
         erroCadastro.classList.add('visivel');
         return;
       }
-      
       if (senha.length < 6) {
         erroCadastro.textContent = 'A senha deve ter pelo menos 6 caracteres.';
         erroCadastro.classList.add('visivel');
         return;
       }
-      
       const btn = document.getElementById('btnCadastro');
       btn.disabled = true;
       btn.textContent = 'Cadastrando...';
-      
       const resultado = await cadastrarUsuario(nome, email, senha);
-      
       btn.disabled = false;
       btn.textContent = 'Cadastrar';
-      
       if (!resultado.success) {
         erroCadastro.textContent = resultado.message;
         erroCadastro.classList.add('visivel');
       }
     });
-    
-    // ============ LOGOUT ============
+
     document.getElementById('btnSair').addEventListener('click', async () => {
       await logoutUsuario();
     });
-    
-    // ============ OBSERVADOR DE AUTENTICAÇÃO ============
+
+    // Observador de autenticação
     observarAutenticacao((estado) => {
       if (estado.logado) {
-        // Usuário logado
         const nome = estado.dados?.nome || estado.user.email;
         document.getElementById('nomeUsuario').textContent = '👋 Olá, ' + nome;
         mostrarTela(telaHome);
-        
-        // Simular carregamento
         loadingHome.style.display = 'block';
         conteudoHome.style.display = 'none';
-        
         setTimeout(() => {
           loadingHome.style.display = 'none';
           conteudoHome.style.display = 'block';
         }, 1000);
-        
         // Limpar campos
         document.getElementById('loginEmail').value = '';
         document.getElementById('loginSenha').value = '';
         document.getElementById('cadastroNome').value = '';
         document.getElementById('cadastroEmail').value = '';
         document.getElementById('cadastroSenha').value = '';
-        
       } else {
-        // Usuário não logado
         mostrarTela(telaLogin);
       }
     });
