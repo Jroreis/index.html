@@ -7,68 +7,60 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f8f9fa;
-      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
       display: flex;
       justify-content: center;
       align-items: center;
+      min-height: 100vh;
       padding: 20px;
     }
     .screen {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
       width: 100%;
-      max-width: 400px;
-      background: #fff;
-      border-radius: 16px;
-      padding: 30px 20px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      max-width: 380px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
-    .title {
-      font-size: 26px;
-      font-weight: bold;
-      text-align: center;
-      margin-bottom: 25px;
-      color: #212529;
+    h1 { text-align: center; margin-bottom: 25px; color: #1a1a1a; font-size: 24px; }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
     }
-    .input {
+    button {
       width: 100%;
       padding: 14px;
-      margin-bottom: 12px;
-      border: 1px solid #dee2e6;
-      border-radius: 10px;
-      font-size: 16px;
-      background: #fff;
-      display: block;
-    }
-    .btn {
-      width: 100%;
-      padding: 15px;
+      background: #4f46e5;
+      color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       font-size: 16px;
-      font-weight: 600;
-      color: #fff;
+      font-weight: bold;
       cursor: pointer;
-      margin-top: 5px;
-      display: block;
+      margin-top: 8px;
     }
-    .btn-primary { background: #4361ee; }
-    .btn-success { background: #2ec4b6; }
-    .btn:active { opacity: 0.8; }
+    button.green { background: #10b981; }
+    button.red { background: #ef4444; width: auto; padding: 8px 16px; font-size: 14px; }
+    button:active { opacity: 0.85; }
     .link {
+      display: block;
       text-align: center;
-      margin-top: 18px;
-      font-size: 14px;
-      color: #4361ee;
+      margin-top: 16px;
+      color: #4f46e5;
       cursor: pointer;
+      font-size: 14px;
       text-decoration: underline;
     }
-    .error-msg {
-      color: #e63946;
+    .error {
+      color: #ef4444;
       text-align: center;
       margin-top: 10px;
       font-size: 13px;
-      min-height: 18px;
     }
     .header {
       display: flex;
@@ -76,269 +68,259 @@
       align-items: center;
       margin-bottom: 20px;
     }
-    .greeting { font-size: 18px; font-weight: 600; color: #212529; }
-    .btn-logout {
-      color: #e63946;
-      font-weight: 600;
-      background: none;
-      border: none;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .item {
-      background: #f8f9fa;
+    .header span { font-size: 18px; font-weight: bold; color: #1a1a1a; }
+    .card {
+      background: #f9fafb;
       padding: 14px;
-      border-radius: 10px;
+      border-radius: 8px;
       margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border: 1px solid #e9ecef;
+      border: 1px solid #e5e7eb;
     }
-    .item-content { flex: 1; }
-    .item-title { font-size: 15px; font-weight: 600; color: #212529; }
-    .item-desc { font-size: 13px; color: #6c757d; margin-top: 3px; }
-    .item-date { font-size: 11px; color: #adb5bd; margin-top: 4px; }
-    .btn-delete {
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      padding: 5px;
-    }
-    .empty { text-align: center; color: #adb5bd; margin-top: 30px; font-size: 15px; }
+    .card-title { font-weight: bold; font-size: 15px; color: #1a1a1a; }
+    .card-desc { font-size: 13px; color: #6b7280; margin-top: 2px; }
+    .card-date { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+    .empty-text { text-align: center; color: #9ca3af; margin-top: 30px; }
+    #itemsContainer { margin-top: 16px; }
   </style>
 </head>
 <body>
 
-  <!-- LOGIN -->
-  <div class="screen" id="loginScreen">
-    <h1 class="title">Entrar</h1>
-    <input class="input" type="email" id="loginEmail" placeholder="Email" autocomplete="email">
-    <input class="input" type="password" id="loginPassword" placeholder="Senha" autocomplete="current-password">
-    <button class="btn btn-primary" id="loginBtn">Entrar</button>
-    <p class="link" id="goToSignup">Não tem conta? Cadastre-se</p>
-    <p class="error-msg" id="loginError"></p>
+<!-- LOGIN -->
+<div class="screen" id="loginScreen">
+  <h1>🔐 Entrar</h1>
+  <input type="email" id="loginEmail" placeholder="Email">
+  <input type="password" id="loginPassword" placeholder="Senha">
+  <button id="loginBtn">Entrar</button>
+  <span class="link" id="showSignup">Não tem conta? Cadastre-se</span>
+  <div class="error" id="loginError"></div>
+</div>
+
+<!-- CADASTRO -->
+<div class="screen" id="signupScreen" style="display:none">
+  <h1>📝 Cadastro</h1>
+  <input type="text" id="signupName" placeholder="Nome">
+  <input type="email" id="signupEmail" placeholder="Email">
+  <input type="password" id="signupPassword" placeholder="Senha (mínimo 6)">
+  <button class="green" id="signupBtn">Cadastrar</button>
+  <span class="link" id="showLogin" style="color:#10b981">Já tem conta? Entrar</span>
+  <div class="error" id="signupError"></div>
+</div>
+
+<!-- HOME -->
+<div class="screen" id="homeScreen" style="display:none">
+  <div class="header">
+    <span id="userName">Olá!</span>
+    <button class="red" id="logoutBtn">Sair</button>
   </div>
+  <input type="text" id="itemTitle" placeholder="Título do item">
+  <input type="text" id="itemDesc" placeholder="Descrição (opcional)">
+  <button id="addItemBtn">➕ Adicionar</button>
+  <div id="itemsContainer"></div>
+  <div class="empty-text" id="emptyMsg">Nenhum item adicionado</div>
+</div>
 
-  <!-- CADASTRO -->
-  <div class="screen" id="signupScreen" style="display:none;">
-    <h1 class="title">Cadastro</h1>
-    <input class="input" type="text" id="signupName" placeholder="Nome">
-    <input class="input" type="email" id="signupEmail" placeholder="Email" autocomplete="email">
-    <input class="input" type="password" id="signupPassword" placeholder="Senha (mínimo 6 caracteres)" autocomplete="new-password">
-    <button class="btn btn-success" id="signupBtn">Cadastrar</button>
-    <p class="link" id="goToLogin" style="color:#2ec4b6;">Já tem conta? Faça login</p>
-    <p class="error-msg" id="signupError"></p>
-  </div>
+<script>
+// ============ ESTADO GLOBAL (em memória) ============
+let currentUser = null;
+let users = [];
+let items = [];
 
-  <!-- HOME -->
-  <div class="screen" id="homeScreen" style="display:none;">
-    <div class="header">
-      <span class="greeting" id="greetingText">Olá!</span>
-      <button class="btn-logout" id="logoutBtn">Sair</button>
-    </div>
-    <input class="input" type="text" id="itemTitle" placeholder="Título">
-    <input class="input" type="text" id="itemDesc" placeholder="Descrição (opcional)">
-    <button class="btn btn-primary" id="addItemBtn">Adicionar</button>
-    <div id="itemsList" style="margin-top:20px;"></div>
-    <p class="empty" id="emptyMsg">Nenhum item. Adicione um acima!</p>
-  </div>
-
-  <script>
-    // ============ STORAGE ============
-    const STORAGE_USERS = 'app_users';
-    const STORAGE_LOGGED = 'app_loggedUser';
-    const STORAGE_ITEMS = 'app_items';
-
-    function getUsers() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_USERS)) || []; }
-      catch(e) { return []; }
+// Salvar no localStorage como backup
+function saveToStorage() {
+  try {
+    localStorage.setItem('app_users', JSON.stringify(users));
+    localStorage.setItem('app_items', JSON.stringify(items));
+    if (currentUser) {
+      localStorage.setItem('app_currentUser', JSON.stringify(currentUser));
     }
-    function saveUsers(users) { localStorage.setItem(STORAGE_USERS, JSON.stringify(users)); }
-    function getLoggedUser() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_LOGGED)); }
-      catch(e) { return null; }
-    }
-    function saveLoggedUser(user) { localStorage.setItem(STORAGE_LOGGED, JSON.stringify(user)); }
-    function getItems() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_ITEMS)) || []; }
-      catch(e) { return []; }
-    }
-    function saveItems(items) { localStorage.setItem(STORAGE_ITEMS, JSON.stringify(items)); }
+  } catch(e) {
+    // Ignora erros de localStorage
+  }
+}
 
-    // ============ TELAS ============
-    const $login = document.getElementById('loginScreen');
-    const $signup = document.getElementById('signupScreen');
-    const $home = document.getElementById('homeScreen');
+function loadFromStorage() {
+  try {
+    const u = localStorage.getItem('app_users');
+    const i = localStorage.getItem('app_items');
+    const c = localStorage.getItem('app_currentUser');
+    if (u) users = JSON.parse(u);
+    if (i) items = JSON.parse(i);
+    if (c) currentUser = JSON.parse(c);
+  } catch(e) {
+    users = [];
+    items = [];
+    currentUser = null;
+  }
+}
 
-    function show(screen) {
-      $login.style.display = 'none';
-      $signup.style.display = 'none';
-      $home.style.display = 'none';
-      screen.style.display = 'block';
-    }
+// ============ TELAS ============
+function showScreen(id) {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('signupScreen').style.display = 'none';
+  document.getElementById('homeScreen').style.display = 'none';
+  document.getElementById(id).style.display = 'block';
+}
 
-    // ============ LOGIN ============
-    document.getElementById('loginBtn').onclick = function() {
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      const err = document.getElementById('loginError');
-      err.textContent = '';
+// ============ LOGIN ============
+document.getElementById('loginBtn').addEventListener('click', function() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPassword').value;
+  const err = document.getElementById('loginError');
+  err.textContent = '';
 
-      if (!email || !password) { err.textContent = 'Preencha todos os campos'; return; }
+  if (!email || !pass) {
+    err.textContent = 'Preencha todos os campos';
+    return;
+  }
 
-      const users = getUsers();
-      console.log('Usuários cadastrados:', users); // debug
-      console.log('Tentando login:', email, password); // debug
+  const found = users.find(u => u.email === email && u.password === pass);
+  if (!found) {
+    err.textContent = 'Email ou senha incorretos';
+    return;
+  }
 
-      const user = users.find(u => u.email === email && u.password === password);
+  currentUser = { id: found.id, name: found.name, email: found.email };
+  saveToStorage();
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPassword').value = '';
+  renderHome();
+  showScreen('homeScreen');
+});
 
-      if (!user) {
-        err.textContent = 'Email ou senha inválidos. Já se cadastrou?';
-        console.log('Login FALHOU');
-        return;
+document.getElementById('showSignup').addEventListener('click', function() {
+  document.getElementById('loginError').textContent = '';
+  showScreen('signupScreen');
+});
+
+// ============ CADASTRO ============
+document.getElementById('signupBtn').addEventListener('click', function() {
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const pass = document.getElementById('signupPassword').value;
+  const err = document.getElementById('signupError');
+  err.textContent = '';
+
+  if (!name || !email || !pass) {
+    err.textContent = 'Preencha todos os campos';
+    return;
+  }
+  if (pass.length < 6) {
+    err.textContent = 'A senha precisa de pelo menos 6 caracteres';
+    return;
+  }
+  if (users.find(u => u.email === email)) {
+    err.textContent = 'Este email já está cadastrado';
+    return;
+  }
+
+  const newUser = {
+    id: Date.now().toString(),
+    name: name,
+    email: email,
+    password: pass
+  };
+  users.push(newUser);
+  currentUser = { id: newUser.id, name: newUser.name, email: newUser.email };
+  saveToStorage();
+
+  document.getElementById('signupName').value = '';
+  document.getElementById('signupEmail').value = '';
+  document.getElementById('signupPassword').value = '';
+  renderHome();
+  showScreen('homeScreen');
+});
+
+document.getElementById('showLogin').addEventListener('click', function() {
+  document.getElementById('signupError').textContent = '';
+  showScreen('loginScreen');
+});
+
+// ============ HOME ============
+function renderHome() {
+  if (!currentUser) return;
+  document.getElementById('userName').textContent = '👋 Olá, ' + currentUser.name;
+
+  const userItems = items.filter(i => i.userId === currentUser.id).reverse();
+  const container = document.getElementById('itemsContainer');
+  const empty = document.getElementById('emptyMsg');
+
+  if (userItems.length === 0) {
+    container.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  container.innerHTML = userItems.map(item => {
+    return `
+      <div class="card">
+        <div>
+          <div class="card-title">${escapeHtml(item.title)}</div>
+          ${item.description ? `<div class="card-desc">${escapeHtml(item.description)}</div>` : ''}
+          <div class="card-date">${item.date}</div>
+        </div>
+        <button class="red" data-id="${item.id}" style="padding:6px 12px;font-size:13px">🗑</button>
+      </div>
+    `;
+  }).join('');
+
+  // Eventos de deletar
+  container.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (confirm('Excluir este item?')) {
+        const id = this.getAttribute('data-id');
+        items = items.filter(i => i.id !== id);
+        saveToStorage();
+        renderHome();
       }
+    });
+  });
+}
 
-      console.log('Login OK:', user);
-      saveLoggedUser({ id: user.id, name: user.name, email: user.email });
-      document.getElementById('loginEmail').value = '';
-      document.getElementById('loginPassword').value = '';
-      loadHome();
-      show($home);
-    };
+function escapeHtml(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-    document.getElementById('goToSignup').onclick = function() {
-      document.getElementById('loginError').textContent = '';
-      document.getElementById('loginEmail').value = '';
-      document.getElementById('loginPassword').value = '';
-      show($signup);
-    };
+document.getElementById('addItemBtn').addEventListener('click', function() {
+  const title = document.getElementById('itemTitle').value.trim();
+  const desc = document.getElementById('itemDesc').value.trim();
+  if (!title) {
+    alert('Digite um título para o item');
+    return;
+  }
+  items.push({
+    id: Date.now().toString(),
+    userId: currentUser.id,
+    title: title,
+    description: desc,
+    date: new Date().toLocaleString('pt-BR')
+  });
+  saveToStorage();
+  document.getElementById('itemTitle').value = '';
+  document.getElementById('itemDesc').value = '';
+  renderHome();
+});
 
-    // ============ CADASTRO ============
-    document.getElementById('signupBtn').onclick = function() {
-      const name = document.getElementById('signupName').value.trim();
-      const email = document.getElementById('signupEmail').value.trim();
-      const password = document.getElementById('signupPassword').value;
-      const err = document.getElementById('signupError');
-      err.textContent = '';
+document.getElementById('logoutBtn').addEventListener('click', function() {
+  if (confirm('Tem certeza que deseja sair?')) {
+    currentUser = null;
+    localStorage.removeItem('app_currentUser');
+    showScreen('loginScreen');
+  }
+});
 
-      if (!name || !email || !password) { err.textContent = 'Preencha todos os campos'; return; }
-      if (password.length < 6) { err.textContent = 'Senha deve ter pelo menos 6 caracteres'; return; }
+// ============ INICIALIZAÇÃO ============
+loadFromStorage();
+if (currentUser) {
+  renderHome();
+  showScreen('homeScreen');
+} else {
+  showScreen('loginScreen');
+}
+</script>
 
-      const users = getUsers();
-      if (users.find(u => u.email === email)) { err.textContent = 'Este email já está cadastrado'; return; }
-
-      const newUser = { id: Date.now().toString(), name, email, password };
-      users.push(newUser);
-      saveUsers(users);
-      console.log('Usuário cadastrado:', newUser);
-      console.log('Todos os usuários agora:', getUsers());
-
-      saveLoggedUser({ id: newUser.id, name, email });
-
-      document.getElementById('signupName').value = '';
-      document.getElementById('signupEmail').value = '';
-      document.getElementById('signupPassword').value = '';
-      loadHome();
-      show($home);
-    };
-
-    document.getElementById('goToLogin').onclick = function() {
-      document.getElementById('signupError').textContent = '';
-      document.getElementById('signupName').value = '';
-      document.getElementById('signupEmail').value = '';
-      document.getElementById('signupPassword').value = '';
-      show($login);
-    };
-
-    // ============ HOME ============
-    function loadHome() {
-      const user = getLoggedUser();
-      document.getElementById('greetingText').textContent = 'Olá, ' + (user ? user.name : '...');
-      renderItems();
-    }
-
-    function renderItems() {
-      const user = getLoggedUser();
-      if (!user) return;
-      const allItems = getItems();
-      const userItems = allItems.filter(i => i.user_id === user.id).reverse();
-      const listEl = document.getElementById('itemsList');
-      const emptyMsg = document.getElementById('emptyMsg');
-
-      if (userItems.length === 0) {
-        listEl.innerHTML = '';
-        emptyMsg.style.display = 'block';
-        return;
-      }
-
-      emptyMsg.style.display = 'none';
-      listEl.innerHTML = userItems.map(item => {
-        const title = item.title.replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        const desc = item.description ? item.description.replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
-        return '<div class="item">' +
-          '<div class="item-content">' +
-            '<div class="item-title">' + title + '</div>' +
-            (desc ? '<div class="item-desc">' + desc + '</div>' : '') +
-            '<div class="item-date">' + item.created_at + '</div>' +
-          '</div>' +
-          '<button class="btn-delete" data-id="' + item.id + '">🗑️</button>' +
-        '</div>';
-      }).join('');
-
-      listEl.querySelectorAll('.btn-delete').forEach(function(btn) {
-        btn.onclick = function() {
-          if (confirm('Excluir este item?')) {
-            const itemId = this.getAttribute('data-id');
-            const items = getItems().filter(function(i) { return i.id !== itemId; });
-            saveItems(items);
-            renderItems();
-          }
-        };
-      });
-    }
-
-    document.getElementById('addItemBtn').onclick = function() {
-      const title = document.getElementById('itemTitle').value.trim();
-      const description = document.getElementById('itemDesc').value.trim();
-      if (!title) { alert('Digite um título'); return; }
-
-      const user = getLoggedUser();
-      if (!user) return;
-      const items = getItems();
-      items.push({
-        id: Date.now().toString(),
-        user_id: user.id,
-        title: title,
-        description: description,
-        created_at: new Date().toLocaleString('pt-BR'),
-      });
-      saveItems(items);
-      document.getElementById('itemTitle').value = '';
-      document.getElementById('itemDesc').value = '';
-      renderItems();
-    };
-
-    document.getElementById('logoutBtn').onclick = function() {
-      if (confirm('Deseja sair?')) {
-        localStorage.removeItem(STORAGE_LOGGED);
-        show($login);
-      }
-    };
-
-    // ============ INICIAR ============
-    (function() {
-      const user = getLoggedUser();
-      if (user) {
-        console.log('Usuário logado encontrado:', user);
-        loadHome();
-        show($home);
-      } else {
-        console.log('Nenhum usuário logado. Mostrando login.');
-        show($login);
-      }
-    })();
-  </script>
 </body>
 </html>
