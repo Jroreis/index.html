@@ -3,54 +3,247 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VoltCalc Pro - Login</title>
+  <title>VoltCalc Pro - NBR 5410</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-    .screen { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 360px; display: none; }
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --premium: #8b5cf6;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --shadow: 0 4px 6px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06);
+      --transition: 0.2s ease;
+    }
+    .dark {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --border: #334155;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
+      transition: background 0.3s;
+    }
+    .screen {
+      display: none;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 36px 28px;
+      width: 100%;
+      animation: fadeIn 0.3s ease;
+    }
     .screen.active { display: block; }
-    input, button { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
-    button { background: #4f46e5; color: white; border: none; font-weight: bold; cursor: pointer; }
-    button.google { background: white; color: #333; border: 1px solid #ddd; }
-    .error { color: red; font-size: 13px; display: none; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
+    .auth-screen {
+      max-width: 400px;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+    }
+    .dark .auth-screen { background: rgba(30,41,59,0.9); }
+    body.auth-bg {
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 50%, #e8f5e9 100%);
+    }
+    .dark body.auth-bg {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    }
+    h1 { text-align: center; font-size: 24px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+    .subtitle { text-align: center; color: var(--text-secondary); font-size: 14px; margin-bottom: 28px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-weight: 500; font-size: 13px; margin-bottom: 6px; color: var(--text); }
+    .form-group input, .form-group select {
+      width: 100%; padding: 12px 16px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 15px; background: var(--card); color: var(--text);
+      transition: var(--transition);
+    }
+    .form-group input:focus, .form-group select:focus {
+      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+    }
+    .row { display: flex; gap: 12px; }
+    .row .form-group { flex: 1; }
+    .btn {
+      width: 100%; padding: 13px 20px; border: none; border-radius: 10px;
+      font-size: 15px; font-weight: 600; cursor: pointer; transition: var(--transition);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
+    .btn-outline:hover { background: rgba(79,70,229,0.05); }
+    .btn-google { background: var(--card); color: var(--text); border: 1.5px solid var(--border); }
+    .btn-google:hover { background: var(--bg); }
+    .btn-sm { padding: 8px 14px; font-size: 13px; width: auto; }
+    .btn-premium { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; }
+    .btn-premium:hover { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .error { background: rgba(239,68,68,0.08); color: var(--danger); padding: 10px 14px; border-radius: 8px; margin-top: 10px; font-size: 13px; display: none; }
     .error.visible { display: block; }
-    .link { color: #4f46e5; cursor: pointer; text-align: center; display: block; margin-top: 10px; }
+    .link { text-align: center; margin-top: 16px; color: var(--primary); cursor: pointer; font-size: 14px; font-weight: 500; }
+    .link:hover { text-decoration: underline; }
+    .divider { display: flex; align-items: center; margin: 18px 0; color: var(--text-secondary); font-size: 12px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .divider span { padding: 0 12px; }
+
+    /* Header */
+    .home-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+    .user-info { display: flex; align-items: center; gap: 10px; }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--primary);
+      display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px;
+    }
+    .plan-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; }
+    .plan-gratuito { background: #e2e8f0; color: #475569; }
+    .plan-premium { background: #ede9fe; color: #5b21b6; }
+    .theme-btn {
+      background: none; border: 1px solid var(--border); border-radius: 50%;
+      width: 36px; height: 36px; cursor: pointer; font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-logout { background: rgba(239,68,68,0.08); color: var(--danger); border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 13px; }
+    .btn-logout:hover { background: rgba(239,68,68,0.15); }
+
+    /* Tabs */
+    .tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 20px; overflow-x: auto; gap: 4px; }
+    .tab {
+      padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--text-secondary);
+      cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap;
+      transition: var(--transition); background: none;
+    }
+    .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .tab-content { display: none; animation: fadeIn 0.3s; }
+    .tab-content.active { display: block; }
+
+    /* Cards */
+    .result-card {
+      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px; margin-top: 20px;
+    }
+    .result-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .result-item:last-child { border-bottom: none; }
+    .result-label { color: var(--text-secondary); }
+    .result-value { font-weight: 600; }
+    .result-highlight {
+      background: rgba(79,70,229,0.06); border-radius: 10px; padding: 12px 16px;
+      margin-top: 12px; font-size: 15px; font-weight: 600; color: var(--primary-dark); text-align: center;
+    }
+    .result-highlight.danger { background: rgba(239,68,68,0.06); color: var(--danger); }
+    .premium-lock {
+      display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 48px 24px;
+      background: var(--bg); border: 2px dashed var(--premium); border-radius: var(--radius); text-align: center;
+    }
+    .history-item { background: var(--bg); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:10px; font-size:13px; }
+    .history-item .type { font-weight:600; color:var(--primary); }
+    .history-item .date { color:var(--text-secondary); font-size:11px; }
+    .empty-state { text-align:center; padding:40px; color:var(--text-secondary); }
+    .spinner {
+      border:3px solid var(--border); border-top:3px solid var(--primary);
+      border-radius:50%; width:32px; height:32px; animation:spin 0.7s linear infinite; margin:20px auto;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    @media (max-width:600px) {
+      .screen { padding: 24px 16px; }
+      .tabs { gap:0; }
+      .tab { padding:10px 10px; font-size:12px; }
+    }
   </style>
 </head>
-<body>
+<body class="auth-bg">
 
-  <!-- Login -->
-  <div class="screen active" id="loginScreen">
-    <h2>Entrar</h2>
-    <input type="email" id="loginEmail" placeholder="Email">
-    <input type="password" id="loginSenha" placeholder="Senha">
-    <button id="btnLogin">Entrar</button>
-    <button class="google" id="btnGoogle">Entrar com Google</button>
-    <span class="error" id="erroLogin"></span>
+  <!-- Tela de Login -->
+  <div class="screen auth-screen active" id="loginScreen">
+    <h1>⚡ VoltCalc Pro</h1>
+    <p class="subtitle">Cálculos elétricos conforme NBR 5410</p>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="seu@email.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label>Senha</label>
+      <input type="password" id="loginSenha" placeholder="••••••" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary" id="btnLogin">Entrar</button>
+    <div class="error" id="erroLogin"></div>
+    <div class="divider"><span>ou</span></div>
+    <button class="btn btn-google" id="btnGoogle">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Entrar com Google
+    </button>
     <span class="link" id="linkCadastro">Não tem conta? Cadastre-se</span>
   </div>
 
-  <!-- Cadastro -->
-  <div class="screen" id="cadastroScreen">
-    <h2>Criar Conta</h2>
-    <input type="text" id="cadNome" placeholder="Nome">
-    <input type="email" id="cadEmail" placeholder="Email">
-    <input type="password" id="cadSenha" placeholder="Senha (mínimo 6)">
-    <button id="btnCadastro">Cadastrar</button>
-    <span class="error" id="erroCadastro"></span>
+  <!-- Tela de Cadastro -->
+  <div class="screen auth-screen" id="cadastroScreen">
+    <h1>📝 Criar Conta</h1>
+    <p class="subtitle">Comece a calcular agora mesmo</p>
+    <div class="form-group"><label>Nome</label><input type="text" id="cadNome" placeholder="Seu nome completo"></div>
+    <div class="form-group"><label>Email</label><input type="email" id="cadEmail" placeholder="seu@email.com"></div>
+    <div class="form-group"><label>Senha</label><input type="password" id="cadSenha" placeholder="Mínimo 6 caracteres"></div>
+    <button class="btn btn-primary" id="btnCadastro">Cadastrar</button>
+    <div class="error" id="erroCadastro"></div>
     <span class="link" id="linkLogin">Já tem conta? Entrar</span>
   </div>
 
-  <!-- Home (após login) -->
-  <div class="screen" id="homeScreen">
-    <h2>Bem-vindo!</h2>
-    <p id="nomeUsuario"></p>
-    <button id="btnSair">Sair</button>
+  <!-- Tela Principal -->
+  <div class="screen" id="homeScreen" style="max-width:800px;">
+    <div class="home-header">
+      <div class="user-info">
+        <div class="avatar" id="avatarInicial"></div>
+        <div>
+          <div class="user-name" id="nomeUsuario" style="font-weight:600;"></div>
+          <span id="planBadge" class="plan-badge plan-gratuito">Gratuito</span>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="theme-btn" id="themeToggle" title="Alternar tema">🌓</button>
+        <button class="btn-logout" id="btnSair">Sair</button>
+      </div>
+    </div>
+
+    <!-- Abas -->
+    <div class="tabs">
+      <button class="tab active" data-tab="corrente">⚡ Corrente</button>
+      <button class="tab" data-tab="condutor">🔌 Condutor</button>
+      <button class="tab" data-tab="disjuntor">🛡️ Disjuntor</button>
+      <button class="tab" data-tab="queda">📉 Queda Tensão</button>
+      <button class="tab" data-tab="eletrodutos">🔧 Eletrodutos</button>
+      <button class="tab" data-tab="curto">💥 Curto</button>
+      <button class="tab" data-tab="historico">📚 Histórico</button>
+      <button class="tab" data-tab="perfil">👤 Perfil</button>
+      <button class="tab" data-tab="admin" id="tabAdmin" style="display:none;">🛡️ Admin</button>
+    </div>
+
+    <!-- Conteúdo das abas -->
+    <div class="tab-content active" id="tab-corrente">...</div>
+    <div class="tab-content" id="tab-condutor">...</div>
+    <div class="tab-content" id="tab-disjuntor">...</div>
+    <div class="tab-content" id="tab-queda">...</div>
+    <div class="tab-content" id="tab-eletrodutos">...</div>
+    <div class="tab-content" id="tab-curto">...</div>
+    <div class="tab-content" id="tab-historico">...</div>
+    <div class="tab-content" id="tab-perfil">...</div>
+    <div class="tab-content" id="tab-admin">...</div>
   </div>
 
   <script>
-    // Configuração do Firebase (seus dados)
+    // Firebase config
     firebase.initializeApp({
       apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
       authDomain: "voltcalc-pro.firebaseapp.com",
@@ -60,114 +253,460 @@
       appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
     });
     const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
 
-    // Telas
-    const loginScreen = document.getElementById('loginScreen');
-    const cadastroScreen = document.getElementById('cadastroScreen');
-    const homeScreen = document.getElementById('homeScreen');
-    function showScreen(screen) {
-      [loginScreen, cadastroScreen, homeScreen].forEach(s => s.classList.remove('active'));
-      screen.classList.add('active');
+    let currentUser = null, userPlan = 'gratuito', isAdmin = false;
+    const screens = {
+      login: document.getElementById('loginScreen'),
+      cadastro: document.getElementById('cadastroScreen'),
+      home: document.getElementById('homeScreen')
+    };
+    function showScreen(s) { Object.values(screens).forEach(x => x.classList.remove('active')); s.classList.add('active'); }
+    function showTab(name) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      const tab = document.querySelector(`.tab[data-tab="${name}"]`);
+      if (tab) tab.classList.add('active');
+      const content = document.getElementById(`tab-${name}`);
+      if (content) content.classList.add('active');
+      if (name === 'historico') carregarHistorico();
+      if (name === 'perfil') renderizarPerfil();
+      if (name === 'admin') renderizarAdmin();
+      if (name === 'eletrodutos') renderizarEletrodutos();
+      if (name === 'curto') renderizarCurto();
     }
 
-    // Navegação
-    document.getElementById('linkCadastro').onclick = () => showScreen(cadastroScreen);
-    document.getElementById('linkLogin').onclick = () => showScreen(loginScreen);
+    // Tabs listener
+    document.querySelector('.tabs').addEventListener('click', (e) => {
+      if (e.target.classList.contains('tab')) showTab(e.target.dataset.tab);
+    });
 
-    // Login email/senha
+    // Navegação
+    document.getElementById('linkCadastro').onclick = () => showScreen(screens.cadastro);
+    document.getElementById('linkLogin').onclick = () => showScreen(screens.login);
+    document.getElementById('btnSair').onclick = () => auth.signOut();
+
+    // Login
     document.getElementById('btnLogin').onclick = async () => {
       const email = document.getElementById('loginEmail').value.trim();
       const senha = document.getElementById('loginSenha').value;
-      const err = document.getElementById('erroLogin');
-      err.classList.remove('visible');
-      if (!email || !senha) {
-        err.textContent = 'Preencha todos os campos.';
-        err.classList.add('visible');
-        return;
-      }
-      const btn = document.getElementById('btnLogin');
-      btn.disabled = true;
-      btn.textContent = 'Entrando...';
+      const err = document.getElementById('erroLogin'); err.classList.remove('visible');
+      if (!email || !senha) { err.textContent = 'Preencha todos os campos.'; err.classList.add('visible'); return; }
+      const btn = document.getElementById('btnLogin'); btn.disabled = true; btn.textContent = 'Entrando...';
       try {
         await auth.signInWithEmailAndPassword(email, senha);
-        // sucesso -> onAuthStateChanged redireciona
-      } catch (error) {
-        console.error(error);
+      } catch (e) {
         let msg = 'Erro ao entrar.';
-        if (error.code === 'auth/invalid-credential') msg = 'Email ou senha incorretos.';
-        else if (error.code === 'auth/too-many-requests') msg = 'Muitas tentativas. Aguarde.';
-        err.textContent = msg;
-        err.classList.add('visible');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Entrar';
-      }
+        if (e.code === 'auth/invalid-credential') msg = 'Email ou senha incorretos.';
+        else if (e.code === 'auth/too-many-requests') msg = 'Muitas tentativas. Aguarde.';
+        err.textContent = msg; err.classList.add('visible');
+      } finally { btn.disabled = false; btn.textContent = 'Entrar'; }
     };
-
     // Google
     document.getElementById('btnGoogle').onclick = async () => {
       const provider = new firebase.auth.GoogleAuthProvider();
-      try {
-        await auth.signInWithPopup(provider);
-      } catch (error) {
-        if (error.code !== 'auth/popup-closed-by-user') {
+      try { await auth.signInWithPopup(provider); }
+      catch (e) {
+        if (e.code !== 'auth/popup-closed-by-user') {
           document.getElementById('erroLogin').textContent = 'Erro no login Google.';
           document.getElementById('erroLogin').classList.add('visible');
         }
       }
     };
-
     // Cadastro
     document.getElementById('btnCadastro').onclick = async () => {
       const nome = document.getElementById('cadNome').value.trim();
       const email = document.getElementById('cadEmail').value.trim();
       const senha = document.getElementById('cadSenha').value;
-      const err = document.getElementById('erroCadastro');
-      err.classList.remove('visible');
-      if (!nome || !email || !senha) {
-        err.textContent = 'Preencha todos os campos.';
-        err.classList.add('visible');
-        return;
-      }
-      if (senha.length < 6) {
-        err.textContent = 'Senha mínima 6 caracteres.';
-        err.classList.add('visible');
-        return;
-      }
-      const btn = document.getElementById('btnCadastro');
-      btn.disabled = true;
-      btn.textContent = 'Cadastrando...';
+      const err = document.getElementById('erroCadastro'); err.classList.remove('visible');
+      if (!nome || !email || !senha) { err.textContent = 'Preencha todos os campos.'; err.classList.add('visible'); return; }
+      if (senha.length < 6) { err.textContent = 'Senha mínima 6 caracteres.'; err.classList.add('visible'); return; }
+      const btn = document.getElementById('btnCadastro'); btn.disabled = true; btn.textContent = 'Cadastrando...';
       try {
         const cred = await auth.createUserWithEmailAndPassword(email, senha);
-        await firebase.firestore().collection('users').doc(cred.user.uid).set({
-          nome: nome,
-          email: email
-        });
-        // sucesso -> redireciona
-      } catch (error) {
+        await db.collection('users').doc(cred.user.uid).set({ nome, email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      } catch (e) {
         let msg = 'Erro ao cadastrar.';
-        if (error.code === 'auth/email-already-in-use') msg = 'Email já cadastrado.';
-        else if (error.code === 'auth/weak-password') msg = 'Senha muito fraca.';
-        err.textContent = msg;
-        err.classList.add('visible');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Cadastrar';
-      }
+        if (e.code === 'auth/email-already-in-use') msg = 'Email já cadastrado.';
+        else if (e.code === 'auth/weak-password') msg = 'Senha muito fraca.';
+        err.textContent = msg; err.classList.add('visible');
+      } finally { btn.disabled = false; btn.textContent = 'Cadastrar'; }
     };
 
-    // Logout
-    document.getElementById('btnSair').onclick = () => auth.signOut();
+    // Tema escuro
+    let darkMode = localStorage.getItem('darkMode') === 'true';
+    function applyTheme() { document.body.classList.toggle('dark', darkMode); localStorage.setItem('darkMode', darkMode); }
+    document.getElementById('themeToggle').onclick = () => { darkMode = !darkMode; applyTheme(); };
+    applyTheme();
 
-    // Observador de estado
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById('nomeUsuario').textContent = 'Olá, ' + (user.displayName || user.email);
-        showScreen(homeScreen);
+    // Carregar dados do usuário e plano
+    async function carregarDados(uid) {
+      try {
+        const userDoc = await db.collection('users').doc(uid).get();
+        const adminDoc = await db.collection('admins').doc(uid).get();
+        isAdmin = adminDoc.exists;
+        document.getElementById('tabAdmin').style.display = isAdmin ? 'inline-block' : 'none';
+        // Verificar assinatura premium (simulada em subscriptions)
+        const subDoc = await db.collection('subscriptions').doc(uid).get();
+        if (subDoc.exists && subDoc.data().plan === 'premium' && subDoc.data().status === 'active') {
+          userPlan = 'premium';
+        } else {
+          userPlan = 'gratuito';
+        }
+        atualizarBadgePlano();
+        return userDoc.data();
+      } catch (e) { return null; }
+    }
+    function atualizarBadgePlano() {
+      const badge = document.getElementById('planBadge');
+      if (userPlan === 'premium') {
+        badge.textContent = 'Premium'; badge.className = 'plan-badge plan-premium';
       } else {
-        showScreen(loginScreen);
+        badge.textContent = 'Gratuito'; badge.className = 'plan-badge plan-gratuito';
+      }
+    }
+
+    // Observer auth
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        const dados = await carregarDados(user.uid);
+        const nome = dados?.nome || user.email;
+        document.getElementById('nomeUsuario').textContent = nome;
+        document.getElementById('avatarInicial').textContent = nome.charAt(0).toUpperCase();
+        showScreen(screens.home);
+        showTab('corrente');
+        ['loginEmail','loginSenha','cadNome','cadEmail','cadSenha'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+      } else {
+        currentUser = null;
+        showScreen(screens.login);
       }
     });
+
+    // --- CÁLCULOS (detalhados) ---
+    const tabelaCondutores = {
+      'PVC': { '1.5': 17.5, '2.5': 24, '4': 32, '6': 41, '10': 57, '16': 76, '25': 99, '35': 125, '50': 151, '70': 192 },
+      'EPR': { '1.5': 22, '2.5': 30, '4': 40, '6': 52, '10': 72, '16': 96, '25': 125, '35': 155, '50': 188, '70': 238 }
+    };
+    const fatorTemperatura = {
+      PVC: {25:1.06,30:1.00,35:0.94,40:0.87,45:0.79},
+      EPR: {25:1.04,30:1.00,35:0.96,40:0.91,45:0.87}
+    };
+    const disjuntores = [2,4,6,10,16,20,25,32,40,50,63,80,100,125,150,175,200,225,250];
+    const quedaUnitaria = {
+      cobre: {1.5:23.0,2.5:14.0,4:8.7,6:5.8,10:3.5,16:2.2,25:1.4},
+      aluminio: {16:3.6,25:2.3,35:1.6}
+    };
+
+    function salvarCalculo(tipo, params, result) {
+      if (!currentUser) return;
+      if (userPlan !== 'premium') {
+        db.collection('calculos').where('userId','==',currentUser.uid).get().then(snap => {
+          if (snap.size >= 5) alert('Limite gratuito de 5 cálculos. Assine Premium.');
+          else db.collection('calculos').add({ userId: currentUser.uid, tipo, parametros: params, resultado: result, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        });
+      } else {
+        db.collection('calculos').add({ userId: currentUser.uid, tipo, parametros: params, resultado: result, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      }
+    }
+
+    function gerarPDF(titulo, conteudoId) {
+      const element = document.getElementById(conteudoId);
+      if (!element) return;
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(16);
+      doc.text('VoltCalc Pro - Relatório', 20, 20);
+      doc.setFontSize(12);
+      doc.text(titulo, 20, 30);
+      doc.html(element.innerHTML, {
+        callback: function(doc) { doc.save('calculo.pdf'); },
+        x: 20, y: 40
+      });
+    }
+
+    // Renderiza campos de Corrente
+    document.getElementById('tab-corrente').innerHTML = `
+      <h2>Cálculo de Corrente (A)</h2>
+      <div class="form-group"><label>Tensão (V)</label><input type="number" id="corrTensao" value="220"></div>
+      <div class="form-group"><label>Potência (W)</label><input type="number" id="corrPotencia" placeholder="Ex: 4400"></div>
+      <div class="form-group"><label>Tipo de circuito</label><select id="corrTipo"><option value="1">Monofásico</option><option value="2">Bifásico</option><option value="3">Trifásico</option></select></div>
+      <div class="form-group"><label>Fator de potência</label><input type="number" id="corrFP" value="0.92" step="0.01" min="0.1" max="1"></div>
+      <button class="btn btn-primary" id="btnCalcularCorrente">Calcular</button>
+      <div id="resultadoCorrente"></div>
+    `;
+    document.getElementById('btnCalcularCorrente').onclick = () => {
+      const V = parseFloat(document.getElementById('corrTensao').value)||220;
+      const P = parseFloat(document.getElementById('corrPotencia').value);
+      const tipo = parseInt(document.getElementById('corrTipo').value);
+      const fp = parseFloat(document.getElementById('corrFP').value)||1;
+      if (!P) return;
+      let I = tipo===1 ? P/(V*fp) : tipo===2 ? P/(V*fp) : P/(V*Math.sqrt(3)*fp);
+      const html = `<div class="result-card"><h3>Resultado</h3>
+        <div class="result-item"><span class="result-label">Potência</span><span class="result-value">${P.toFixed(0)} W</span></div>
+        <div class="result-item"><span class="result-label">Tensão</span><span class="result-value">${V} V</span></div>
+        <div class="result-item"><span class="result-label">Fator de potência</span><span class="result-value">${fp}</span></div>
+        <div class="result-highlight">Corrente de projeto: <strong>${I.toFixed(2)} A</strong></div></div>
+        <button class="btn btn-outline btn-sm" onclick="gerarPDF('Corrente','resultadoCorrente')">📄 Baixar PDF</button>`;
+      document.getElementById('resultadoCorrente').innerHTML = html;
+      salvarCalculo('Corrente', {V,P,tipo,fp}, {corrente: I.toFixed(2)});
+    };
+
+    // Condutor (detalhes técnicos)
+    document.getElementById('tab-condutor').innerHTML = `
+      <h2>Dimensionamento do Condutor</h2>
+      <div class="form-group"><label>Corrente de projeto Ib (A)</label><input type="number" id="condIb" placeholder="Ex: 20"></div>
+      <div class="form-group"><label>Método de instalação</label><select id="condMetodo"><option value="B1">B1 - Eletroduto embutido</option><option value="B2">B2 - Eletroduto aparente</option><option value="C">C - Cabos ao ar livre</option><option value="D">D - Cabos enterrados</option></select></div>
+      <div class="form-group"><label>Isolação</label><select id="condIsolacao"><option value="PVC">PVC (70°C)</option><option value="EPR">EPR/XLPE (90°C)</option></select></div>
+      <div class="row">
+        <div class="form-group"><label>Condutores carregados</label><input type="number" id="condCarregados" value="2" min="2" max="3"></div>
+        <div class="form-group"><label>Temperatura ambiente (°C)</label><input type="number" id="condTemp" value="30"></div>
+      </div>
+      <button class="btn btn-primary" id="btnCalcularCondutor">Dimensionar</button>
+      <div id="resultadoCondutor"></div>
+    `;
+    document.getElementById('btnCalcularCondutor').onclick = () => {
+      const Ib = parseFloat(document.getElementById('condIb').value);
+      const metodo = document.getElementById('condMetodo').value;
+      const isolacao = document.getElementById('condIsolacao').value;
+      const n = parseInt(document.getElementById('condCarregados').value)||2;
+      const temp = parseInt(document.getElementById('condTemp').value)||30;
+      if (!Ib) return;
+      const ft = fatorTemperatura[isolacao]?.[temp] || (temp>=35?0.94:1.0);
+      const fa = n===3 ? 0.8 : 1.0;
+      const fatorTotal = ft*fa;
+      const IzMin = Ib / fatorTotal;
+      let secao = null, Iz = 0;
+      for (const [s, cap] of Object.entries(tabelaCondutores[isolacao])) {
+        if (cap * fatorTotal >= Ib) { secao = s; Iz = cap * fatorTotal; break; }
+      }
+      if (!secao) { document.getElementById('resultadoCondutor').innerHTML = '<div class="error visible">Não há condutor disponível para esta corrente.</div>'; return; }
+      const html = `<div class="result-card"><h3>Resultado do Dimensionamento</h3>
+        <div class="result-item"><span class="result-label">Corrente de projeto (Ib)</span><span class="result-value">${Ib} A</span></div>
+        <div class="result-item"><span class="result-label">Método de instalação</span><span class="result-value">${metodo}</span></div>
+        <div class="result-item"><span class="result-label">Isolação</span><span class="result-value">${isolacao}</span></div>
+        <div class="result-item"><span class="result-label">Fator de temperatura (${temp}°C)</span><span class="result-value">${ft.toFixed(2)}</span></div>
+        <div class="result-item"><span class="result-label">Fator de agrupamento</span><span class="result-value">${fa.toFixed(2)}</span></div>
+        <div class="result-item"><span class="result-label">Capacidade de condução (Iz)</span><span class="result-value">${Iz.toFixed(1)} A</span></div>
+        <div class="result-highlight">Seção recomendada: <strong>${secao} mm²</strong></div>
+        <p style="font-size:12px;color:var(--text-secondary);margin-top:8px;">Critério: Iz ≥ Ib → ${Iz.toFixed(1)} A ≥ ${Ib} A (atende NBR 5410)</p></div>
+        <button class="btn btn-outline btn-sm" onclick="gerarPDF('Condutor','resultadoCondutor')">📄 Baixar PDF</button>`;
+      document.getElementById('resultadoCondutor').innerHTML = html;
+      salvarCalculo('Condutor', {Ib, metodo, isolacao, temp}, {secao, Iz: Iz.toFixed(1)});
+    };
+
+    // Disjuntor
+    document.getElementById('tab-disjuntor').innerHTML = `
+      <h2>Dimensionamento do Disjuntor</h2>
+      <div class="form-group"><label>Corrente de projeto Ib (A)</label><input type="number" id="disjIb" placeholder="Ex: 20"></div>
+      <div class="form-group"><label>Seção do condutor (mm²)</label><select id="disjSecao"><option value="1.5">1,5</option><option value="2.5">2,5</option><option value="4">4</option><option value="6">6</option><option value="10" selected>10</option><option value="16">16</option><option value="25">25</option><option value="35">35</option></select></div>
+      <div class="form-group"><label>Isolação</label><select id="disjIsolacao"><option value="PVC">PVC</option><option value="EPR">EPR/XLPE</option></select></div>
+      <button class="btn btn-primary" id="btnCalcularDisjuntor">Dimensionar</button>
+      <div id="resultadoDisjuntor"></div>
+    `;
+    document.getElementById('btnCalcularDisjuntor').onclick = () => {
+      const Ib = parseFloat(document.getElementById('disjIb').value);
+      const secao = document.getElementById('disjSecao').value;
+      const isolacao = document.getElementById('disjIsolacao').value;
+      if (!Ib) return;
+      const Iz = tabelaCondutores[isolacao][secao] || 0;
+      let In = disjuntores.find(d => d >= Ib && d <= Iz*1.45);
+      if (!In) { document.getElementById('resultadoDisjuntor').innerHTML = '<div class="error visible">Não foi possível encontrar disjuntor. Verifique os dados.</div>'; return; }
+      const html = `<div class="result-card"><h3>Disjuntor Recomendado</h3>
+        <div class="result-item"><span class="result-label">Corrente de projeto (Ib)</span><span class="result-value">${Ib} A</span></div>
+        <div class="result-item"><span class="result-label">Capacidade do condutor (Iz)</span><span class="result-value">${Iz} A</span></div>
+        <div class="result-item"><span class="result-label">Condição Ib ≤ In ≤ Iz*1,45</span><span class="result-value">${Ib} ≤ ${In} ≤ ${(Iz*1.45).toFixed(1)} ✅</span></div>
+        <div class="result-highlight">Disjuntor indicado: <strong>${In} A</strong> (curva C, conforme NBR 5410)</div></div>
+        <button class="btn btn-outline btn-sm" onclick="gerarPDF('Disjuntor','resultadoDisjuntor')">📄 Baixar PDF</button>`;
+      document.getElementById('resultadoDisjuntor').innerHTML = html;
+      salvarCalculo('Disjuntor', {Ib, secao, Iz}, {disjuntor: In});
+    };
+
+    // Queda de tensão
+    document.getElementById('tab-queda').innerHTML = `
+      <h2>Queda de Tensão</h2>
+      <div class="form-group"><label>Tensão (V)</label><input type="number" id="qdTensao" value="220"></div>
+      <div class="form-group"><label>Corrente (A)</label><input type="number" id="qdCorrente" placeholder="Ex: 20"></div>
+      <div class="form-group"><label>Distância (m)</label><input type="number" id="qdDistancia" placeholder="Ex: 50"></div>
+      <div class="form-group"><label>Seção (mm²)</label><select id="qdSecao"><option value="1.5">1,5</option><option value="2.5" selected>2,5</option><option value="4">4</option><option value="6">6</option><option value="10">10</option><option value="16">16</option><option value="25">25</option></select></div>
+      <div class="form-group"><label>Material</label><select id="qdMaterial"><option value="cobre">Cobre</option><option value="aluminio">Alumínio</option></select></div>
+      <div class="form-group"><label>Tipo de circuito</label><select id="qdTipo"><option value="1">Monofásico</option><option value="3">Trifásico</option></select></div>
+      <button class="btn btn-primary" id="btnCalcularQueda">Calcular</button>
+      <div id="resultadoQueda"></div>
+    `;
+    document.getElementById('btnCalcularQueda').onclick = () => {
+      const V = parseFloat(document.getElementById('qdTensao').value)||220;
+      const I = parseFloat(document.getElementById('qdCorrente').value);
+      const L = parseFloat(document.getElementById('qdDistancia').value);
+      const S = document.getElementById('qdSecao').value;
+      const material = document.getElementById('qdMaterial').value;
+      const tipo = parseInt(document.getElementById('qdTipo').value);
+      if (!I || !L) return;
+      const vu = quedaUnitaria[material]?.[S];
+      if (!vu) { document.getElementById('resultadoQueda').innerHTML = '<div class="error visible">Dados insuficientes.</div>'; return; }
+      const deltaV = tipo===1 ? 2*I*(L/1000)*vu : Math.sqrt(3)*I*(L/1000)*vu;
+      const perc = (deltaV/V)*100;
+      const limite = tipo===1 ? 4 : 5;
+      const aprovado = perc <= limite;
+      const html = `<div class="result-card"><h3>Queda de Tensão Calculada</h3>
+        <div class="result-item"><span class="result-label">ΔV</span><span class="result-value">${deltaV.toFixed(2)} V</span></div>
+        <div class="result-item"><span class="result-label">Percentual</span><span class="result-value">${perc.toFixed(2)}%</span></div>
+        <div class="result-item"><span class="result-label">Limite normativo</span><span class="result-value">${limite}%</span></div>
+        <div class="result-highlight ${aprovado?'':'danger'}">${aprovado ? '✅ Queda dentro do limite' : '❌ Queda acima do permitido'}</div></div>
+        <button class="btn btn-outline btn-sm" onclick="gerarPDF('Queda Tensão','resultadoQueda')">📄 Baixar PDF</button>`;
+      document.getElementById('resultadoQueda').innerHTML = html;
+      salvarCalculo('Queda', {V,I,L,S,material,tipo}, {deltaV: deltaV.toFixed(2), perc: perc.toFixed(2)});
+    };
+
+    // Premium modules (bloqueados)
+    function renderizarEletrodutos() {
+      const container = document.getElementById('tab-eletrodutos');
+      if (userPlan !== 'premium') {
+        container.innerHTML = `<div class="premium-lock"><h3>⭐ Recurso Premium</h3><p>Assine para dimensionar eletrodutos.</p><button class="btn btn-premium" onclick="upgradePremium()">Assinar Premium</button></div>`;
+        return;
+      }
+      container.innerHTML = `
+        <h2>Dimensionamento de Eletroduto</h2>
+        <div class="form-group"><label>Seção total dos condutores (mm²)</label><input type="number" id="eletroSecao"></div>
+        <div class="form-group"><label>Diâmetro do eletroduto (mm)</label><select id="eletroDiam"><option value="16">16</option><option value="20">20</option><option value="25">25</option><option value="32">32</option><option value="40">40</option><option value="50">50</option></select></div>
+        <button class="btn btn-primary" id="btnCalcularEletroduto">Verificar</button>
+        <div id="resultadoEletroduto"></div>
+      `;
+      document.getElementById('btnCalcularEletroduto').onclick = () => {
+        const secao = parseFloat(document.getElementById('eletroSecao').value);
+        const diam = parseInt(document.getElementById('eletroDiam').value);
+        if (!secao) return;
+        const area = Math.PI * (diam/2)**2;
+        const ocup = (secao / area)*100;
+        const ok = ocup <= 40;
+        document.getElementById('resultadoEletroduto').innerHTML = `
+          <div class="result-card">
+            <div class="result-item"><span>Ocupação</span><span>${ocup.toFixed(1)}%</span></div>
+            <div class="result-highlight ${ok?'':'danger'}">${ok ? '✅ Ocupação ≤ 40%' : '❌ Ocupação > 40%'}</div>
+          </div>`;
+      };
+    }
+    function renderizarCurto() {
+      const container = document.getElementById('tab-curto');
+      if (userPlan !== 'premium') {
+        container.innerHTML = `<div class="premium-lock"><h3>⭐ Recurso Premium</h3><p>Assine para cálculo de curto-circuito.</p><button class="btn btn-premium" onclick="upgradePremium()">Assinar Premium</button></div>`;
+        return;
+      }
+      container.innerHTML = `
+        <h2>Corrente de Curto-circuito</h2>
+        <div class="form-group"><label>Tensão (V)</label><input type="number" id="curtoV" value="220"></div>
+        <div class="form-group"><label>Impedância do transformador (Ω)</label><input type="number" id="curtoZ" placeholder="Ex: 0.05"></div>
+        <button class="btn btn-primary" id="btnCalcularCurto">Calcular Ik</button>
+        <div id="resultadoCurto"></div>
+      `;
+      document.getElementById('btnCalcularCurto').onclick = () => {
+        const V = parseFloat(document.getElementById('curtoV').value)||220;
+        const Z = parseFloat(document.getElementById('curtoZ').value);
+        if (!Z) return;
+        const Ik = V/Z;
+        document.getElementById('resultadoCurto').innerHTML = `<div class="result-card"><div class="result-highlight">Ik = ${Ik.toFixed(0)} A</div></div>`;
+      };
+    }
+
+    // Histórico
+    async function carregarHistorico() {
+      const container = document.getElementById('tab-historico');
+      container.innerHTML = '<div class="spinner"></div>';
+      if (!currentUser) return;
+      try {
+        let q = db.collection('calculos').where('userId','==',currentUser.uid).orderBy('createdAt','desc');
+        if (userPlan !== 'premium') q = q.limit(5);
+        const snap = await q.get();
+        if (snap.empty) { container.innerHTML = '<div class="empty-state">Nenhum cálculo salvo.</div>'; return; }
+        let html = '';
+        snap.forEach(doc => {
+          const d = doc.data();
+          const data = d.createdAt?.toDate().toLocaleString('pt-BR') || '';
+          html += `<div class="history-item"><span class="type">${d.tipo}</span> - ${JSON.stringify(d.parametros)} → ${JSON.stringify(d.resultado)}<br><span class="date">${data}</span></div>`;
+        });
+        if (userPlan !== 'premium') html += '<p style="text-align:center;color:var(--text-secondary);">Limite de 5 cálculos. <span class="link" onclick="showTab(\'perfil\')">Assine Premium</span></p>';
+        container.innerHTML = html;
+      } catch(e) { container.innerHTML = '<div class="error visible">Erro ao carregar.</div>'; }
+    }
+
+    // Perfil
+    function renderizarPerfil() {
+      const container = document.getElementById('tab-perfil');
+      if (!currentUser) return;
+      db.collection('users').doc(currentUser.uid).get().then(doc => {
+        const data = doc.data() || {};
+        const foto = data.photoURL || '';
+        container.innerHTML = `
+          <h2>Meu Perfil</h2>
+          <div style="text-align:center; margin-bottom:20px;">
+            <img src="${foto || 'https://via.placeholder.com/80/4f46e5/ffffff?text='+(data.nome||'?')[0].toUpperCase()}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--primary);" id="fotoPerfil">
+            <br><input type="file" id="uploadFoto" accept="image/*" style="display:none;">
+            <button class="btn btn-outline btn-sm" onclick="document.getElementById('uploadFoto').click()">Alterar foto</button>
+          </div>
+          <div class="form-group"><label>Nome</label><input type="text" id="perfilNome" value="${data.nome||''}"></div>
+          <div class="form-group"><label>Email</label><input disabled value="${currentUser.email}"></div>
+          <button class="btn btn-primary" id="btnSalvarPerfil">Salvar</button>
+          <button class="btn btn-outline" id="btnTrocarSenha" style="margin-top:8px;">Alterar senha</button>
+          <div class="divider"><span>Plano</span></div>
+          <p>Status: <strong>${userPlan==='premium'?'Premium':'Gratuito'}</strong></p>
+          ${userPlan !== 'premium' ? '<button class="btn btn-premium" id="btnUpgradePerfil">Assinar Premium</button>' : ''}
+          <div class="error" id="erroPerfil"></div>
+        `;
+        document.getElementById('btnSalvarPerfil').onclick = async () => {
+          const nome = document.getElementById('perfilNome').value.trim();
+          await db.collection('users').doc(currentUser.uid).update({ nome });
+          document.getElementById('nomeUsuario').textContent = nome;
+          alert('Perfil atualizado.');
+        };
+        document.getElementById('btnTrocarSenha').onclick = () => {
+          const nova = prompt('Nova senha (mínimo 6):');
+          if (nova && nova.length>=6) {
+            currentUser.updatePassword(nova).then(()=>alert('Senha alterada.')).catch(e=>alert('Erro: '+e.message));
+          }
+        };
+        document.getElementById('uploadFoto').onchange = async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const ref = storage.ref(`users/${currentUser.uid}/profile.${file.name.split('.').pop()}`);
+          await ref.put(file);
+          const url = await ref.getDownloadURL();
+          await db.collection('users').doc(currentUser.uid).update({ photoURL: url });
+          document.getElementById('fotoPerfil').src = url;
+        };
+        if (userPlan !== 'premium') {
+          document.getElementById('btnUpgradePerfil').onclick = upgradePremium;
+        }
+      });
+    }
+
+    // Admin
+    async function renderizarAdmin() {
+      const container = document.getElementById('tab-admin');
+      if (!isAdmin) return;
+      container.innerHTML = '<div class="spinner"></div>';
+      const snap = await db.collection('users').get();
+      let html = '<h3>Usuários cadastrados</h3>';
+      snap.forEach(d => { const u = d.data(); html += `<div class="history-item">${u.nome||'sem nome'} - ${u.email}</div>`; });
+      container.innerHTML = html;
+    }
+
+    // Upgrade simulado
+    async function upgradePremium() {
+      if (!currentUser) return;
+      if (confirm('Simular assinatura Premium?')) {
+        await db.collection('subscriptions').doc(currentUser.uid).set({ plan: 'premium', status: 'active', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        userPlan = 'premium';
+        atualizarBadgePlano();
+        showTab('corrente'); // recarregar abas
+        alert('Agora você é Premium!');
+      }
+    }
+    window.upgradePremium = upgradePremium;
+
+    // Inicializar abas premium
+    renderizarEletrodutos();
+    renderizarCurto();
   </script>
 </body>
 </html>
