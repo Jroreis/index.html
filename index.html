@@ -3,138 +3,260 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VoltCalc Pro</title>
+  <title>VoltCalc Pro - NBR 5410</title>
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #1e293b;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.08);
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f2f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; padding: 20px;
     }
-    .tela {
-      display: none;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      padding: 40px 30px;
-      width: 100%;
-      max-width: 420px;
-      animation: fadeIn 0.3s ease;
+    /* Telas */
+    .screen {
+      display: none; background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow-lg); padding: 32px 28px;
+      width: 100%; max-width: 480px; animation: fadeIn 0.3s ease;
     }
-    .tela.ativa { display: block; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    h1 { text-align: center; color: var(--text); font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    h2 { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 16px; }
+    .subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 24px; font-size: 14px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: var(--text); font-size: 13px; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: 14px; transition: all 0.2s; background: #fff;
     }
-    h1 { text-align: center; margin-bottom: 8px; color: #1a1a2e; font-size: 24px; }
-    .subtitulo { text-align: center; color: #6b7280; margin-bottom: 24px; font-size: 14px; }
-    .campo { margin-bottom: 16px; }
-    .campo label { display: block; margin-bottom: 6px; font-weight: 500; color: #374151; font-size: 14px; }
-    .campo input {
-      width: 100%; padding: 12px 14px; border: 1.5px solid #d1d5db;
-      border-radius: 8px; font-size: 15px; transition: border-color 0.2s;
+    .form-group input:focus, .form-group select:focus {
+      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
     }
-    .campo input:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+    .row { display: flex; gap: 10px; }
+    .row .form-group { flex: 1; }
     .btn {
       width: 100%; padding: 13px; border: none; border-radius: 8px;
-      font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+      font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
     .btn:active { transform: scale(0.98); }
     .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn-primario { background: #4f46e5; color: white; }
-    .btn-primario:hover { background: #4338ca; }
-    .btn-google {
-      background: white; color: #374151; border: 1.5px solid #d1d5db;
-      margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;
-    }
-    .btn-google:hover { background: #f9fafb; }
-    .btn-google img { width: 20px; height: 20px; }
-    .btn-sair { background: #ef4444; color: white; padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
-    .link { display: block; text-align: center; margin-top: 18px; color: #4f46e5; cursor: pointer; font-size: 14px; text-decoration: none; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outline { background: #fff; color: var(--primary); border: 1.5px solid var(--primary); }
+    .btn-outline:hover { background: #f8fafc; }
+    .btn-google { background: #fff; color: var(--text); border: 1.5px solid var(--border); }
+    .btn-google:hover { background: #f8fafc; }
+    .btn-sm { padding: 8px 16px; font-size: 13px; width: auto; }
+    .error { background: #fef2f2; color: #dc2626; padding: 10px 14px; border-radius: 8px; margin-top: 10px; font-size: 13px; display: none; }
+    .error.visible { display: block; }
+    .link { display: block; text-align: center; margin-top: 16px; color: var(--primary); cursor: pointer; font-size: 13px; }
     .link:hover { text-decoration: underline; }
-    .divisor { display: flex; align-items: center; margin: 20px 0; color: #9ca3af; font-size: 13px; }
-    .divisor::before, .divisor::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
-    .divisor span { padding: 0 12px; }
-    .erro { background: #fef2f2; color: #dc2626; padding: 10px 14px; border-radius: 8px; margin-top: 12px; font-size: 13px; text-align: center; display: none; }
-    .erro.visivel { display: block; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-    .header .nome-usuario { font-size: 18px; font-weight: 600; color: #1a1a2e; }
-    .loading { text-align: center; padding: 20px; color: #6b7280; }
-    .spinner { border: 3px solid #e5e7eb; border-top: 3px solid #4f46e5; border-radius: 50%; width: 40px; height: 40px; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+    .divider { display: flex; align-items: center; margin: 18px 0; color: #94a3b8; font-size: 12px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .divider span { padding: 0 10px; }
+    /* Home */
+    .home-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .home-header .user-info { display: flex; align-items: center; gap: 10px; }
+    .home-header .user-name { font-weight: 600; color: var(--text); font-size: 15px; }
+    .home-header .btn-logout { background: #fee2e2; color: var(--danger); border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 13px; }
+    .home-header .btn-logout:hover { background: #fecaca; }
+    /* Tabs */
+    .tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 20px; overflow-x: auto; gap: 4px; }
+    .tab {
+      padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--text-secondary);
+      cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap;
+      transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none;
+    }
+    .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .tab-content { display: none; animation: fadeIn 0.3s ease; }
+    .tab-content.active { display: block; }
+    /* Result Card */
+    .result-card {
+      background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 20px; margin-top: 20px;
+    }
+    .result-card h3 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+    .result-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .result-item:last-child { border-bottom: none; }
+    .result-item .label { color: var(--text-secondary); }
+    .result-item .value { font-weight: 600; color: var(--text); }
+    .result-highlight { background: #eef2ff; border-radius: 8px; padding: 12px; margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--primary-dark); text-align: center; }
+    .result-highlight.danger { background: #fef2f2; color: #dc2626; }
+    /* History */
+    .history-item {
+      background: #f8fafc; border: 1px solid var(--border); border-radius: 8px;
+      padding: 14px; margin-bottom: 10px; font-size: 13px;
+    }
+    .history-item .type { font-weight: 600; color: var(--primary); }
+    .history-item .date { color: var(--text-secondary); font-size: 11px; }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
+    .empty-state svg { width: 60px; height: 60px; margin-bottom: 16px; color: #cbd5e1; }
+    .badge {
+      display: inline-block; padding: 4px 10px; border-radius: 20px;
+      font-size: 12px; font-weight: 600;
+    }
+    .badge-success { background: #d1fae5; color: #065f46; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    .spinner {
+      border: 3px solid #e2e8f0; border-top: 3px solid var(--primary);
+      border-radius: 50%; width: 32px; height: 32px; animation: spin 0.7s linear infinite; margin: 20px auto;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
+    @media (max-width: 500px) {
+      .screen { padding: 24px 16px; }
+      .tabs { gap: 0; }
+      .tab { padding: 10px 10px; font-size: 12px; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Tela de Login -->
-  <div class="tela ativa" id="telaLogin">
+  <!-- ============ TELA DE LOGIN ============ -->
+  <div class="screen active" id="loginScreen">
     <h1>⚡ VoltCalc Pro</h1>
-    <p class="subtitulo">Cálculos elétricos baseados na NBR 5410</p>
-    <div class="campo">
-      <label for="loginEmail">Email</label>
-      <input type="email" id="loginEmail" placeholder="seu@email.com">
-    </div>
-    <div class="campo">
-      <label for="loginSenha">Senha</label>
-      <input type="password" id="loginSenha" placeholder="••••••">
-    </div>
-    <button class="btn btn-primario" id="btnLogin">Entrar</button>
-    <div class="erro" id="erroLogin"></div>
-    <div class="divisor"><span>ou</span></div>
-    <button class="btn btn-google" id="btnGoogle">
-      <img src="https://www.google.com/favicon.ico" alt="Google">
-      Entrar com Google
-    </button>
+    <p class="subtitle">Cálculos elétricos NBR 5410</p>
+    <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="seu@email.com"></div>
+    <div class="form-group"><label>Senha</label><input type="password" id="loginSenha" placeholder="••••••"></div>
+    <button class="btn btn-primary" id="btnLogin">Entrar</button>
+    <div class="error" id="erroLogin"></div>
+    <div class="divider"><span>ou</span></div>
+    <button class="btn btn-google" id="btnGoogle"><span style="font-size:18px;">G</span> Entrar com Google</button>
     <span class="link" id="linkCadastro">Não tem conta? Cadastre-se</span>
   </div>
 
-  <!-- Tela de Cadastro -->
-  <div class="tela" id="telaCadastro">
+  <!-- ============ TELA DE CADASTRO ============ -->
+  <div class="screen" id="cadastroScreen">
     <h1>📝 Criar Conta</h1>
-    <p class="subtitulo">Preencha os dados para se cadastrar</p>
-    <div class="campo">
-      <label for="cadastroNome">Nome</label>
-      <input type="text" id="cadastroNome" placeholder="Seu nome">
-    </div>
-    <div class="campo">
-      <label for="cadastroEmail">Email</label>
-      <input type="email" id="cadastroEmail" placeholder="seu@email.com">
-    </div>
-    <div class="campo">
-      <label for="cadastroSenha">Senha</label>
-      <input type="password" id="cadastroSenha" placeholder="Mínimo 6 caracteres">
-    </div>
-    <button class="btn btn-primario" id="btnCadastro">Cadastrar</button>
-    <div class="erro" id="erroCadastro"></div>
+    <p class="subtitle">Cadastre-se para salvar seus cálculos</p>
+    <div class="form-group"><label>Nome</label><input type="text" id="cadNome" placeholder="Seu nome"></div>
+    <div class="form-group"><label>Email</label><input type="email" id="cadEmail" placeholder="seu@email.com"></div>
+    <div class="form-group"><label>Senha</label><input type="password" id="cadSenha" placeholder="Mínimo 6 caracteres"></div>
+    <button class="btn btn-primary" id="btnCadastro">Cadastrar</button>
+    <div class="error" id="erroCadastro"></div>
     <span class="link" id="linkLogin">Já tem conta? Entrar</span>
   </div>
 
-  <!-- Tela Home -->
-  <div class="tela" id="telaHome">
-    <div class="header">
-      <span class="nome-usuario" id="nomeUsuario">Olá!</span>
-      <button class="btn-sair" id="btnSair">Sair</button>
+  <!-- ============ TELA HOME (APÓS LOGIN) ============ -->
+  <div class="screen" id="homeScreen" style="max-width: 600px;">
+    <div class="home-header">
+      <div class="user-info"><span class="user-name" id="nomeUsuario">Olá!</span></div>
+      <button class="btn-logout" id="btnSair">Sair</button>
     </div>
-    <div class="loading" id="loadingHome">
-      <div class="spinner"></div>
-      <p>Carregando...</p>
+    <!-- Abas -->
+    <div class="tabs" id="tabsContainer">
+      <button class="tab active" data-tab="corrente">⚡ Corrente</button>
+      <button class="tab" data-tab="condutor">🔌 Condutor</button>
+      <button class="tab" data-tab="disjuntor">🛡️ Disjuntor</button>
+      <button class="tab" data-tab="queda">📉 Queda Tensão</button>
+      <button class="tab" data-tab="historico">📚 Histórico</button>
     </div>
-    <div id="conteudoHome" style="display:none;">
-      <p style="text-align:center;color:#6b7280;">✅ Login realizado com sucesso!</p>
-      <p style="text-align:center;color:#6b7280;margin-top:12px;">Em breve: calculadora NBR 5410</p>
+
+    <!-- Aba: Corrente / Potência -->
+    <div class="tab-content active" id="tab-corrente">
+      <h2>Cálculo de Corrente</h2>
+      <div class="form-group"><label>Tensão (V)</label><input type="number" id="corrTensao" placeholder="Ex: 220" value="220"></div>
+      <div class="form-group"><label>Potência (W)</label><input type="number" id="corrPotencia" placeholder="Ex: 4400"></div>
+      <div class="form-group"><label>Tipo de circuito</label>
+        <select id="corrTipo">
+          <option value="1">Monofásico (F+N)</option>
+          <option value="2">Bifásico (F+F)</option>
+          <option value="3">Trifásico (F+F+F)</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Fator de potência</label><input type="number" id="corrFP" placeholder="0 a 1" value="0.92" step="0.01" min="0.1" max="1"></div>
+      <button class="btn btn-primary" id="btnCalcularCorrente">Calcular Corrente</button>
+      <div id="resultadoCorrente" style="margin-top:16px;"></div>
+    </div>
+
+    <!-- Aba: Condutor -->
+    <div class="tab-content" id="tab-condutor">
+      <h2>Dimensionamento de Condutor</h2>
+      <div class="form-group"><label>Corrente de projeto (A)</label><input type="number" id="condCorrente" placeholder="Ex: 20"></div>
+      <div class="form-group"><label>Método de instalação</label>
+        <select id="condMetodo">
+          <option value="B1">B1 - Eletroduto embutido</option>
+          <option value="B2">B2 - Eletroduto aparente</option>
+          <option value="C">C - Cabos ao ar livre</option>
+          <option value="D">D - Cabos enterrados</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Isolação do condutor</label>
+        <select id="condIsolacao">
+          <option value="PVC">PVC (70°C)</option>
+          <option value="EPR">EPR/XLPE (90°C)</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="form-group"><label>Nº condutores carregados</label><input type="number" id="condCarregados" value="2" min="2" max="3"></div>
+        <div class="form-group"><label>Temperatura ambiente (°C)</label><input type="number" id="condTemp" value="30"></div>
+      </div>
+      <button class="btn btn-primary" id="btnCalcularCondutor">Dimensionar Condutor</button>
+      <div id="resultadoCondutor" style="margin-top:16px;"></div>
+    </div>
+
+    <!-- Aba: Disjuntor -->
+    <div class="tab-content" id="tab-disjuntor">
+      <h2>Dimensionamento de Disjuntor</h2>
+      <div class="form-group"><label>Corrente de projeto Ib (A)</label><input type="number" id="disjIb" placeholder="Ex: 20"></div>
+      <div class="form-group"><label>Seção do condutor (mm²)</label>
+        <select id="disjSecao">
+          <option value="1.5">1,5 mm²</option><option value="2.5">2,5 mm²</option>
+          <option value="4">4 mm²</option><option value="6">6 mm²</option>
+          <option value="10" selected>10 mm²</option><option value="16">16 mm²</option>
+          <option value="25">25 mm²</option><option value="35">35 mm²</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Isolação</label>
+        <select id="disjIsolacao"><option value="PVC">PVC</option><option value="EPR">EPR/XLPE</option></select>
+      </div>
+      <button class="btn btn-primary" id="btnCalcularDisjuntor">Dimensionar Disjuntor</button>
+      <div id="resultadoDisjuntor" style="margin-top:16px;"></div>
+    </div>
+
+    <!-- Aba: Queda de Tensão -->
+    <div class="tab-content" id="tab-queda">
+      <h2>Queda de Tensão</h2>
+      <div class="form-group"><label>Tensão do circuito (V)</label><input type="number" id="qdTensao" value="220"></div>
+      <div class="form-group"><label>Corrente (A)</label><input type="number" id="qdCorrente" placeholder="Ex: 20"></div>
+      <div class="form-group"><label>Distância (m)</label><input type="number" id="qdDistancia" placeholder="Ex: 50"></div>
+      <div class="form-group"><label>Seção do condutor (mm²)</label>
+        <select id="qdSecao"><option value="1.5">1,5</option><option value="2.5" selected>2,5</option><option value="4">4</option><option value="6">6</option><option value="10">10</option><option value="16">16</option><option value="25">25</option></select>
+      </div>
+      <div class="form-group"><label>Material</label><select id="qdMaterial"><option value="cobre">Cobre</option><option value="aluminio">Alumínio</option></select></div>
+      <div class="form-group"><label>Tipo de circuito</label><select id="qdTipo"><option value="1">Monofásico</option><option value="3">Trifásico</option></select></div>
+      <button class="btn btn-primary" id="btnCalcularQueda">Calcular Queda de Tensão</button>
+      <div id="resultadoQueda" style="margin-top:16px;"></div>
+    </div>
+
+    <!-- Aba: Histórico -->
+    <div class="tab-content" id="tab-historico">
+      <h2>Histórico de Cálculos</h2>
+      <div id="historicoContainer"><div class="spinner"></div></div>
     </div>
   </div>
 
   <script>
-    // ============ Configuração do Firebase ============
+    // ==================== FIREBASE ====================
     const firebaseConfig = {
       apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
       authDomain: "voltcalc-pro.firebaseapp.com",
@@ -143,216 +265,259 @@
       messagingSenderId: "411208955318",
       appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
     };
-
-    // Inicializar Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // ============ Funções de Autenticação ============
-    async function cadastrarUsuario(nome, email, senha) {
+    // ==================== AUTENTICAÇÃO ====================
+    async function cadastrar(nome, email, senha) {
       try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
-        await db.collection('users').doc(userCredential.user.uid).set({
-          nome: nome,
-          email: email,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        return { success: true, user: userCredential.user };
-      } catch (error) {
-        console.error('Erro ao cadastrar:', error);
-        let mensagem = 'Erro ao cadastrar.';
-        switch (error.code) {
-          case 'auth/email-already-in-use': mensagem = 'Este email já está cadastrado.'; break;
-          case 'auth/weak-password': mensagem = 'A senha deve ter pelo menos 6 caracteres.'; break;
-          case 'auth/invalid-email': mensagem = 'Email inválido.'; break;
-          default: mensagem = 'Erro ao cadastrar. Tente novamente.';
-        }
-        return { success: false, message: mensagem };
+        const cred = await auth.createUserWithEmailAndPassword(email, senha);
+        await db.collection('users').doc(cred.user.uid).set({ nome, email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        return { success: true };
+      } catch (e) {
+        const msgs = { 'auth/email-already-in-use': 'Email já cadastrado.', 'auth/weak-password': 'Senha muito fraca (mín. 6).', 'auth/invalid-email': 'Email inválido.' };
+        return { success: false, message: msgs[e.code] || 'Erro ao cadastrar.' };
       }
     }
-
-    async function loginUsuario(email, senha) {
-      try {
-        const userCredential = await auth.signInWithEmailAndPassword(email, senha);
-        return { success: true, user: userCredential.user };
-      } catch (error) {
-        console.error('Erro ao fazer login:', error);
-        let mensagem = 'Erro ao fazer login.';
-        switch (error.code) {
-          case 'auth/invalid-credential': mensagem = 'Email ou senha incorretos.'; break;
-          case 'auth/user-not-found': mensagem = 'Usuário não encontrado.'; break;
-          case 'auth/wrong-password': mensagem = 'Senha incorreta.'; break;
-          case 'auth/invalid-email': mensagem = 'Email inválido.'; break;
-          case 'auth/too-many-requests': mensagem = 'Muitas tentativas. Aguarde um momento.'; break;
-          default: mensagem = 'Erro ao fazer login. Tente novamente.';
-        }
-        return { success: false, message: mensagem };
+    async function login(email, senha) {
+      try { await auth.signInWithEmailAndPassword(email, senha); return { success: true }; }
+      catch (e) {
+        const msgs = { 'auth/invalid-credential': 'Email ou senha incorretos.', 'auth/user-not-found': 'Usuário não encontrado.', 'auth/too-many-requests': 'Muitas tentativas. Aguarde.' };
+        return { success: false, message: msgs[e.code] || 'Erro ao entrar.' };
       }
     }
-
-    async function loginComGoogle() {
+    async function loginGoogle() {
       try {
         const provider = new firebase.auth.GoogleAuthProvider();
         const result = await auth.signInWithPopup(provider);
-        await db.collection('users').doc(result.user.uid).set({
-          nome: result.user.displayName,
-          email: result.user.email,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-        return { success: true, user: result.user };
-      } catch (error) {
-        console.error('Erro ao fazer login com Google:', error);
-        if (error.code === 'auth/popup-closed-by-user') {
-          return { success: false, message: 'Login cancelado.' };
-        }
-        return { success: false, message: 'Erro ao fazer login com Google.' };
-      }
-    }
-
-    async function logoutUsuario() {
-      try {
-        await auth.signOut();
+        await db.collection('users').doc(result.user.uid).set({ nome: result.user.displayName, email: result.user.email, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
         return { success: true };
-      } catch (error) {
-        return { success: false, message: 'Erro ao sair.' };
+      } catch (e) {
+        if (e.code === 'auth/popup-closed-by-user') return { success: false, message: 'Login cancelado.' };
+        return { success: false, message: 'Erro no login Google.' };
       }
     }
+    function logout() { return auth.signOut(); }
 
-    async function buscarDadosUsuario(uid) {
-      try {
-        const doc = await db.collection('users').doc(uid).get();
-        if (doc.exists) return doc.data();
-        return null;
-      } catch (error) {
-        console.error('Erro ao buscar dados:', error);
-        return null;
-      }
-    }
+    // ==================== UI ====================
+    const $loginScr = document.getElementById('loginScreen');
+    const $cadScr = document.getElementById('cadastroScreen');
+    const $homeScr = document.getElementById('homeScreen');
+    function show(scr) { [$loginScr, $cadScr, $homeScr].forEach(s => s.classList.remove('active')); scr.classList.add('active'); }
+    // Navegação entre telas
+    document.getElementById('linkCadastro').onclick = () => { document.getElementById('erroLogin').classList.remove('visible'); show($cadScr); };
+    document.getElementById('linkLogin').onclick = () => { document.getElementById('erroCadastro').classList.remove('visible'); show($loginScr); };
+    // Login
+    document.getElementById('btnLogin').onclick = async () => {
+      const e = document.getElementById('loginEmail').value.trim(), s = document.getElementById('loginSenha').value;
+      const err = document.getElementById('erroLogin'); err.classList.remove('visible');
+      if (!e || !s) { err.textContent = 'Preencha todos os campos.'; err.classList.add('visible'); return; }
+      const btn = document.getElementById('btnLogin'); btn.disabled = true; btn.textContent = 'Entrando...';
+      const r = await login(e, s);
+      btn.disabled = false; btn.textContent = 'Entrar';
+      if (!r.success) { err.textContent = r.message; err.classList.add('visible'); }
+    };
+    // Google
+    document.getElementById('btnGoogle').onclick = async () => {
+      const err = document.getElementById('erroLogin'); err.classList.remove('visible');
+      const btn = document.getElementById('btnGoogle'); btn.disabled = true; btn.textContent = 'Conectando...';
+      const r = await loginGoogle();
+      btn.disabled = false; btn.innerHTML = '<span style="font-size:18px;">G</span> Entrar com Google';
+      if (!r.success) { err.textContent = r.message; err.classList.add('visible'); }
+    };
+    // Cadastro
+    document.getElementById('btnCadastro').onclick = async () => {
+      const n = document.getElementById('cadNome').value.trim();
+      const e = document.getElementById('cadEmail').value.trim();
+      const s = document.getElementById('cadSenha').value;
+      const err = document.getElementById('erroCadastro'); err.classList.remove('visible');
+      if (!n || !e || !s) { err.textContent = 'Preencha todos os campos.'; err.classList.add('visible'); return; }
+      if (s.length < 6) { err.textContent = 'Senha mínima 6 caracteres.'; err.classList.add('visible'); return; }
+      const btn = document.getElementById('btnCadastro'); btn.disabled = true; btn.textContent = 'Cadastrando...';
+      const r = await cadastrar(n, e, s);
+      btn.disabled = false; btn.textContent = 'Cadastrar';
+      if (!r.success) { err.textContent = r.message; err.classList.add('visible'); }
+    };
+    // Logout
+    document.getElementById('btnSair').onclick = () => logout();
 
-    function observarAutenticacao(callback) {
-      auth.onAuthStateChanged(async (user) => {
-        if (user) {
-          const dados = await buscarDadosUsuario(user.uid);
-          callback({ logado: true, user: user, dados: dados });
-        } else {
-          callback({ logado: false, user: null, dados: null });
-        }
+    // ==================== ABAS ====================
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        if (tab.dataset.tab === 'historico') carregarHistorico();
       });
+    });
+
+    // ==================== TABELAS NBR 5410 SIMPLIFICADAS ====================
+    // Capacidade de condução (A) para cabos de cobre, 2 condutores carregados, PVC 70°C, temp amb 30°C
+    const tabelaCondutores = {
+      'PVC': { '1.5': 17.5, '2.5': 24, '4': 32, '6': 41, '10': 57, '16': 76, '25': 99, '35': 125, '50': 151, '70': 192, '95': 232, '120': 269 },
+      'EPR': { '1.5': 22, '2.5': 30, '4': 40, '6': 52, '10': 72, '16': 96, '25': 125, '35': 155, '50': 188, '70': 238, '95': 288, '120': 334 }
+    };
+    // Fatores de correção para temperatura (simplificado)
+    const fatorTemperatura = { PVC: { 25: 1.06, 30: 1.00, 35: 0.94, 40: 0.87, 45: 0.79 }, EPR: { 25: 1.04, 30: 1.00, 35: 0.96, 40: 0.91, 45: 0.87 } };
+    // Disjuntores comerciais
+    const disjuntores = [2, 4, 6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 150, 175, 200, 225, 250];
+    // Queda de tensão unitária (V/A.km) para FP=0.92
+    const quedaUnitaria = { cobre: { 1.5: 23.0, 2.5: 14.0, 4: 8.7, 6: 5.8, 10: 3.5, 16: 2.2, 25: 1.4 }, aluminio: { 16: 3.6, 25: 2.3, 35: 1.6 } };
+
+    // ==================== SALVAR HISTÓRICO ====================
+    async function salvarCalculo(tipo, parametros, resultado) {
+      const user = auth.currentUser;
+      if (!user) return;
+      try {
+        await db.collection('calculos').add({
+          userId: user.uid, tipo, parametros, resultado,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (e) { console.error('Erro ao salvar histórico:', e); }
     }
 
-    // ============ Lógica da Interface ============
-    const telaLogin = document.getElementById('telaLogin');
-    const telaCadastro = document.getElementById('telaCadastro');
-    const telaHome = document.getElementById('telaHome');
-    const erroLogin = document.getElementById('erroLogin');
-    const erroCadastro = document.getElementById('erroCadastro');
-    const loadingHome = document.getElementById('loadingHome');
-    const conteudoHome = document.getElementById('conteudoHome');
+    // ==================== CÁLCULO DE CORRENTE ====================
+    document.getElementById('btnCalcularCorrente').addEventListener('click', async () => {
+      const V = parseFloat(document.getElementById('corrTensao').value) || 220;
+      const P = parseFloat(document.getElementById('corrPotencia').value);
+      const tipo = parseInt(document.getElementById('corrTipo').value);
+      const fp = parseFloat(document.getElementById('corrFP').value) || 1;
+      if (!P || P <= 0) { document.getElementById('resultadoCorrente').innerHTML = '<div class="error visible">Informe a potência.</div>'; return; }
+      let I;
+      if (tipo === 1) I = P / (V * fp);
+      else if (tipo === 2) I = P / (V * fp);
+      else I = P / (V * Math.sqrt(3) * fp);
+      const html = `<div class="result-card"><h3>Resultado</h3>
+        <div class="result-item"><span class="label">Potência</span><span class="value">${P.toFixed(0)} W</span></div>
+        <div class="result-item"><span class="label">Tensão</span><span class="value">${V} V (${tipo===1?'Mono':tipo===2?'Bi':'Tri'}fásico)</span></div>
+        <div class="result-item"><span class="label">Fator de potência</span><span class="value">${fp}</span></div>
+        <div class="result-highlight">Corrente: <strong>${I.toFixed(2)} A</strong></div></div>`;
+      document.getElementById('resultadoCorrente').innerHTML = html;
+      await salvarCalculo('Corrente', { V, P, tipo, fp }, { corrente: I.toFixed(2) });
+    });
 
-    function mostrarTela(tela) {
-      telaLogin.classList.remove('ativa');
-      telaCadastro.classList.remove('ativa');
-      telaHome.classList.remove('ativa');
-      tela.classList.add('ativa');
+    // ==================== DIMENSIONAMENTO DE CONDUTOR ====================
+    document.getElementById('btnCalcularCondutor').addEventListener('click', async () => {
+      const Ib = parseFloat(document.getElementById('condCorrente').value);
+      const metodo = document.getElementById('condMetodo').value;
+      const isolacao = document.getElementById('condIsolacao').value;
+      const nCarregados = parseInt(document.getElementById('condCarregados').value) || 2;
+      const temp = parseInt(document.getElementById('condTemp').value) || 30;
+      if (!Ib || Ib <= 0) { document.getElementById('resultadoCondutor').innerHTML = '<div class="error visible">Informe a corrente.</div>'; return; }
+      const tabela = tabelaCondutores[isolacao];
+      const ft = (fatorTemperatura[isolacao] && fatorTemperatura[isolacao][temp]) ? fatorTemperatura[isolacao][temp] : (temp >= 35 ? 0.94 : 1.00);
+      const fatorAgrupamento = nCarregados === 3 ? 0.8 : 1.0;
+      const IzMin = Ib / (ft * fatorAgrupamento);
+      let secaoEscolhida = null, IzFinal = 0;
+      for (const [secao, capacidade] of Object.entries(tabela)) {
+        if (capacidade * ft * fatorAgrupamento >= Ib) { secaoEscolhida = secao; IzFinal = capacidade * ft * fatorAgrupamento; break; }
+      }
+      if (!secaoEscolhida) { document.getElementById('resultadoCondutor').innerHTML = '<div class="error visible">Nenhum condutor disponível para esta corrente.</div>'; return; }
+      const html = `<div class="result-card"><h3>Resultado</h3>
+        <div class="result-item"><span class="label">Corrente de projeto (Ib)</span><span class="value">${Ib} A</span></div>
+        <div class="result-item"><span class="label">Fator temperatura (${temp}°C)</span><span class="value">${ft.toFixed(2)}</span></div>
+        <div class="result-item"><span class="label">Fator agrupamento</span><span class="value">${fatorAgrupamento.toFixed(2)}</span></div>
+        <div class="result-item"><span class="label">Capacidade de condução (Iz)</span><span class="value">${IzFinal.toFixed(1)} A</span></div>
+        <div class="result-highlight">Seção recomendada: <strong>${secaoEscolhida} mm²</strong> (${isolacao}, ${metodo})</div></div>`;
+      document.getElementById('resultadoCondutor').innerHTML = html;
+      await salvarCalculo('Condutor', { Ib, metodo, isolacao, temp }, { secao: secaoEscolhida, Iz: IzFinal.toFixed(1) });
+    });
+
+    // ==================== DIMENSIONAMENTO DE DISJUNTOR ====================
+    document.getElementById('btnCalcularDisjuntor').addEventListener('click', async () => {
+      const Ib = parseFloat(document.getElementById('disjIb').value);
+      const secao = document.getElementById('disjSecao').value;
+      const isolacao = document.getElementById('disjIsolacao').value;
+      if (!Ib || Ib <= 0) { document.getElementById('resultadoDisjuntor').innerHTML = '<div class="error visible">Informe a corrente.</div>'; return; }
+      const Iz = tabelaCondutores[isolacao][secao] || 0;
+      let In = null;
+      for (const d of disjuntores) { if (d >= Ib && d <= Iz * 1.45) { In = d; break; } }
+      if (!In) {
+        document.getElementById('resultadoDisjuntor').innerHTML = `<div class="result-card"><h3>Resultado</h3>
+          <div class="result-highlight danger">Não foi possível encontrar disjuntor adequado.<br>Verifique os parâmetros.</div></div>`;
+        return;
+      }
+      const html = `<div class="result-card"><h3>Resultado</h3>
+        <div class="result-item"><span class="label">Corrente de projeto (Ib)</span><span class="value">${Ib} A</span></div>
+        <div class="result-item"><span class="label">Capacidade do condutor (Iz)</span><span class="value">${Iz} A</span></div>
+        <div class="result-item"><span class="label">Condição Ib ≤ In ≤ Iz</span><span class="value"><span class="badge badge-success">OK</span></span></div>
+        <div class="result-highlight">Disjuntor recomendado: <strong>${In} A</strong></div></div>`;
+      document.getElementById('resultadoDisjuntor').innerHTML = html;
+      await salvarCalculo('Disjuntor', { Ib, secao, Iz }, { disjuntor: In });
+    });
+
+    // ==================== QUEDA DE TENSÃO ====================
+    document.getElementById('btnCalcularQueda').addEventListener('click', async () => {
+      const V = parseFloat(document.getElementById('qdTensao').value) || 220;
+      const I = parseFloat(document.getElementById('qdCorrente').value);
+      const L = parseFloat(document.getElementById('qdDistancia').value);
+      const S = document.getElementById('qdSecao').value;
+      const material = document.getElementById('qdMaterial').value;
+      const tipo = parseInt(document.getElementById('qdTipo').value);
+      if (!I || !L || I <= 0 || L <= 0) { document.getElementById('resultadoQueda').innerHTML = '<div class="error visible">Preencha corrente e distância.</div>'; return; }
+      const tabelaQ = quedaUnitaria[material];
+      if (!tabelaQ || !tabelaQ[S]) { document.getElementById('resultadoQueda').innerHTML = '<div class="error visible">Seção não disponível para este material.</div>'; return; }
+      const Vu = tabelaQ[S]; // V/A.km
+      let deltaV;
+      if (tipo === 1) deltaV = 2 * I * (L / 1000) * Vu;
+      else deltaV = Math.sqrt(3) * I * (L / 1000) * Vu;
+      const percentual = (deltaV / V) * 100;
+      const limite = tipo === 1 ? 4 : 5; // 4% mono, 5% tri
+      const aprovado = percentual <= limite;
+      const html = `<div class="result-card"><h3>Resultado</h3>
+        <div class="result-item"><span class="label">Tensão</span><span class="value">${V} V</span></div>
+        <div class="result-item"><span class="label">Corrente</span><span class="value">${I} A</span></div>
+        <div class="result-item"><span class="label">Distância</span><span class="value">${L} m</span></div>
+        <div class="result-item"><span class="label">Seção</span><span class="value">${S} mm² (${material})</span></div>
+        <div class="result-item"><span class="label">Queda de tensão</span><span class="value">${deltaV.toFixed(2)} V (${percentual.toFixed(2)}%)</span></div>
+        <div class="result-highlight ${aprovado ? '' : 'danger'}">
+          ${aprovado ? '✅ Queda dentro do limite (' + limite + '%)' : '❌ Queda acima do limite de ' + limite + '%'}
+        </div></div>`;
+      document.getElementById('resultadoQueda').innerHTML = html;
+      await salvarCalculo('Queda Tensão', { V, I, L, S, material, tipo }, { deltaV: deltaV.toFixed(2), percentual: percentual.toFixed(2), aprovado });
+    });
+
+    // ==================== HISTÓRICO ====================
+    async function carregarHistorico() {
+      const container = document.getElementById('historicoContainer');
+      const user = auth.currentUser;
+      if (!user) { container.innerHTML = '<div class="empty-state">Faça login para ver o histórico.</div>'; return; }
+      container.innerHTML = '<div class="spinner"></div>';
+      try {
+        const snap = await db.collection('calculos').where('userId', '==', user.uid).orderBy('createdAt', 'desc').limit(50).get();
+        if (snap.empty) { container.innerHTML = '<div class="empty-state">📭 Nenhum cálculo salvo ainda.</div>'; return; }
+        let html = '';
+        snap.forEach(doc => {
+          const d = doc.data();
+          const date = d.createdAt ? d.createdAt.toDate().toLocaleString('pt-BR') : '';
+          const params = d.parametros ? JSON.stringify(d.parametros).replace(/"/g, '') : '';
+          const result = d.resultado ? JSON.stringify(d.resultado).replace(/"/g, '') : '';
+          html += `<div class="history-item">
+            <div class="type">${d.tipo}</div>
+            <div style="font-size:12px;color:var(--text-secondary);">${params} → ${result}</div>
+            <div class="date">${date}</div>
+          </div>`;
+        });
+        container.innerHTML = html;
+      } catch (e) { container.innerHTML = '<div class="error visible">Erro ao carregar histórico.</div>'; }
     }
 
-    document.getElementById('linkCadastro').addEventListener('click', () => {
-      erroLogin.classList.remove('visivel');
-      mostrarTela(telaCadastro);
-    });
-
-    document.getElementById('linkLogin').addEventListener('click', () => {
-      erroCadastro.classList.remove('visivel');
-      mostrarTela(telaLogin);
-    });
-
-    document.getElementById('btnLogin').addEventListener('click', async () => {
-      const email = document.getElementById('loginEmail').value.trim();
-      const senha = document.getElementById('loginSenha').value;
-      erroLogin.classList.remove('visivel');
-      if (!email || !senha) {
-        erroLogin.textContent = 'Preencha todos os campos.';
-        erroLogin.classList.add('visivel');
-        return;
-      }
-      const btn = document.getElementById('btnLogin');
-      btn.disabled = true;
-      btn.textContent = 'Entrando...';
-      const resultado = await loginUsuario(email, senha);
-      btn.disabled = false;
-      btn.textContent = 'Entrar';
-      if (!resultado.success) {
-        erroLogin.textContent = resultado.message;
-        erroLogin.classList.add('visivel');
-      }
-    });
-
-    document.getElementById('btnGoogle').addEventListener('click', async () => {
-      erroLogin.classList.remove('visivel');
-      const btn = document.getElementById('btnGoogle');
-      btn.disabled = true;
-      btn.textContent = 'Conectando...';
-      const resultado = await loginComGoogle();
-      btn.disabled = false;
-      btn.innerHTML = '<img src="https://www.google.com/favicon.ico" alt="Google"> Entrar com Google';
-      if (!resultado.success) {
-        erroLogin.textContent = resultado.message;
-        erroLogin.classList.add('visivel');
-      }
-    });
-
-    document.getElementById('btnCadastro').addEventListener('click', async () => {
-      const nome = document.getElementById('cadastroNome').value.trim();
-      const email = document.getElementById('cadastroEmail').value.trim();
-      const senha = document.getElementById('cadastroSenha').value;
-      erroCadastro.classList.remove('visivel');
-      if (!nome || !email || !senha) {
-        erroCadastro.textContent = 'Preencha todos os campos.';
-        erroCadastro.classList.add('visivel');
-        return;
-      }
-      if (senha.length < 6) {
-        erroCadastro.textContent = 'A senha deve ter pelo menos 6 caracteres.';
-        erroCadastro.classList.add('visivel');
-        return;
-      }
-      const btn = document.getElementById('btnCadastro');
-      btn.disabled = true;
-      btn.textContent = 'Cadastrando...';
-      const resultado = await cadastrarUsuario(nome, email, senha);
-      btn.disabled = false;
-      btn.textContent = 'Cadastrar';
-      if (!resultado.success) {
-        erroCadastro.textContent = resultado.message;
-        erroCadastro.classList.add('visivel');
-      }
-    });
-
-    document.getElementById('btnSair').addEventListener('click', async () => {
-      await logoutUsuario();
-    });
-
-    // Observador de autenticação
-    observarAutenticacao((estado) => {
-      if (estado.logado) {
-        const nome = estado.dados?.nome || estado.user.email;
-        document.getElementById('nomeUsuario').textContent = '👋 Olá, ' + nome;
-        mostrarTela(telaHome);
-        loadingHome.style.display = 'block';
-        conteudoHome.style.display = 'none';
-        setTimeout(() => {
-          loadingHome.style.display = 'none';
-          conteudoHome.style.display = 'block';
-        }, 1000);
-        // Limpar campos
-        document.getElementById('loginEmail').value = '';
-        document.getElementById('loginSenha').value = '';
-        document.getElementById('cadastroNome').value = '';
-        document.getElementById('cadastroEmail').value = '';
-        document.getElementById('cadastroSenha').value = '';
+    // ==================== OBSERVADOR DE AUTENTICAÇÃO ====================
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        let nome = user.email;
+        try {
+          const snap = await db.collection('users').doc(user.uid).get();
+          if (snap.exists && snap.data().nome) nome = snap.data().nome;
+        } catch (e) {}
+        document.getElementById('nomeUsuario').textContent = '👋 ' + nome;
+        show($homeScr);
+        // Limpar campos de login/cadastro
+        ['loginEmail','loginSenha','cadNome','cadEmail','cadSenha'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
       } else {
-        mostrarTela(telaLogin);
+        show($loginScr);
       }
     });
   </script>
