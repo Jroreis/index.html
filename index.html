@@ -3,702 +3,169 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VoltCalc Pro - NBR 5410</title>
-  <!-- Firebase SDKs -->
+  <title>VoltCalc Pro - Login</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-  <!-- jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    :root {
-      --primary: #4f46e5;
-      --primary-dark: #4338ca;
-      --success: #10b981;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-      --premium: #8b5cf6;
-      --bg: #f1f5f9;
-      --card: #ffffff;
-      --text: #1e293b;
-      --text-secondary: #64748b;
-      --border: #e2e8f0;
-      --radius: 12px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-      --shadow-lg: 0 10px 25px rgba(0,0,0,0.08);
-      --transition: all 0.2s;
-    }
-    .dark {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --text: #f1f5f9;
-      --text-secondary: #94a3b8;
-      --border: #334155;
-      --shadow: 0 1px 3px rgba(0,0,0,0.3);
-      --shadow-lg: 0 10px 25px rgba(0,0,0,0.4);
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-      background: var(--bg); color: var(--text);
-      display: flex; justify-content: center; align-items: center;
-      min-height: 100vh; padding: 20px; transition: background 0.3s;
-    }
-    .screen {
-      display: none; background: var(--card); border-radius: var(--radius);
-      box-shadow: var(--shadow-lg); padding: 32px 28px;
-      width: 100%; max-width: 500px; animation: fadeIn 0.3s ease;
-    }
+    body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .screen { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 360px; display: none; }
     .screen.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    h1 { text-align: center; color: var(--text); font-size: 24px; font-weight: 700; margin-bottom: 4px; }
-    h2 { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 16px; }
-    .subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 24px; font-size: 14px; }
-    .logo { display: block; margin: 0 auto 16px; width: 60px; height: 60px; }
-    .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: var(--text); font-size: 13px; }
-    .form-group input, .form-group select {
-      width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
-      border-radius: 8px; font-size: 14px; transition: var(--transition); background: var(--card); color: var(--text);
-    }
-    .form-group input:focus, .form-group select:focus {
-      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
-    }
-    .row { display: flex; gap: 10px; }
-    .row .form-group { flex: 1; }
-    .btn {
-      width: 100%; padding: 13px; border: none; border-radius: 8px;
-      font-size: 15px; font-weight: 600; cursor: pointer; transition: var(--transition);
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .btn:active { transform: scale(0.98); }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: var(--primary-dark); }
-    .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
-    .btn-outline:hover { background: rgba(79,70,229,0.05); }
-    .btn-google { background: var(--card); color: var(--text); border: 1.5px solid var(--border); }
-    .btn-google:hover { background: var(--bg); }
-    .btn-sm { padding: 8px 16px; font-size: 13px; width: auto; }
-    .btn-premium { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; font-weight: 700; }
-    .btn-premium:hover { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
-    .btn-danger { background: var(--danger); color: #fff; }
-    .error { background: rgba(239,68,68,0.1); color: var(--danger); padding: 10px 14px; border-radius: 8px; margin-top: 10px; font-size: 13px; display: none; }
+    input, button { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+    button { background: #4f46e5; color: white; border: none; font-weight: bold; cursor: pointer; }
+    button.google { background: white; color: #333; border: 1px solid #ddd; }
+    .error { color: red; font-size: 13px; display: none; }
     .error.visible { display: block; }
-    .link { display: block; text-align: center; margin-top: 16px; color: var(--primary); cursor: pointer; font-size: 13px; }
-    .link:hover { text-decoration: underline; }
-    .divider { display: flex; align-items: center; margin: 18px 0; color: var(--text-secondary); font-size: 12px; }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-    .divider span { padding: 0 10px; }
-
-    /* Header */
-    .home-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 8px; }
-    .user-info { display: flex; align-items: center; gap: 10px; }
-    .avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: var(--primary); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; }
-    .badge-plan { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px; }
-    .badge-gratuito { background: #e2e8f0; color: #475569; }
-    .badge-premium { background: #ede9fe; color: #5b21b6; }
-    .btn-logout { background: rgba(239,68,68,0.1); color: var(--danger); border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 13px; }
-    .btn-logout:hover { background: rgba(239,68,68,0.2); }
-
-    /* Tabs */
-    .tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 20px; overflow-x: auto; gap: 2px; }
-    .tab {
-      padding: 10px 12px; font-size: 13px; font-weight: 600; color: var(--text-secondary);
-      cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap;
-      transition: var(--transition); background: none; border-top: none; border-left: none; border-right: none;
-    }
-    .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
-    .tab-content { display: none; animation: fadeIn 0.3s ease; }
-    .tab-content.active { display: block; }
-
-    /* Cards */
-    .result-card {
-      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 20px; margin-top: 20px;
-    }
-    .result-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
-    .result-item:last-child { border-bottom: none; }
-    .result-item .label { color: var(--text-secondary); }
-    .result-item .value { font-weight: 600; color: var(--text); }
-    .result-highlight { background: rgba(79,70,229,0.05); border-radius: 8px; padding: 12px; margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--primary); text-align: center; }
-    .result-highlight.danger { background: rgba(239,68,68,0.05); color: var(--danger); }
-    .premium-lock {
-      display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 40px 20px;
-      background: var(--bg); border: 2px dashed var(--premium); border-radius: var(--radius);
-      text-align: center; margin-top: 20px;
-    }
-    .premium-lock h3 { color: var(--premium); }
-
-    /* History */
-    .history-item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 10px; font-size: 13px; }
-    .history-item .type { font-weight: 600; color: var(--primary); }
-    .history-item .date { color: var(--text-secondary); font-size: 11px; }
-    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
-
-    /* Toggle tema */
-    .theme-toggle {
-      background: none; border: 1px solid var(--border); border-radius: 20px;
-      width: 40px; height: 24px; cursor: pointer; position: relative;
-    }
-    .theme-toggle::after {
-      content: '☀️'; position: absolute; top: 50%; left: 2px; transform: translateY(-50%);
-      font-size: 14px; transition: var(--transition);
-    }
-    .dark .theme-toggle::after { content: '🌙'; left: auto; right: 2px; }
-
-    .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .badge-success { background: rgba(16,185,129,0.1); color: var(--success); }
-    .badge-warning { background: rgba(245,158,11,0.1); color: var(--warning); }
-    .spinner {
-      border: 3px solid var(--border); border-top: 3px solid var(--primary);
-      border-radius: 50%; width: 32px; height: 32px; animation: spin 0.7s linear infinite; margin: 20px auto;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    @media (max-width: 600px) {
-      .screen { padding: 24px 16px; }
-      .tabs { gap: 0; }
-      .tab { padding: 10px 8px; font-size: 12px; }
-    }
+    .link { color: #4f46e5; cursor: pointer; text-align: center; display: block; margin-top: 10px; }
   </style>
 </head>
 <body>
 
   <!-- Login -->
   <div class="screen active" id="loginScreen">
-    <h1>⚡ VoltCalc Pro</h1>
-    <p class="subtitle">Cálculos elétricos NBR 5410</p>
-    <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="seu@email.com"></div>
-    <div class="form-group"><label>Senha</label><input type="password" id="loginSenha" placeholder="••••••"></div>
-    <button class="btn btn-primary" id="btnLogin">Entrar</button>
-    <div class="error" id="erroLogin"></div>
-    <div class="divider"><span>ou</span></div>
-    <button class="btn btn-google" id="btnGoogle">G Entrar com Google</button>
+    <h2>Entrar</h2>
+    <input type="email" id="loginEmail" placeholder="Email">
+    <input type="password" id="loginSenha" placeholder="Senha">
+    <button id="btnLogin">Entrar</button>
+    <button class="google" id="btnGoogle">Entrar com Google</button>
+    <span class="error" id="erroLogin"></span>
     <span class="link" id="linkCadastro">Não tem conta? Cadastre-se</span>
   </div>
 
   <!-- Cadastro -->
   <div class="screen" id="cadastroScreen">
-    <h1>📝 Criar Conta</h1>
-    <p class="subtitle">Comece a calcular agora</p>
-    <div class="form-group"><label>Nome</label><input type="text" id="cadNome" placeholder="Seu nome"></div>
-    <div class="form-group"><label>Email</label><input type="email" id="cadEmail" placeholder="seu@email.com"></div>
-    <div class="form-group"><label>Senha</label><input type="password" id="cadSenha" placeholder="Mínimo 6 caracteres"></div>
-    <button class="btn btn-primary" id="btnCadastro">Cadastrar</button>
-    <div class="error" id="erroCadastro"></div>
+    <h2>Criar Conta</h2>
+    <input type="text" id="cadNome" placeholder="Nome">
+    <input type="email" id="cadEmail" placeholder="Email">
+    <input type="password" id="cadSenha" placeholder="Senha (mínimo 6)">
+    <button id="btnCadastro">Cadastrar</button>
+    <span class="error" id="erroCadastro"></span>
     <span class="link" id="linkLogin">Já tem conta? Entrar</span>
   </div>
 
-  <!-- Home (principal) -->
-  <div class="screen" id="homeScreen" style="max-width: 700px;">
-    <div class="home-header">
-      <div class="user-info">
-        <div class="avatar" id="avatarInicial"></div>
-        <span class="user-name" id="nomeUsuario"></span>
-        <span id="planBadge" class="badge-plan badge-gratuito">Gratuito</span>
-      </div>
-      <div style="display:flex; align-items:center; gap:10px;">
-        <button class="theme-toggle" id="themeToggle" title="Alternar tema"></button>
-        <button class="btn-logout" id="btnSair">Sair</button>
-      </div>
-    </div>
-
-    <!-- Abas -->
-    <div class="tabs" id="tabsContainer">
-      <button class="tab active" data-tab="corrente">⚡ Corrente</button>
-      <button class="tab" data-tab="condutor">🔌 Condutor</button>
-      <button class="tab" data-tab="disjuntor">🛡️ Disjuntor</button>
-      <button class="tab" data-tab="queda">📉 Queda</button>
-      <button class="tab" data-tab="eletrodutos">🔧 Eletrodutos</button>
-      <button class="tab" data-tab="curto">💥 Curto</button>
-      <button class="tab" data-tab="historico">📚 Histórico</button>
-      <button class="tab" data-tab="perfil">👤 Perfil</button>
-      <button class="tab" data-tab="admin" id="tabAdmin" style="display:none;">🛡️ Admin</button>
-    </div>
-
-    <!-- Aba Corrente -->
-    <div class="tab-content active" id="tab-corrente">
-      <h2>Cálculo de Corrente</h2>
-      <div class="form-group"><label>Tensão (V)</label><input type="number" id="corrTensao" value="220"></div>
-      <div class="form-group"><label>Potência (W)</label><input type="number" id="corrPotencia" placeholder="Ex: 4400"></div>
-      <div class="form-group"><label>Tipo</label><select id="corrTipo"><option value="1">Monofásico</option><option value="2">Bifásico</option><option value="3">Trifásico</option></select></div>
-      <div class="form-group"><label>Fator de potência</label><input type="number" id="corrFP" value="0.92" step="0.01"></div>
-      <button class="btn btn-primary" id="btnCalcularCorrente">Calcular</button>
-      <div id="resultadoCorrente"></div>
-    </div>
-
-    <!-- Aba Condutor -->
-    <div class="tab-content" id="tab-condutor">
-      <h2>Dimensionamento de Condutor</h2>
-      <div class="form-group"><label>Corrente (A)</label><input type="number" id="condCorrente" placeholder="Ex: 20"></div>
-      <div class="form-group"><label>Método</label><select id="condMetodo"><option value="B1">B1 - Eletroduto embutido</option><option value="B2">B2 - Eletroduto aparente</option><option value="C">C - Cabos ao ar livre</option><option value="D">D - Cabos enterrados</option></select></div>
-      <div class="form-group"><label>Isolação</label><select id="condIsolacao"><option value="PVC">PVC (70°C)</option><option value="EPR">EPR/XLPE (90°C)</option></select></div>
-      <div class="row">
-        <div class="form-group"><label>Cond. carregados</label><input type="number" id="condCarregados" value="2" min="2" max="3"></div>
-        <div class="form-group"><label>Temp. ambiente (°C)</label><input type="number" id="condTemp" value="30"></div>
-      </div>
-      <button class="btn btn-primary" id="btnCalcularCondutor">Dimensionar</button>
-      <div id="resultadoCondutor"></div>
-    </div>
-
-    <!-- Aba Disjuntor -->
-    <div class="tab-content" id="tab-disjuntor">
-      <h2>Disjuntor</h2>
-      <div class="form-group"><label>Corrente de projeto (A)</label><input type="number" id="disjIb" placeholder="Ex: 20"></div>
-      <div class="form-group"><label>Seção do condutor (mm²)</label><select id="disjSecao"><option value="1.5">1,5</option><option value="2.5">2,5</option><option value="4">4</option><option value="6">6</option><option value="10" selected>10</option><option value="16">16</option><option value="25">25</option><option value="35">35</option></select></div>
-      <div class="form-group"><label>Isolação</label><select id="disjIsolacao"><option value="PVC">PVC</option><option value="EPR">EPR/XLPE</option></select></div>
-      <button class="btn btn-primary" id="btnCalcularDisjuntor">Dimensionar</button>
-      <div id="resultadoDisjuntor"></div>
-    </div>
-
-    <!-- Aba Queda de Tensão -->
-    <div class="tab-content" id="tab-queda">
-      <h2>Queda de Tensão</h2>
-      <div class="form-group"><label>Tensão (V)</label><input type="number" id="qdTensao" value="220"></div>
-      <div class="form-group"><label>Corrente (A)</label><input type="number" id="qdCorrente" placeholder="Ex: 20"></div>
-      <div class="form-group"><label>Distância (m)</label><input type="number" id="qdDistancia" placeholder="Ex: 50"></div>
-      <div class="form-group"><label>Seção (mm²)</label><select id="qdSecao"><option value="1.5">1,5</option><option value="2.5" selected>2,5</option><option value="4">4</option><option value="6">6</option><option value="10">10</option><option value="16">16</option><option value="25">25</option></select></div>
-      <div class="form-group"><label>Material</label><select id="qdMaterial"><option value="cobre">Cobre</option><option value="aluminio">Alumínio</option></select></div>
-      <div class="form-group"><label>Tipo</label><select id="qdTipo"><option value="1">Monofásico</option><option value="3">Trifásico</option></select></div>
-      <button class="btn btn-primary" id="btnCalcularQueda">Calcular</button>
-      <div id="resultadoQueda"></div>
-    </div>
-
-    <!-- Aba Eletrodutos (Premium) -->
-    <div class="tab-content" id="tab-eletrodutos">
-      <h2>Dimensionamento de Eletroduto</h2>
-      <div id="eletrodutosContent"></div>
-    </div>
-
-    <!-- Aba Curto-circuito (Premium) -->
-    <div class="tab-content" id="tab-curto">
-      <h2>Corrente de Curto-circuito</h2>
-      <div id="curtoContent"></div>
-    </div>
-
-    <!-- Aba Histórico -->
-    <div class="tab-content" id="tab-historico">
-      <h2>Histórico</h2>
-      <div id="historicoContainer"><div class="spinner"></div></div>
-    </div>
-
-    <!-- Aba Perfil -->
-    <div class="tab-content" id="tab-perfil">
-      <h2>Meu Perfil</h2>
-      <div id="perfilContent"></div>
-    </div>
-
-    <!-- Aba Admin -->
-    <div class="tab-content" id="tab-admin">
-      <h2>Painel Administrativo</h2>
-      <div id="adminContent"></div>
-    </div>
+  <!-- Home (após login) -->
+  <div class="screen" id="homeScreen">
+    <h2>Bem-vindo!</h2>
+    <p id="nomeUsuario"></p>
+    <button id="btnSair">Sair</button>
   </div>
 
   <script>
-    // ==================== Firebase Init ====================
-    const firebaseConfig = {
+    // Configuração do Firebase (seus dados)
+    firebase.initializeApp({
       apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
       authDomain: "voltcalc-pro.firebaseapp.com",
       projectId: "voltcalc-pro",
       storageBucket: "voltcalc-pro.firebasestorage.app",
       messagingSenderId: "411208955318",
       appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
-
-    // ==================== Estado global ====================
-    let currentUser = null;
-    let userPlan = 'gratuito';
-    let isAdmin = false;
-    let darkMode = localStorage.getItem('darkMode') === 'true';
-
-    // ==================== Temas ====================
-    function aplicarTema() {
-      document.body.classList.toggle('dark', darkMode);
-      localStorage.setItem('darkMode', darkMode);
-    }
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      darkMode = !darkMode;
-      aplicarTema();
     });
-    aplicarTema();
+    const auth = firebase.auth();
 
-    // ==================== Autenticação ====================
-    async function cadastrar(nome, email, senha) {
-      try {
-        const cred = await auth.createUserWithEmailAndPassword(email, senha);
-        await db.collection('users').doc(cred.user.uid).set({ nome, email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-        return { success: true };
-      } catch (e) {
-        const msgs = { 'auth/email-already-in-use': 'Email já cadastrado.', 'auth/weak-password': 'Senha muito fraca.', 'auth/invalid-email': 'Email inválido.' };
-        return { success: false, message: msgs[e.code] || 'Erro ao cadastrar.' };
-      }
-    }
-    async function login(email, senha) {
-      try { await auth.signInWithEmailAndPassword(email, senha); return { success: true }; }
-      catch (e) {
-        const msgs = { 'auth/invalid-credential': 'Email ou senha incorretos.', 'auth/too-many-requests': 'Muitas tentativas.' };
-        return { success: false, message: msgs[e.code] || 'Erro ao entrar.' };
-      }
-    }
-    async function loginGoogle() {
-      try {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        const result = await auth.signInWithPopup(provider);
-        const userDoc = await db.collection('users').doc(result.user.uid).get();
-        if (!userDoc.exists) {
-          await db.collection('users').doc(result.user.uid).set({ nome: result.user.displayName, email: result.user.email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-        } else {
-          await db.collection('users').doc(result.user.uid).update({ updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-        }
-        return { success: true };
-      } catch (e) {
-        if (e.code === 'auth/popup-closed-by-user') return { success: false, message: 'Login cancelado.' };
-        return { success: false, message: 'Erro no login Google.' };
-      }
-    }
-    function logout() { return auth.signOut(); }
-
-    // ==================== UI Helpers ====================
-    const screens = {
-      login: document.getElementById('loginScreen'),
-      cadastro: document.getElementById('cadastroScreen'),
-      home: document.getElementById('homeScreen')
-    };
-    function showScreen(scr) {
-      Object.values(screens).forEach(s => s.classList.remove('active'));
-      scr.classList.add('active');
-    }
-    function showTab(tabName) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      const tabBtn = document.querySelector(`.tab[data-tab="${tabName}"]`);
-      if (tabBtn) tabBtn.classList.add('active');
-      const content = document.getElementById(`tab-${tabName}`);
-      if (content) content.classList.add('active');
-      if (tabName === 'historico') carregarHistorico();
-      if (tabName === 'perfil') renderizarPerfil();
-      if (tabName === 'admin') renderizarAdmin();
-      if (tabName === 'eletrodutos') renderizarEletrodutos();
-      if (tabName === 'curto') renderizarCurto();
+    // Telas
+    const loginScreen = document.getElementById('loginScreen');
+    const cadastroScreen = document.getElementById('cadastroScreen');
+    const homeScreen = document.getElementById('homeScreen');
+    function showScreen(screen) {
+      [loginScreen, cadastroScreen, homeScreen].forEach(s => s.classList.remove('active'));
+      screen.classList.add('active');
     }
 
-    // ==================== Navegação ====================
-    document.getElementById('linkCadastro').onclick = () => showScreen(screens.cadastro);
-    document.getElementById('linkLogin').onclick = () => showScreen(screens.login);
+    // Navegação
+    document.getElementById('linkCadastro').onclick = () => showScreen(cadastroScreen);
+    document.getElementById('linkLogin').onclick = () => showScreen(loginScreen);
+
+    // Login email/senha
     document.getElementById('btnLogin').onclick = async () => {
       const email = document.getElementById('loginEmail').value.trim();
       const senha = document.getElementById('loginSenha').value;
-      const err = document.getElementById('erroLogin'); err.classList.remove('visible');
-      if (!email || !senha) { err.textContent = 'Preencha todos os campos.'; err.classList.add('visible'); return; }
-      const btn = document.getElementById('btnLogin'); btn.disabled = true; btn.textContent = 'Entrando...';
-      const r = await login(email, senha);
-      btn.disabled = false; btn.textContent = 'Entrar';
-      if (!r.success) { err.textContent = r.message; err.classList.add('visible'); }
+      const err = document.getElementById('erroLogin');
+      err.classList.remove('visible');
+      if (!email || !senha) {
+        err.textContent = 'Preencha todos os campos.';
+        err.classList.add('visible');
+        return;
+      }
+      const btn = document.getElementById('btnLogin');
+      btn.disabled = true;
+      btn.textContent = 'Entrando...';
+      try {
+        await auth.signInWithEmailAndPassword(email, senha);
+        // sucesso -> onAuthStateChanged redireciona
+      } catch (error) {
+        console.error(error);
+        let msg = 'Erro ao entrar.';
+        if (error.code === 'auth/invalid-credential') msg = 'Email ou senha incorretos.';
+        else if (error.code === 'auth/too-many-requests') msg = 'Muitas tentativas. Aguarde.';
+        err.textContent = msg;
+        err.classList.add('visible');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+      }
     };
+
+    // Google
     document.getElementById('btnGoogle').onclick = async () => {
-      const err = document.getElementById('erroLogin'); err.classList.remove('visible');
-      const btn = document.getElementById('btnGoogle'); btn.disabled = true; btn.textContent = 'Conectando...';
-      const r = await loginGoogle();
-      btn.disabled = false; btn.innerHTML = 'G Entrar com Google';
-      if (!r.success) { err.textContent = r.message; err.classList.add('visible'); }
+      const provider = new firebase.auth.GoogleAuthProvider();
+      try {
+        await auth.signInWithPopup(provider);
+      } catch (error) {
+        if (error.code !== 'auth/popup-closed-by-user') {
+          document.getElementById('erroLogin').textContent = 'Erro no login Google.';
+          document.getElementById('erroLogin').classList.add('visible');
+        }
+      }
     };
+
+    // Cadastro
     document.getElementById('btnCadastro').onclick = async () => {
       const nome = document.getElementById('cadNome').value.trim();
       const email = document.getElementById('cadEmail').value.trim();
       const senha = document.getElementById('cadSenha').value;
-      const err = document.getElementById('erroCadastro'); err.classList.remove('visible');
-      if (!nome || !email || !senha) { err.textContent = 'Preencha todos os campos.'; err.classList.add('visible'); return; }
-      if (senha.length < 6) { err.textContent = 'Senha mínima 6 caracteres.'; err.classList.add('visible'); return; }
-      const btn = document.getElementById('btnCadastro'); btn.disabled = true; btn.textContent = 'Cadastrando...';
-      const r = await cadastrar(nome, email, senha);
-      btn.disabled = false; btn.textContent = 'Cadastrar';
-      if (!r.success) { err.textContent = r.message; err.classList.add('visible'); }
+      const err = document.getElementById('erroCadastro');
+      err.classList.remove('visible');
+      if (!nome || !email || !senha) {
+        err.textContent = 'Preencha todos os campos.';
+        err.classList.add('visible');
+        return;
+      }
+      if (senha.length < 6) {
+        err.textContent = 'Senha mínima 6 caracteres.';
+        err.classList.add('visible');
+        return;
+      }
+      const btn = document.getElementById('btnCadastro');
+      btn.disabled = true;
+      btn.textContent = 'Cadastrando...';
+      try {
+        const cred = await auth.createUserWithEmailAndPassword(email, senha);
+        await firebase.firestore().collection('users').doc(cred.user.uid).set({
+          nome: nome,
+          email: email
+        });
+        // sucesso -> redireciona
+      } catch (error) {
+        let msg = 'Erro ao cadastrar.';
+        if (error.code === 'auth/email-already-in-use') msg = 'Email já cadastrado.';
+        else if (error.code === 'auth/weak-password') msg = 'Senha muito fraca.';
+        err.textContent = msg;
+        err.classList.add('visible');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Cadastrar';
+      }
     };
-    document.getElementById('btnSair').onclick = () => logout();
 
-    // Tabs listener
-    document.getElementById('tabsContainer').addEventListener('click', (e) => {
-      if (e.target.classList.contains('tab')) {
-        showTab(e.target.dataset.tab);
-      }
-    });
+    // Logout
+    document.getElementById('btnSair').onclick = () => auth.signOut();
 
-    // ==================== Dados do usuário e plano ====================
-    async function carregarDadosUsuario(uid) {
-      try {
-        const userDoc = await db.collection('users').doc(uid).get();
-        const adminDoc = await db.collection('admins').doc(uid).get();
-        isAdmin = adminDoc.exists;
-        document.getElementById('tabAdmin').style.display = isAdmin ? 'block' : 'none';
-
-        // Plano via Stripe Extension
-        const customerDoc = await db.collection('customers').doc(uid).get();
-        if (customerDoc.exists) {
-          const subs = await db.collection('customers').doc(uid).collection('subscriptions').where('status', 'in', ['active', 'trialing']).get();
-          if (!subs.empty) {
-            userPlan = 'premium';
-          } else {
-            userPlan = 'gratuito';
-          }
-        } else {
-          userPlan = 'gratuito';
-        }
-        atualizarBadgePlano();
-        return userDoc.exists ? userDoc.data() : null;
-      } catch (e) { return null; }
-    }
-
-    function atualizarBadgePlano() {
-      const badge = document.getElementById('planBadge');
-      if (userPlan === 'premium') {
-        badge.textContent = 'Premium';
-        badge.className = 'badge-plan badge-premium';
-      } else {
-        badge.textContent = 'Gratuito';
-        badge.className = 'badge-plan badge-gratuito';
-      }
-    }
-
-    // ==================== Aba Perfil ====================
-    function renderizarPerfil() {
-      const container = document.getElementById('perfilContent');
-      if (!currentUser) return;
-      db.collection('users').doc(currentUser.uid).get().then(doc => {
-        const data = doc.data() || {};
-        const foto = data.photoURL || '';
-        container.innerHTML = `
-          <div style="text-align:center; margin-bottom:20px;">
-            <img src="${foto || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%234f46e5%22/%3E%3Ctext x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2240%22%3E${(data.nome||'?')[0].toUpperCase()}%3C/text%3E%3C/svg%3E'}" 
-                 style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid var(--primary);" id="fotoPerfil">
-            <br>
-            <input type="file" id="uploadFoto" accept="image/*" style="display:none;">
-            <button class="btn btn-outline btn-sm" onclick="document.getElementById('uploadFoto').click()">Alterar foto</button>
-          </div>
-          <div class="form-group"><label>Nome</label><input type="text" id="perfilNome" value="${data.nome || ''}"></div>
-          <div class="form-group"><label>Email</label><input type="email" disabled value="${currentUser.email}"></div>
-          <button class="btn btn-primary" id="btnSalvarPerfil">Salvar</button>
-          <button class="btn btn-outline" id="btnTrocarSenha" style="margin-top:8px;">Alterar senha</button>
-          <div class="divider"><span>Assinatura</span></div>
-          <p>Status: <strong>${userPlan === 'premium' ? 'Premium' : 'Gratuito'}</strong></p>
-          ${userPlan === 'premium' ? 
-            `<button class="btn btn-danger btn-sm" id="btnGerenciarAssinatura">Gerenciar assinatura (Stripe)</button>` :
-            `<button class="btn btn-premium" id="btnUpgradePerfil">Assinar Premium</button>`
-          }
-          <div class="error" id="erroPerfil"></div>
-        `;
-
-        document.getElementById('btnSalvarPerfil').onclick = async () => {
-          const novoNome = document.getElementById('perfilNome').value.trim();
-          await db.collection('users').doc(currentUser.uid).update({ nome: novoNome });
-          document.getElementById('nomeUsuario').textContent = '👋 ' + novoNome;
-          alert('Perfil atualizado!');
-        };
-        document.getElementById('btnTrocarSenha').onclick = () => {
-          const newPass = prompt('Digite a nova senha (mínimo 6):');
-          if (newPass && newPass.length >= 6) {
-            currentUser.updatePassword(newPass).then(() => alert('Senha alterada!')).catch(e => alert('Erro: ' + e.message));
-          } else if (newPass) alert('Mínimo 6 caracteres.');
-        };
-        document.getElementById('uploadFoto').onchange = async (e) => {
-          const file = e.target.files[0];
-          if (!file) return;
-          const ref = storage.ref(`users/${currentUser.uid}/profile.${file.name.split('.').pop()}`);
-          try {
-            await ref.put(file);
-            const url = await ref.getDownloadURL();
-            await db.collection('users').doc(currentUser.uid).update({ photoURL: url });
-            document.getElementById('fotoPerfil').src = url;
-          } catch (err) { alert('Erro no upload.'); }
-        };
-        if (userPlan === 'premium') {
-          document.getElementById('btnGerenciarAssinatura').onclick = async () => {
-            // Redirecionar para o portal do cliente Stripe
-            const customerDoc = await db.collection('customers').doc(currentUser.uid).get();
-            if (customerDoc.exists && customerDoc.data().stripeId) {
-              // Isso requer uma função Firebase, mas como usamos a extensão, podemos chamar uma cloud function.
-              // Por simplicidade, abriremos o link de faturamento do Stripe (precisa ser configurado)
-              window.open('https://billing.stripe.com/p/login/xxx', '_blank');
-            }
-          };
-        } else {
-          document.getElementById('btnUpgradePerfil').onclick = () => showTab('premium'); // vai para aba de upgrade
-        }
-      });
-    }
-
-    // ==================== Aba Admin ====================
-    async function renderizarAdmin() {
-      const container = document.getElementById('adminContent');
-      if (!isAdmin) return;
-      container.innerHTML = '<div class="spinner"></div>';
-      try {
-        const usersSnap = await db.collection('users').get();
-        let html = '<h3>Usuários</h3>';
-        usersSnap.forEach(doc => {
-          const u = doc.data();
-          html += `<div class="history-item"><strong>${u.nome || 'Sem nome'}</strong> (${u.email})</div>`;
-        });
-        container.innerHTML = html;
-      } catch (e) { container.innerHTML = '<div class="error visible">Erro ao carregar.</div>'; }
-    }
-
-    // ==================== Módulos Premium ====================
-    function isPremium() { return userPlan === 'premium'; }
-
-    function renderizarEletrodutos() {
-      const container = document.getElementById('eletrodutosContent');
-      if (!isPremium()) {
-        container.innerHTML = `<div class="premium-lock"><h3>Recurso Premium</h3><p>Assine para dimensionar eletrodutos.</p><button class="btn btn-premium" onclick="showTab('premium')">Assinar</button></div>`;
-        return;
-      }
-      container.innerHTML = `
-        <div class="form-group"><label>Seção total dos condutores (mm²)</label><input type="number" id="eletroSecao" placeholder="Soma das seções"></div>
-        <div class="form-group"><label>Diâmetro do eletroduto (mm)</label><select id="eletroDiam"><option value="16">16</option><option value="20">20</option><option value="25">25</option><option value="32">32</option><option value="40">40</option><option value="50">50</option></select></div>
-        <button class="btn btn-primary" id="btnCalcularEletroduto">Verificar ocupação</button>
-        <div id="resultadoEletroduto"></div>
-      `;
-      document.getElementById('btnCalcularEletroduto').onclick = () => {
-        const secao = parseFloat(document.getElementById('eletroSecao').value);
-        const diam = parseInt(document.getElementById('eletroDiam').value);
-        if (!secao || secao <= 0) return;
-        const areaEletro = Math.PI * Math.pow(diam/2, 2);
-        const ocupacao = (secao / areaEletro) * 100;
-        const limite = 40; // 40% para 3+ condutores (NBR 5410)
-        const ok = ocupacao <= limite;
-        document.getElementById('resultadoEletroduto').innerHTML = `
-          <div class="result-card"><h3>Resultado</h3>
-          <div class="result-item"><span class="label">Ocupação</span><span class="value">${ocupacao.toFixed(1)}%</span></div>
-          <div class="result-highlight ${ok ? '' : 'danger'}">${ok ? '✅ Dentro do limite de 40%' : '❌ Excede 40%, escolha eletroduto maior'}</div></div>`;
-      };
-    }
-
-    function renderizarCurto() {
-      const container = document.getElementById('curtoContent');
-      if (!isPremium()) {
-        container.innerHTML = `<div class="premium-lock"><h3>Recurso Premium</h3><p>Assine para calcular curto-circuito.</p><button class="btn btn-premium" onclick="showTab('premium')">Assinar</button></div>`;
-        return;
-      }
-      container.innerHTML = `
-        <div class="form-group"><label>Tensão (V)</label><input type="number" id="curtoTensao" value="220"></div>
-        <div class="form-group"><label>Impedância do transformador (Ω)</label><input type="number" id="curtoZ" placeholder="Ex: 0.05"></div>
-        <button class="btn btn-primary" id="btnCalcularCurto">Calcular Ik</button>
-        <div id="resultadoCurto"></div>
-      `;
-      document.getElementById('btnCalcularCurto').onclick = () => {
-        const V = parseFloat(document.getElementById('curtoTensao').value) || 220;
-        const Z = parseFloat(document.getElementById('curtoZ').value);
-        if (!Z || Z <= 0) return;
-        const Ik = V / Z;
-        document.getElementById('resultadoCurto').innerHTML = `
-          <div class="result-card"><h3>Resultado</h3>
-          <div class="result-highlight">Corrente de curto presumida: <strong>${Ik.toFixed(0)} A</strong></div></div>`;
-      };
-    }
-
-    // ==================== Cálculos existentes (com PDF) ====================
-    function gerarPDF(titulo, conteudoHTML) {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.setFontSize(16);
-      doc.text('VoltCalc Pro - Relatório', 20, 20);
-      doc.setFontSize(12);
-      doc.text(titulo, 20, 30);
-      doc.html(conteudoHTML, {
-        callback: function (doc) {
-          doc.save('calculo.pdf');
-        },
-        x: 20, y: 40
-      });
-    }
-
-    // Os cálculos existentes permanecem, apenas adicionamos botão PDF em cada resultado.
-    // (código adaptado para incluir botão PDF após o resultado)
-    // ... (os listeners dos cálculos são os mesmos, só adicionaremos um botão "Baixar PDF" no HTML gerado)
-
-    // Exemplo para Corrente:
-    document.getElementById('btnCalcularCorrente').addEventListener('click', async () => {
-      const V = parseFloat(document.getElementById('corrTensao').value) || 220;
-      const P = parseFloat(document.getElementById('corrPotencia').value);
-      const tipo = parseInt(document.getElementById('corrTipo').value);
-      const fp = parseFloat(document.getElementById('corrFP').value) || 1;
-      if (!P) return;
-      let I;
-      if (tipo === 1) I = P / (V * fp);
-      else if (tipo === 2) I = P / (V * fp);
-      else I = P / (V * Math.sqrt(3) * fp);
-      const html = `<div class="result-card"><h3>Corrente Calculada</h3>
-        <div class="result-item"><span>Potência</span><span>${P} W</span></div>
-        <div class="result-item"><span>Tensão</span><span>${V} V</span></div>
-        <div class="result-highlight">Corrente: <strong>${I.toFixed(2)} A</strong></div></div>
-        <button class="btn btn-outline btn-sm" onclick="gerarPDF('Cálculo de Corrente', document.getElementById('resultadoCorrente').innerHTML)">📄 Baixar PDF</button>`;
-      document.getElementById('resultadoCorrente').innerHTML = html;
-      await salvarCalculo('Corrente', {V,P,tipo,fp}, {corrente: I.toFixed(2)});
-    });
-
-    // (Repita a lógica para os demais cálculos: Condutor, Disjuntor, Queda, com botão PDF)
-
-    // ==================== Histórico (com limite) ====================
-    async function salvarCalculo(tipo, parametros, resultado) {
-      if (!currentUser) return;
-      if (!isPremium()) {
-        const count = await db.collection('calculos').where('userId', '==', currentUser.uid).get();
-        if (count.size >= 5) { alert('Limite gratuito atingido. Assine Premium.'); return; }
-      }
-      await db.collection('calculos').add({ userId: currentUser.uid, tipo, parametros, resultado, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-    }
-
-    async function carregarHistorico() {
-      const container = document.getElementById('historicoContainer');
-      if (!currentUser) return;
-      container.innerHTML = '<div class="spinner"></div>';
-      try {
-        let query = db.collection('calculos').where('userId', '==', currentUser.uid).orderBy('createdAt', 'desc');
-        if (!isPremium()) query = query.limit(5);
-        const snap = await query.get();
-        if (snap.empty) { container.innerHTML = '<div class="empty-state">Nenhum cálculo.</div>'; return; }
-        let html = '';
-        snap.forEach(doc => {
-          const d = doc.data();
-          html += `<div class="history-item"><span class="type">${d.tipo}</span> - ${d.parametros?.V || ''} → ${d.resultado?.corrente || ''}<br><span class="date">${d.createdAt?.toDate().toLocaleString()}</span></div>`;
-        });
-        container.innerHTML = html;
-      } catch (e) { container.innerHTML = '<div class="error visible">Erro.</div>'; }
-    }
-
-    // ==================== Stripe Checkout (redirecionamento) ====================
-    async function iniciarCheckout(priceId) {
-      if (!currentUser) return;
-      try {
-        const customerSnap = await db.collection('customers').doc(currentUser.uid).get();
-        if (!customerSnap.exists) {
-          // Criar customer via extensão (chamada indireta, geralmente ao criar checkout)
-        }
-        // Redirecionar para o link de pagamento do Stripe configurado na extensão
-        window.open(`https://buy.stripe.com/...`); // Deve ser substituído pelo link real
-      } catch (e) { alert('Erro ao iniciar checkout.'); }
-    }
-
-    // ==================== Auth Observer ====================
-    auth.onAuthStateChanged(async (user) => {
+    // Observador de estado
+    auth.onAuthStateChanged(user => {
       if (user) {
-        currentUser = user;
-        const dados = await carregarDadosUsuario(user.uid);
-        const nome = dados?.nome || user.email;
-        document.getElementById('nomeUsuario').textContent = '👋 ' + nome;
-        document.getElementById('avatarInicial').textContent = nome.charAt(0).toUpperCase();
-        showScreen(screens.home);
-        showTab('corrente'); // aba inicial
-        ['loginEmail','loginSenha','cadNome','cadEmail','cadSenha'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+        document.getElementById('nomeUsuario').textContent = 'Olá, ' + (user.displayName || user.email);
+        showScreen(homeScreen);
       } else {
-        currentUser = null;
-        showScreen(screens.login);
+        showScreen(loginScreen);
       }
     });
   </script>
