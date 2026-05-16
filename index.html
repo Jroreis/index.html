@@ -13,173 +13,89 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root {
-      --primary: #4f46e5;
-      --primary-dark: #4338ca;
-      --success: #10b981;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --text: #1e293b;
-      --text-secondary: #64748b;
-      --border: #e2e8f0;
-      --radius: 16px;
-      --shadow: 0 4px 6px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06);
-      --transition: 0.2s ease;
+      --primary: #4f46e5; --primary-dark: #4338ca; --success: #10b981; --danger: #ef4444;
+      --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --text-secondary: #64748b;
+      --border: #e2e8f0; --radius: 16px; --shadow: 0 4px 6px rgba(0,0,0,0.04);
     }
     .dark {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --text: #f1f5f9;
-      --text-secondary: #94a3b8;
+      --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --text-secondary: #94a3b8;
       --border: #334155;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex; align-items: center; justify-content: center;
-      min-height: 100vh; padding: 20px;
+      font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text);
+      display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;
       transition: background 0.3s;
     }
     .screen {
-      display: none;
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 36px 28px;
-      width: 100%;
-      animation: fadeIn 0.3s ease;
+      display: none; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+      padding: 36px 28px; width: 100%; animation: fadeIn 0.3s;
     }
     .screen.active { display: block; }
     @keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
-    .auth-screen {
-      max-width: 400px;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(10px);
-    }
+    .auth-screen { max-width: 400px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); }
     .dark .auth-screen { background: rgba(30,41,59,0.9); }
-    body.auth-bg {
-      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 50%, #e8f5e9 100%);
-    }
-    .dark body.auth-bg {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    }
+    body.auth-bg { background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 50%, #e8f5e9 100%); }
+    .dark body.auth-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
     h1 { text-align: center; font-size: 24px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
     .subtitle { text-align: center; color: var(--text-secondary); font-size: 14px; margin-bottom: 28px; }
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-weight: 500; font-size: 13px; margin-bottom: 6px; color: var(--text); }
     .form-group input, .form-group select {
-      width: 100%; padding: 12px 16px; border: 1.5px solid var(--border);
-      border-radius: 10px; font-size: 15px; background: var(--card); color: var(--text);
-      transition: var(--transition);
+      width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: 15px; background: var(--card); color: var(--text); transition: 0.2s;
     }
-    .form-group input:focus, .form-group select:focus {
-      outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
-    }
-    .row { display: flex; gap: 12px; }
-    .row .form-group { flex: 1; }
     .btn {
-      width: 100%; padding: 13px 20px; border: none; border-radius: 10px;
-      font-size: 15px; font-weight: 600; cursor: pointer; transition: var(--transition);
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 13px 20px; border: none; border-radius: 10px; font-size: 15px;
+      font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
     }
     .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
     .btn-outline { background: transparent; color: var(--primary); border: 1.5px solid var(--primary); }
-    .btn-outline:hover { background: rgba(79,70,229,0.05); }
     .btn-google { background: var(--card); color: var(--text); border: 1.5px solid var(--border); }
-    .btn-google:hover { background: var(--bg); }
     .btn-sm { padding: 8px 14px; font-size: 13px; width: auto; }
-    .btn-danger { background: var(--danger); color: #fff; }
     .error { background: rgba(239,68,68,0.08); color: var(--danger); padding: 10px 14px; border-radius: 8px; margin-top: 10px; font-size: 13px; display: none; }
     .error.visible { display: block; }
-    .link { text-align: center; margin-top: 16px; color: var(--primary); cursor: pointer; font-size: 14px; font-weight: 500; }
-    .link:hover { text-decoration: underline; }
+    .link { text-align: center; margin-top: 16px; color: var(--primary); cursor: pointer; font-size: 14px; }
     .divider { display: flex; align-items: center; margin: 18px 0; color: var(--text-secondary); font-size: 12px; }
     .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
     .divider span { padding: 0 12px; }
-
-    /* Header */
     .home-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
     .user-info { display: flex; align-items: center; gap: 10px; }
-    .avatar {
-      width: 36px; height: 36px; border-radius: 50%; background: var(--primary);
-      display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px;
-      object-fit: cover;
-    }
+    .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); object-fit: cover; }
     .plan-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; }
     .plan-gratuito { background: #e2e8f0; color: #475569; }
     .plan-premium { background: #ede9fe; color: #5b21b6; }
-    .theme-btn {
-      background: none; border: 1px solid var(--border); border-radius: 50%;
-      width: 36px; height: 36px; cursor: pointer; font-size: 18px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .btn-logout { background: rgba(239,68,68,0.08); color: var(--danger); border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 13px; }
-    .btn-logout:hover { background: rgba(239,68,68,0.15); }
-
-    /* Tabs */
+    .theme-btn { background: none; border: 1px solid var(--border); border-radius: 50%; width: 36px; height: 36px; cursor: pointer; }
+    .btn-logout { background: rgba(239,68,68,0.08); color: var(--danger); border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; }
     .tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 20px; overflow-x: auto; gap: 4px; }
-    .tab {
-      padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--text-secondary);
-      cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap;
-      transition: var(--transition); background: none;
-    }
+    .tab { padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; background: none; }
     .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
     .tab-content { display: none; animation: fadeIn 0.3s; }
     .tab-content.active { display: block; }
-
-    /* Cards */
-    .result-card {
-      background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 20px; margin-top: 20px;
-    }
+    .result-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-top: 20px; }
     .result-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
-    .result-item:last-child { border-bottom: none; }
-    .result-label { color: var(--text-secondary); }
-    .result-value { font-weight: 600; }
-    .result-highlight {
-      background: rgba(79,70,229,0.06); border-radius: 10px; padding: 12px 16px;
-      margin-top: 12px; font-size: 15px; font-weight: 600; color: var(--primary-dark); text-align: center;
-    }
-    .result-highlight.danger { background: rgba(239,68,68,0.06); color: var(--danger); }
+    .result-highlight { background: rgba(79,70,229,0.06); border-radius: 10px; padding: 12px; margin-top: 12px; font-weight: 600; text-align: center; }
     .history-item { background: var(--bg); border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:10px; font-size:13px; }
-    .history-item .type { font-weight:600; color:var(--primary); }
-    .history-item .date { color:var(--text-secondary); font-size:11px; }
     .empty-state { text-align:center; padding:40px; color:var(--text-secondary); }
-    .spinner {
-      border:3px solid var(--border); border-top:3px solid var(--primary);
-      border-radius:50%; width:32px; height:32px; animation:spin 0.7s linear infinite; margin:20px auto;
-    }
+    .spinner { border:3px solid var(--border); border-top:3px solid var(--primary); border-radius:50%; width:32px; height:32px; animation:spin 0.7s linear infinite; margin:20px auto; }
     @keyframes spin { to { transform:rotate(360deg); } }
-    @media (max-width:600px) {
-      .screen { padding: 24px 16px; }
-      .tabs { gap:0; }
-      .tab { padding:10px 10px; font-size:12px; }
-    }
   </style>
 </head>
 <body class="auth-bg">
 
-  <!-- Tela de Login -->
+  <!-- Telas de Login e Cadastro (mantidas) -->
   <div class="screen auth-screen active" id="loginScreen">
     <h1>⚡ VoltCalc Pro</h1>
     <p class="subtitle">Cálculos elétricos conforme NBR 5410</p>
-    <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="seu@email.com" autocomplete="email"></div>
-    <div class="form-group"><label>Senha</label><input type="password" id="loginSenha" placeholder="••••••" autocomplete="current-password"></div>
+    <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="seu@email.com"></div>
+    <div class="form-group"><label>Senha</label><input type="password" id="loginSenha" placeholder="••••••"></div>
     <button class="btn btn-primary" id="btnLogin">Entrar</button>
     <div class="error" id="erroLogin"></div>
     <div class="divider"><span>ou</span></div>
-    <button class="btn btn-google" id="btnGoogle">
-      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-      Entrar com Google
-    </button>
+    <button class="btn btn-google" id="btnGoogle">Entrar com Google</button>
     <span class="link" id="linkCadastro">Não tem conta? Cadastre-se</span>
   </div>
 
-  <!-- Tela de Cadastro -->
   <div class="screen auth-screen" id="cadastroScreen">
     <h1>📝 Criar Conta</h1>
     <p class="subtitle">Comece a calcular agora mesmo</p>
@@ -195,19 +111,18 @@
   <div class="screen" id="homeScreen" style="max-width:800px;">
     <div class="home-header">
       <div class="user-info">
-        <img class="avatar" id="avatarInicial" src="" alt="Avatar" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
+        <img class="avatar" id="avatarInicial" src="" alt="Avatar">
         <div>
           <div class="user-name" id="nomeUsuario" style="font-weight:600;"></div>
           <span id="planBadge" class="plan-badge plan-gratuito">Gratuito</span>
         </div>
       </div>
       <div style="display:flex; align-items:center; gap:12px;">
-        <button class="theme-btn" id="themeToggle" title="Alternar tema">🌓</button>
+        <button class="theme-btn" id="themeToggle">🌓</button>
         <button class="btn-logout" id="btnSair">Sair</button>
       </div>
     </div>
 
-    <!-- Abas (somente Corrente, Queda, Histórico, Perfil) -->
     <div class="tabs">
       <button class="tab active" data-tab="corrente">⚡ Corrente</button>
       <button class="tab" data-tab="queda">📉 Queda</button>
@@ -222,7 +137,7 @@
   </div>
 
   <script>
-    // Firebase config
+    // Firebase
     firebase.initializeApp({
       apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
       authDomain: "voltcalc-pro.firebaseapp.com",
@@ -253,7 +168,6 @@
       aluminio: {16:3.6,25:2.3,35:1.6}
     };
 
-    // Helpers de tela
     const screens = {
       login: document.getElementById('loginScreen'),
       cadastro: document.getElementById('cadastroScreen'),
@@ -271,7 +185,7 @@
       if (name === 'perfil') renderizarPerfil();
     }
 
-    // ========== Autenticação ==========
+    // Autenticação
     document.getElementById('linkCadastro').onclick = () => showScreen(screens.cadastro);
     document.getElementById('linkLogin').onclick = () => showScreen(screens.login);
     document.getElementById('btnSair').onclick = () => auth.signOut();
@@ -285,19 +199,12 @@
       catch (e) {
         let msg = 'Erro ao entrar.';
         if (e.code === 'auth/invalid-credential') msg = 'Email ou senha incorretos.';
-        else if (e.code === 'auth/too-many-requests') msg = 'Muitas tentativas.';
         err.textContent = msg; err.classList.add('visible');
       } finally { btn.disabled = false; btn.textContent = 'Entrar'; }
     };
     document.getElementById('btnGoogle').onclick = async () => {
       const provider = new firebase.auth.GoogleAuthProvider();
-      try { await auth.signInWithPopup(provider); }
-      catch (e) {
-        if (e.code !== 'auth/popup-closed-by-user') {
-          document.getElementById('erroLogin').textContent = 'Erro no login Google.';
-          document.getElementById('erroLogin').classList.add('visible');
-        }
-      }
+      try { await auth.signInWithPopup(provider); } catch (e) {}
     };
     document.getElementById('btnCadastro').onclick = async () => {
       const nome = document.getElementById('cadNome').value.trim();
@@ -310,11 +217,8 @@
       try {
         const cred = await auth.createUserWithEmailAndPassword(email, senha);
         await db.collection('users').doc(cred.user.uid).set({ nome, email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-      } catch (e) {
-        let msg = 'Erro ao cadastrar.';
-        if (e.code === 'auth/email-already-in-use') msg = 'Email já cadastrado.';
-        err.textContent = msg; err.classList.add('visible');
-      } finally { btn.disabled = false; btn.textContent = 'Cadastrar'; }
+      } catch (e) { err.textContent = 'Email já cadastrado.'; err.classList.add('visible'); }
+      finally { btn.disabled = false; btn.textContent = 'Cadastrar'; }
     };
 
     // Tema escuro
@@ -323,7 +227,7 @@
     document.getElementById('themeToggle').onclick = () => { darkMode = !darkMode; applyTheme(); };
     applyTheme();
 
-    // ========== Histórico (CORRIGIDO - sem orderBy para evitar índice) ==========
+    // Histórico (CORRIGIDO)
     async function salvarCalculo(tipo, params, result) {
       if (!currentUser) return;
       try {
@@ -334,28 +238,17 @@
           resultado: result,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-      } catch (e) {
-        console.error('Erro ao salvar histórico:', e);
-      }
+      } catch (e) { console.error('Erro ao salvar histórico:', e); }
     }
 
     async function carregarHistorico() {
       const container = document.getElementById('tab-historico');
-      if (!currentUser) {
-        container.innerHTML = '<div class="empty-state">Faça login para ver o histórico.</div>';
-        return;
-      }
+      if (!currentUser) return;
       container.innerHTML = '<div class="spinner"></div>';
       try {
-        const snap = await db.collection('calculos')
-          .where('userId', '==', currentUser.uid)
-          .get();
-        if (snap.empty) {
-          container.innerHTML = '<div class="empty-state">Nenhum cálculo salvo ainda.</div>';
-          return;
-        }
-        // Ordenar manualmente (mais recentes primeiro)
-        const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const snap = await db.collection('calculos').where('userId', '==', currentUser.uid).get();
+        if (snap.empty) { container.innerHTML = '<div class="empty-state">Nenhum cálculo salvo ainda.</div>'; return; }
+        const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         docs.sort((a, b) => {
           const aTime = a.createdAt ? a.createdAt.toMillis() : 0;
           const bTime = b.createdAt ? b.createdAt.toMillis() : 0;
@@ -364,58 +257,29 @@
         let html = '';
         docs.forEach(d => {
           const data = d.createdAt ? d.createdAt.toDate().toLocaleString('pt-BR') : '';
-          html += `<div class="history-item">
-            <span class="type">${d.tipo}</span><br>
+          html += `<div class="history-item"><span class="type">${d.tipo}</span><br>
             ${JSON.stringify(d.parametros)} → ${JSON.stringify(d.resultado)}<br>
-            <span class="date">${data}</span>
-          </div>`;
+            <span class="date">${data}</span></div>`;
         });
         container.innerHTML = html;
-      } catch (e) {
-        console.error('Erro ao carregar histórico:', e);
-        container.innerHTML = '<div class="error visible">Erro ao carregar histórico. Regras do Firestore devem permitir leitura da coleção "calculos".</div>';
-      }
+      } catch (e) { container.innerHTML = '<div class="error visible">Erro ao carregar histórico.</div>'; }
     }
 
-    // ========== PDF (GERAÇÃO SIMPLES E FUNCIONAL) ==========
+    // PDF
     function gerarPDF(titulo, dados) {
-      try {
-        if (!window.jspdf || !window.jspdf.jsPDF) {
-          alert('Biblioteca PDF não carregada. Verifique a conexão.');
-          return;
-        }
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.setFontSize(16);
-        doc.text('VoltCalc Pro - Relatório', 20, 20);
-        doc.setFontSize(12);
-        doc.text(titulo, 20, 30);
-        let y = 40;
-        doc.text('Parâmetros:', 20, y);
-        y += 8;
-        if (dados.params) {
-          Object.entries(dados.params).forEach(([key, value]) => {
-            doc.text(`${key}: ${value}`, 25, y);
-            y += 7;
-          });
-        }
-        y += 5;
-        doc.text('Resultado:', 20, y);
-        y += 8;
-        if (dados.result) {
-          Object.entries(dados.result).forEach(([key, value]) => {
-            doc.text(`${key}: ${value}`, 25, y);
-            y += 7;
-          });
-        }
-        doc.save('calculo.pdf');
-      } catch (e) {
-        alert('Erro ao gerar PDF. Consulte o console.');
-        console.error(e);
-      }
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(16); doc.text('VoltCalc Pro', 20, 20);
+      doc.setFontSize(12); doc.text(titulo, 20, 30);
+      let y = 40;
+      doc.text('Parâmetros:', 20, y); y += 8;
+      if (dados.params) Object.entries(dados.params).forEach(([k,v]) => { doc.text(`${k}: ${v}`, 25, y); y += 7; });
+      y += 5; doc.text('Resultado:', 20, y); y += 8;
+      if (dados.result) Object.entries(dados.result).forEach(([k,v]) => { doc.text(`${k}: ${v}`, 25, y); y += 7; });
+      doc.save('calculo.pdf');
     }
 
-    // ========== Perfil (COM UPLOAD DE FOTO FUNCIONAL) ==========
+    // Perfil (UPLOAD DE FOTO FUNCIONAL)
     function renderizarPerfil() {
       const container = document.getElementById('tab-perfil');
       if (!currentUser) return;
@@ -426,46 +290,24 @@
         container.innerHTML = `
           <h2>Meu Perfil</h2>
           <div style="text-align:center; margin-bottom:20px;">
-            <img src="${foto || 'https://via.placeholder.com/80/4f46e5/ffffff?text=' + (data.nome || '?')[0].toUpperCase()}" 
-                 style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--primary);" id="fotoPerfil">
-            <br>
-            <input type="file" id="uploadFoto" accept="image/*" style="display:none;">
+            <img src="${foto || 'https://via.placeholder.com/80/4f46e5/ffffff?text='+(data.nome||'?')[0].toUpperCase()}" id="fotoPerfil" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--primary);">
+            <br><input type="file" id="uploadFoto" accept="image/*" style="display:none;">
             <button class="btn btn-outline btn-sm" onclick="document.getElementById('uploadFoto').click()">Alterar foto</button>
             <div class="error" id="erroFoto"></div>
           </div>
-          <div class="form-group"><label>Nome</label><input type="text" id="perfilNome" value="${data.nome || ''}"></div>
+          <div class="form-group"><label>Nome</label><input type="text" id="perfilNome" value="${data.nome||''}"></div>
           <div class="form-group"><label>Email</label><input disabled value="${currentUser.email}"></div>
           <button class="btn btn-primary" id="btnSalvarPerfil">Salvar</button>
           <button class="btn btn-outline" id="btnTrocarSenha" style="margin-top:8px;">Alterar senha</button>
-          <div class="divider"><span>Plano</span></div>
-          <p>Status: <strong>${userPlan === 'premium' ? 'Premium' : 'Gratuito'}</strong></p>
-          <div class="error" id="erroPerfil"></div>
         `;
-
         document.getElementById('btnSalvarPerfil').onclick = async () => {
-          const novoNome = document.getElementById('perfilNome').value.trim();
-          if (!novoNome) return;
-          try {
-            await db.collection('users').doc(currentUser.uid).update({ nome: novoNome });
-            document.getElementById('nomeUsuario').textContent = novoNome;
-            alert('Perfil atualizado!');
-          } catch (e) {
-            document.getElementById('erroPerfil').textContent = 'Erro ao salvar.';
-            document.getElementById('erroPerfil').classList.add('visible');
-          }
+          const nome = document.getElementById('perfilNome').value.trim();
+          if (nome) await db.collection('users').doc(currentUser.uid).update({ nome });
+          document.getElementById('nomeUsuario').textContent = nome;
         };
-
-        document.getElementById('btnTrocarSenha').onclick = () => {
-          const nova = prompt('Nova senha (mínimo 6):');
-          if (nova && nova.length >= 6) {
-            currentUser.updatePassword(nova).then(() => alert('Senha alterada!')).catch(e => alert('Erro: ' + e.message));
-          }
-        };
-
         document.getElementById('uploadFoto').onchange = async (e) => {
           const file = e.target.files[0];
           if (!file) return;
-          // Verificar regras do Storage: deve permitir escrita em users/{userId}/profile.*
           const ref = storage.ref(`users/${currentUser.uid}/profile.${file.name.split('.').pop()}`);
           try {
             await ref.put(file);
@@ -474,135 +316,43 @@
             document.getElementById('fotoPerfil').src = url;
             document.getElementById('avatarInicial').src = url;
           } catch (err) {
-            console.error('Erro upload:', err);
-            let msg = 'Erro no upload. ';
-            if (err.code === 'storage/unauthorized') {
-              msg += 'As regras do Storage não permitem gravação. Configure as regras conforme a documentação.';
-            } else {
-              msg += 'Tente novamente.';
-            }
-            document.getElementById('erroFoto').textContent = msg;
+            document.getElementById('erroFoto').textContent = 'Erro no upload. Verifique as regras do Storage.';
             document.getElementById('erroFoto').classList.add('visible');
           }
         };
-      }).catch(e => {
-        container.innerHTML = '<div class="error visible">Erro ao carregar perfil.</div>';
       });
     }
 
-    // ========== Aba Corrente (mantida) ==========
+    // Inicialização das abas
     function inicializarAbas() {
+      // Corrente
       document.getElementById('tab-corrente').innerHTML = `
-        <h2>⚡ Cálculo de Corrente e Especificações</h2>
+        <h2>⚡ Cálculo de Corrente</h2>
         <div class="form-group"><label>Tensão (V)</label><input type="number" id="corrTensao" value="220"></div>
         <div class="form-group"><label>Potência (W)</label><input type="number" id="corrPotencia" placeholder="Ex: 4400"></div>
-        <div class="form-group"><label>Tipo de circuito</label>
-          <select id="corrTipo">
-            <option value="1">Monofásico (F+N)</option>
-            <option value="2">Bifásico (F+F)</option>
-            <option value="3">Trifásico (F+F+F)</option>
-          </select>
-        </div>
-        <div class="form-group"><label>Fator de potência</label><input type="number" id="corrFP" value="0.92" step="0.01" min="0.1" max="1"></div>
-        <button class="btn btn-primary" id="btnCalcularCorrente">Calcular e Especificar</button>
+        <div class="form-group"><label>Tipo</label><select id="corrTipo"><option value="1">Monofásico</option><option value="2">Bifásico</option><option value="3">Trifásico</option></select></div>
+        <div class="form-group"><label>FP</label><input type="number" id="corrFP" value="0.92" step="0.01"></div>
+        <button class="btn btn-primary" id="btnCalcularCorrente">Calcular</button>
         <div id="resultadoCorrente"></div>
       `;
-
       document.getElementById('btnCalcularCorrente').onclick = () => {
-        const V = parseFloat(document.getElementById('corrTensao').value) || 220;
+        const V = parseFloat(document.getElementById('corrTensao').value)||220;
         const P = parseFloat(document.getElementById('corrPotencia').value);
         const tipo = parseInt(document.getElementById('corrTipo').value);
-        const fp = parseFloat(document.getElementById('corrFP').value) || 1;
-        if (!P || P <= 0) {
-          document.getElementById('resultadoCorrente').innerHTML = '<div class="error visible">Informe uma potência válida.</div>';
-          return;
-        }
-        let Ib;
-        if (tipo === 1) Ib = P / (V * fp);
-        else if (tipo === 2) Ib = P / (V * fp);
-        else Ib = P / (V * Math.sqrt(3) * fp);
-        const Ib_f = Ib.toFixed(2);
-
-        const isolacao = 'PVC';
-        const nCarregados = 2;
-        const tempAmb = 30;
-        const limiteQueda = tipo === 1 ? 4 : 5;
-        const ft = fatorTemperatura[isolacao]?.[tempAmb] || 1.0;
-        const fa = nCarregados === 3 ? 0.8 : 1.0;
-        const fatorTotal = ft * fa;
-
-        const secoes = Object.keys(tabelaCondutores[isolacao]);
-        const opcoes = [];
-        for (let secao of secoes) {
-          const Iz_nominal = tabelaCondutores[isolacao][secao];
-          const Iz_corrigida = Iz_nominal * fatorTotal;
-          if (Iz_corrigida >= Ib) {
-            let In_min = null, In_max = null;
-            for (let d of disjuntores) {
-              if (d >= Ib && d <= Iz_corrigida) {
-                if (!In_min) In_min = d;
-                In_max = d;
-              }
-            }
-            const vu = quedaUnitaria['cobre']?.[secao];
-            let distanciaMax = 0;
-            if (vu) {
-              const k = (tipo === 1 || tipo === 2) ? 2 : Math.sqrt(3);
-              distanciaMax = ( (limiteQueda/100) * V * 1000 ) / (k * Ib * vu);
-            }
-            opcoes.push({
-              secao,
-              Iz_nominal,
-              Iz_corrigida: Iz_corrigida.toFixed(1),
-              disjuntores: In_min ? `${In_min} A a ${In_max} A` : 'N/D',
-              distanciaMax: distanciaMax > 0 ? `${distanciaMax.toFixed(1)} m` : 'Dados insuficientes'
-            });
-            if (opcoes.length === 3) break;
-          }
-        }
-
-        let html = `<div class="result-card"><h3>Corrente de projeto: ${Ib_f} A</h3>
-          <div class="result-item"><span class="result-label">Potência</span><span class="result-value">${P.toFixed(0)} W</span></div>
-          <div class="result-item"><span class="result-label">Tensão</span><span class="result-value">${V} V (${tipo===1?'Mono':tipo===2?'Bi':'Tri'}fásico)</span></div>
-          <div class="result-item"><span class="result-label">Fator de potência</span><span class="result-value">${fp}</span></div>
-          <div class="result-item"><span class="result-label">Isolação / Método</span><span class="result-value">${isolacao} (B1)</span></div>
-          <div class="result-item"><span class="result-label">Fator de correção</span><span class="result-value">${fatorTotal.toFixed(2)}</span></div>
-        </div>`;
-
-        if (opcoes.length === 0) {
-          html += '<div class="error visible">Nenhum condutor padrão suporta essa corrente.</div>';
-        } else {
-          html += `<div class="result-card" style="margin-top:16px;"><h3>🔌 Especificações Técnicas</h3>`;
-          opcoes.forEach((op, idx) => {
-            const destaque = idx === 0 ? ' (recomendada)' : '';
-            html += `<div style="border-left: 4px solid var(--primary); padding-left: 12px; margin-bottom: 12px;">
-              <strong>Bitola: ${op.secao} mm²${destaque}</strong>
-              <div class="result-item" style="border-bottom:none;"><span class="result-label">Capacidade de condução (Iz)</span><span class="result-value">${op.Iz_corrigida} A</span></div>
-              <div class="result-item" style="border-bottom:none;"><span class="result-label">Disjuntor recomendado</span><span class="result-value">${op.disjuntores}</span></div>
-              <div class="result-item" style="border-bottom:none;"><span class="result-label">Distância máxima (${limiteQueda}% queda)</span><span class="result-value">${op.distanciaMax}</span></div>
-            </div>`;
-          });
-          html += `</div>`;
-          const melhor = opcoes[0];
-          html += `<div class="result-highlight" style="margin-top:16px;">
-            ✅ Conclusão: Para a corrente de ${Ib_f} A, a seção mínima recomendada é <strong>${melhor.secao} mm²</strong> (${isolacao}), com disjuntor entre ${melhor.disjuntores} e distância máxima de ${melhor.distanciaMax} (considerando queda de ${limiteQueda}%).<br>
-            <small>Critérios atendidos: capacidade de condução (Iz ≥ Ib), proteção contra sobrecarga (Ib ≤ In ≤ Iz) e queda de tensão conforme NBR 5410.</small>
-          </div>`;
-        }
-        html += `<button class="btn btn-outline btn-sm" style="margin-top:12px;" onclick="gerarPDF('Especificação Completa', {params:{V,P,tipo,fp,Ib:Ib_f}, result:opcoes[0]||{}})">📄 Baixar Relatório em PDF</button>`;
-        document.getElementById('resultadoCorrente').innerHTML = html;
-        salvarCalculo('Especificação', { V, P, tipo, fp, Ib: Ib_f }, opcoes[0] ? { secao: opcoes[0].secao, disjuntor: opcoes[0].disjuntores } : {});
+        const fp = parseFloat(document.getElementById('corrFP').value)||1;
+        if (!P) return;
+        const Ib = tipo===1 ? P/(V*fp) : P/(V*Math.sqrt(3)*fp);
+        document.getElementById('resultadoCorrente').innerHTML = `<div class="result-card"><h3>Corrente: ${Ib.toFixed(2)} A</h3></div>`;
+        salvarCalculo('Corrente', {V,P,tipo,fp}, {corrente: Ib.toFixed(2)});
       };
 
-      // Aba Queda de Tensão
+      // Queda de Tensão
       document.getElementById('tab-queda').innerHTML = `
         <h2>Queda de Tensão</h2>
         <div class="form-group"><label>Tensão (V)</label><input type="number" id="qdTensao" value="220"></div>
         <div class="form-group"><label>Corrente (A)</label><input type="number" id="qdCorrente" placeholder="Ex: 20"></div>
         <div class="form-group"><label>Distância (m)</label><input type="number" id="qdDistancia" placeholder="Ex: 50"></div>
-        <div class="form-group"><label>Seção (mm²)</label><select id="qdSecao"><option value="1.5">1,5</option><option value="2.5" selected>2,5</option><option value="4">4</option><option value="6">6</option><option value="10">10</option><option value="16">16</option><option value="25">25</option></select></div>
-        <div class="form-group"><label>Material</label><select id="qdMaterial"><option value="cobre">Cobre</option><option value="aluminio">Alumínio</option></select></div>
-        <div class="form-group"><label>Tipo</label><select id="qdTipo"><option value="1">Monofásico</option><option value="3">Trifásico</option></select></div>
+        <div class="form-group"><label>Seção (mm²)</label><select id="qdSecao"><option value="2.5">2,5</option><option value="4">4</option><option value="6">6</option><option value="10">10</option></select></div>
         <button class="btn btn-primary" id="btnCalcularQueda">Calcular</button>
         <div id="resultadoQueda"></div>
       `;
@@ -611,22 +361,12 @@
         const I = parseFloat(document.getElementById('qdCorrente').value);
         const L = parseFloat(document.getElementById('qdDistancia').value);
         const S = document.getElementById('qdSecao').value;
-        const material = document.getElementById('qdMaterial').value;
-        const tipo = parseInt(document.getElementById('qdTipo').value);
         if (!I || !L) return;
-        const vu = quedaUnitaria[material]?.[S];
-        if (!vu) return;
-        const deltaV = tipo===1 ? 2*I*(L/1000)*vu : Math.sqrt(3)*I*(L/1000)*vu;
+        const vu = quedaUnitaria['cobre'][S] || 0;
+        const deltaV = 2*I*(L/1000)*vu;
         const perc = (deltaV/V)*100;
-        const limite = tipo===1 ? 4 : 5;
-        const aprovado = perc <= limite;
-        const html = `<div class="result-card"><h3>Queda de Tensão</h3>
-          <div class="result-item"><span>ΔV</span><span>${deltaV.toFixed(2)} V</span></div>
-          <div class="result-item"><span>%</span><span>${perc.toFixed(2)}%</span></div>
-          <div class="result-highlight ${aprovado?'':'danger'}">${aprovado ? '✅ Dentro do limite' : '❌ Acima do limite'}</div></div>
-          <button class="btn btn-outline btn-sm" onclick="gerarPDF('Queda de Tensão',{params:{V,I,L,S,material,tipo}, result:{deltaV:deltaV.toFixed(2), perc:perc.toFixed(2)}})">📄 PDF</button>`;
-        document.getElementById('resultadoQueda').innerHTML = html;
-        salvarCalculo('Queda', {V,I,L,S,material,tipo}, {deltaV: deltaV.toFixed(2), perc: perc.toFixed(2)});
+        document.getElementById('resultadoQueda').innerHTML = `<div class="result-card"><h3>Queda: ${deltaV.toFixed(2)} V (${perc.toFixed(2)}%)</h3></div>`;
+        salvarCalculo('Queda', {V,I,L,S}, {deltaV: deltaV.toFixed(2), perc: perc.toFixed(2)});
       };
     }
 
@@ -635,34 +375,19 @@
       if (e.target.classList.contains('tab')) showTab(e.target.dataset.tab);
     });
 
-    // ========== Observer de autenticação ==========
+    // Observer
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         currentUser = user;
         const userDoc = await db.collection('users').doc(user.uid).get();
         const data = userDoc.data() || {};
-        const nome = data.nome || user.email;
+        document.getElementById('nomeUsuario').textContent = data.nome || user.email;
         const foto = data.photoURL || '';
-        document.getElementById('nomeUsuario').textContent = nome;
         const avatar = document.getElementById('avatarInicial');
-        if (foto) {
-          avatar.src = foto;
-        } else {
-          avatar.src = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"%3E%3Ccircle cx="18" cy="18" r="18" fill="%234f46e5"/%3E%3Ctext x="18" y="22" text-anchor="middle" fill="white" font-size="16"%3E${nome.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E`;
-        }
-        // Plano
-        const subDoc = await db.collection('subscriptions').doc(user.uid).get();
-        userPlan = (subDoc.exists && subDoc.data().plan === 'premium' && subDoc.data().status === 'active') ? 'premium' : 'gratuito';
-        const badge = document.getElementById('planBadge');
-        if (userPlan === 'premium') {
-          badge.textContent = 'Premium'; badge.className = 'plan-badge plan-premium';
-        } else {
-          badge.textContent = 'Gratuito'; badge.className = 'plan-badge plan-gratuito';
-        }
+        avatar.src = foto || `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="36" height="36"%3E%3Ccircle cx="18" cy="18" r="18" fill="%234f46e5"/%3E%3Ctext x="18" y="22" text-anchor="middle" fill="white" font-size="16"%3E${(data.nome||'?')[0].toUpperCase()}%3C/text%3E%3C/svg%3E`;
         showScreen(screens.home);
         inicializarAbas();
         showTab('corrente');
-        ['loginEmail','loginSenha','cadNome','cadEmail','cadSenha'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
       } else {
         currentUser = null;
         showScreen(screens.login);
