@@ -207,7 +207,7 @@
       </div>
     </div>
 
-    <!-- Abas (sem Condutor e Disjuntor) -->
+    <!-- Abas (somente Corrente, Queda, Histórico, Perfil) -->
     <div class="tabs">
       <button class="tab active" data-tab="corrente">⚡ Corrente</button>
       <button class="tab" data-tab="queda">📉 Queda</button>
@@ -323,7 +323,7 @@
     document.getElementById('themeToggle').onclick = () => { darkMode = !darkMode; applyTheme(); };
     applyTheme();
 
-    // ========== Histórico (CORRIGIDO) ==========
+    // ========== Histórico (CORRIGIDO - sem orderBy para evitar índice) ==========
     async function salvarCalculo(tipo, params, result) {
       if (!currentUser) return;
       try {
@@ -349,17 +349,21 @@
       try {
         const snap = await db.collection('calculos')
           .where('userId', '==', currentUser.uid)
-          .orderBy('createdAt', 'desc')
-          .limit(50)
           .get();
         if (snap.empty) {
           container.innerHTML = '<div class="empty-state">Nenhum cálculo salvo ainda.</div>';
           return;
         }
+        // Ordenar manualmente (mais recentes primeiro)
+        const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        docs.sort((a, b) => {
+          const aTime = a.createdAt ? a.createdAt.toMillis() : 0;
+          const bTime = b.createdAt ? b.createdAt.toMillis() : 0;
+          return bTime - aTime;
+        });
         let html = '';
-        snap.forEach(doc => {
-          const d = doc.data();
-          const data = d.createdAt?.toDate().toLocaleString('pt-BR') || '';
+        docs.forEach(d => {
+          const data = d.createdAt ? d.createdAt.toDate().toLocaleString('pt-BR') : '';
           html += `<div class="history-item">
             <span class="type">${d.tipo}</span><br>
             ${JSON.stringify(d.parametros)} → ${JSON.stringify(d.resultado)}<br>
@@ -369,13 +373,17 @@
         container.innerHTML = html;
       } catch (e) {
         console.error('Erro ao carregar histórico:', e);
-        container.innerHTML = '<div class="error visible">Erro ao carregar histórico. Verifique as regras do Firestore.</div>';
+        container.innerHTML = '<div class="error visible">Erro ao carregar histórico. Regras do Firestore devem permitir leitura da coleção "calculos".</div>';
       }
     }
 
-    // ========== PDF simples e funcional ==========
+    // ========== PDF (GERAÇÃO SIMPLES E FUNCIONAL) ==========
     function gerarPDF(titulo, dados) {
       try {
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+          alert('Biblioteca PDF não carregada. Verifique a conexão.');
+          return;
+        }
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         doc.setFontSize(16);
@@ -385,17 +393,21 @@
         let y = 40;
         doc.text('Parâmetros:', 20, y);
         y += 8;
-        Object.entries(dados.params || {}).forEach(([key, value]) => {
-          doc.text(`${key}: ${value}`, 25, y);
-          y += 7;
-        });
+        if (dados.params) {
+          Object.entries(dados.params).forEach(([key, value]) => {
+            doc.text(`${key}: ${value}`, 25, y);
+            y += 7;
+          });
+        }
         y += 5;
         doc.text('Resultado:', 20, y);
         y += 8;
-        Object.entries(dados.result || {}).forEach(([key, value]) => {
-          doc.text(`${key}: ${value}`, 25, y);
-          y += 7;
-        });
+        if (dados.result) {
+          Object.entries(dados.result).forEach(([key, value]) => {
+            doc.text(`${key}: ${value}`, 25, y);
+            y += 7;
+          });
+        }
         doc.save('calculo.pdf');
       } catch (e) {
         alert('Erro ao gerar PDF. Consulte o console.');
@@ -403,7 +415,7 @@
       }
     }
 
-    // ========== Perfil (CORRIGIDO) ==========
+    // ========== Perfil (COM UPLOAD DE FOTO FUNCIONAL) ==========
     function renderizarPerfil() {
       const container = document.getElementById('tab-perfil');
       if (!currentUser) return;
@@ -453,6 +465,7 @@
         document.getElementById('uploadFoto').onchange = async (e) => {
           const file = e.target.files[0];
           if (!file) return;
+          // Verificar regras do Storage: deve permitir escrita em users/{userId}/profile.*
           const ref = storage.ref(`users/${currentUser.uid}/profile.${file.name.split('.').pop()}`);
           try {
             await ref.put(file);
@@ -462,7 +475,13 @@
             document.getElementById('avatarInicial').src = url;
           } catch (err) {
             console.error('Erro upload:', err);
-            document.getElementById('erroFoto').textContent = 'Erro no upload. Verifique as regras do Storage.';
+            let msg = 'Erro no upload. ';
+            if (err.code === 'storage/unauthorized') {
+              msg += 'As regras do Storage não permitem gravação. Configure as regras conforme a documentação.';
+            } else {
+              msg += 'Tente novamente.';
+            }
+            document.getElementById('erroFoto').textContent = msg;
             document.getElementById('erroFoto').classList.add('visible');
           }
         };
@@ -471,7 +490,7 @@
       });
     }
 
-    // ========== Aba Corrente (detalhada) ==========
+    // ========== Aba Corrente (mantida) ==========
     function inicializarAbas() {
       document.getElementById('tab-corrente').innerHTML = `
         <h2>⚡ Cálculo de Corrente e Especificações</h2>
