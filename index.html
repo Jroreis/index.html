@@ -167,14 +167,8 @@
   <div class="screen auth-screen active" id="loginScreen">
     <h1>⚡ VoltCalc Pro</h1>
     <p class="subtitle">Cálculos elétricos conforme NBR 5410</p>
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="loginEmail" placeholder="seu@email.com" autocomplete="email">
-    </div>
-    <div class="form-group">
-      <label>Senha</label>
-      <input type="password" id="loginSenha" placeholder="••••••" autocomplete="current-password">
-    </div>
+    <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="seu@email.com" autocomplete="email"></div>
+    <div class="form-group"><label>Senha</label><input type="password" id="loginSenha" placeholder="••••••" autocomplete="current-password"></div>
     <button class="btn btn-primary" id="btnLogin">Entrar</button>
     <div class="error" id="erroLogin"></div>
     <div class="divider"><span>ou</span></div>
@@ -213,27 +207,22 @@
       </div>
     </div>
 
-    <!-- Abas -->
+    <!-- Abas (sem Condutor e Disjuntor) -->
     <div class="tabs">
       <button class="tab active" data-tab="corrente">⚡ Corrente</button>
-      <button class="tab" data-tab="condutor">🔌 Condutor</button>
-      <button class="tab" data-tab="disjuntor">🛡️ Disjuntor</button>
       <button class="tab" data-tab="queda">📉 Queda</button>
       <button class="tab" data-tab="historico">📚 Histórico</button>
       <button class="tab" data-tab="perfil">👤 Perfil</button>
     </div>
 
-    <!-- Conteúdo das abas -->
     <div class="tab-content active" id="tab-corrente"></div>
-    <div class="tab-content" id="tab-condutor"></div>
-    <div class="tab-content" id="tab-disjuntor"></div>
     <div class="tab-content" id="tab-queda"></div>
     <div class="tab-content" id="tab-historico"></div>
     <div class="tab-content" id="tab-perfil"></div>
   </div>
 
   <script>
-    // ==================== Firebase Init ====================
+    // Firebase config
     firebase.initializeApp({
       apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
       authDomain: "voltcalc-pro.firebaseapp.com",
@@ -248,6 +237,8 @@
 
     let currentUser = null;
     let userPlan = 'gratuito';
+
+    // Tabelas NBR 5410
     const tabelaCondutores = {
       'PVC': { '1.5': 17.5, '2.5': 24, '4': 32, '6': 41, '10': 57, '16': 76, '25': 99, '35': 125, '50': 151, '70': 192 },
       'EPR': { '1.5': 22, '2.5': 30, '4': 40, '6': 52, '10': 72, '16': 96, '25': 125, '35': 155, '50': 188, '70': 238 }
@@ -262,16 +253,13 @@
       aluminio: {16:3.6,25:2.3,35:1.6}
     };
 
-    // ==================== Helpers ====================
+    // Helpers de tela
     const screens = {
       login: document.getElementById('loginScreen'),
       cadastro: document.getElementById('cadastroScreen'),
       home: document.getElementById('homeScreen')
     };
-    function showScreen(s) {
-      Object.values(screens).forEach(x => x.classList.remove('active'));
-      s.classList.add('active');
-    }
+    function showScreen(s) { Object.values(screens).forEach(x => x.classList.remove('active')); s.classList.add('active'); }
     function showTab(name) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -283,27 +271,24 @@
       if (name === 'perfil') renderizarPerfil();
     }
 
-    // ==================== Autenticação ====================
+    // ========== Autenticação ==========
     document.getElementById('linkCadastro').onclick = () => showScreen(screens.cadastro);
     document.getElementById('linkLogin').onclick = () => showScreen(screens.login);
     document.getElementById('btnSair').onclick = () => auth.signOut();
-
     document.getElementById('btnLogin').onclick = async () => {
       const email = document.getElementById('loginEmail').value.trim();
       const senha = document.getElementById('loginSenha').value;
       const err = document.getElementById('erroLogin'); err.classList.remove('visible');
       if (!email || !senha) { err.textContent = 'Preencha todos os campos.'; err.classList.add('visible'); return; }
       const btn = document.getElementById('btnLogin'); btn.disabled = true; btn.textContent = 'Entrando...';
-      try {
-        await auth.signInWithEmailAndPassword(email, senha);
-      } catch (e) {
+      try { await auth.signInWithEmailAndPassword(email, senha); }
+      catch (e) {
         let msg = 'Erro ao entrar.';
         if (e.code === 'auth/invalid-credential') msg = 'Email ou senha incorretos.';
         else if (e.code === 'auth/too-many-requests') msg = 'Muitas tentativas.';
         err.textContent = msg; err.classList.add('visible');
       } finally { btn.disabled = false; btn.textContent = 'Entrar'; }
     };
-
     document.getElementById('btnGoogle').onclick = async () => {
       const provider = new firebase.auth.GoogleAuthProvider();
       try { await auth.signInWithPopup(provider); }
@@ -314,7 +299,6 @@
         }
       }
     };
-
     document.getElementById('btnCadastro').onclick = async () => {
       const nome = document.getElementById('cadNome').value.trim();
       const email = document.getElementById('cadEmail').value.trim();
@@ -333,13 +317,13 @@
       } finally { btn.disabled = false; btn.textContent = 'Cadastrar'; }
     };
 
-    // ==================== Tema Escuro ====================
+    // Tema escuro
     let darkMode = localStorage.getItem('darkMode') === 'true';
     function applyTheme() { document.body.classList.toggle('dark', darkMode); localStorage.setItem('darkMode', darkMode); }
     document.getElementById('themeToggle').onclick = () => { darkMode = !darkMode; applyTheme(); };
     applyTheme();
 
-    // ==================== Histórico (CORRIGIDO) ====================
+    // ========== Histórico (CORRIGIDO) ==========
     async function salvarCalculo(tipo, params, result) {
       if (!currentUser) return;
       try {
@@ -385,40 +369,41 @@
         container.innerHTML = html;
       } catch (e) {
         console.error('Erro ao carregar histórico:', e);
-        container.innerHTML = '<div class="error visible">Erro ao carregar histórico.</div>';
+        container.innerHTML = '<div class="error visible">Erro ao carregar histórico. Verifique as regras do Firestore.</div>';
       }
     }
 
-    // ==================== PDF (CORRIGIDO) ====================
-    function gerarPDF(titulo, conteudoId) {
-      const element = document.getElementById(conteudoId);
-      if (!element) {
-        alert('Elemento não encontrado para gerar PDF.');
-        return;
-      }
+    // ========== PDF simples e funcional ==========
+    function gerarPDF(titulo, dados) {
       try {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+        const doc = new jsPDF();
         doc.setFontSize(16);
-        doc.text('VoltCalc Pro - Relatório', 10, 15);
+        doc.text('VoltCalc Pro - Relatório', 20, 20);
         doc.setFontSize(12);
-        doc.text(titulo, 10, 25);
-        doc.html(element, {
-          callback: function(pdf) {
-            pdf.save('calculo.pdf');
-          },
-          x: 10,
-          y: 30,
-          width: 190,
-          windowWidth: 800
+        doc.text(titulo, 20, 30);
+        let y = 40;
+        doc.text('Parâmetros:', 20, y);
+        y += 8;
+        Object.entries(dados.params || {}).forEach(([key, value]) => {
+          doc.text(`${key}: ${value}`, 25, y);
+          y += 7;
         });
+        y += 5;
+        doc.text('Resultado:', 20, y);
+        y += 8;
+        Object.entries(dados.result || {}).forEach(([key, value]) => {
+          doc.text(`${key}: ${value}`, 25, y);
+          y += 7;
+        });
+        doc.save('calculo.pdf');
       } catch (e) {
-        console.error('Erro ao gerar PDF:', e);
-        alert('Erro ao gerar PDF. Tente novamente.');
+        alert('Erro ao gerar PDF. Consulte o console.');
+        console.error(e);
       }
     }
 
-    // ==================== Perfil (CORRIGIDO) ====================
+    // ========== Perfil (CORRIGIDO) ==========
     function renderizarPerfil() {
       const container = document.getElementById('tab-perfil');
       if (!currentUser) return;
@@ -461,9 +446,7 @@
         document.getElementById('btnTrocarSenha').onclick = () => {
           const nova = prompt('Nova senha (mínimo 6):');
           if (nova && nova.length >= 6) {
-            currentUser.updatePassword(nova)
-              .then(() => alert('Senha alterada!'))
-              .catch(e => alert('Erro: ' + e.message));
+            currentUser.updatePassword(nova).then(() => alert('Senha alterada!')).catch(e => alert('Erro: ' + e.message));
           }
         };
 
@@ -478,16 +461,18 @@
             document.getElementById('fotoPerfil').src = url;
             document.getElementById('avatarInicial').src = url;
           } catch (err) {
-            document.getElementById('erroFoto').textContent = 'Erro no upload.';
+            console.error('Erro upload:', err);
+            document.getElementById('erroFoto').textContent = 'Erro no upload. Verifique as regras do Storage.';
             document.getElementById('erroFoto').classList.add('visible');
           }
         };
+      }).catch(e => {
+        container.innerHTML = '<div class="error visible">Erro ao carregar perfil.</div>';
       });
     }
 
-    // ==================== Renderização das Abas ====================
+    // ========== Aba Corrente (detalhada) ==========
     function inicializarAbas() {
-      // Aba Corrente (DETALHADA)
       document.getElementById('tab-corrente').innerHTML = `
         <h2>⚡ Cálculo de Corrente e Especificações</h2>
         <div class="form-group"><label>Tensão (V)</label><input type="number" id="corrTensao" value="220"></div>
@@ -557,8 +542,7 @@
           }
         }
 
-        let html = `<div class="result-card" id="resultadoCorrenteInner">
-          <h3>Corrente de projeto: ${Ib_f} A</h3>
+        let html = `<div class="result-card"><h3>Corrente de projeto: ${Ib_f} A</h3>
           <div class="result-item"><span class="result-label">Potência</span><span class="result-value">${P.toFixed(0)} W</span></div>
           <div class="result-item"><span class="result-label">Tensão</span><span class="result-value">${V} V (${tipo===1?'Mono':tipo===2?'Bi':'Tri'}fásico)</span></div>
           <div class="result-item"><span class="result-label">Fator de potência</span><span class="result-value">${fp}</span></div>
@@ -580,83 +564,15 @@
             </div>`;
           });
           html += `</div>`;
-
           const melhor = opcoes[0];
           html += `<div class="result-highlight" style="margin-top:16px;">
             ✅ Conclusão: Para a corrente de ${Ib_f} A, a seção mínima recomendada é <strong>${melhor.secao} mm²</strong> (${isolacao}), com disjuntor entre ${melhor.disjuntores} e distância máxima de ${melhor.distanciaMax} (considerando queda de ${limiteQueda}%).<br>
             <small>Critérios atendidos: capacidade de condução (Iz ≥ Ib), proteção contra sobrecarga (Ib ≤ In ≤ Iz) e queda de tensão conforme NBR 5410.</small>
           </div>`;
         }
-        html += `<button class="btn btn-outline btn-sm" style="margin-top:12px;" onclick="gerarPDF('Especificação Completa','resultadoCorrente')">📄 Baixar Relatório em PDF</button>`;
+        html += `<button class="btn btn-outline btn-sm" style="margin-top:12px;" onclick="gerarPDF('Especificação Completa', {params:{V,P,tipo,fp,Ib:Ib_f}, result:opcoes[0]||{}})">📄 Baixar Relatório em PDF</button>`;
         document.getElementById('resultadoCorrente').innerHTML = html;
         salvarCalculo('Especificação', { V, P, tipo, fp, Ib: Ib_f }, opcoes[0] ? { secao: opcoes[0].secao, disjuntor: opcoes[0].disjuntores } : {});
-      };
-
-      // Aba Condutor
-      document.getElementById('tab-condutor').innerHTML = `
-        <h2>Dimensionamento do Condutor</h2>
-        <div class="form-group"><label>Corrente de projeto Ib (A)</label><input type="number" id="condIb" placeholder="Ex: 20"></div>
-        <div class="form-group"><label>Método</label><select id="condMetodo"><option value="B1">B1 - Embutido</option><option value="B2">B2 - Aparente</option></select></div>
-        <div class="form-group"><label>Isolação</label><select id="condIsolacao"><option value="PVC">PVC</option><option value="EPR">EPR/XLPE</option></select></div>
-        <div class="row">
-          <div class="form-group"><label>Cond. carregados</label><input type="number" id="condCarregados" value="2" min="2" max="3"></div>
-          <div class="form-group"><label>Temp. (°C)</label><input type="number" id="condTemp" value="30"></div>
-        </div>
-        <button class="btn btn-primary" id="btnCalcularCondutor">Dimensionar</button>
-        <div id="resultadoCondutor"></div>
-      `;
-      document.getElementById('btnCalcularCondutor').onclick = () => {
-        const Ib = parseFloat(document.getElementById('condIb').value);
-        const metodo = document.getElementById('condMetodo').value;
-        const isolacao = document.getElementById('condIsolacao').value;
-        const n = parseInt(document.getElementById('condCarregados').value)||2;
-        const temp = parseInt(document.getElementById('condTemp').value)||30;
-        if (!Ib) return;
-        const ft = fatorTemperatura[isolacao]?.[temp] || (temp>=35?0.94:1.0);
-        const fa = n===3 ? 0.8 : 1.0;
-        const fatorTotal = ft*fa;
-        let secao = null, Iz = 0;
-        for (const [s, cap] of Object.entries(tabelaCondutores[isolacao])) {
-          if (cap * fatorTotal >= Ib) { secao = s; Iz = cap * fatorTotal; break; }
-        }
-        if (!secao) { document.getElementById('resultadoCondutor').innerHTML = '<div class="error visible">Nenhum condutor disponível.</div>'; return; }
-        const html = `<div class="result-card"><h3>Resultado</h3>
-          <div class="result-item"><span>Ib</span><span>${Ib} A</span></div>
-          <div class="result-item"><span>Método</span><span>${metodo}</span></div>
-          <div class="result-item"><span>Isolação</span><span>${isolacao}</span></div>
-          <div class="result-item"><span>Fator temp.</span><span>${ft.toFixed(2)}</span></div>
-          <div class="result-item"><span>Fator agrup.</span><span>${fa.toFixed(2)}</span></div>
-          <div class="result-item"><span>Iz corrigida</span><span>${Iz.toFixed(1)} A</span></div>
-          <div class="result-highlight">Seção: <strong>${secao} mm²</strong></div></div>
-          <button class="btn btn-outline btn-sm" onclick="gerarPDF('Condutor','resultadoCondutor')">📄 PDF</button>`;
-        document.getElementById('resultadoCondutor').innerHTML = html;
-        salvarCalculo('Condutor', {Ib, metodo, isolacao, temp}, {secao, Iz: Iz.toFixed(1)});
-      };
-
-      // Aba Disjuntor
-      document.getElementById('tab-disjuntor').innerHTML = `
-        <h2>Disjuntor</h2>
-        <div class="form-group"><label>Ib (A)</label><input type="number" id="disjIb" placeholder="Ex: 20"></div>
-        <div class="form-group"><label>Seção (mm²)</label><select id="disjSecao"><option value="1.5">1,5</option><option value="2.5">2,5</option><option value="4">4</option><option value="6">6</option><option value="10" selected>10</option><option value="16">16</option><option value="25">25</option><option value="35">35</option></select></div>
-        <div class="form-group"><label>Isolação</label><select id="disjIsolacao"><option value="PVC">PVC</option><option value="EPR">EPR/XLPE</option></select></div>
-        <button class="btn btn-primary" id="btnCalcularDisjuntor">Dimensionar</button>
-        <div id="resultadoDisjuntor"></div>
-      `;
-      document.getElementById('btnCalcularDisjuntor').onclick = () => {
-        const Ib = parseFloat(document.getElementById('disjIb').value);
-        const secao = document.getElementById('disjSecao').value;
-        const isolacao = document.getElementById('disjIsolacao').value;
-        if (!Ib) return;
-        const Iz = tabelaCondutores[isolacao][secao] || 0;
-        let In = disjuntores.find(d => d >= Ib && d <= Iz*1.45);
-        if (!In) { document.getElementById('resultadoDisjuntor').innerHTML = '<div class="error visible">Nenhum disjuntor adequado.</div>'; return; }
-        const html = `<div class="result-card"><h3>Disjuntor Recomendado</h3>
-          <div class="result-item"><span>Ib</span><span>${Ib} A</span></div>
-          <div class="result-item"><span>Iz</span><span>${Iz} A</span></div>
-          <div class="result-highlight">Disjuntor: <strong>${In} A</strong></div></div>
-          <button class="btn btn-outline btn-sm" onclick="gerarPDF('Disjuntor','resultadoDisjuntor')">📄 PDF</button>`;
-        document.getElementById('resultadoDisjuntor').innerHTML = html;
-        salvarCalculo('Disjuntor', {Ib, secao, Iz}, {disjuntor: In});
       };
 
       // Aba Queda de Tensão
@@ -684,11 +600,12 @@
         const deltaV = tipo===1 ? 2*I*(L/1000)*vu : Math.sqrt(3)*I*(L/1000)*vu;
         const perc = (deltaV/V)*100;
         const limite = tipo===1 ? 4 : 5;
+        const aprovado = perc <= limite;
         const html = `<div class="result-card"><h3>Queda de Tensão</h3>
           <div class="result-item"><span>ΔV</span><span>${deltaV.toFixed(2)} V</span></div>
           <div class="result-item"><span>%</span><span>${perc.toFixed(2)}%</span></div>
-          <div class="result-highlight ${perc>limite?'danger':''}">${perc<=limite?'✅ Dentro do limite':'❌ Acima do limite'}</div></div>
-          <button class="btn btn-outline btn-sm" onclick="gerarPDF('Queda','resultadoQueda')">📄 PDF</button>`;
+          <div class="result-highlight ${aprovado?'':'danger'}">${aprovado ? '✅ Dentro do limite' : '❌ Acima do limite'}</div></div>
+          <button class="btn btn-outline btn-sm" onclick="gerarPDF('Queda de Tensão',{params:{V,I,L,S,material,tipo}, result:{deltaV:deltaV.toFixed(2), perc:perc.toFixed(2)}})">📄 PDF</button>`;
         document.getElementById('resultadoQueda').innerHTML = html;
         salvarCalculo('Queda', {V,I,L,S,material,tipo}, {deltaV: deltaV.toFixed(2), perc: perc.toFixed(2)});
       };
@@ -699,7 +616,7 @@
       if (e.target.classList.contains('tab')) showTab(e.target.dataset.tab);
     });
 
-    // ==================== Observer de autenticação ====================
+    // ========== Observer de autenticação ==========
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         currentUser = user;
@@ -712,9 +629,9 @@
         if (foto) {
           avatar.src = foto;
         } else {
-          avatar.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"%3E%3Ccircle cx="18" cy="18" r="18" fill="%234f46e5"/%3E%3Ctext x="18" y="22" text-anchor="middle" fill="white" font-size="16"%3E' + nome.charAt(0).toUpperCase() + '%3C/text%3E%3C/svg%3E';
+          avatar.src = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"%3E%3Ccircle cx="18" cy="18" r="18" fill="%234f46e5"/%3E%3Ctext x="18" y="22" text-anchor="middle" fill="white" font-size="16"%3E${nome.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E`;
         }
-        // Verificar plano
+        // Plano
         const subDoc = await db.collection('subscriptions').doc(user.uid).get();
         userPlan = (subDoc.exists && subDoc.data().plan === 'premium' && subDoc.data().status === 'active') ? 'premium' : 'gratuito';
         const badge = document.getElementById('planBadge');
