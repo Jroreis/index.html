@@ -102,17 +102,28 @@
       font-weight:700; font-size:16px; cursor:pointer; transition:0.2s;
     }
     .btn-primary:hover { background:var(--primary-dark); }
+    .btn-sm {
+      padding:8px 16px; font-size:13px; width:auto; background:var(--primary); color:#fff; border:none; border-radius:6px; cursor:pointer;
+    }
+    .btn-danger-sm {
+      padding:8px 16px; font-size:13px; width:auto; background:#ef4444; color:#fff; border:none; border-radius:6px; cursor:pointer;
+    }
     .result-card { background:var(--white); border-radius:var(--radius); padding:20px; margin-top:20px; box-shadow:var(--shadow); }
     .error-msg { background:#fef2f2; color:#dc2626; padding:10px; border-radius:6px; margin-top:8px; display:none; }
     .error-msg.active { display:block; }
     .price-table-wrapper { overflow-x:auto; margin-top:16px; }
-    .price-table { width:100%; border-collapse:collapse; font-size:13px; min-width:700px; }
-    .price-table th { background:var(--primary); color:#fff; padding:10px; text-align:left; font-size:12px; }
-    .price-table td { padding:8px 10px; border-bottom:1px solid #e2e8f0; }
+    .price-table { width:100%; border-collapse:collapse; font-size:12px; min-width:700px; }
+    .price-table th { background:var(--primary); color:#fff; padding:8px; text-align:left; font-size:11px; }
+    .price-table td { padding:6px 8px; border-bottom:1px solid #e2e8f0; }
     .price-table tr:nth-child(even) { background:#f8fafc; }
     .category-row { background:#e2e8f0!important; font-weight:700; color:var(--dark); }
-    .category-row td { padding:10px; }
+    .category-row td { padding:8px; font-size:13px; }
     .logout-btn { background:#ef4444; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; }
+    .item-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+    .item-row input { flex:1; min-width:100px; }
+    .item-row .qty { width:70px; }
+    .item-row .price { width:100px; }
+    .divider { border-top:1px solid #e2e8f0; margin:16px 0; }
 
     @media (max-width:600px) {
       .hero h1 { font-size:26px; }
@@ -155,7 +166,6 @@
 
   <!-- ========== MODAL LOGIN/CADASTRO ========== -->
   <div class="modal-overlay" id="modalOverlay">
-    <!-- Login -->
     <div class="modal" id="modalLogin" style="display:none;">
       <button onclick="closeModal()" style="float:right; background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
       <h2>🔐 Entrar</h2>
@@ -176,7 +186,6 @@
       <p style="text-align:center; margin-top:14px; font-size:13px;">Não tem conta? <strong style="color:var(--primary); cursor:pointer;" id="goToSignup">Cadastre-se</strong></p>
     </div>
 
-    <!-- Cadastro -->
     <div class="modal" id="modalCadastro" style="display:none;">
       <button onclick="closeModal()" style="float:right; background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
       <h2>📝 Criar Conta</h2>
@@ -270,14 +279,11 @@
       catch(e) { err.textContent='Email ou senha incorretos.'; err.classList.add('active'); }
     };
 
-    // Google Login (ADICIONADO)
     document.getElementById('btnGoogle').onclick = async () => {
       const provider = new firebase.auth.GoogleAuthProvider();
-      try {
-        await auth.signInWithPopup(provider);
-        // onAuthStateChanged redireciona automaticamente
-      } catch (e) {
-        if (e.code !== 'auth/popup-closed-by-user') {
+      try { await auth.signInWithPopup(provider); }
+      catch(e) {
+        if(e.code !== 'auth/popup-closed-by-user') {
           alert('Erro ao entrar com Google. Verifique se o provedor está habilitado no Firebase.');
         }
       }
@@ -356,65 +362,276 @@
         saveCalc('Queda',{V,I,L,S},{deltaV:dV.toFixed(2), perc:perc.toFixed(2)});
       };
 
-      // Orçamento
+      // ==================== ORÇAMENTO PROFISSIONAL ====================
       document.getElementById('tab-orcamento').innerHTML = `
-        <h2>Gerador de Orçamento</h2>
-        <div class="form-group"><label>Nome do cliente</label><input type="text" id="orcNome" placeholder="Nome completo"></div>
-        <div class="form-group"><label>Telefone</label><input type="tel" id="orcTel" placeholder="(11) 99999-9999"></div>
-        <div class="form-group"><label>Endereço</label><input type="text" id="orcEnd" placeholder="Rua, número, bairro"></div>
-        <div class="form-group"><label>Tipo de serviço</label><select id="orcTipo"><option value="">Selecione...</option><option>Instalação</option><option>Manutenção</option><option>Padrão de entrada</option><option>Projeto</option><option>Outros</option></select></div>
-        <div class="form-group"><label>Descrição</label><textarea id="orcDesc" placeholder="Descreva o serviço..."></textarea></div>
-        <div class="form-group"><label>Valor (R$)</label><input type="number" id="orcValor" step="0.01"></div>
-        <button class="btn-primary" id="gerarOrc">Gerar Orçamento</button>
-        <div id="orcOutput" class="result-card"></div>`;
-      document.getElementById('gerarOrc').onclick = () => {
-        const nome = document.getElementById('orcNome').value;
-        const tel = document.getElementById('orcTel').value;
-        const end = document.getElementById('orcEnd').value;
-        const tipo = document.getElementById('orcTipo').value;
-        const desc = document.getElementById('orcDesc').value;
-        const valor = parseFloat(document.getElementById('orcValor').value).toFixed(2);
-        document.getElementById('orcOutput').innerHTML = `
-          <h3>Orçamento</h3>
-          <p><strong>Cliente:</strong> ${nome}<br><strong>Telefone:</strong> ${tel}<br><strong>Endereço:</strong> ${end}</p>
-          <p><strong>Serviço:</strong> ${tipo}<br><strong>Descrição:</strong> ${desc}</p>
-          <p style="font-size:20px;font-weight:700;">Total: R$ ${valor}</p>`;
+        <h2>Gerador de Orçamento Profissional</h2>
+        <!-- Dados do Profissional -->
+        <div style="display:flex; gap:16px; align-items:center; margin-bottom:16px;">
+          <div style="width:80px; height:80px; border:2px dashed #e2e8f0; border-radius:8px; display:flex; align-items:center; justify-content:center; text-align:center; font-size:12px; color:var(--text-light); overflow:hidden;" id="logoPreview">Logo</div>
+          <div style="flex:1;">
+            <div class="form-group"><label>Nome do Profissional/Empresa</label><input type="text" id="profNome" placeholder="Sua empresa"></div>
+          </div>
+        </div>
+        <input type="file" id="logoUpload" accept="image/*" style="display:none;">
+        <button class="btn-sm" onclick="document.getElementById('logoUpload').click()" style="margin-bottom:12px;">📷 Carregar Logo</button>
+        <div class="row" style="display:flex; gap:12px;">
+          <div class="form-group" style="flex:1;"><label>Telefone</label><input type="tel" id="profTel" placeholder="(11) 99999-9999"></div>
+          <div class="form-group" style="flex:1;"><label>Email</label><input type="email" id="profEmail" placeholder="contato@exemplo.com"></div>
+        </div>
+        <div class="form-group"><label>CNPJ ou CPF</label><input type="text" id="profCNPJ" placeholder="00.000.000/0000-00"></div>
+        <div class="divider"></div>
+        <!-- Dados do Cliente -->
+        <h3>Dados do Cliente</h3>
+        <div class="form-group"><label>Nome do Cliente</label><input type="text" id="cliNome" placeholder="Nome completo"></div>
+        <div class="row" style="display:flex; gap:12px;">
+          <div class="form-group" style="flex:1;"><label>Telefone</label><input type="tel" id="cliTel" placeholder="(11) 99999-9999"></div>
+          <div class="form-group" style="flex:1;"><label>Email</label><input type="email" id="cliEmail" placeholder="cliente@exemplo.com"></div>
+        </div>
+        <div class="form-group"><label>Endereço</label><input type="text" id="cliEnd" placeholder="Rua, número, bairro, cidade"></div>
+        <div class="divider"></div>
+        <!-- Itens do Orçamento -->
+        <h3>Itens / Serviços</h3>
+        <div id="itensContainer">
+          <div class="item-row" data-index="0">
+            <input type="text" placeholder="Descrição do serviço" class="desc">
+            <input type="number" placeholder="Qtd" class="qty" value="1" min="1" style="width:60px;">
+            <input type="number" placeholder="Valor Unit. (R$)" class="unitPrice" step="0.01" style="width:100px;">
+            <span class="itemTotal" style="font-weight:600; width:80px;">R$ 0,00</span>
+            <button class="btn-danger-sm removerItem" style="display:none;">✕</button>
+          </div>
+        </div>
+        <button class="btn-sm" id="addItem" style="margin-bottom:16px;">+ Adicionar Item</button>
+        <div style="text-align:right; font-size:18px; font-weight:700; margin-bottom:16px;">
+          Total: <span id="orcTotalGeral">R$ 0,00</span>
+        </div>
+        <button class="btn-primary" id="gerarOrcamento">📄 Gerar Orçamento</button>
+        <div id="orcOutput" class="result-card"></div>
+      `;
+
+      // Lógica do orçamento
+      let logoDataUrl = '';
+      document.getElementById('logoUpload').onchange = function(e) {
+        const file = e.target.files[0];
+        if(file) {
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            logoDataUrl = ev.target.result;
+            document.getElementById('logoPreview').innerHTML = `<img src="${logoDataUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+          };
+          reader.readAsDataURL(file);
+        }
       };
 
-      // Tabela de preços (resumida mas com categorias)
+      function recalcularTotal() {
+        let total = 0;
+        document.querySelectorAll('.item-row').forEach(row => {
+          const qty = parseFloat(row.querySelector('.qty').value) || 0;
+          const unit = parseFloat(row.querySelector('.unitPrice').value) || 0;
+          const subtotal = qty * unit;
+          row.querySelector('.itemTotal').textContent = `R$ ${subtotal.toFixed(2)}`;
+          total += subtotal;
+        });
+        document.getElementById('orcTotalGeral').textContent = `R$ ${total.toFixed(2)}`;
+      }
+
+      document.getElementById('addItem').onclick = function() {
+        const container = document.getElementById('itensContainer');
+        const index = container.querySelectorAll('.item-row').length;
+        const newRow = document.createElement('div');
+        newRow.className = 'item-row';
+        newRow.dataset.index = index;
+        newRow.innerHTML = `
+          <input type="text" placeholder="Descrição do serviço" class="desc">
+          <input type="number" placeholder="Qtd" class="qty" value="1" min="1" style="width:60px;">
+          <input type="number" placeholder="Valor Unit. (R$)" class="unitPrice" step="0.01" style="width:100px;">
+          <span class="itemTotal" style="font-weight:600; width:80px;">R$ 0,00</span>
+          <button class="btn-danger-sm removerItem">✕</button>
+        `;
+        container.appendChild(newRow);
+        // Atualizar eventos
+        newRow.querySelectorAll('input').forEach(input => input.addEventListener('input', recalcularTotal));
+        newRow.querySelector('.removerItem').addEventListener('click', function() {
+          newRow.remove();
+          recalcularTotal();
+        });
+        // Mostrar botão remover na primeira linha se houver mais de uma
+        if(container.querySelectorAll('.item-row').length > 1) {
+          container.querySelectorAll('.removerItem').forEach(b => b.style.display = 'inline-block');
+        }
+      };
+
+      // Eventos iniciais
+      document.querySelectorAll('#tab-orcamento .item-row input').forEach(input => input.addEventListener('input', recalcularTotal));
+      document.querySelector('#tab-orcamento .removerItem').addEventListener('click', function() {
+        if(document.querySelectorAll('.item-row').length > 1) {
+          this.closest('.item-row').remove();
+          recalcularTotal();
+        }
+      });
+
+      document.getElementById('gerarOrcamento').onclick = function() {
+        const profNome = document.getElementById('profNome').value || 'Profissional';
+        const profTel = document.getElementById('profTel').value;
+        const profEmail = document.getElementById('profEmail').value;
+        const profCNPJ = document.getElementById('profCNPJ').value;
+        const cliNome = document.getElementById('cliNome').value || 'Cliente';
+        const cliTel = document.getElementById('cliTel').value;
+        const cliEmail = document.getElementById('cliEmail').value;
+        const cliEnd = document.getElementById('cliEnd').value;
+        
+        let itensHTML = '';
+        let total = 0;
+        document.querySelectorAll('#tab-orcamento .item-row').forEach((row, idx) => {
+          const desc = row.querySelector('.desc').value || `Serviço ${idx+1}`;
+          const qty = parseFloat(row.querySelector('.qty').value) || 1;
+          const unit = parseFloat(row.querySelector('.unitPrice').value) || 0;
+          const subtotal = qty * unit;
+          total += subtotal;
+          itensHTML += `<tr><td>${desc}</td><td>${qty}</td><td>R$ ${unit.toFixed(2)}</td><td>R$ ${subtotal.toFixed(2)}</td></tr>`;
+        });
+
+        const output = document.getElementById('orcOutput');
+        output.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:16px;">
+            <div>
+              ${logoDataUrl ? `<img src="${logoDataUrl}" style="width:70px; height:70px; object-fit:cover; border-radius:8px; margin-bottom:8px;">` : ''}
+              <h3>${profNome}</h3>
+              <p>${profTel ? '📞 '+profTel : ''} ${profEmail ? '📧 '+profEmail : ''}</p>
+              <p>${profCNPJ ? 'CNPJ/CPF: '+profCNPJ : ''}</p>
+            </div>
+            <div style="text-align:right;">
+              <p><strong>Cliente:</strong> ${cliNome}</p>
+              <p>${cliTel ? '📞 '+cliTel : ''} ${cliEmail ? '📧 '+cliEmail : ''}</p>
+              <p>${cliEnd ? '📍 '+cliEnd : ''}</p>
+              <p><strong>Data:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <table style="width:100%; border-collapse:collapse;">
+            <thead><tr style="background:#f1f5f9;"><th>Serviço</th><th>Qtd</th><th>Unit.</th><th>Subtotal</th></tr></thead>
+            <tbody>${itensHTML}</tbody>
+            <tfoot><tr style="font-weight:700;"><td colspan="3" style="text-align:right;">TOTAL</td><td>R$ ${total.toFixed(2)}</td></tr></tfoot>
+          </table>
+          <p style="margin-top:16px; font-size:12px; color:var(--text-light);">Orçamento gerado pelo VoltCalc Pro</p>
+        `;
+      };
+
+      // ==================== TABELA DE PREÇOS COMPLETA ====================
       const priceData = [
         {cat:"ILUMINAÇÃO", items:[
+          ["INSTALAÇÃO DE INTERRUPTOR COMPLETO PULSADOR","-","R$ 80,00","-"],
           ["INSTALAÇÃO DE INTERRUPTOR THREE-WAY OU FOUR-WAY","R$ 70,00","R$ 200,00","R$ 110,00"],
+          ["INSTALAÇÃO DE INTERRUPTOR DUPLO OU BIFILAR","-","-","-"],
+          ["INSTALAÇÃO DE INTERRUPTOR TOMADA (Juntos)","R$ 70,00","R$ 100,00","-"],
+          ["INSTALAÇÃO DE ARANDELA PENDENTE OU SPOT COMUM","R$ 75,00","-","-"],
+          ["INSTALAÇÃO DE LÂMPADA FLUORESCENTE (TUBO)","R$ 60,00","-","-"],
+          ["INSTALAÇÃO DE CORES POLIVANTE","-","-","-"],
+          ["INSTALAÇÃO DE LUSTRES GRANDES","R$ 100,00","R$ 200,00","-"],
+          ["INSTALAÇÃO DE REFLETOR DE JARDIM","R$ 110,00","R$ 150,00","-"],
+          ["INSTALAÇÃO DE REFLETOR DE POSTE COMUM","R$ 140,00","R$ 200,00","-"],
           ["INSTALAÇÃO DE REFLETOR DE POSTE COM LÂMPADA VAPOR","R$ 145,00","R$ 200,00","R$ 170,00"],
-          ["INSTALAÇÃO DE PERFIL DE LED (O METRO)","-","-","R$ 205,00"]
+          ["INSTALAÇÃO DE REATOR DE LÂMPADA A VAPOR","R$ 60,00","-","R$ 110,00"],
+          ["INSTALAÇÃO DE FOTOCÉLULA OU SENSOR DE PRESENÇA","R$ 80,00","R$ 140,00","-"],
+          ["INSTALAÇÃO DE REFLETOR LED FOTOCÉLULA SENSOR DE PRESENÇA","R$ 90,00","-","-"],
+          ["INSTALAÇÃO DE LUMINÁRIA DE EMERGÊNCIA DE SOBREPOR","-","-","-"],
+          ["INSTALAÇÃO DE LUMINÁRIA DE EMERGÊNCIA DE EMBUTIR","R$ 70,00","-","R$ 115,00"],
+          ["INSTALAÇÃO DE PERFIL DE LED (O METRO)","-","-","R$ 205,00"],
+          ["INSTALAÇÃO DE LUMINÁRIA TUBULAR OU TROCA REATOR LED","R$ 90,00","R$ 130,00","-"]
         ]},
         {cat:"PONTO DE UTILIZAÇÃO", items:[
+          ["INSTALAÇÃO DE TOMADA SIMPLES","R$ 40,00","R$ 80,00","-"],
+          ["INSTALAÇÃO DE TOMADA DUPLA","-","-","-"],
+          ["INSTALAÇÃO DE TOMADA TRIPLA","-","-","-"],
+          ["INSTALAÇÃO DE TOMADA DE REDE OU TELEFONE","R$ 70,00","R$ 90,00","R$ 80,00"],
+          ["INSTALAÇÃO DE TOMADA INDUSTRIAL","-","R$ 150,00","-"],
+          ["INSTALAÇÃO DE TOMADA DE SOBREPOR COM CANALETA","R$ 70,00","-","-"],
+          ["INSTALAÇÃO DE CHAVE DE BOIA SUPERIOR (EM EMERGÊNCIA)","R$ 105,00","-","R$ 140,00"],
           ["INSTALAÇÃO DE VENTILADOR DE TETO","R$ 180,00","R$ 300,00","R$ 240,00"],
+          ["INSTALAÇÃO DE VENTILADOR DE PAREDE","-","-","-"],
+          ["INSTALAÇÃO DE CHUVEIRO ELÉTRICO SIMPLES","-","R$ 120,00","-"],
           ["INSTALAÇÃO DE CHUVEIRO ELETRÔNICO OU DUCHA","R$ 130,00","-","R$ 170,00"],
-          ["INSTALAÇÃO DE INTERFONE 2 CHAMADAS","R$ 220,00","R$ 310,00","R$ 265,00"]
+          ["INSTALAÇÃO DE TROCA DE RESISTÊNCIA DE CHUVEIRO","R$ 60,00","R$ 115,00","R$ 102,00"],
+          ["INSTALAÇÃO DE BANHEIRA ELÉTRICA","-","-","-"],
+          ["INSTALAÇÃO DE CAMPAINHA ATÉ 20 MTS","R$ 60,00","R$ 100,00","-"],
+          ["INSTALAÇÃO DE INTERFONE 1 CHAMADA","-","R$ 200,50","R$ 200,00"],
+          ["INSTALAÇÃO DE INTERFONE 2 CHAMADAS","R$ 220,00","R$ 310,00","R$ 265,00"],
+          ["INSTALAÇÃO DE VÍDEO PORTEIRO","-","-","R$ 345,00"],
+          ["INSTALAÇÃO DE CÂMERAS CFTV / CÂMERA WI-FI sem configuração","-","-","-"],
+          ["INSTALAÇÃO DE CÂMERAS CFTV / CÂMERA WI-FI com configuração","R$ 140,00","-","R$ 430,00"],
+          ["INSTALAÇÃO DE PORTÃO ELETRÔNICO DESLIZANTE","-","R$ 350,00","-"],
+          ["INSTALAÇÃO DE PORTÃO ELETRÔNICO PIVOTANTE OU BASCULANTE","-","-","-"],
+          ["INSTALAÇÃO DE BOTOEIRA OU FECHADURA ELETRÔNICA PORTÃO","-","R$ 160,00","-"],
+          ["INSTALAÇÃO DE FECHADURA ELETRÔNICA (Porta de Madeira)","-","R$ 280,00","-"],
+          ["INSTALAÇÃO DE EXAUSTOR COZINHA OU BANHEIRO","-","-","-"],
+          ["INSTALAÇÃO DE SISTEMA DE ALARME RESIDENCIAL","R$ 900,00","R$ 1.300,00","-"],
+          ["INSTALAÇÃO DE AQUECEDOR ELÉTRICO com passagem de cabos","R$ 210,00","R$ 320,00","R$ 270,00"],
+          ["INSTALAÇÃO DE DETECTOR DE FUMAÇA","-","R$ 110,00","-"],
+          ["INSTALAÇÃO DE CERCA ELÉTRICA","R$ 70,00","-","-"],
+          ["INSTALAÇÃO DE NOBREAK","-","R$ 360,00","R$ 342,00"],
+          ["INSTALAÇÃO DE INVERSOR","-","R$ 452,00","-"],
+          ["INSTALAÇÃO DE TERMOSTATO TEMPORIZADOR","-","R$ 150,00","-"]
         ]},
         {cat:"QUADROS DE DISTRIBUIÇÃO/PAINEL", items:[
+          ["SUBSTITUIÇÃO DE DISJUNTOR MONOFÁSICO","R$ 60,00","R$ 80,00","-"],
           ["SUBSTITUIÇÃO DE DISJUNTOR BIFÁSICO","R$ 80,00","R$ 130,00","R$ 100,00"],
+          ["SUBSTITUIÇÃO DE DISJUNTOR TRIFÁSICO","R$ 120,00","-","-"],
+          ["INSTALAÇÃO DE INTERRUPTOR DIFERENCIAL DR","-","-","-"],
+          ["INSTALAÇÃO DE DPS - DISPOSITIVO DE PROTEÇÃO CONTRA SURTOS","-","-","R$ 130,00"],
+          ["INSTALAÇÃO DE BARRAMENTO PENTE MONOPOLAR NO QDC","R$ 70,20","R$ 90,00","R$ 80,00"],
+          ["INSTALAÇÃO DE BARRAMENTO PENTE BIPOLAR NO QDC","R$ 80,00","R$ 100,00","-"],
+          ["INSTALAÇÃO DE BARRAMENTO PENTE TRIPOLAR NO QDC","R$ 90,00","R$ 180,00","R$ 130,00"],
+          ["INSTALAÇÃO DE BARRAMENTO DE NEUTRO OU TERRA","R$ 100,00","R$ 120,00","R$ 110,00"],
           ["INSTALAÇÃO DE HASTE DE ATERRAMENTO","R$ 250,00","-","R$ 280,00"],
-          ["INSTALAÇÃO E MONTAGEM QDC 12 CIRCUITOS","R$ 1.000,00","R$ 1.300,00","R$ 1.250,00"]
+          ["INSTALAÇÃO DE CONTATOR E RELÉ TÉRMICO","-","R$ 250,00","R$ 220,00"],
+          ["INSTALAÇÃO E MONTAGEM QDC CIRCUITOS (sem DPS)","-","R$ 800,00","R$ 725,00"],
+          ["INSTALAÇÃO E MONTAGEM QDC CIRCUITOS (com DR)","-","R$ 1.000,00","R$ 925,00"],
+          ["INSTALAÇÃO E MONTAGEM QDC 12 CIRCUITOS","R$ 1.000,00","R$ 1.300,00","R$ 1.250,00"],
+          ["INSTALAÇÃO E MONTAGEM QDC 24 CIRCUITOS","R$ 1.500,00","R$ 2.000,00","R$ 1.800,00"]
+        ]},
+        {cat:"PASSAGEM DE CABOS (CIRCUITOS DE ATÉ 20MT)", items:[
+          ["ENTRADA MONOFÁSICA (QM PARA QDC)","-","R$ 220,00","-"],
+          ["ENTRADA BIFÁSICA OU TRIFÁSICA (QM PARA QDC)","-","R$ 330,00","R$ 280,00"],
+          ["ALIMENTAÇÃO PARA MONO/BI/TRI","-","R$ 300,00","R$ 260,00"]
+        ]},
+        {cat:"SOLUÇÃO DE PROBLEMAS ELÉTRICOS", items:[
+          ["CURTO CIRCUITO MONOFÁSICO","-","R$ 600,00","-"],
+          ["CURTO CIRCUITO BIFÁSICO","R$ 450,00","R$ 1.000,00","R$ 720,00"],
+          ["CURTO CIRCUITO TRIFÁSICO","-","R$ 1.100,00","-"]
         ]},
         {cat:"PADRÃO DE ENTRADA", items:[
-          ["INSTALAÇÃO DE MEDIDOR MONOFÁSICO","R$ 1.300,00","R$ 1.700,00","R$ 1.500,00"],
-          ["INSTALAÇÃO DE MEDIDOR BIFÁSICO","R$ 1.400,00","R$ 2.000,00","R$ 1.700,00"]
+          ["INSTALAÇÃO DE MEDIDOR (Padrão de entrada Monofásico 127/220)","R$ 1.300,00","R$ 1.700,00","R$ 1.500,00"],
+          ["INSTALAÇÃO DE MEDIDOR (Padrão de entrada Bifásico 220V)","R$ 1.400,00","R$ 2.000,00","R$ 1.700,00"],
+          ["INSTALAÇÃO DE MEDIDOR (Padrão de entrada Trifásico 220V)","R$ 1.800,00","R$ 2.500,00","-"]
+        ]},
+        {cat:"CARREGADOR VEICULAR", items:[
+          ["INSTALAÇÃO CARREGADOR VEICULAR","R$ 800,00","R$ 1.600,00","-"]
         ]},
         {cat:"AUTOMAÇÃO RESIDENCIAL", items:[
           ["INSTALAÇÃO DE INTERRUPTOR INTELIGENTE","R$ 100,00","R$ 200,00","R$ 150,00"],
-          ["INSTALAÇÃO RELÉ DIMMER","R$ 150,00","R$ 350,00","R$ 250,00"]
+          ["INSTALAÇÃO MICRO INTERRUPTOR","-","R$ 300,00","R$ 250,00"],
+          ["INSTALAÇÃO RELÉ DE IMPULSO","R$ 130,00","R$ 220,00","R$ 175,00"],
+          ["INSTALAÇÃO RELÉ DIMMER","R$ 150,00","R$ 350,00","R$ 250,00"],
+          ["INSTALAÇÃO E CONFIGURAÇÃO CONTROLE REMOTO UNIVERSAL","-","R$ 150,00","R$ 130,00"],
+          ["INSTALAÇÃO DE TOMADA INTELIGENTE","-","R$ 200,00","-"],
+          ["INSTALAÇÃO MINI RELÉ CONTROLE DE PERSIANA","-","-","R$ 250,00"],
+          ["INSTALAÇÃO E CONFIGURAÇÃO HUB","-","R$ 250,00","R$ 225,00"],
+          ["INSTALAÇÃO E CONFIGURAÇÃO ROTEADOR","R$ 150,00","R$ 300,00","R$ 225,00"],
+          ["INSTALAÇÃO E CONFIGURAÇÃO FECHADURA INTELIGENTE","R$ 250,00","R$ 400,00","R$ 325,00"],
+          ["INSTALAÇÃO E CONFIGURAÇÃO ASSISTENTE VIRTUAL","-","-","R$ 250,00"]
         ]}
       ];
-      let priceHTML = '<h2>Tabela de Preços Médios - 2026</h2><div class="price-table-wrapper"><table class="price-table"><thead><tr><th>Descrição</th><th>Mínimo</th><th>Máximo</th><th>Médio</th></tr></thead><tbody>';
-      priceData.forEach(cat=>{
+
+      let priceHTML = '<h2>TABELA DE PREÇOS MÉDIOS DE SERVIÇOS ELÉTRICOS - 2026</h2>';
+      priceHTML += '<p style="font-size:12px; color:var(--text-light); margin-bottom:8px;">* Preços referentes apenas à <strong>mão de obra</strong>. Material não incluso. Valores podem variar por região.</p>';
+      priceHTML += '<div class="price-table-wrapper"><table class="price-table"><thead><tr><th>Descrição do Serviço</th><th>▼ Mínimo</th><th>Máximo</th><th>▲ Médio</th></tr></thead><tbody>';
+      priceData.forEach(cat => {
         priceHTML += `<tr class="category-row"><td colspan="4">${cat.cat}</td></tr>`;
-        cat.items.forEach(item=>{
+        cat.items.forEach(item => {
           priceHTML += `<tr><td>${item[0]}</td><td>${item[1]}</td><td>${item[2]}</td><td>${item[3]}</td></tr>`;
         });
       });
-      priceHTML += '</tbody></table></div><p style="font-size:12px;color:var(--text-light);margin-top:12px;">* Valores de referência apenas para mão de obra. Material não incluso. Preços podem variar por região.</p>';
+      priceHTML += '</tbody></table></div>';
+      priceHTML += '<p style="font-size:11px; color:var(--text-light); margin-top:12px;">* Pesquisa de preços realizada em base de dados própria, reajustada anualmente.</p>';
       document.getElementById('tab-precos').innerHTML = priceHTML;
 
       // Perfil
@@ -432,8 +649,8 @@
     }
 
     // Listener das tabs
-    document.querySelectorAll('.tab').forEach(tab=>{
-      tab.addEventListener('click', ()=> switchTab(tab.dataset.tab));
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => switchTab(tab.dataset.tab));
     });
 
     // Observer de autenticação
@@ -446,7 +663,7 @@
         showApp();
         initTabs();
         closeModal();
-        setTimeout(()=>{ const inp = document.getElementById('perfilNome'); if(inp) inp.value = nome; }, 200);
+        setTimeout(() => { const inp = document.getElementById('perfilNome'); if(inp) inp.value = nome; }, 200);
       } else {
         currentUser = null;
         showLanding();
