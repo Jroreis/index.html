@@ -97,9 +97,6 @@
     .btn-sm {
       padding:8px 16px; font-size:13px; width:auto; background:var(--primary); color:#fff; border:none; border-radius:6px; cursor:pointer;
     }
-    .btn-danger-sm {
-      padding:8px 16px; font-size:13px; width:auto; background:#ef4444; color:#fff; border:none; border-radius:6px; cursor:pointer;
-    }
     .result-card { background:var(--white); border-radius:var(--radius); padding:20px; margin-top:20px; box-shadow:var(--shadow); }
     .error-msg { background:#fef2f2; color:#dc2626; padding:10px; border-radius:6px; margin-top:8px; display:none; }
     .error-msg.active { display:block; }
@@ -109,12 +106,7 @@
     .price-table td { padding:6px 8px; border-bottom:1px solid #e2e8f0; }
     .price-table tr:nth-child(even) { background:#f8fafc; }
     .category-row { background:#e2e8f0!important; font-weight:700; color:var(--dark); }
-    .category-row td { padding:8px; font-size:13px; }
     .logout-btn { background:#ef4444; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; }
-    .item-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
-    .item-row input { flex:1; min-width:100px; }
-    .item-row .qty { width:70px; }
-    .item-row .price { width:100px; }
     .divider { border-top:1px solid #e2e8f0; margin:16px 0; }
     .role-selector {
       display:flex; gap:12px; margin:16px 0;
@@ -126,13 +118,16 @@
     .role-card.selected { border-color:var(--primary); background:rgba(79,70,229,0.05); }
     .role-card h3 { font-size:16px; margin-bottom:4px; }
     .role-card p { font-size:12px; color:var(--text-light); }
-
+    /* Mapa */
+    #map { height: 300px; width: 100%; border-radius: var(--radius); margin-bottom: 16px; }
     @media (max-width:600px) {
       .hero h1 { font-size:26px; }
       .header { padding:12px 16px; }
       .btn-header { padding:8px 14px; font-size:12px; }
     }
   </style>
+  <!-- Google Maps API (substitua SUA_CHAVE_API) -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=SUA_CHAVE_API&libraries=places"></script>
 </head>
 <body>
   <!-- ========== LANDING PAGE ========== -->
@@ -170,15 +165,12 @@
     <div class="modal" id="modalLogin" style="display:none;">
       <button onclick="closeModal()" style="float:right; background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
       <h2>🔐 Entrar</h2>
-      <!-- Seletor de perfil -->
       <div class="role-selector" id="loginRoleSelector">
         <div class="role-card selected" data-role="profissional" onclick="selectLoginRole('profissional')">
-          <h3>👨‍🔧 Profissional</h3>
-          <p>Eletricista / Engenheiro</p>
+          <h3>👨‍🔧 Profissional</h3><p>Eletricista / Engenheiro</p>
         </div>
         <div class="role-card" data-role="cliente" onclick="selectLoginRole('cliente')">
-          <h3>🏠 Cliente</h3>
-          <p>Buscar orçamento</p>
+          <h3>🏠 Cliente</h3><p>Buscar orçamento</p>
         </div>
       </div>
       <p style="color:var(--text-light); text-align:center; margin-bottom:20px;">Acesse sua conta</p>
@@ -201,12 +193,10 @@
       <h2>📝 Criar Conta</h2>
       <div class="role-selector" id="signupRoleSelector">
         <div class="role-card selected" data-role="profissional" onclick="selectSignupRole('profissional')">
-          <h3>👨‍🔧 Profissional</h3>
-          <p>Eletricista / Engenheiro</p>
+          <h3>👨‍🔧 Profissional</h3><p>Eletricista / Engenheiro</p>
         </div>
         <div class="role-card" data-role="cliente" onclick="selectSignupRole('cliente')">
-          <h3>🏠 Cliente</h3>
-          <p>Buscar orçamento</p>
+          <h3>🏠 Cliente</h3><p>Buscar orçamento</p>
         </div>
       </div>
       <p style="color:var(--text-light); text-align:center; margin-bottom:20px;">Cadastre-se gratuitamente</p>
@@ -250,23 +240,27 @@
       <button class="logout-btn" id="btnLogoutCli">Sair</button>
     </div>
     <h2>Solicitar Orçamento</h2>
-    <p style="color:var(--text-light); margin-bottom:20px;">Preencha os dados abaixo para receber orçamentos de profissionais.</p>
+    <p style="color:var(--text-light); margin-bottom:8px;">Encontre profissionais próximos e peça seu orçamento.</p>
+    <!-- Mapa -->
+    <div id="map"></div>
+    <div class="form-group">
+      <label>Buscar pelo CEP</label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="cepInput" placeholder="00000-000" style="flex:2;">
+        <button class="btn-sm" id="buscarCep" style="flex:1;">🔍 Buscar</button>
+      </div>
+    </div>
+    <div class="form-group"><label>Endereço completo</label><input type="text" id="cliSolicEnd" placeholder="Rua, número, bairro, cidade"></div>
     <div class="form-group"><label>Nome do solicitante</label><input type="text" id="cliSolicNome" placeholder="Seu nome completo"></div>
     <div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="cliSolicTel" placeholder="(11) 99999-9999"></div>
     <div class="form-group"><label>Email</label><input type="email" id="cliSolicEmail" placeholder="seu@email.com"></div>
-    <div class="form-group"><label>Endereço</label><input type="text" id="cliSolicEnd" placeholder="Rua, número, bairro, cidade"></div>
     <div class="form-group"><label>Tipo de serviço</label>
       <select id="cliSolicTipo">
         <option value="">Selecione...</option>
-        <option>Instalação elétrica residencial</option>
-        <option>Manutenção corretiva</option>
-        <option>Padrão de entrada (relógio)</option>
-        <option>Projeto elétrico</option>
-        <option>Automação residencial</option>
-        <option>Outros</option>
+        <!-- Opções serão inseridas dinamicamente -->
       </select>
     </div>
-    <div class="form-group"><label>Descrição do serviço</label><textarea id="cliSolicDesc" placeholder="Descreva o que precisa..."></textarea></div>
+    <div class="form-group"><label>Descrição detalhada</label><textarea id="cliSolicDesc" placeholder="Descreva o que precisa..."></textarea></div>
     <button class="btn-primary" id="btnEnviarSolicitacao">📩 Enviar Solicitação</button>
     <div class="error-msg" id="erroSolicitacao"></div>
     <div id="solicitacaoEnviada" class="result-card" style="display:none;">
@@ -276,6 +270,7 @@
   </div>
 
   <script>
+    // Firebase init
     firebase.initializeApp({
       apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
       authDomain: "voltcalc-pro.firebaseapp.com",
@@ -288,12 +283,117 @@
     const db = firebase.firestore();
 
     let currentUser = null;
-    let currentRole = 'profissional'; // padrão
+    let currentRole = 'profissional';
     const tabelaCondutores = {
       'PVC': {'1.5':17.5,'2.5':24,'4':32,'6':41,'10':57,'16':76,'25':99},
       'EPR': {'1.5':22,'2.5':30,'4':40,'6':52,'10':72,'16':96,'25':125}
     };
     const quedaUnitaria = { cobre: {1.5:23.0,2.5:14.0,4:8.7,6:5.8,10:3.5,16:2.2,25:1.4} };
+
+    // Tabela de preços completa (usada também para popular o select do cliente)
+    const priceData = [
+      {cat:"ILUMINAÇÃO", items:[
+        ["INSTALAÇÃO DE INTERRUPTOR COMPLETO PULSADOR","-","R$ 80,00","-"],
+        ["INSTALAÇÃO DE INTERRUPTOR THREE-WAY OU FOUR-WAY","R$ 70,00","R$ 200,00","R$ 110,00"],
+        ["INSTALAÇÃO DE INTERRUPTOR DUPLO OU BIFILAR","-","-","-"],
+        ["INSTALAÇÃO DE INTERRUPTOR TOMADA (Juntos)","R$ 70,00","R$ 100,00","-"],
+        ["INSTALAÇÃO DE ARANDELA PENDENTE OU SPOT COMUM","R$ 75,00","-","-"],
+        ["INSTALAÇÃO DE LÂMPADA FLUORESCENTE (TUBO)","R$ 60,00","-","-"],
+        ["INSTALAÇÃO DE CORES POLIVANTE","-","-","-"],
+        ["INSTALAÇÃO DE LUSTRES GRANDES","R$ 100,00","R$ 200,00","-"],
+        ["INSTALAÇÃO DE REFLETOR DE JARDIM","R$ 110,00","R$ 150,00","-"],
+        ["INSTALAÇÃO DE REFLETOR DE POSTE COMUM","R$ 140,00","R$ 200,00","-"],
+        ["INSTALAÇÃO DE REFLETOR DE POSTE COM LÂMPADA VAPOR","R$ 145,00","R$ 200,00","R$ 170,00"],
+        ["INSTALAÇÃO DE REATOR DE LÂMPADA A VAPOR","R$ 60,00","-","R$ 110,00"],
+        ["INSTALAÇÃO DE FOTOCÉLULA OU SENSOR DE PRESENÇA","R$ 80,00","R$ 140,00","-"],
+        ["INSTALAÇÃO DE REFLETOR LED FOTOCÉLULA SENSOR DE PRESENÇA","R$ 90,00","-","-"],
+        ["INSTALAÇÃO DE LUMINÁRIA DE EMERGÊNCIA DE SOBREPOR","-","-","-"],
+        ["INSTALAÇÃO DE LUMINÁRIA DE EMERGÊNCIA DE EMBUTIR","R$ 70,00","-","R$ 115,00"],
+        ["INSTALAÇÃO DE PERFIL DE LED (O METRO)","-","-","R$ 205,00"],
+        ["INSTALAÇÃO DE LUMINÁRIA TUBULAR OU TROCA REATOR LED","R$ 90,00","R$ 130,00","-"]
+      ]},
+      {cat:"PONTO DE UTILIZAÇÃO", items:[
+        ["INSTALAÇÃO DE TOMADA SIMPLES","R$ 40,00","R$ 80,00","-"],
+        ["INSTALAÇÃO DE TOMADA DUPLA","-","-","-"],
+        ["INSTALAÇÃO DE TOMADA TRIPLA","-","-","-"],
+        ["INSTALAÇÃO DE TOMADA DE REDE OU TELEFONE","R$ 70,00","R$ 90,00","R$ 80,00"],
+        ["INSTALAÇÃO DE TOMADA INDUSTRIAL","-","R$ 150,00","-"],
+        ["INSTALAÇÃO DE TOMADA DE SOBREPOR COM CANALETA","R$ 70,00","-","-"],
+        ["INSTALAÇÃO DE CHAVE DE BOIA SUPERIOR (EM EMERGÊNCIA)","R$ 105,00","-","R$ 140,00"],
+        ["INSTALAÇÃO DE VENTILADOR DE TETO","R$ 180,00","R$ 300,00","R$ 240,00"],
+        ["INSTALAÇÃO DE VENTILADOR DE PAREDE","-","-","-"],
+        ["INSTALAÇÃO DE CHUVEIRO ELÉTRICO SIMPLES","-","R$ 120,00","-"],
+        ["INSTALAÇÃO DE CHUVEIRO ELETRÔNICO OU DUCHA","R$ 130,00","-","R$ 170,00"],
+        ["INSTALAÇÃO DE TROCA DE RESISTÊNCIA DE CHUVEIRO","R$ 60,00","R$ 115,00","R$ 102,00"],
+        ["INSTALAÇÃO DE BANHEIRA ELÉTRICA","-","-","-"],
+        ["INSTALAÇÃO DE CAMPAINHA ATÉ 20 MTS","R$ 60,00","R$ 100,00","-"],
+        ["INSTALAÇÃO DE INTERFONE 1 CHAMADA","-","R$ 200,50","R$ 200,00"],
+        ["INSTALAÇÃO DE INTERFONE 2 CHAMADAS","R$ 220,00","R$ 310,00","R$ 265,00"],
+        ["INSTALAÇÃO DE VÍDEO PORTEIRO","-","-","R$ 345,00"],
+        ["INSTALAÇÃO DE CÂMERAS CFTV / CÂMERA WI-FI sem configuração","-","-","-"],
+        ["INSTALAÇÃO DE CÂMERAS CFTV / CÂMERA WI-FI com configuração","R$ 140,00","-","R$ 430,00"],
+        ["INSTALAÇÃO DE PORTÃO ELETRÔNICO DESLIZANTE","-","R$ 350,00","-"],
+        ["INSTALAÇÃO DE PORTÃO ELETRÔNICO PIVOTANTE OU BASCULANTE","-","-","-"],
+        ["INSTALAÇÃO DE BOTOEIRA OU FECHADURA ELETRÔNICA PORTÃO","-","R$ 160,00","-"],
+        ["INSTALAÇÃO DE FECHADURA ELETRÔNICA (Porta de Madeira)","-","R$ 280,00","-"],
+        ["INSTALAÇÃO DE EXAUSTOR COZINHA OU BANHEIRO","-","-","-"],
+        ["INSTALAÇÃO DE SISTEMA DE ALARME RESIDENCIAL","R$ 900,00","R$ 1.300,00","-"],
+        ["INSTALAÇÃO DE AQUECEDOR ELÉTRICO com passagem de cabos","R$ 210,00","R$ 320,00","R$ 270,00"],
+        ["INSTALAÇÃO DE DETECTOR DE FUMAÇA","-","R$ 110,00","-"],
+        ["INSTALAÇÃO DE CERCA ELÉTRICA","R$ 70,00","-","-"],
+        ["INSTALAÇÃO DE NOBREAK","-","R$ 360,00","R$ 342,00"],
+        ["INSTALAÇÃO DE INVERSOR","-","R$ 452,00","-"],
+        ["INSTALAÇÃO DE TERMOSTATO TEMPORIZADOR","-","R$ 150,00","-"]
+      ]},
+      {cat:"QUADROS DE DISTRIBUIÇÃO/PAINEL", items:[
+        ["SUBSTITUIÇÃO DE DISJUNTOR MONOFÁSICO","R$ 60,00","R$ 80,00","-"],
+        ["SUBSTITUIÇÃO DE DISJUNTOR BIFÁSICO","R$ 80,00","R$ 130,00","R$ 100,00"],
+        ["SUBSTITUIÇÃO DE DISJUNTOR TRIFÁSICO","R$ 120,00","-","-"],
+        ["INSTALAÇÃO DE INTERRUPTOR DIFERENCIAL DR","-","-","-"],
+        ["INSTALAÇÃO DE DPS - DISPOSITIVO DE PROTEÇÃO CONTRA SURTOS","-","-","R$ 130,00"],
+        ["INSTALAÇÃO DE BARRAMENTO PENTE MONOPOLAR NO QDC","R$ 70,20","R$ 90,00","R$ 80,00"],
+        ["INSTALAÇÃO DE BARRAMENTO PENTE BIPOLAR NO QDC","R$ 80,00","R$ 100,00","-"],
+        ["INSTALAÇÃO DE BARRAMENTO PENTE TRIPOLAR NO QDC","R$ 90,00","R$ 180,00","R$ 130,00"],
+        ["INSTALAÇÃO DE BARRAMENTO DE NEUTRO OU TERRA","R$ 100,00","R$ 120,00","R$ 110,00"],
+        ["INSTALAÇÃO DE HASTE DE ATERRAMENTO","R$ 250,00","-","R$ 280,00"],
+        ["INSTALAÇÃO DE CONTATOR E RELÉ TÉRMICO","-","R$ 250,00","R$ 220,00"],
+        ["INSTALAÇÃO E MONTAGEM QDC CIRCUITOS (sem DPS)","-","R$ 800,00","R$ 725,00"],
+        ["INSTALAÇÃO E MONTAGEM QDC CIRCUITOS (com DR)","-","R$ 1.000,00","R$ 925,00"],
+        ["INSTALAÇÃO E MONTAGEM QDC 12 CIRCUITOS","R$ 1.000,00","R$ 1.300,00","R$ 1.250,00"],
+        ["INSTALAÇÃO E MONTAGEM QDC 24 CIRCUITOS","R$ 1.500,00","R$ 2.000,00","R$ 1.800,00"]
+      ]},
+      {cat:"PASSAGEM DE CABOS (CIRCUITOS DE ATÉ 20MT)", items:[
+        ["ENTRADA MONOFÁSICA (QM PARA QDC)","-","R$ 220,00","-"],
+        ["ENTRADA BIFÁSICA OU TRIFÁSICA (QM PARA QDC)","-","R$ 330,00","R$ 280,00"],
+        ["ALIMENTAÇÃO PARA MONO/BI/TRI","-","R$ 300,00","R$ 260,00"]
+      ]},
+      {cat:"SOLUÇÃO DE PROBLEMAS ELÉTRICOS", items:[
+        ["CURTO CIRCUITO MONOFÁSICO","-","R$ 600,00","-"],
+        ["CURTO CIRCUITO BIFÁSICO","R$ 450,00","R$ 1.000,00","R$ 720,00"],
+        ["CURTO CIRCUITO TRIFÁSICO","-","R$ 1.100,00","-"]
+      ]},
+      {cat:"PADRÃO DE ENTRADA", items:[
+        ["INSTALAÇÃO DE MEDIDOR (Padrão Monofásico 127/220)","R$ 1.300,00","R$ 1.700,00","R$ 1.500,00"],
+        ["INSTALAÇÃO DE MEDIDOR (Padrão Bifásico 220V)","R$ 1.400,00","R$ 2.000,00","R$ 1.700,00"],
+        ["INSTALAÇÃO DE MEDIDOR (Padrão Trifásico 220V)","R$ 1.800,00","R$ 2.500,00","-"]
+      ]},
+      {cat:"CARREGADOR VEICULAR", items:[
+        ["INSTALAÇÃO CARREGADOR VEICULAR","R$ 800,00","R$ 1.600,00","-"]
+      ]},
+      {cat:"AUTOMAÇÃO RESIDENCIAL", items:[
+        ["INSTALAÇÃO DE INTERRUPTOR INTELIGENTE","R$ 100,00","R$ 200,00","R$ 150,00"],
+        ["INSTALAÇÃO MICRO INTERRUPTOR","-","R$ 300,00","R$ 250,00"],
+        ["INSTALAÇÃO RELÉ DE IMPULSO","R$ 130,00","R$ 220,00","R$ 175,00"],
+        ["INSTALAÇÃO RELÉ DIMMER","R$ 150,00","R$ 350,00","R$ 250,00"],
+        ["INSTALAÇÃO E CONFIGURAÇÃO CONTROLE REMOTO UNIVERSAL","-","R$ 150,00","R$ 130,00"],
+        ["INSTALAÇÃO DE TOMADA INTELIGENTE","-","R$ 200,00","-"],
+        ["INSTALAÇÃO MINI RELÉ CONTROLE DE PERSIANA","-","-","R$ 250,00"],
+        ["INSTALAÇÃO E CONFIGURAÇÃO HUB","-","R$ 250,00","R$ 225,00"],
+        ["INSTALAÇÃO E CONFIGURAÇÃO ROTEADOR","R$ 150,00","R$ 300,00","R$ 225,00"],
+        ["INSTALAÇÃO E CONFIGURAÇÃO FECHADURA INTELIGENTE","R$ 250,00","R$ 400,00","R$ 325,00"],
+        ["INSTALAÇÃO E CONFIGURAÇÃO ASSISTENTE VIRTUAL","-","-","R$ 250,00"]
+      ]}
+    ];
 
     // UI Helpers
     const landing = document.getElementById('landingPage');
@@ -305,7 +405,7 @@
 
     function showLanding() { landing.style.display='block'; profScreen.style.display='none'; cliScreen.style.display='none'; }
     function showProfissional() { landing.style.display='none'; profScreen.style.display='block'; cliScreen.style.display='none'; }
-    function showCliente() { landing.style.display='none'; profScreen.style.display='none'; cliScreen.style.display='block'; }
+    function showCliente() { landing.style.display='none'; profScreen.style.display='none'; cliScreen.style.display='block'; initMap(); }
     function openModal(type) {
       overlay.style.display='flex';
       modalLogin.style.display = type==='login' ? 'block' : 'none';
@@ -318,16 +418,8 @@
     document.getElementById('goToLogin').onclick = () => { modalCadastro.style.display='none'; modalLogin.style.display='block'; };
 
     // Seleção de perfil
-    function selectLoginRole(role) {
-      currentRole = role;
-      document.querySelectorAll('#loginRoleSelector .role-card').forEach(c => c.classList.remove('selected'));
-      document.querySelector(`#loginRoleSelector .role-card[data-role="${role}"]`).classList.add('selected');
-    }
-    function selectSignupRole(role) {
-      currentRole = role;
-      document.querySelectorAll('#signupRoleSelector .role-card').forEach(c => c.classList.remove('selected'));
-      document.querySelector(`#signupRoleSelector .role-card[data-role="${role}"]`).classList.add('selected');
-    }
+    function selectLoginRole(role) { currentRole = role; document.querySelectorAll('#loginRoleSelector .role-card').forEach(c => c.classList.remove('selected')); document.querySelector(`#loginRoleSelector .role-card[data-role="${role}"]`).classList.add('selected'); }
+    function selectSignupRole(role) { currentRole = role; document.querySelectorAll('#signupRoleSelector .role-card').forEach(c => c.classList.remove('selected')); document.querySelector(`#signupRoleSelector .role-card[data-role="${role}"]`).classList.add('selected'); }
 
     function switchTab(tabName) {
       document.querySelectorAll('#profissionalScreen .tab').forEach(t=>t.classList.remove('active'));
@@ -348,17 +440,37 @@
       if(!email||!senha) { err.textContent='Preencha todos os campos.'; err.classList.add('active'); return; }
       try {
         await auth.signInWithEmailAndPassword(email, senha);
-        // salvar role no Firestore
         const user = auth.currentUser;
         await db.collection('users').doc(user.uid).set({ role: currentRole }, { merge: true });
       } catch(e) { err.textContent='Email ou senha incorretos.'; err.classList.add('active'); }
     };
+    // Google Login corrigido
     document.getElementById('btnGoogle').onclick = async () => {
       const provider = new firebase.auth.GoogleAuthProvider();
       try {
         const result = await auth.signInWithPopup(provider);
-        await db.collection('users').doc(result.user.uid).set({ role: currentRole, nome: result.user.displayName, email: result.user.email }, { merge: true });
-      } catch(e) { if(e.code !== 'auth/popup-closed-by-user') alert('Erro ao entrar com Google.'); }
+        // Usuário novo ou existente: mescla dados sem sobrescrever role se já existir
+        const user = result.user;
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        if (!userDoc.exists) {
+          await db.collection('users').doc(user.uid).set({
+            nome: user.displayName,
+            email: user.email,
+            role: currentRole
+          });
+        } else {
+          // Atualiza nome e email, mas mantém role se já definido
+          const existingData = userDoc.data();
+          await db.collection('users').doc(user.uid).update({
+            nome: user.displayName,
+            email: user.email,
+            // só atualiza role se não estiver definido ou se o usuário está redefinindo (pode manter o existente)
+            role: existingData.role || currentRole
+          });
+        }
+      } catch(e) {
+        if(e.code !== 'auth/popup-closed-by-user') alert('Erro ao entrar com Google.');
+      }
     };
     document.getElementById('btnCadastro').onclick = async () => {
       const nome = document.getElementById('cadNome').value.trim();
@@ -390,7 +502,7 @@
       cont.innerHTML = html;
     }
 
-    // Solicitações (Profissional)
+    // Solicitações
     async function loadSolicitacoes() {
       const cont = document.getElementById('tab-solicitacoes');
       cont.innerHTML = '<p>Carregando...</p>';
@@ -409,7 +521,7 @@
       cont.innerHTML = html;
     }
 
-    // Enviar solicitação (Cliente)
+    // Envio de solicitação (Cliente)
     document.getElementById('btnEnviarSolicitacao').onclick = async () => {
       const nome = document.getElementById('cliSolicNome').value.trim();
       const tel = document.getElementById('cliSolicTel').value.trim();
@@ -426,15 +538,38 @@
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         document.getElementById('solicitacaoEnviada').style.display='block';
-        ['cliSolicNome','cliSolicTel','cliSolicEmail','cliSolicEnd','cliSolicTipo','cliSolicDesc'].forEach(id => {
-          document.getElementById(id).value = '';
-        });
+        ['cliSolicNome','cliSolicTel','cliSolicEmail','cliSolicEnd','cliSolicTipo','cliSolicDesc'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('solicitacaoEnviada').scrollIntoView({ behavior: 'smooth' });
       } catch(e) { err.textContent='Erro ao enviar.'; err.classList.add('active'); }
     };
 
+    // Mapa
+    let map, geocoder;
+    function initMap() {
+      if (typeof google === 'undefined') return;
+      const defaultLocation = { lat: -23.5505, lng: -46.6333 }; // São Paulo
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: defaultLocation,
+        zoom: 13
+      });
+      geocoder = new google.maps.Geocoder();
+      document.getElementById('buscarCep').addEventListener('click', () => {
+        const cep = document.getElementById('cepInput').value.replace(/\D/g, '');
+        if (cep.length !== 8) { alert('CEP inválido'); return; }
+        geocoder.geocode({ address: cep }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            map.setCenter(results[0].geometry.location);
+            map.setZoom(15);
+            document.getElementById('cliSolicEnd').value = results[0].formatted_address;
+          } else {
+            alert('CEP não encontrado');
+          }
+        });
+      });
+    }
+
     // Inicializar abas do profissional
     function initProfTabs() {
-      // Corrente
       document.getElementById('tab-corrente').innerHTML = `
         <h2>Cálculo de Corrente</h2>
         <div class="form-group"><label>Tensão (V)</label><input type="number" id="corrV" value="220"></div>
@@ -453,7 +588,7 @@
         document.getElementById('resCorrente').innerHTML = `<strong>Corrente: ${I.toFixed(2)} A</strong>`;
         saveCalc('Corrente',{V,P,tipo,fp},{corrente:I.toFixed(2)});
       };
-      // Queda
+
       document.getElementById('tab-queda').innerHTML = `
         <h2>Queda de Tensão</h2>
         <div class="form-group"><label>Tensão (V)</label><input type="number" id="qdV" value="220"></div>
@@ -474,7 +609,7 @@
         document.getElementById('resQueda').innerHTML = `<strong>Queda: ${dV.toFixed(2)} V (${perc.toFixed(2)}%)</strong>`;
         saveCalc('Queda',{V,I,L,S},{deltaV:dV.toFixed(2), perc:perc.toFixed(2)});
       };
-      // Orçamento profissional
+
       document.getElementById('tab-orcamento').innerHTML = `
         <h2>Gerador de Orçamento</h2>
         <div class="form-group"><label>Nome do cliente</label><input type="text" id="orcNome" placeholder="Nome completo"></div>
@@ -494,110 +629,8 @@
         const valor = parseFloat(document.getElementById('orcValor').value).toFixed(2);
         document.getElementById('orcOutput').innerHTML = `<h3>Orçamento</h3><p><strong>Cliente:</strong> ${nome}<br><strong>Tel:</strong> ${tel}<br><strong>End:</strong> ${end}</p><p><strong>Serviço:</strong> ${tipo}<br>${desc}</p><p style="font-size:20px;font-weight:700;">Total: R$ ${valor}</p>`;
       };
-      // Tabela de preços COMPLETA
-      const priceData = [
-        {cat:"ILUMINAÇÃO", items:[
-          ["INSTALAÇÃO DE INTERRUPTOR COMPLETO PULSADOR","-","R$ 80,00","-"],
-          ["INSTALAÇÃO DE INTERRUPTOR THREE-WAY OU FOUR-WAY","R$ 70,00","R$ 200,00","R$ 110,00"],
-          ["INSTALAÇÃO DE INTERRUPTOR DUPLO OU BIFILAR","-","-","-"],
-          ["INSTALAÇÃO DE INTERRUPTOR TOMADA (Juntos)","R$ 70,00","R$ 100,00","-"],
-          ["INSTALAÇÃO DE ARANDELA PENDENTE OU SPOT COMUM","R$ 75,00","-","-"],
-          ["INSTALAÇÃO DE LÂMPADA FLUORESCENTE (TUBO)","R$ 60,00","-","-"],
-          ["INSTALAÇÃO DE CORES POLIVANTE","-","-","-"],
-          ["INSTALAÇÃO DE LUSTRES GRANDES","R$ 100,00","R$ 200,00","-"],
-          ["INSTALAÇÃO DE REFLETOR DE JARDIM","R$ 110,00","R$ 150,00","-"],
-          ["INSTALAÇÃO DE REFLETOR DE POSTE COMUM","R$ 140,00","R$ 200,00","-"],
-          ["INSTALAÇÃO DE REFLETOR DE POSTE COM LÂMPADA VAPOR","R$ 145,00","R$ 200,00","R$ 170,00"],
-          ["INSTALAÇÃO DE REATOR DE LÂMPADA A VAPOR","R$ 60,00","-","R$ 110,00"],
-          ["INSTALAÇÃO DE FOTOCÉLULA OU SENSOR DE PRESENÇA","R$ 80,00","R$ 140,00","-"],
-          ["INSTALAÇÃO DE REFLETOR LED FOTOCÉLULA SENSOR DE PRESENÇA","R$ 90,00","-","-"],
-          ["INSTALAÇÃO DE LUMINÁRIA DE EMERGÊNCIA DE SOBREPOR","-","-","-"],
-          ["INSTALAÇÃO DE LUMINÁRIA DE EMERGÊNCIA DE EMBUTIR","R$ 70,00","-","R$ 115,00"],
-          ["INSTALAÇÃO DE PERFIL DE LED (O METRO)","-","-","R$ 205,00"],
-          ["INSTALAÇÃO DE LUMINÁRIA TUBULAR OU TROCA REATOR LED","R$ 90,00","R$ 130,00","-"]
-        ]},
-        {cat:"PONTO DE UTILIZAÇÃO", items:[
-          ["INSTALAÇÃO DE TOMADA SIMPLES","R$ 40,00","R$ 80,00","-"],
-          ["INSTALAÇÃO DE TOMADA DUPLA","-","-","-"],
-          ["INSTALAÇÃO DE TOMADA TRIPLA","-","-","-"],
-          ["INSTALAÇÃO DE TOMADA DE REDE OU TELEFONE","R$ 70,00","R$ 90,00","R$ 80,00"],
-          ["INSTALAÇÃO DE TOMADA INDUSTRIAL","-","R$ 150,00","-"],
-          ["INSTALAÇÃO DE TOMADA DE SOBREPOR COM CANALETA","R$ 70,00","-","-"],
-          ["INSTALAÇÃO DE CHAVE DE BOIA SUPERIOR (EM EMERGÊNCIA)","R$ 105,00","-","R$ 140,00"],
-          ["INSTALAÇÃO DE VENTILADOR DE TETO","R$ 180,00","R$ 300,00","R$ 240,00"],
-          ["INSTALAÇÃO DE VENTILADOR DE PAREDE","-","-","-"],
-          ["INSTALAÇÃO DE CHUVEIRO ELÉTRICO SIMPLES","-","R$ 120,00","-"],
-          ["INSTALAÇÃO DE CHUVEIRO ELETRÔNICO OU DUCHA","R$ 130,00","-","R$ 170,00"],
-          ["INSTALAÇÃO DE TROCA DE RESISTÊNCIA DE CHUVEIRO","R$ 60,00","R$ 115,00","R$ 102,00"],
-          ["INSTALAÇÃO DE BANHEIRA ELÉTRICA","-","-","-"],
-          ["INSTALAÇÃO DE CAMPAINHA ATÉ 20 MTS","R$ 60,00","R$ 100,00","-"],
-          ["INSTALAÇÃO DE INTERFONE 1 CHAMADA","-","R$ 200,50","R$ 200,00"],
-          ["INSTALAÇÃO DE INTERFONE 2 CHAMADAS","R$ 220,00","R$ 310,00","R$ 265,00"],
-          ["INSTALAÇÃO DE VÍDEO PORTEIRO","-","-","R$ 345,00"],
-          ["INSTALAÇÃO DE CÂMERAS CFTV / CÂMERA WI-FI sem configuração","-","-","-"],
-          ["INSTALAÇÃO DE CÂMERAS CFTV / CÂMERA WI-FI com configuração","R$ 140,00","-","R$ 430,00"],
-          ["INSTALAÇÃO DE PORTÃO ELETRÔNICO DESLIZANTE","-","R$ 350,00","-"],
-          ["INSTALAÇÃO DE PORTÃO ELETRÔNICO PIVOTANTE OU BASCULANTE","-","-","-"],
-          ["INSTALAÇÃO DE BOTOEIRA OU FECHADURA ELETRÔNICA PORTÃO","-","R$ 160,00","-"],
-          ["INSTALAÇÃO DE FECHADURA ELETRÔNICA (Porta de Madeira)","-","R$ 280,00","-"],
-          ["INSTALAÇÃO DE EXAUSTOR COZINHA OU BANHEIRO","-","-","-"],
-          ["INSTALAÇÃO DE SISTEMA DE ALARME RESIDENCIAL","R$ 900,00","R$ 1.300,00","-"],
-          ["INSTALAÇÃO DE AQUECEDOR ELÉTRICO com passagem de cabos","R$ 210,00","R$ 320,00","R$ 270,00"],
-          ["INSTALAÇÃO DE DETECTOR DE FUMAÇA","-","R$ 110,00","-"],
-          ["INSTALAÇÃO DE CERCA ELÉTRICA","R$ 70,00","-","-"],
-          ["INSTALAÇÃO DE NOBREAK","-","R$ 360,00","R$ 342,00"],
-          ["INSTALAÇÃO DE INVERSOR","-","R$ 452,00","-"],
-          ["INSTALAÇÃO DE TERMOSTATO TEMPORIZADOR","-","R$ 150,00","-"]
-        ]},
-        {cat:"QUADROS DE DISTRIBUIÇÃO/PAINEL", items:[
-          ["SUBSTITUIÇÃO DE DISJUNTOR MONOFÁSICO","R$ 60,00","R$ 80,00","-"],
-          ["SUBSTITUIÇÃO DE DISJUNTOR BIFÁSICO","R$ 80,00","R$ 130,00","R$ 100,00"],
-          ["SUBSTITUIÇÃO DE DISJUNTOR TRIFÁSICO","R$ 120,00","-","-"],
-          ["INSTALAÇÃO DE INTERRUPTOR DIFERENCIAL DR","-","-","-"],
-          ["INSTALAÇÃO DE DPS - DISPOSITIVO DE PROTEÇÃO CONTRA SURTOS","-","-","R$ 130,00"],
-          ["INSTALAÇÃO DE BARRAMENTO PENTE MONOPOLAR NO QDC","R$ 70,20","R$ 90,00","R$ 80,00"],
-          ["INSTALAÇÃO DE BARRAMENTO PENTE BIPOLAR NO QDC","R$ 80,00","R$ 100,00","-"],
-          ["INSTALAÇÃO DE BARRAMENTO PENTE TRIPOLAR NO QDC","R$ 90,00","R$ 180,00","R$ 130,00"],
-          ["INSTALAÇÃO DE BARRAMENTO DE NEUTRO OU TERRA","R$ 100,00","R$ 120,00","R$ 110,00"],
-          ["INSTALAÇÃO DE HASTE DE ATERRAMENTO","R$ 250,00","-","R$ 280,00"],
-          ["INSTALAÇÃO DE CONTATOR E RELÉ TÉRMICO","-","R$ 250,00","R$ 220,00"],
-          ["INSTALAÇÃO E MONTAGEM QDC CIRCUITOS (sem DPS)","-","R$ 800,00","R$ 725,00"],
-          ["INSTALAÇÃO E MONTAGEM QDC CIRCUITOS (com DR)","-","R$ 1.000,00","R$ 925,00"],
-          ["INSTALAÇÃO E MONTAGEM QDC 12 CIRCUITOS","R$ 1.000,00","R$ 1.300,00","R$ 1.250,00"],
-          ["INSTALAÇÃO E MONTAGEM QDC 24 CIRCUITOS","R$ 1.500,00","R$ 2.000,00","R$ 1.800,00"]
-        ]},
-        {cat:"PASSAGEM DE CABOS (CIRCUITOS DE ATÉ 20MT)", items:[
-          ["ENTRADA MONOFÁSICA (QM PARA QDC)","-","R$ 220,00","-"],
-          ["ENTRADA BIFÁSICA OU TRIFÁSICA (QM PARA QDC)","-","R$ 330,00","R$ 280,00"],
-          ["ALIMENTAÇÃO PARA MONO/BI/TRI","-","R$ 300,00","R$ 260,00"]
-        ]},
-        {cat:"SOLUÇÃO DE PROBLEMAS ELÉTRICOS", items:[
-          ["CURTO CIRCUITO MONOFÁSICO","-","R$ 600,00","-"],
-          ["CURTO CIRCUITO BIFÁSICO","R$ 450,00","R$ 1.000,00","R$ 720,00"],
-          ["CURTO CIRCUITO TRIFÁSICO","-","R$ 1.100,00","-"]
-        ]},
-        {cat:"PADRÃO DE ENTRADA", items:[
-          ["INSTALAÇÃO DE MEDIDOR (Padrão Monofásico 127/220)","R$ 1.300,00","R$ 1.700,00","R$ 1.500,00"],
-          ["INSTALAÇÃO DE MEDIDOR (Padrão Bifásico 220V)","R$ 1.400,00","R$ 2.000,00","R$ 1.700,00"],
-          ["INSTALAÇÃO DE MEDIDOR (Padrão Trifásico 220V)","R$ 1.800,00","R$ 2.500,00","-"]
-        ]},
-        {cat:"CARREGADOR VEICULAR", items:[
-          ["INSTALAÇÃO CARREGADOR VEICULAR","R$ 800,00","R$ 1.600,00","-"]
-        ]},
-        {cat:"AUTOMAÇÃO RESIDENCIAL", items:[
-          ["INSTALAÇÃO DE INTERRUPTOR INTELIGENTE","R$ 100,00","R$ 200,00","R$ 150,00"],
-          ["INSTALAÇÃO MICRO INTERRUPTOR","-","R$ 300,00","R$ 250,00"],
-          ["INSTALAÇÃO RELÉ DE IMPULSO","R$ 130,00","R$ 220,00","R$ 175,00"],
-          ["INSTALAÇÃO RELÉ DIMMER","R$ 150,00","R$ 350,00","R$ 250,00"],
-          ["INSTALAÇÃO E CONFIGURAÇÃO CONTROLE REMOTO UNIVERSAL","-","R$ 150,00","R$ 130,00"],
-          ["INSTALAÇÃO DE TOMADA INTELIGENTE","-","R$ 200,00","-"],
-          ["INSTALAÇÃO MINI RELÉ CONTROLE DE PERSIANA","-","-","R$ 250,00"],
-          ["INSTALAÇÃO E CONFIGURAÇÃO HUB","-","R$ 250,00","R$ 225,00"],
-          ["INSTALAÇÃO E CONFIGURAÇÃO ROTEADOR","R$ 150,00","R$ 300,00","R$ 225,00"],
-          ["INSTALAÇÃO E CONFIGURAÇÃO FECHADURA INTELIGENTE","R$ 250,00","R$ 400,00","R$ 325,00"],
-          ["INSTALAÇÃO E CONFIGURAÇÃO ASSISTENTE VIRTUAL","-","-","R$ 250,00"]
-        ]}
-      ];
+
+      // Tabela de preços
       let priceHTML = '<h2>TABELA DE PREÇOS MÉDIOS DE SERVIÇOS ELÉTRICOS - 2026</h2>';
       priceHTML += '<p style="font-size:12px; color:var(--text-light); margin-bottom:8px;">* Preços referentes apenas à <strong>mão de obra</strong>. Material não incluso.</p>';
       priceHTML += '<div class="price-table-wrapper"><table class="price-table"><thead><tr><th>Descrição do Serviço</th><th>▼ Mínimo</th><th>Máximo</th><th>▲ Médio</th></tr></thead><tbody>';
@@ -621,6 +654,27 @@
       };
     }
 
+    // Popular o select de serviços do cliente com todas as descrições da tabela (sem preços)
+    function popularServicosCliente() {
+      const select = document.getElementById('cliSolicTipo');
+      if (!select) return;
+      // Extrai todas as descrições únicas
+      const servicos = [];
+      priceData.forEach(cat => {
+        cat.items.forEach(item => {
+          if (item[0] && !servicos.includes(item[0])) {
+            servicos.push(item[0]);
+          }
+        });
+      });
+      servicos.forEach(servico => {
+        const opt = document.createElement('option');
+        opt.value = servico;
+        opt.textContent = servico;
+        select.appendChild(opt);
+      });
+    }
+
     // Listener tabs profissional
     document.querySelectorAll('#profissionalScreen .tab').forEach(tab => {
       tab.addEventListener('click', () => switchTab(tab.dataset.tab));
@@ -628,15 +682,17 @@
 
     // Observer de autenticação
     auth.onAuthStateChanged(async user => {
-      if(user) {
+      if (user) {
         currentUser = user;
         const doc = await db.collection('users').doc(user.uid).get();
         const data = doc.data() || {};
         const role = data.role || 'profissional';
         const nome = data.nome || user.email;
-        if(role === 'cliente') {
+        if (role === 'cliente') {
           document.getElementById('cliDisplayName').textContent = nome;
           showCliente();
+          popularServicosCliente();
+          setTimeout(initMap, 500); // inicializa mapa após mostrar
         } else {
           document.getElementById('profDisplayName').textContent = nome;
           showProfissional();
