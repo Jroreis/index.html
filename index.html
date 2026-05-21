@@ -2,133 +2,653 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Meu Aplicativo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoltCalc Pro - NBR 5410</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --secondary: #f59e0b;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --white: #ffffff;
+      --radius: 12px;
+      --shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
+    * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: #FFFFFF;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: var(--light);
+      color: var(--text);
+      line-height: 1.6;
     }
-    #root {
-      width: 100%;
-      max-width: 480px; /* simulando largura de celular */
-      min-height: 100vh;
-      background: #F9F9F9;
-      display: flex;
-      flex-direction: column;
+    .header {
+      background: var(--white); box-shadow: var(--shadow); padding: 16px 24px;
+      display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100;
+    }
+    .logo { font-size:22px; font-weight:800; color:var(--primary); text-decoration:none; display:flex; align-items:center; gap:8px; }
+    .logo span { color:var(--secondary); }
+    .header-btns { display:flex; gap:12px; }
+    .btn-header {
+      padding:10px 20px; border-radius:8px; font-weight:600; font-size:14px; cursor:pointer; transition:0.2s;
+      background:transparent; border:2px solid var(--primary); color:var(--primary);
+    }
+    .btn-header.filled { background:var(--primary); color:#fff; }
+    .btn-header:hover { opacity:0.9; transform:translateY(-1px); }
+    .hero { max-width:900px; margin:0 auto; padding:60px 24px; text-align:center; }
+    .hero h1 { font-size:36px; font-weight:800; color:var(--dark); }
+    .hero h1 span { color:var(--primary); }
+    .hero p { font-size:18px; color:var(--text-light); margin:16px 0 32px; }
+    .hero-cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:40px; }
+    .hero-card {
+      background:var(--white); border-radius:var(--radius); padding:24px 16px; box-shadow:var(--shadow);
+      text-align:center; transition:0.2s;
+    }
+    .hero-card:hover { transform:translateY(-4px); }
+    .hero-card .icon { font-size:36px; margin-bottom:12px; }
+    .hero-card h3 { font-size:16px; font-weight:700; color:var(--dark); }
+    .hero-card p { font-size:13px; color:var(--text-light); }
+    .video-section {
+      background:var(--white); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow); margin:0 auto;
+    }
+    .video-section h3 { font-size:18px; margin-bottom:16px; color:var(--dark); }
+    .video-container { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; }
+    .video-container iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:none; }
+    .modal-overlay {
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:200;
+      align-items:center; justify-content:center; padding:20px;
+    }
+    .modal {
+      background:var(--white); border-radius:var(--radius); padding:32px 24px;
+      max-width:400px; width:100%; max-height:90vh; overflow-y:auto;
+    }
+    .modal h2 { text-align:center; margin-bottom:16px; }
+    .btn-google {
+      background:var(--white); color:var(--text); border:1.5px solid #e2e8f0;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      width:100%; padding:12px; border-radius:8px; font-weight:600; cursor:pointer;
+    }
+    .btn-google:hover { background:#f8fafc; }
+    .app-screen { display:none; max-width:900px; margin:0 auto; padding:30px 20px; }
+    .tabs { display:flex; flex-wrap:wrap; border-bottom:2px solid #e2e8f0; margin-bottom:24px; gap:4px; }
+    .tab {
+      padding:10px 14px; font-size:14px; font-weight:600; color:var(--text-light); cursor:pointer;
+      border-bottom:3px solid transparent; white-space:nowrap; background:none; transition:0.2s;
+    }
+    .tab.active { color:var(--primary); border-bottom-color:var(--primary); }
+    .tab-content { display:none; animation: fadeIn 0.3s; }
+    .tab-content.active { display:block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
+    .form-group { margin-bottom:16px; }
+    .form-group label { display:block; font-weight:600; font-size:13px; margin-bottom:5px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px; font-family:inherit;
+    }
+    .btn-primary {
+      width:100%; padding:14px; background:var(--primary); color:#fff; border:none; border-radius:8px;
+      font-weight:700; font-size:16px; cursor:pointer; transition:0.2s;
+    }
+    .btn-primary:hover { background:var(--primary-dark); }
+    .btn-sm {
+      padding:8px 16px; font-size:13px; width:auto; background:var(--primary); color:#fff; border:none; border-radius:6px; cursor:pointer;
+    }
+    .btn-danger-sm {
+      padding:8px 16px; font-size:13px; width:auto; background:#ef4444; color:#fff; border:none; border-radius:6px; cursor:pointer;
+    }
+    .result-card { background:var(--white); border-radius:var(--radius); padding:20px; margin-top:20px; box-shadow:var(--shadow); }
+    .error-msg { background:#fef2f2; color:#dc2626; padding:10px; border-radius:6px; margin-top:8px; display:none; }
+    .error-msg.active { display:block; }
+    .price-table-wrapper { overflow-x:auto; margin-top:16px; }
+    .price-table { width:100%; border-collapse:collapse; font-size:12px; min-width:700px; }
+    .price-table th { background:var(--primary); color:#fff; padding:8px; text-align:left; font-size:11px; }
+    .price-table td { padding:6px 8px; border-bottom:1px solid #e2e8f0; }
+    .price-table tr:nth-child(even) { background:#f8fafc; }
+    .category-row { background:#e2e8f0!important; font-weight:700; color:var(--dark); }
+    .category-row td { padding:8px; font-size:13px; }
+    .logout-btn { background:#ef4444; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; }
+    .item-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+    .item-row input { flex:1; min-width:100px; }
+    .item-row .qty { width:70px; }
+    .item-row .price { width:100px; }
+    .divider { border-top:1px solid #e2e8f0; margin:16px 0; }
+    .role-selector {
+      display:flex; gap:12px; margin:16px 0;
+    }
+    .role-card {
+      flex:1; border:2px solid #e2e8f0; border-radius:var(--radius); padding:16px; text-align:center;
+      cursor:pointer; transition:0.2s;
+    }
+    .role-card.selected { border-color:var(--primary); background:rgba(79,70,229,0.05); }
+    .role-card h3 { font-size:16px; margin-bottom:4px; }
+    .role-card p { font-size:12px; color:var(--text-light); }
+
+    @media (max-width:600px) {
+      .hero h1 { font-size:26px; }
+      .header { padding:12px 16px; }
+      .btn-header { padding:8px 14px; font-size:12px; }
     }
   </style>
 </head>
 <body>
-  <div id="root"></div>
-
-  <!-- React e Babel standalone -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-  <script type="text/babel">
-    const { useState } = React;
-
-    // Componente CustomButton (adaptado do TouchableOpacity para <button>)
-    const CustomButton = ({ titulo, aoPressionar }) => {
-      const buttonStyle = {
-        backgroundColor: '#007AFF',
-        paddingVertical: '14px',
-        paddingHorizontal: '32px',
-        borderRadius: '8px',
-        width: '100%',
-        border: 'none',
-        color: '#FFFFFF',
-        fontSize: '16px',
-        fontWeight: '600',
-        cursor: 'pointer',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        marginTop: '8px',
-        transition: 'opacity 0.2s',
-      };
-
-      const handleMouseDown = (e) => e.target.style.opacity = '0.8';
-      const handleMouseUp = (e) => e.target.style.opacity = '1';
-
-      return (
-        <button
-          onClick={aoPressionar}
-          style={buttonStyle}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-        >
-          {titulo}
-        </button>
-      );
-    };
-
-    // Tela HomeScreen
-    const HomeScreen = () => {
-      const lidarComClique = () => {
-        console.log("O botão principal foi clicado!");
-        alert("Ação iniciada! Veja o console para detalhes.");
-      };
-
-      const screenStyle = {
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '20px',
-        backgroundColor: '#F9F9F9',
-        minHeight: '100vh',
-      };
-
-      const titleStyle = {
-        fontSize: '26px',
-        fontWeight: 'bold',
-        color: '#1A1A1A',
-        marginBottom: '8px',
-      };
-
-      const subtitleStyle = {
-        fontSize: '14px',
-        color: '#666666',
-        marginBottom: '24px',
-        textAlign: 'center',
-      };
-
-      return (
-        <div style={screenStyle}>
-          <h1 style={titleStyle}>Painel Principal</h1>
-          <p style={subtitleStyle}>Este é o esqueleto funcional do seu app.</p>
-          <div style={{ width: '100%', maxWidth: '300px' }}>
-            <CustomButton titulo="Iniciar Ação" aoPressionar={lidarComClique} />
-          </div>
+  <!-- ========== LANDING PAGE ========== -->
+  <div id="landingPage">
+    <header class="header">
+      <a href="#" class="logo">⚡ VoltCalc <span>Pro</span></a>
+      <div class="header-btns">
+        <button class="btn-header" id="showLoginModal">Login</button>
+        <button class="btn-header filled" id="showSignupModal">Criar Conta</button>
+      </div>
+    </header>
+    <section class="hero">
+      <h1>Calculadora Elétrica <span>Profissional</span></h1>
+      <p>Ferramenta completa para eletricistas, engenheiros e técnicos. Baseada na <strong>NBR 5410</strong>.</p>
+      <div class="hero-cards">
+        <div class="hero-card"><div class="icon">⚡</div><h3>Cálculo de Potência</h3><p>Corrente, tensão e fator de potência</p></div>
+        <div class="hero-card"><div class="icon">📉</div><h3>Queda de Tensão</h3><p>Dimensionamento conforme norma</p></div>
+        <div class="hero-card"><div class="icon">📚</div><h3>Histórico</h3><p>Salve e acesse seus cálculos</p></div>
+        <div class="hero-card"><div class="icon">🔌</div><h3>Especificações</h3><p>Bitola, disjuntor e distância máxima</p></div>
+      </div>
+      <div class="video-section">
+        <h3>🎬 Conheça o VoltCalc Pro</h3>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/SEU_VIDEO_ID" allowfullscreen></iframe>
         </div>
-      );
-    };
+        <p style="text-align:center;margin-top:12px;font-size:13px;color:var(--text-light);">
+          Inscreva-se: <a href="https://youtube.com/@voltcalcpro" target="_blank" style="color:var(--primary);">youtube.com/@voltcalcpro</a>
+        </p>
+      </div>
+    </section>
+  </div>
 
-    // Componente App (sem SafeAreaView real, mas com padding do body)
-    const App = () => {
-      return (
-        <div style={{ backgroundColor: '#FFFFFF', minHeight: '100vh' }}>
-          <HomeScreen />
+  <!-- ========== MODAL LOGIN/CADASTRO ========== -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modalLogin" style="display:none;">
+      <button onclick="closeModal()" style="float:right; background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
+      <h2>🔐 Entrar</h2>
+      <!-- Seletor de perfil -->
+      <div class="role-selector" id="loginRoleSelector">
+        <div class="role-card selected" data-role="profissional" onclick="selectLoginRole('profissional')">
+          <h3>👨‍🔧 Profissional</h3>
+          <p>Eletricista / Engenheiro</p>
         </div>
-      );
+        <div class="role-card" data-role="cliente" onclick="selectLoginRole('cliente')">
+          <h3>🏠 Cliente</h3>
+          <p>Buscar orçamento</p>
+        </div>
+      </div>
+      <p style="color:var(--text-light); text-align:center; margin-bottom:20px;">Acesse sua conta</p>
+      <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="seu@email.com"></div>
+      <div class="form-group"><label>Senha</label><input type="password" id="loginSenha" placeholder="••••••"></div>
+      <button class="btn-primary" id="btnLogin">Entrar</button>
+      <div class="error-msg" id="erroLogin"></div>
+      <div style="display:flex; align-items:center; margin:16px 0; color:var(--text-light); font-size:12px;">
+        <span style="flex:1; height:1px; background:#e2e8f0;"></span><span style="padding:0 10px;">ou</span><span style="flex:1; height:1px; background:#e2e8f0;"></span>
+      </div>
+      <button class="btn-google" id="btnGoogle">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Entrar com Google
+      </button>
+      <p style="text-align:center; margin-top:14px; font-size:13px;">Não tem conta? <strong style="color:var(--primary); cursor:pointer;" id="goToSignup">Cadastre-se</strong></p>
+    </div>
+
+    <div class="modal" id="modalCadastro" style="display:none;">
+      <button onclick="closeModal()" style="float:right; background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
+      <h2>📝 Criar Conta</h2>
+      <div class="role-selector" id="signupRoleSelector">
+        <div class="role-card selected" data-role="profissional" onclick="selectSignupRole('profissional')">
+          <h3>👨‍🔧 Profissional</h3>
+          <p>Eletricista / Engenheiro</p>
+        </div>
+        <div class="role-card" data-role="cliente" onclick="selectSignupRole('cliente')">
+          <h3>🏠 Cliente</h3>
+          <p>Buscar orçamento</p>
+        </div>
+      </div>
+      <p style="color:var(--text-light); text-align:center; margin-bottom:20px;">Cadastre-se gratuitamente</p>
+      <div class="form-group"><label>Nome</label><input type="text" id="cadNome" placeholder="Seu nome completo"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="cadEmail" placeholder="seu@email.com"></div>
+      <div class="form-group"><label>Senha</label><input type="password" id="cadSenha" placeholder="Mínimo 6 caracteres"></div>
+      <button class="btn-primary" id="btnCadastro">Cadastrar</button>
+      <div class="error-msg" id="erroCadastro"></div>
+      <p style="text-align:center; margin-top:14px; font-size:13px;">Já tem conta? <strong style="color:var(--primary); cursor:pointer;" id="goToLogin">Entrar</strong></p>
+    </div>
+  </div>
+
+  <!-- ========== ÁREA DO PROFISSIONAL ========== -->
+  <div class="app-screen" id="profissionalScreen">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <span style="font-weight:700; font-size:18px;">👋 <span id="profDisplayName"></span></span>
+      <button class="logout-btn" id="btnLogoutProf">Sair</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-tab="corrente">⚡ Corrente</button>
+      <button class="tab" data-tab="queda">📉 Queda</button>
+      <button class="tab" data-tab="orcamento">📋 Orçamento</button>
+      <button class="tab" data-tab="precos">💰 Preços</button>
+      <button class="tab" data-tab="solicitacoes">📩 Solicitações</button>
+      <button class="tab" data-tab="historico">📚 Histórico</button>
+      <button class="tab" data-tab="perfil">👤 Perfil</button>
+    </div>
+    <div class="tab-content active" id="tab-corrente"></div>
+    <div class="tab-content" id="tab-queda"></div>
+    <div class="tab-content" id="tab-orcamento"></div>
+    <div class="tab-content" id="tab-precos"></div>
+    <div class="tab-content" id="tab-solicitacoes"></div>
+    <div class="tab-content" id="tab-historico"></div>
+    <div class="tab-content" id="tab-perfil"></div>
+  </div>
+
+  <!-- ========== ÁREA DO CLIENTE ========== -->
+  <div class="app-screen" id="clienteScreen">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <span style="font-weight:700; font-size:18px;">🏠 <span id="cliDisplayName"></span></span>
+      <button class="logout-btn" id="btnLogoutCli">Sair</button>
+    </div>
+    <h2>Solicitar Orçamento</h2>
+    <p style="color:var(--text-light); margin-bottom:20px;">Preencha os dados abaixo para receber orçamentos de profissionais.</p>
+    <div class="form-group"><label>Nome do solicitante</label><input type="text" id="cliSolicNome" placeholder="Seu nome completo"></div>
+    <div class="form-group"><label>Telefone / WhatsApp</label><input type="tel" id="cliSolicTel" placeholder="(11) 99999-9999"></div>
+    <div class="form-group"><label>Email</label><input type="email" id="cliSolicEmail" placeholder="seu@email.com"></div>
+    <div class="form-group"><label>Endereço</label><input type="text" id="cliSolicEnd" placeholder="Rua, número, bairro, cidade"></div>
+    <div class="form-group"><label>Tipo de serviço</label>
+      <select id="cliSolicTipo">
+        <option value="">Selecione...</option>
+        <option>Instalação elétrica residencial</option>
+        <option>Manutenção corretiva</option>
+        <option>Padrão de entrada (relógio)</option>
+        <option>Projeto elétrico</option>
+        <option>Automação residencial</option>
+        <option>Outros</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Descrição do serviço</label><textarea id="cliSolicDesc" placeholder="Descreva o que precisa..."></textarea></div>
+    <button class="btn-primary" id="btnEnviarSolicitacao">📩 Enviar Solicitação</button>
+    <div class="error-msg" id="erroSolicitacao"></div>
+    <div id="solicitacaoEnviada" class="result-card" style="display:none;">
+      <h3>✅ Solicitação enviada!</h3>
+      <p>Os profissionais cadastrados receberão seu pedido e entrarão em contato.</p>
+    </div>
+  </div>
+
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
+      authDomain: "voltcalc-pro.firebaseapp.com",
+      projectId: "voltcalc-pro",
+      storageBucket: "voltcalc-pro.firebasestorage.app",
+      messagingSenderId: "411208955318",
+      appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
+    });
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+    let currentRole = 'profissional'; // padrão
+    const tabelaCondutores = {
+      'PVC': {'1.5':17.5,'2.5':24,'4':32,'6':41,'10':57,'16':76,'25':99},
+      'EPR': {'1.5':22,'2.5':30,'4':40,'6':52,'10':72,'16':96,'25':125}
+    };
+    const quedaUnitaria = { cobre: {1.5:23.0,2.5:14.0,4:8.7,6:5.8,10:3.5,16:2.2,25:1.4} };
+
+    // UI Helpers
+    const landing = document.getElementById('landingPage');
+    const profScreen = document.getElementById('profissionalScreen');
+    const cliScreen = document.getElementById('clienteScreen');
+    const overlay = document.getElementById('modalOverlay');
+    const modalLogin = document.getElementById('modalLogin');
+    const modalCadastro = document.getElementById('modalCadastro');
+
+    function showLanding() { landing.style.display='block'; profScreen.style.display='none'; cliScreen.style.display='none'; }
+    function showProfissional() { landing.style.display='none'; profScreen.style.display='block'; cliScreen.style.display='none'; }
+    function showCliente() { landing.style.display='none'; profScreen.style.display='none'; cliScreen.style.display='block'; }
+    function openModal(type) {
+      overlay.style.display='flex';
+      modalLogin.style.display = type==='login' ? 'block' : 'none';
+      modalCadastro.style.display = type==='signup' ? 'block' : 'none';
+    }
+    function closeModal() { overlay.style.display='none'; }
+    document.getElementById('showLoginModal').onclick = () => openModal('login');
+    document.getElementById('showSignupModal').onclick = () => openModal('signup');
+    document.getElementById('goToSignup').onclick = () => { modalLogin.style.display='none'; modalCadastro.style.display='block'; };
+    document.getElementById('goToLogin').onclick = () => { modalCadastro.style.display='none'; modalLogin.style.display='block'; };
+
+    // Seleção de perfil
+    function selectLoginRole(role) {
+      currentRole = role;
+      document.querySelectorAll('#loginRoleSelector .role-card').forEach(c => c.classList.remove('selected'));
+      document.querySelector(`#loginRoleSelector .role-card[data-role="${role}"]`).classList.add('selected');
+    }
+    function selectSignupRole(role) {
+      currentRole = role;
+      document.querySelectorAll('#signupRoleSelector .role-card').forEach(c => c.classList.remove('selected'));
+      document.querySelector(`#signupRoleSelector .role-card[data-role="${role}"]`).classList.add('selected');
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('#profissionalScreen .tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('#profissionalScreen .tab-content').forEach(c=>c.classList.remove('active'));
+      const tab = document.querySelector(`#profissionalScreen .tab[data-tab="${tabName}"]`);
+      if(tab) tab.classList.add('active');
+      const content = document.getElementById(`tab-${tabName}`);
+      if(content) content.classList.add('active');
+      if(tabName==='historico') loadHistory();
+      if(tabName==='solicitacoes') loadSolicitacoes();
+    }
+
+    // Autenticação
+    document.getElementById('btnLogin').onclick = async () => {
+      const email = document.getElementById('loginEmail').value.trim();
+      const senha = document.getElementById('loginSenha').value;
+      const err = document.getElementById('erroLogin'); err.classList.remove('active');
+      if(!email||!senha) { err.textContent='Preencha todos os campos.'; err.classList.add('active'); return; }
+      try {
+        await auth.signInWithEmailAndPassword(email, senha);
+        // salvar role no Firestore
+        const user = auth.currentUser;
+        await db.collection('users').doc(user.uid).set({ role: currentRole }, { merge: true });
+      } catch(e) { err.textContent='Email ou senha incorretos.'; err.classList.add('active'); }
+    };
+    document.getElementById('btnGoogle').onclick = async () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      try {
+        const result = await auth.signInWithPopup(provider);
+        await db.collection('users').doc(result.user.uid).set({ role: currentRole, nome: result.user.displayName, email: result.user.email }, { merge: true });
+      } catch(e) { if(e.code !== 'auth/popup-closed-by-user') alert('Erro ao entrar com Google.'); }
+    };
+    document.getElementById('btnCadastro').onclick = async () => {
+      const nome = document.getElementById('cadNome').value.trim();
+      const email = document.getElementById('cadEmail').value.trim();
+      const senha = document.getElementById('cadSenha').value;
+      const err = document.getElementById('erroCadastro'); err.classList.remove('active');
+      if(!nome||!email||!senha) { err.textContent='Preencha todos os campos.'; err.classList.add('active'); return; }
+      if(senha.length<6) { err.textContent='Senha mínima 6 caracteres.'; err.classList.add('active'); return; }
+      try {
+        const cred = await auth.createUserWithEmailAndPassword(email, senha);
+        await db.collection('users').doc(cred.user.uid).set({ nome, email, role: currentRole });
+      } catch(e) { err.textContent='Email já cadastrado.'; err.classList.add('active'); }
+    };
+    document.getElementById('btnLogoutProf').onclick = () => auth.signOut();
+    document.getElementById('btnLogoutCli').onclick = () => auth.signOut();
+
+    // Histórico
+    async function saveCalc(tipo, params, result) {
+      if(!currentUser) return;
+      await db.collection('calculos').add({ userId: currentUser.uid, tipo, parametros:params, resultado:result, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    }
+    async function loadHistory() {
+      const cont = document.getElementById('tab-historico');
+      cont.innerHTML = '<p>Carregando...</p>';
+      const snap = await db.collection('calculos').where('userId','==',currentUser.uid).get();
+      if(snap.empty) { cont.innerHTML='<p>Nenhum cálculo salvo.</p>'; return; }
+      let html = '';
+      snap.forEach(d=>{ const data=d.data(); html+=`<div style="background:#fff;padding:10px;margin-bottom:8px;border-radius:8px;"><strong>${data.tipo}</strong>: ${JSON.stringify(data.parametros)} → ${JSON.stringify(data.resultado)}</div>`; });
+      cont.innerHTML = html;
+    }
+
+    // Solicitações (Profissional)
+    async function loadSolicitacoes() {
+      const cont = document.getElementById('tab-solicitacoes');
+      cont.innerHTML = '<p>Carregando...</p>';
+      const snap = await db.collection('solicitacoes').orderBy('createdAt','desc').limit(30).get();
+      if(snap.empty) { cont.innerHTML='<p>Nenhuma solicitação recebida.</p>'; return; }
+      let html = '';
+      snap.forEach(d=>{
+        const s = d.data();
+        html += `<div style="background:#fff;padding:12px;margin-bottom:8px;border-radius:8px;">
+          <strong>${s.nome}</strong> (${s.telefone})<br>
+          <small>${s.tipo} - ${s.endereco}</small><br>
+          <em>${s.descricao}</em><br>
+          <span style="font-size:11px;color:var(--text-light);">${s.createdAt?.toDate().toLocaleString()}</span>
+        </div>`;
+      });
+      cont.innerHTML = html;
+    }
+
+    // Enviar solicitação (Cliente)
+    document.getElementById('btnEnviarSolicitacao').onclick = async () => {
+      const nome = document.getElementById('cliSolicNome').value.trim();
+      const tel = document.getElementById('cliSolicTel').value.trim();
+      const email = document.getElementById('cliSolicEmail').value.trim();
+      const end = document.getElementById('cliSolicEnd').value.trim();
+      const tipo = document.getElementById('cliSolicTipo').value;
+      const desc = document.getElementById('cliSolicDesc').value.trim();
+      const err = document.getElementById('erroSolicitacao'); err.classList.remove('active');
+      if(!nome||!tel||!end||!tipo||!desc) { err.textContent='Preencha todos os campos.'; err.classList.add('active'); return; }
+      try {
+        await db.collection('solicitacoes').add({
+          nome, telefone: tel, email, endereco: end, tipo, descricao: desc,
+          userId: currentUser?.uid || 'anon',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        document.getElementById('solicitacaoEnviada').style.display='block';
+        ['cliSolicNome','cliSolicTel','cliSolicEmail','cliSolicEnd','cliSolicTipo','cliSolicDesc'].forEach(id => {
+          document.getElementById(id).value = '';
+        });
+      } catch(e) { err.textContent='Erro ao enviar.'; err.classList.add('active'); }
     };
 
-    // Renderizar no DOM
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    // Inicializar abas do profissional
+    function initProfTabs() {
+      // Corrente
+      document.getElementById('tab-corrente').innerHTML = `
+        <h2>Cálculo de Corrente</h2>
+        <div class="form-group"><label>Tensão (V)</label><input type="number" id="corrV" value="220"></div>
+        <div class="form-group"><label>Potência (W)</label><input type="number" id="corrP" placeholder="Ex: 4400"></div>
+        <div class="form-group"><label>Tipo</label><select id="corrTipo"><option value="1">Monofásico</option><option value="3">Trifásico</option></select></div>
+        <div class="form-group"><label>FP</label><input type="number" id="corrFP" value="0.92" step="0.01"></div>
+        <button class="btn-primary" id="calcCorrente">Calcular</button>
+        <div id="resCorrente" class="result-card"></div>`;
+      document.getElementById('calcCorrente').onclick = () => {
+        const V=parseFloat(document.getElementById('corrV').value);
+        const P=parseFloat(document.getElementById('corrP').value);
+        const tipo=parseInt(document.getElementById('corrTipo').value);
+        const fp=parseFloat(document.getElementById('corrFP').value);
+        if(!P) return;
+        const I = tipo===1 ? P/(V*fp) : P/(V*Math.sqrt(3)*fp);
+        document.getElementById('resCorrente').innerHTML = `<strong>Corrente: ${I.toFixed(2)} A</strong>`;
+        saveCalc('Corrente',{V,P,tipo,fp},{corrente:I.toFixed(2)});
+      };
+      // Queda
+      document.getElementById('tab-queda').innerHTML = `
+        <h2>Queda de Tensão</h2>
+        <div class="form-group"><label>Tensão (V)</label><input type="number" id="qdV" value="220"></div>
+        <div class="form-group"><label>Corrente (A)</label><input type="number" id="qdI" placeholder="Ex: 20"></div>
+        <div class="form-group"><label>Distância (m)</label><input type="number" id="qdL" placeholder="Ex: 50"></div>
+        <div class="form-group"><label>Seção (mm²)</label><select id="qdS"><option value="2.5">2,5</option><option value="4">4</option><option value="6">6</option><option value="10">10</option></select></div>
+        <button class="btn-primary" id="calcQueda">Calcular</button>
+        <div id="resQueda" class="result-card"></div>`;
+      document.getElementById('calcQueda').onclick = () => {
+        const V=parseFloat(document.getElementById('qdV').value);
+        const I=parseFloat(document.getElementById('qdI').value);
+        const L=parseFloat(document.getElementById('qdL').value);
+        const S=document.getElementById('qdS').value;
+        if(!I||!L) return;
+        const vu = quedaUnitaria.cobre[S] || 0;
+        const dV = 2*I*(L/1000)*vu;
+        const perc = (dV/V)*100;
+        document.getElementById('resQueda').innerHTML = `<strong>Queda: ${dV.toFixed(2)} V (${perc.toFixed(2)}%)</strong>`;
+        saveCalc('Queda',{V,I,L,S},{deltaV:dV.toFixed(2), perc:perc.toFixed(2)});
+      };
+      // Orçamento profissional
+      document.getElementById('tab-orcamento').innerHTML = `
+        <h2>Gerador de Orçamento</h2>
+        <div class="form-group"><label>Nome do cliente</label><input type="text" id="orcNome" placeholder="Nome completo"></div>
+        <div class="form-group"><label>Telefone</label><input type="tel" id="orcTel" placeholder="(11) 99999-9999"></div>
+        <div class="form-group"><label>Endereço</label><input type="text" id="orcEnd" placeholder="Rua, número, bairro"></div>
+        <div class="form-group"><label>Tipo de serviço</label><select id="orcTipo"><option value="">Selecione...</option><option>Instalação</option><option>Manutenção</option><option>Padrão de entrada</option><option>Projeto</option></select></div>
+        <div class="form-group"><label>Descrição</label><textarea id="orcDesc" placeholder="Descreva o serviço..."></textarea></div>
+        <div class="form-group"><label>Valor (R$)</label><input type="number" id="orcValor" step="0.01"></div>
+        <button class="btn-primary" id="gerarOrc">Gerar Orçamento</button>
+        <div id="orcOutput" class="result-card"></div>`;
+      document.getElementById('gerarOrc').onclick = () => {
+        const nome = document.getElementById('orcNome').value;
+        const tel = document.getElementById('orcTel').value;
+        const end = document.getElementById('orcEnd').value;
+        const tipo = document.getElementById('orcTipo').value;
+        const desc = document.getElementById('orcDesc').value;
+        const valor = parseFloat(document.getElementById('orcValor').value).toFixed(2);
+        document.getElementById('orcOutput').innerHTML = `<h3>Orçamento</h3><p><strong>Cliente:</strong> ${nome}<br><strong>Tel:</strong> ${tel}<br><strong>End:</strong> ${end}</p><p><strong>Serviço:</strong> ${tipo}<br>${desc}</p><p style="font-size:20px;font-weight:700;">Total: R$ ${valor}</p>`;
+      };
+      // Tabela de preços COMPLETA
+      const priceData = [
+        {cat:"ILUMINAÇÃO", items:[
+          ["INSTALAÇÃO DE INTERRUPTOR COMPLETO PULSADOR","-","R$ 80,00","-"],
+          ["INSTALAÇÃO DE INTERRUPTOR THREE-WAY OU FOUR-WAY","R$ 70,00","R$ 200,00","R$ 110,00"],
+          ["INSTALAÇÃO DE INTERRUPTOR DUPLO OU BIFILAR","-","-","-"],
+          ["INSTALAÇÃO DE INTERRUPTOR TOMADA (Juntos)","R$ 70,00","R$ 100,00","-"],
+          ["INSTALAÇÃO DE ARANDELA PENDENTE OU SPOT COMUM","R$ 75,00","-","-"],
+          ["INSTALAÇÃO DE LÂMPADA FLUORESCENTE (TUBO)","R$ 60,00","-","-"],
+          ["INSTALAÇÃO DE CORES POLIVANTE","-","-","-"],
+          ["INSTALAÇÃO DE LUSTRES GRANDES","R$ 100,00","R$ 200,00","-"],
+          ["INSTALAÇÃO DE REFLETOR DE JARDIM","R$ 110,00","R$ 150,00","-"],
+          ["INSTALAÇÃO DE REFLETOR DE POSTE COMUM","R$ 140,00","R$ 200,00","-"],
+          ["INSTALAÇÃO DE REFLETOR DE POSTE COM LÂMPADA VAPOR","R$ 145,00","R$ 200,00","R$ 170,00"],
+          ["INSTALAÇÃO DE REATOR DE LÂMPADA A VAPOR","R$ 60,00","-","R$ 110,00"],
+          ["INSTALAÇÃO DE FOTOCÉLULA OU SENSOR DE PRESENÇA","R$ 80,00","R$ 140,00","-"],
+          ["INSTALAÇÃO DE REFLETOR LED FOTOCÉLULA SENSOR DE PRESENÇA","R$ 90,00","-","-"],
+          ["INSTALAÇÃO DE LUMINÁRIA DE EMERGÊNCIA DE SOBREPOR","-","-","-"],
+          ["INSTALAÇÃO DE LUMINÁRIA DE EMERGÊNCIA DE EMBUTIR","R$ 70,00","-","R$ 115,00"],
+          ["INSTALAÇÃO DE PERFIL DE LED (O METRO)","-","-","R$ 205,00"],
+          ["INSTALAÇÃO DE LUMINÁRIA TUBULAR OU TROCA REATOR LED","R$ 90,00","R$ 130,00","-"]
+        ]},
+        {cat:"PONTO DE UTILIZAÇÃO", items:[
+          ["INSTALAÇÃO DE TOMADA SIMPLES","R$ 40,00","R$ 80,00","-"],
+          ["INSTALAÇÃO DE TOMADA DUPLA","-","-","-"],
+          ["INSTALAÇÃO DE TOMADA TRIPLA","-","-","-"],
+          ["INSTALAÇÃO DE TOMADA DE REDE OU TELEFONE","R$ 70,00","R$ 90,00","R$ 80,00"],
+          ["INSTALAÇÃO DE TOMADA INDUSTRIAL","-","R$ 150,00","-"],
+          ["INSTALAÇÃO DE TOMADA DE SOBREPOR COM CANALETA","R$ 70,00","-","-"],
+          ["INSTALAÇÃO DE CHAVE DE BOIA SUPERIOR (EM EMERGÊNCIA)","R$ 105,00","-","R$ 140,00"],
+          ["INSTALAÇÃO DE VENTILADOR DE TETO","R$ 180,00","R$ 300,00","R$ 240,00"],
+          ["INSTALAÇÃO DE VENTILADOR DE PAREDE","-","-","-"],
+          ["INSTALAÇÃO DE CHUVEIRO ELÉTRICO SIMPLES","-","R$ 120,00","-"],
+          ["INSTALAÇÃO DE CHUVEIRO ELETRÔNICO OU DUCHA","R$ 130,00","-","R$ 170,00"],
+          ["INSTALAÇÃO DE TROCA DE RESISTÊNCIA DE CHUVEIRO","R$ 60,00","R$ 115,00","R$ 102,00"],
+          ["INSTALAÇÃO DE BANHEIRA ELÉTRICA","-","-","-"],
+          ["INSTALAÇÃO DE CAMPAINHA ATÉ 20 MTS","R$ 60,00","R$ 100,00","-"],
+          ["INSTALAÇÃO DE INTERFONE 1 CHAMADA","-","R$ 200,50","R$ 200,00"],
+          ["INSTALAÇÃO DE INTERFONE 2 CHAMADAS","R$ 220,00","R$ 310,00","R$ 265,00"],
+          ["INSTALAÇÃO DE VÍDEO PORTEIRO","-","-","R$ 345,00"],
+          ["INSTALAÇÃO DE CÂMERAS CFTV / CÂMERA WI-FI sem configuração","-","-","-"],
+          ["INSTALAÇÃO DE CÂMERAS CFTV / CÂMERA WI-FI com configuração","R$ 140,00","-","R$ 430,00"],
+          ["INSTALAÇÃO DE PORTÃO ELETRÔNICO DESLIZANTE","-","R$ 350,00","-"],
+          ["INSTALAÇÃO DE PORTÃO ELETRÔNICO PIVOTANTE OU BASCULANTE","-","-","-"],
+          ["INSTALAÇÃO DE BOTOEIRA OU FECHADURA ELETRÔNICA PORTÃO","-","R$ 160,00","-"],
+          ["INSTALAÇÃO DE FECHADURA ELETRÔNICA (Porta de Madeira)","-","R$ 280,00","-"],
+          ["INSTALAÇÃO DE EXAUSTOR COZINHA OU BANHEIRO","-","-","-"],
+          ["INSTALAÇÃO DE SISTEMA DE ALARME RESIDENCIAL","R$ 900,00","R$ 1.300,00","-"],
+          ["INSTALAÇÃO DE AQUECEDOR ELÉTRICO com passagem de cabos","R$ 210,00","R$ 320,00","R$ 270,00"],
+          ["INSTALAÇÃO DE DETECTOR DE FUMAÇA","-","R$ 110,00","-"],
+          ["INSTALAÇÃO DE CERCA ELÉTRICA","R$ 70,00","-","-"],
+          ["INSTALAÇÃO DE NOBREAK","-","R$ 360,00","R$ 342,00"],
+          ["INSTALAÇÃO DE INVERSOR","-","R$ 452,00","-"],
+          ["INSTALAÇÃO DE TERMOSTATO TEMPORIZADOR","-","R$ 150,00","-"]
+        ]},
+        {cat:"QUADROS DE DISTRIBUIÇÃO/PAINEL", items:[
+          ["SUBSTITUIÇÃO DE DISJUNTOR MONOFÁSICO","R$ 60,00","R$ 80,00","-"],
+          ["SUBSTITUIÇÃO DE DISJUNTOR BIFÁSICO","R$ 80,00","R$ 130,00","R$ 100,00"],
+          ["SUBSTITUIÇÃO DE DISJUNTOR TRIFÁSICO","R$ 120,00","-","-"],
+          ["INSTALAÇÃO DE INTERRUPTOR DIFERENCIAL DR","-","-","-"],
+          ["INSTALAÇÃO DE DPS - DISPOSITIVO DE PROTEÇÃO CONTRA SURTOS","-","-","R$ 130,00"],
+          ["INSTALAÇÃO DE BARRAMENTO PENTE MONOPOLAR NO QDC","R$ 70,20","R$ 90,00","R$ 80,00"],
+          ["INSTALAÇÃO DE BARRAMENTO PENTE BIPOLAR NO QDC","R$ 80,00","R$ 100,00","-"],
+          ["INSTALAÇÃO DE BARRAMENTO PENTE TRIPOLAR NO QDC","R$ 90,00","R$ 180,00","R$ 130,00"],
+          ["INSTALAÇÃO DE BARRAMENTO DE NEUTRO OU TERRA","R$ 100,00","R$ 120,00","R$ 110,00"],
+          ["INSTALAÇÃO DE HASTE DE ATERRAMENTO","R$ 250,00","-","R$ 280,00"],
+          ["INSTALAÇÃO DE CONTATOR E RELÉ TÉRMICO","-","R$ 250,00","R$ 220,00"],
+          ["INSTALAÇÃO E MONTAGEM QDC CIRCUITOS (sem DPS)","-","R$ 800,00","R$ 725,00"],
+          ["INSTALAÇÃO E MONTAGEM QDC CIRCUITOS (com DR)","-","R$ 1.000,00","R$ 925,00"],
+          ["INSTALAÇÃO E MONTAGEM QDC 12 CIRCUITOS","R$ 1.000,00","R$ 1.300,00","R$ 1.250,00"],
+          ["INSTALAÇÃO E MONTAGEM QDC 24 CIRCUITOS","R$ 1.500,00","R$ 2.000,00","R$ 1.800,00"]
+        ]},
+        {cat:"PASSAGEM DE CABOS (CIRCUITOS DE ATÉ 20MT)", items:[
+          ["ENTRADA MONOFÁSICA (QM PARA QDC)","-","R$ 220,00","-"],
+          ["ENTRADA BIFÁSICA OU TRIFÁSICA (QM PARA QDC)","-","R$ 330,00","R$ 280,00"],
+          ["ALIMENTAÇÃO PARA MONO/BI/TRI","-","R$ 300,00","R$ 260,00"]
+        ]},
+        {cat:"SOLUÇÃO DE PROBLEMAS ELÉTRICOS", items:[
+          ["CURTO CIRCUITO MONOFÁSICO","-","R$ 600,00","-"],
+          ["CURTO CIRCUITO BIFÁSICO","R$ 450,00","R$ 1.000,00","R$ 720,00"],
+          ["CURTO CIRCUITO TRIFÁSICO","-","R$ 1.100,00","-"]
+        ]},
+        {cat:"PADRÃO DE ENTRADA", items:[
+          ["INSTALAÇÃO DE MEDIDOR (Padrão Monofásico 127/220)","R$ 1.300,00","R$ 1.700,00","R$ 1.500,00"],
+          ["INSTALAÇÃO DE MEDIDOR (Padrão Bifásico 220V)","R$ 1.400,00","R$ 2.000,00","R$ 1.700,00"],
+          ["INSTALAÇÃO DE MEDIDOR (Padrão Trifásico 220V)","R$ 1.800,00","R$ 2.500,00","-"]
+        ]},
+        {cat:"CARREGADOR VEICULAR", items:[
+          ["INSTALAÇÃO CARREGADOR VEICULAR","R$ 800,00","R$ 1.600,00","-"]
+        ]},
+        {cat:"AUTOMAÇÃO RESIDENCIAL", items:[
+          ["INSTALAÇÃO DE INTERRUPTOR INTELIGENTE","R$ 100,00","R$ 200,00","R$ 150,00"],
+          ["INSTALAÇÃO MICRO INTERRUPTOR","-","R$ 300,00","R$ 250,00"],
+          ["INSTALAÇÃO RELÉ DE IMPULSO","R$ 130,00","R$ 220,00","R$ 175,00"],
+          ["INSTALAÇÃO RELÉ DIMMER","R$ 150,00","R$ 350,00","R$ 250,00"],
+          ["INSTALAÇÃO E CONFIGURAÇÃO CONTROLE REMOTO UNIVERSAL","-","R$ 150,00","R$ 130,00"],
+          ["INSTALAÇÃO DE TOMADA INTELIGENTE","-","R$ 200,00","-"],
+          ["INSTALAÇÃO MINI RELÉ CONTROLE DE PERSIANA","-","-","R$ 250,00"],
+          ["INSTALAÇÃO E CONFIGURAÇÃO HUB","-","R$ 250,00","R$ 225,00"],
+          ["INSTALAÇÃO E CONFIGURAÇÃO ROTEADOR","R$ 150,00","R$ 300,00","R$ 225,00"],
+          ["INSTALAÇÃO E CONFIGURAÇÃO FECHADURA INTELIGENTE","R$ 250,00","R$ 400,00","R$ 325,00"],
+          ["INSTALAÇÃO E CONFIGURAÇÃO ASSISTENTE VIRTUAL","-","-","R$ 250,00"]
+        ]}
+      ];
+      let priceHTML = '<h2>TABELA DE PREÇOS MÉDIOS DE SERVIÇOS ELÉTRICOS - 2026</h2>';
+      priceHTML += '<p style="font-size:12px; color:var(--text-light); margin-bottom:8px;">* Preços referentes apenas à <strong>mão de obra</strong>. Material não incluso.</p>';
+      priceHTML += '<div class="price-table-wrapper"><table class="price-table"><thead><tr><th>Descrição do Serviço</th><th>▼ Mínimo</th><th>Máximo</th><th>▲ Médio</th></tr></thead><tbody>';
+      priceData.forEach(cat => {
+        priceHTML += `<tr class="category-row"><td colspan="4">${cat.cat}</td></tr>`;
+        cat.items.forEach(item => {
+          priceHTML += `<tr><td>${item[0]}</td><td>${item[1]}</td><td>${item[2]}</td><td>${item[3]}</td></tr>`;
+        });
+      });
+      priceHTML += '</tbody></table></div><p style="font-size:11px; color:var(--text-light); margin-top:12px;">* Pesquisa de preços própria, reajustada anualmente.</p>';
+      document.getElementById('tab-precos').innerHTML = priceHTML;
+
+      // Perfil
+      document.getElementById('tab-perfil').innerHTML = `
+        <h2>Meu Perfil</h2>
+        <div class="form-group"><label>Nome</label><input type="text" id="perfilNome"></div>
+        <button class="btn-primary" id="salvarPerfil">Salvar</button>`;
+      document.getElementById('salvarPerfil').onclick = async () => {
+        const nome = document.getElementById('perfilNome').value.trim();
+        if(nome) { await db.collection('users').doc(currentUser.uid).update({ nome }); document.getElementById('profDisplayName').textContent = nome; }
+      };
+    }
+
+    // Listener tabs profissional
+    document.querySelectorAll('#profissionalScreen .tab').forEach(tab => {
+      tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+    });
+
+    // Observer de autenticação
+    auth.onAuthStateChanged(async user => {
+      if(user) {
+        currentUser = user;
+        const doc = await db.collection('users').doc(user.uid).get();
+        const data = doc.data() || {};
+        const role = data.role || 'profissional';
+        const nome = data.nome || user.email;
+        if(role === 'cliente') {
+          document.getElementById('cliDisplayName').textContent = nome;
+          showCliente();
+        } else {
+          document.getElementById('profDisplayName').textContent = nome;
+          showProfissional();
+          initProfTabs();
+          setTimeout(() => { const inp = document.getElementById('perfilNome'); if(inp) inp.value = nome; }, 200);
+        }
+        closeModal();
+      } else {
+        currentUser = null;
+        showLanding();
+      }
+    });
   </script>
 </body>
 </html>
