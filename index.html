@@ -116,6 +116,7 @@
     #map { height: 300px; width: 100%; border-radius: var(--radius); margin-bottom: 16px; }
     .service-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
     .service-item select { flex: 1; }
+    .loading { opacity: 0.7; pointer-events: none; }
     @media (max-width:600px) {
       .hero h1 { font-size:26px; }
       .header { padding:12px 16px; }
@@ -145,6 +146,7 @@
       <div class="video-section">
         <h3>🎬 Conheça o VoltCalc Pro</h3>
         <div class="video-container">
+          <!-- Substitua SEU_VIDEO_ID pelo ID real do seu vídeo -->
           <iframe src="https://www.youtube.com/embed/SEU_VIDEO_ID" allowfullscreen></iframe>
         </div>
         <p style="text-align:center;margin-top:12px;font-size:13px;color:var(--text-light);">
@@ -240,7 +242,7 @@
       apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
       authDomain: "voltcalc-pro.firebaseapp.com",
       projectId: "voltcalc-pro",
-      storageBucket: "voltcalc-pro.firebasestorage.app",
+      storageBucket: "voltcalc-pro.appspot.com",
       messagingSenderId: "411208955318",
       appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
     });
@@ -251,6 +253,7 @@
     let currentRole = 'profissional';
     let map = null;
     let mapInitialized = false;
+    let clienteTabsInitialized = false;
 
     // Tabelas profissional
     const tabelaCondutores = {
@@ -259,7 +262,7 @@
     };
     const quedaUnitaria = { cobre: {1.5:23.0,2.5:14.0,4:8.7,6:5.8,10:3.5,16:2.2,25:1.4} };
 
-    // Lista de serviços (para selects e tabela do cliente)
+    // Lista de serviços
     const servicosList = [
       "INSTALAÇÃO DE INTERRUPTOR COMPLETO PULSADOR","INSTALAÇÃO DE INTERRUPTOR THREE-WAY OU FOUR-WAY",
       "INSTALAÇÃO DE INTERRUPTOR DUPLO OU BIFILAR","INSTALAÇÃO DE INTERRUPTOR TOMADA (Juntos)",
@@ -303,7 +306,7 @@
       "INSTALAÇÃO E CONFIGURAÇÃO ASSISTENTE VIRTUAL"
     ];
 
-    // UI helpers
+    // UI
     const landing = document.getElementById('landingPage');
     const profScreen = document.getElementById('profissionalScreen');
     const cliScreen = document.getElementById('clienteScreen');
@@ -344,40 +347,20 @@
       if(!email||!senha) { err.textContent='Preencha todos os campos.'; err.classList.add('active'); return; }
       try {
         await auth.signInWithEmailAndPassword(email, senha);
-        // role será aplicado pelo observer
       } catch(e) {
         err.textContent = 'Email ou senha incorretos.';
         err.classList.add('active');
       }
     };
 
-    // Google Login corrigido: salva role imediatamente, sem esperar observer
+    // Google Login: redirect para mobile
     document.getElementById('btnGoogle').onclick = async () => {
       const provider = new firebase.auth.GoogleAuthProvider();
       try {
-        const result = await auth.signInWithPopup(provider);
-        const user = result.user;
-        // Força a criação/atualização do documento com o role escolhido
-        const userRef = db.collection('users').doc(user.uid);
-        const doc = await userRef.get();
-        if (!doc.exists) {
-          await userRef.set({
-            nome: user.displayName,
-            email: user.email,
-            role: currentRole
-          });
-        } else {
-          await userRef.update({
-            nome: user.displayName,
-            email: user.email,
-            role: currentRole // atualiza sempre o role escolhido
-          });
-        }
-        // O observer será chamado em seguida e usará o role correto
+        await auth.signInWithRedirect(provider);
+        // O observer cuidará do restante
       } catch(e) {
-        if(e.code !== 'auth/popup-closed-by-user') {
-          alert('Erro ao entrar com Google. Tente novamente.');
-        }
+        alert('Erro ao iniciar login com Google.');
       }
     };
 
@@ -429,7 +412,8 @@
         if(snap.empty) { cont.innerHTML='<p>Nenhuma solicitação.</p>'; return; }
         cont.innerHTML = snap.docs.map(d=>{
           const s = d.data();
-          return `<div class="result-card"><strong>${s.nome}</strong> (${s.telefone})<br><small>${s.servicos?.join(', ') || s.tipo} - ${s.endereco}</small><br>${s.descricao}<br><small>${new Date(s.createdAt?.toDate()).toLocaleString()}</small></div>`;
+          const dateStr = s.createdAt ? s.createdAt.toDate().toLocaleString() : 'Agora';
+          return `<div class="result-card"><strong>${s.nome}</strong> (${s.telefone})<br><small>${s.servicos?.join(', ') || s.tipo} - ${s.endereco}</small><br>${s.descricao}<br><small>${dateStr}</small></div>`;
         }).join('');
       } catch(e) { cont.innerHTML = '<p>Erro.</p>'; }
     }
@@ -453,6 +437,7 @@
         document.getElementById('resCorrente').innerHTML = `<strong>Corrente: ${I.toFixed(2)} A</strong>`;
         db.collection('calculos').add({ userId: currentUser.uid, tipo:'Corrente', parametros:{V,P,tipo,fp}, resultado:{corrente:I.toFixed(2)}, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
       };
+
       document.getElementById('tab-queda').innerHTML = `
         <h2>Queda de Tensão</h2>
         <div class="form-group"><label>Tensão (V)</label><input type="number" id="qdV" value="220"></div>
@@ -473,6 +458,7 @@
         document.getElementById('resQueda').innerHTML = `<strong>Queda: ${dV.toFixed(2)} V (${perc.toFixed(2)}%)</strong>`;
         db.collection('calculos').add({ userId: currentUser.uid, tipo:'Queda', parametros:{V,I,L,S}, resultado:{deltaV:dV.toFixed(2), perc:perc.toFixed(2)}, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
       };
+
       document.getElementById('tab-orcamento').innerHTML = `
         <h2>Gerador de Orçamento</h2>
         <div class="form-group"><label>Nome do cliente</label><input type="text" id="orcNome" placeholder="Nome completo"></div>
@@ -489,15 +475,17 @@
         const end = document.getElementById('orcEnd').value;
         const tipo = document.getElementById('orcTipo').value;
         const desc = document.getElementById('orcDesc').value;
-        const valor = parseFloat(document.getElementById('orcValor').value).toFixed(2);
+        const valor = parseFloat(document.getElementById('orcValor').value || 0).toFixed(2);
         document.getElementById('orcOutput').innerHTML = `<h3>Orçamento</h3><p><strong>Cliente:</strong> ${nome}<br><strong>Tel:</strong> ${tel}<br><strong>End:</strong> ${end}</p><p><strong>Serviço:</strong> ${tipo}<br>${desc}</p><p style="font-size:20px;font-weight:700;">Total: R$ ${valor}</p>`;
       };
+
       document.getElementById('tab-precos').innerHTML = `
         <h2>Tabela de Preços</h2>
         <div class="price-table-wrapper"><table class="price-table"><thead><tr><th>Serviço</th><th>Mínimo</th><th>Máximo</th><th>Médio</th></tr></thead><tbody>
         <tr><td>Instalação de tomada simples</td><td>R$ 40,00</td><td>R$ 80,00</td><td>-</td></tr>
         <tr><td>Instalação de ventilador de teto</td><td>R$ 180,00</td><td>R$ 300,00</td><td>R$ 240,00</td></tr>
         </tbody></table></div>`;
+
       document.getElementById('tab-perfil').innerHTML = `
         <h2>Perfil</h2>
         <div class="form-group"><label>Nome</label><input type="text" id="perfilNomeProf"></div>
@@ -518,11 +506,9 @@
       if(content) content.classList.add('active');
 
       if(tabName === 'orcamento-cli') {
-        // Inicializa o mapa apenas se necessário
         if (!mapInitialized) {
-          setTimeout(initMap, 200); // pequeno delay para o DOM estar pronto
+          setTimeout(initMap, 200);
         } else {
-          // Redimensiona o mapa existente
           map.invalidateSize();
         }
       }
@@ -531,8 +517,8 @@
 
     function initMap() {
       const mapDiv = document.getElementById('map');
-      if (!mapDiv || mapInitialized) return;
-      // Garante altura mínima
+      if (!mapDiv) return;
+      if (map) { map.remove(); mapInitialized = false; }
       mapDiv.style.height = '300px';
       map = L.map('map').setView([-23.5505, -46.6333], 13);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -543,8 +529,11 @@
       document.getElementById('buscarCep').addEventListener('click', async () => {
         const cep = document.getElementById('cepInput').value.replace(/\D/g, '');
         if (cep.length !== 8) { alert('CEP inválido'); return; }
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), 8000);
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${cep}&country=Brazil&format=json&limit=1`);
+          const url = `https://nominatim.openstreetmap.org/search?postalcode=${cep}&country=Brazil&format=json&limit=1`;
+          const res = await fetch(url, { signal: controller.signal });
           const data = await res.json();
           if (data.length > 0) {
             const lat = parseFloat(data[0].lat);
@@ -554,7 +543,10 @@
           } else {
             alert('CEP não encontrado');
           }
-        } catch(e) { alert('Erro ao buscar CEP.'); }
+        } catch(e) {
+          if (e.name === 'AbortError') alert('Busca demorou muito. Tente novamente.');
+          else alert('Erro ao buscar CEP.');
+        }
       });
     }
 
@@ -579,13 +571,17 @@
         if(snap.empty) { cont.innerHTML='<p>Nenhum pedido.</p>'; return; }
         cont.innerHTML = snap.docs.map(doc => {
           const s = doc.data();
-          return `<div class="result-card"><strong>${s.servicos?.join(', ') || s.tipo}</strong><br><small>${s.endereco}</small><br>${s.descricao}<br><small>${new Date(s.createdAt?.toDate()).toLocaleString()}</small></div>`;
+          const dateStr = s.createdAt ? s.createdAt.toDate().toLocaleString() : 'Agora';
+          return `<div class="result-card"><strong>${s.servicos?.join(', ') || s.tipo}</strong><br><small>${s.endereco}</small><br>${s.descricao}<br><small>${dateStr}</small></div>`;
         }).join('');
       }).catch(() => { cont.innerHTML='<p>Erro.</p>'; });
     }
 
     function initClienteTabs() {
-      // Perfil do cliente
+      if (clienteTabsInitialized) return;
+      clienteTabsInitialized = true;
+
+      // Perfil
       const perfilContainer = document.getElementById('tab-perfil-cli');
       perfilContainer.innerHTML = '<p>Carregando...</p>';
       db.collection('users').doc(currentUser.uid).get().then(doc => {
@@ -615,8 +611,7 @@
       }).catch(() => { perfilContainer.innerHTML = '<p>Erro ao carregar perfil.</p>'; });
 
       // Orçamento
-      const orcContainer = document.getElementById('tab-orcamento-cli');
-      orcContainer.innerHTML = `
+      document.getElementById('tab-orcamento-cli').innerHTML = `
         <h2>Solicitar Orçamento</h2>
         <div id="map" style="height:300px;"></div>
         <div class="form-group"><label>Buscar pelo CEP</label><div style="display:flex; gap:8px;"><input type="text" id="cepInput" placeholder="00000-000" style="flex:2;"><button class="btn-sm" id="buscarCep" style="flex:1;">🔍 Buscar</button></div></div>
@@ -640,7 +635,6 @@
       `;
       popularServicosCliente();
 
-      // Add mais serviços
       document.getElementById('addServico').onclick = () => {
         const container = document.getElementById('servicosContainer');
         const div = document.createElement('div');
@@ -648,22 +642,14 @@
         div.innerHTML = `<select class="servicoSelect"><option value="">Selecione um serviço...</option></select><button class="btn-danger-sm removerServico">✕</button>`;
         container.appendChild(div);
         popularServicosCliente();
-        div.querySelector('.removerServico').onclick = () => { div.remove(); };
-        if(document.querySelectorAll('.service-item').length > 1) {
-          document.querySelectorAll('.removerServico').forEach(b=>b.style.display='inline-block');
-        }
+        div.querySelector('.removerServico').onclick = () => div.remove();
+        document.querySelectorAll('.removerServico').forEach(b=>b.style.display='inline-block');
       };
-      // Handler do primeiro remover
-      const firstRemover = document.querySelector('.removerServico');
-      if(firstRemover) {
-        firstRemover.onclick = function() {
-          if(document.querySelectorAll('.service-item').length > 1) {
-            this.closest('.service-item').remove();
-          }
-        };
-      }
 
-      // Enviar solicitação
+      document.querySelector('.removerServico').onclick = function() {
+        if(document.querySelectorAll('.service-item').length > 1) this.closest('.service-item').remove();
+      };
+
       document.getElementById('btnEnviarSolicitacao').onclick = async () => {
         const nome = document.getElementById('cliSolicNome').value.trim();
         const tel = document.getElementById('cliSolicTel').value.trim();
@@ -686,7 +672,7 @@
         } catch(e) { err.textContent='Erro ao enviar.'; err.classList.add('active'); }
       };
 
-      // Tabela de Serviços (apenas nomes)
+      // Tabela de Serviços
       document.getElementById('tab-servicos-cli').innerHTML = `
         <h2>Serviços Disponíveis</h2>
         <div class="price-table-wrapper"><table class="price-table"><thead><tr><th>Serviço</th></tr></thead><tbody>
@@ -703,13 +689,17 @@
       if (user) {
         currentUser = user;
         try {
-          const doc = await db.collection('users').doc(user.uid).get();
-          let data = doc.data();
-          // Se não existir documento, cria com valores padrão
-          if (!data) {
-            data = { nome: user.displayName || user.email, email: user.email, role: currentRole };
-            await db.collection('users').doc(user.uid).set(data);
+          let doc = await db.collection('users').doc(user.uid).get();
+          if (!doc.exists) {
+            // Cria documento se não existir (login Google redirect)
+            await db.collection('users').doc(user.uid).set({
+              nome: user.displayName || user.email,
+              email: user.email,
+              role: currentRole || 'profissional'
+            });
+            doc = await db.collection('users').doc(user.uid).get();
           }
+          const data = doc.data();
           const role = data.role || 'profissional';
           const nome = data.nome || user.email;
           if (role === 'cliente') {
@@ -721,13 +711,14 @@
             document.getElementById('profDisplayName').textContent = nome;
             showProfissional();
             initProfTabs();
-            document.getElementById('perfilNomeProf').value = nome;
+            const perfilInput = document.getElementById('perfilNomeProf');
+            if(perfilInput) perfilInput.value = nome;
           }
           closeModal();
         } catch(e) {
-          console.error('Erro no observer:', e);
-          // Fallback: se der erro, tenta mostrar profissional
-          showProfissional();
+          console.error(e);
+          alert('Erro ao carregar usuário.');
+          showLanding();
         }
       } else {
         currentUser = null;
