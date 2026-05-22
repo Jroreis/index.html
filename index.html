@@ -249,11 +249,10 @@
 
     let currentUser = null;
     let currentRole = 'profissional';
-    // Map Leaflet
     let map = null;
     let mapInitialized = false;
 
-    // Tabelas para profissional
+    // Tabelas profissional
     const tabelaCondutores = {
       'PVC': {'1.5':17.5,'2.5':24,'4':32,'6':41,'10':57,'16':76,'25':99},
       'EPR': {'1.5':22,'2.5':30,'4':40,'6':52,'10':72,'16':96,'25':125}
@@ -304,7 +303,7 @@
       "INSTALAÇÃO E CONFIGURAÇÃO ASSISTENTE VIRTUAL"
     ];
 
-    // ==================== UI HELPERS ====================
+    // UI helpers
     const landing = document.getElementById('landingPage');
     const profScreen = document.getElementById('profissionalScreen');
     const cliScreen = document.getElementById('clienteScreen');
@@ -326,8 +325,16 @@
     document.getElementById('goToSignup').onclick = () => { modalLogin.style.display='none'; modalCadastro.style.display='block'; };
     document.getElementById('goToLogin').onclick = () => { modalCadastro.style.display='none'; modalLogin.style.display='block'; };
 
-    function selectLoginRole(role) { currentRole = role; document.querySelectorAll('#loginRoleSelector .role-card').forEach(c => c.classList.remove('selected')); document.querySelector(`#loginRoleSelector .role-card[data-role="${role}"]`).classList.add('selected'); }
-    function selectSignupRole(role) { currentRole = role; document.querySelectorAll('#signupRoleSelector .role-card').forEach(c => c.classList.remove('selected')); document.querySelector(`#signupRoleSelector .role-card[data-role="${role}"]`).classList.add('selected'); }
+    function selectLoginRole(role) {
+      currentRole = role;
+      document.querySelectorAll('#loginRoleSelector .role-card').forEach(c => c.classList.remove('selected'));
+      document.querySelector(`#loginRoleSelector .role-card[data-role="${role}"]`).classList.add('selected');
+    }
+    function selectSignupRole(role) {
+      currentRole = role;
+      document.querySelectorAll('#signupRoleSelector .role-card').forEach(c => c.classList.remove('selected'));
+      document.querySelector(`#signupRoleSelector .role-card[data-role="${role}"]`).classList.add('selected');
+    }
 
     // ==================== AUTENTICAÇÃO ====================
     document.getElementById('btnLogin').onclick = async () => {
@@ -337,24 +344,43 @@
       if(!email||!senha) { err.textContent='Preencha todos os campos.'; err.classList.add('active'); return; }
       try {
         await auth.signInWithEmailAndPassword(email, senha);
-        await db.collection('users').doc(auth.currentUser.uid).set({ role: currentRole }, { merge: true });
-      } catch(e) { err.textContent='Email ou senha incorretos.'; err.classList.add('active'); }
+        // role será aplicado pelo observer
+      } catch(e) {
+        err.textContent = 'Email ou senha incorretos.';
+        err.classList.add('active');
+      }
     };
+
+    // Google Login corrigido: salva role imediatamente, sem esperar observer
     document.getElementById('btnGoogle').onclick = async () => {
       const provider = new firebase.auth.GoogleAuthProvider();
       try {
         const result = await auth.signInWithPopup(provider);
         const user = result.user;
-        const userDoc = await db.collection('users').doc(user.uid).get();
-        if (!userDoc.exists) {
-          await db.collection('users').doc(user.uid).set({ nome: user.displayName, email: user.email, role: currentRole });
+        // Força a criação/atualização do documento com o role escolhido
+        const userRef = db.collection('users').doc(user.uid);
+        const doc = await userRef.get();
+        if (!doc.exists) {
+          await userRef.set({
+            nome: user.displayName,
+            email: user.email,
+            role: currentRole
+          });
         } else {
-          await db.collection('users').doc(user.uid).update({ nome: user.displayName, email: user.email, role: userDoc.data().role || currentRole });
+          await userRef.update({
+            nome: user.displayName,
+            email: user.email,
+            role: currentRole // atualiza sempre o role escolhido
+          });
         }
+        // O observer será chamado em seguida e usará o role correto
       } catch(e) {
-        if(e.code !== 'auth/popup-closed-by-user') alert('Erro ao entrar com Google.');
+        if(e.code !== 'auth/popup-closed-by-user') {
+          alert('Erro ao entrar com Google. Tente novamente.');
+        }
       }
     };
+
     document.getElementById('btnCadastro').onclick = async () => {
       const nome = document.getElementById('cadNome').value.trim();
       const email = document.getElementById('cadEmail').value.trim();
@@ -365,7 +391,10 @@
       try {
         const cred = await auth.createUserWithEmailAndPassword(email, senha);
         await db.collection('users').doc(cred.user.uid).set({ nome, email, role: currentRole });
-      } catch(e) { err.textContent='Email já cadastrado.'; err.classList.add('active'); }
+      } catch(e) {
+        err.textContent = 'Email já cadastrado.';
+        err.classList.add('active');
+      }
     };
     document.getElementById('btnLogoutProf').onclick = () => auth.signOut();
     document.getElementById('btnLogoutCli').onclick = () => auth.signOut();
@@ -487,18 +516,24 @@
       if(tab) tab.classList.add('active');
       const content = document.getElementById(`tab-${tabName}`);
       if(content) content.classList.add('active');
-      if(tabName==='orcamento-cli') initMap();
-      if(tabName==='pedidos-cli') loadMeusPedidos();
+
+      if(tabName === 'orcamento-cli') {
+        // Inicializa o mapa apenas se necessário
+        if (!mapInitialized) {
+          setTimeout(initMap, 200); // pequeno delay para o DOM estar pronto
+        } else {
+          // Redimensiona o mapa existente
+          map.invalidateSize();
+        }
+      }
+      if(tabName === 'pedidos-cli') loadMeusPedidos();
     }
 
     function initMap() {
-      if (mapInitialized) return;
       const mapDiv = document.getElementById('map');
-      if (!mapDiv) return;
-      // Força altura se estiver zerada
-      if (mapDiv.offsetHeight === 0) {
-        mapDiv.style.height = '300px';
-      }
+      if (!mapDiv || mapInitialized) return;
+      // Garante altura mínima
+      mapDiv.style.height = '300px';
       map = L.map('map').setView([-23.5505, -46.6333], 13);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
@@ -521,8 +556,6 @@
           }
         } catch(e) { alert('Erro ao buscar CEP.'); }
       });
-      // Garante que o mapa redimensione ao exibir
-      setTimeout(() => { map.invalidateSize(); }, 100);
     }
 
     function popularServicosCliente() {
@@ -541,6 +574,7 @@
     function loadMeusPedidos() {
       const cont = document.getElementById('tab-pedidos-cli');
       cont.innerHTML = '<p>Carregando...</p>';
+      if (!currentUser) return;
       db.collection('solicitacoes').where('userId','==',currentUser.uid).orderBy('createdAt','desc').get().then(snap => {
         if(snap.empty) { cont.innerHTML='<p>Nenhum pedido.</p>'; return; }
         cont.innerHTML = snap.docs.map(doc => {
@@ -551,7 +585,7 @@
     }
 
     function initClienteTabs() {
-      // Perfil
+      // Perfil do cliente
       const perfilContainer = document.getElementById('tab-perfil-cli');
       perfilContainer.innerHTML = '<p>Carregando...</p>';
       db.collection('users').doc(currentUser.uid).get().then(doc => {
@@ -571,6 +605,7 @@
           const endereco = document.getElementById('cliPerfilEnd').value.trim();
           try {
             await db.collection('users').doc(currentUser.uid).update({ nome, telefone, endereco });
+            document.getElementById('cliDisplayName').textContent = nome;
             alert('Perfil atualizado!');
           } catch(e) {
             document.getElementById('erroPerfilCli').textContent = 'Erro ao salvar.';
@@ -580,7 +615,8 @@
       }).catch(() => { perfilContainer.innerHTML = '<p>Erro ao carregar perfil.</p>'; });
 
       // Orçamento
-      document.getElementById('tab-orcamento-cli').innerHTML = `
+      const orcContainer = document.getElementById('tab-orcamento-cli');
+      orcContainer.innerHTML = `
         <h2>Solicitar Orçamento</h2>
         <div id="map" style="height:300px;"></div>
         <div class="form-group"><label>Buscar pelo CEP</label><div style="display:flex; gap:8px;"><input type="text" id="cepInput" placeholder="00000-000" style="flex:2;"><button class="btn-sm" id="buscarCep" style="flex:1;">🔍 Buscar</button></div></div>
@@ -617,9 +653,15 @@
           document.querySelectorAll('.removerServico').forEach(b=>b.style.display='inline-block');
         }
       };
-      document.querySelector('.removerServico').onclick = function() {
-        if(document.querySelectorAll('.service-item').length > 1) this.closest('.service-item').remove();
-      };
+      // Handler do primeiro remover
+      const firstRemover = document.querySelector('.removerServico');
+      if(firstRemover) {
+        firstRemover.onclick = function() {
+          if(document.querySelectorAll('.service-item').length > 1) {
+            this.closest('.service-item').remove();
+          }
+        };
+      }
 
       // Enviar solicitação
       document.getElementById('btnEnviarSolicitacao').onclick = async () => {
@@ -662,7 +704,12 @@
         currentUser = user;
         try {
           const doc = await db.collection('users').doc(user.uid).get();
-          const data = doc.data() || {};
+          let data = doc.data();
+          // Se não existir documento, cria com valores padrão
+          if (!data) {
+            data = { nome: user.displayName || user.email, email: user.email, role: currentRole };
+            await db.collection('users').doc(user.uid).set(data);
+          }
           const role = data.role || 'profissional';
           const nome = data.nome || user.email;
           if (role === 'cliente') {
@@ -678,8 +725,9 @@
           }
           closeModal();
         } catch(e) {
-          console.error(e);
-          showLanding();
+          console.error('Erro no observer:', e);
+          // Fallback: se der erro, tenta mostrar profissional
+          showProfissional();
         }
       } else {
         currentUser = null;
