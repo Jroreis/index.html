@@ -4,445 +4,164 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VoltCalc Pro - NBR 5410</title>
-
-  <!-- SEO & Open Graph -->
   <meta name="description" content="Calculadora elétrica profissional baseada na NBR 5410. Ferramenta completa para eletricistas, engenheiros e técnicos.">
   <meta property="og:title" content="VoltCalc Pro - NBR 5410">
   <meta property="og:description" content="Ferramenta completa para eletricistas e engenheiros. Cálculo de potência, queda de tensão e dimensionamento conforme norma.">
   <meta property="og:type" content="website">
-
-  <!-- Firebase (defer: não bloqueia o parser HTML) -->
   <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-  <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- Leaflet: carregado via JS apenas quando necessário -->
-
   <style>
     :root {
-      --primary: #4f46e5;
-      --primary-dark: #3730a3;
-      --secondary: #f59e0b;
-      --dark: #1e293b;
-      --light: #f8fafc;
-      --text: #1e293b;
-      --text-light: #4b5563; /* melhorado de #64748b para melhor contraste */
-      --white: #ffffff;
-      --radius: 12px;
-      --shadow: 0 4px 6px rgba(0,0,0,0.05);
+      --primary: #4f46e5; --primary-dark: #3730a3; --secondary: #f59e0b;
+      --dark: #1e293b; --light: #f8fafc; --text: #1e293b; --text-light: #4b5563;
+      --white: #ffffff; --radius: 12px; --shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Inter', 'Segoe UI', sans-serif;
-      background: var(--light);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    /* ── Header ── */
-    .header {
-      background: var(--white);
-      box-shadow: var(--shadow);
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .logo {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--primary);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--light); color: var(--text); line-height: 1.6; }
+    .header { background: var(--white); box-shadow: var(--shadow); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .logo { font-size: 22px; font-weight: 800; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; }
     .logo span { color: var(--secondary); }
     .header-btns { display: flex; gap: 12px; }
-    .btn-header {
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: 0.2s;
-      background: transparent;
-      border: 2px solid var(--primary);
-      color: var(--primary);
-    }
+    .btn-header { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; background: transparent; border: 2px solid var(--primary); color: var(--primary); }
     .btn-header.filled { background: var(--primary); color: #fff; }
     .btn-header:hover { opacity: 0.9; transform: translateY(-1px); }
-
-    /* ── Hero ── */
-    .hero {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 60px 24px;
-      text-align: center;
-    }
+    .hero { max-width: 900px; margin: 0 auto; padding: 60px 24px; text-align: center; }
     .hero h1 { font-size: 36px; font-weight: 800; color: var(--dark); }
     .hero h1 span { color: var(--primary); }
     .hero p { font-size: 18px; color: var(--text-light); margin: 16px 0 32px; }
-    .hero-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 40px;
-    }
-    .hero-card {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 24px 16px;
-      box-shadow: var(--shadow);
-      text-align: center;
-      transition: 0.2s;
-    }
+    .hero-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 40px; }
+    .hero-card { background: var(--white); border-radius: var(--radius); padding: 24px 16px; box-shadow: var(--shadow); text-align: center; transition: 0.2s; }
     .hero-card:hover { transform: translateY(-4px); }
     .hero-card .icon { font-size: 36px; margin-bottom: 12px; }
     .hero-card h3 { font-size: 16px; font-weight: 700; color: var(--dark); }
     .hero-card p { font-size: 13px; color: var(--text-light); }
-
-    /* ── Video ── */
-    .video-section {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: var(--shadow);
-      margin: 0 auto;
-    }
+    .video-section { background: var(--white); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
     .video-section h3 { font-size: 18px; margin-bottom: 16px; color: var(--dark); }
-    .video-container {
-      position: relative;
-      padding-bottom: 56.25%;
-      height: 0;
-      overflow: hidden;
-      border-radius: 8px;
-    }
-    .video-container iframe {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      border: none;
-    }
-
-    /* ── Modal ── */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
     .modal-overlay.open { display: flex; }
-    .modal {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 32px 24px;
-      max-width: 400px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      position: relative;
-    }
+    .modal { background: var(--white); border-radius: var(--radius); padding: 32px 24px; max-width: 400px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
     .modal h2 { text-align: center; margin-bottom: 16px; }
-    .modal-close {
-      position: absolute;
-      top: 12px; right: 16px;
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: var(--text-light);
-      line-height: 1;
-    }
+    .modal-close { position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light); line-height: 1; }
     .modal-close:hover { color: var(--dark); }
-
-    /* ── Google Button ── */
-    .btn-google {
-      background: var(--white);
-      color: var(--text);
-      border: 1.5px solid #e2e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    .btn-google { background: var(--white); color: var(--text); border: 1.5px solid #e2e8f0; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
     .btn-google:hover { background: #f8fafc; }
-
-    /* ── App screens ── */
     .app-screen { display: none; max-width: 900px; margin: 0 auto; padding: 30px 20px; }
-
-    /* Utilitários para substituir inline styles */
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
     .mb-20 { margin-bottom: 20px; }
     .screen-title { font-weight: 700; font-size: 18px; }
-
-    /* ── Tabs: scroll horizontal no mobile, sem quebra de linha ── */
-    .tabs {
-      display: flex;
-      overflow-x: auto;
-      flex-wrap: nowrap;
-      -webkit-overflow-scrolling: touch;
-      border-bottom: 2px solid #e2e8f0;
-      margin-bottom: 24px;
-      gap: 4px;
-      scrollbar-width: none;
-    }
+    .tabs { display: flex; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; border-bottom: 2px solid #e2e8f0; margin-bottom: 24px; gap: 4px; scrollbar-width: none; }
     .tabs::-webkit-scrollbar { display: none; }
-    .tab {
-      padding: 10px 14px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-light);
-      cursor: pointer;
-      border: none;
-      border-bottom: 3px solid transparent;
-      white-space: nowrap;
-      background: none;
-      transition: 0.2s;
-      flex-shrink: 0;
-    }
+    .tab { padding: 10px 14px; font-size: 14px; font-weight: 600; color: var(--text-light); cursor: pointer; border: none; border-bottom: 3px solid transparent; white-space: nowrap; background: none; transition: 0.2s; flex-shrink: 0; }
     .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
     .tab-content { display: none; animation: fadeIn 0.3s; }
     .tab-content.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* ── Forms ── */
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 5px; }
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 14px;
-      font-family: inherit;
-      transition: border-color 0.2s;
-    }
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
-    }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-family: inherit; transition: border-color 0.2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
     .form-group input:invalid:not(:placeholder-shown) { border-color: #ef4444; }
-
-    /* ── Buttons ── */
-    .btn-primary {
-      width: 100%;
-      padding: 14px;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
+    .btn-primary { width: 100%; padding: 14px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
     .btn-primary:hover { background: var(--primary-dark); }
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    /* Botões pequenos: base + modificador (sem duplicação) */
-    .btn-sm {
-      padding: 8px 16px;
-      font-size: 13px;
-      width: auto;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background: var(--primary);
-      color: #fff;
-      transition: 0.2s;
-    }
+    .btn-sm { padding: 8px 16px; font-size: 13px; width: auto; border: none; border-radius: 6px; cursor: pointer; background: var(--primary); color: #fff; transition: 0.2s; }
     .btn-sm:hover { opacity: 0.9; }
     .btn-sm--danger { background: #ef4444; }
-
-    /* ── Cards / Erros ── */
-    .result-card {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-top: 20px;
-      box-shadow: var(--shadow);
-    }
-    .error-msg {
-      background: #fef2f2;
-      color: #dc2626;
-      padding: 10px;
-      border-radius: 6px;
-      margin-top: 8px;
-      display: none;
-    }
+    .result-card { background: var(--white); border-radius: var(--radius); padding: 20px; margin-top: 20px; box-shadow: var(--shadow); }
+    .error-msg { background: #fef2f2; color: #dc2626; padding: 10px; border-radius: 6px; margin-top: 8px; display: none; }
     .error-msg.active { display: block; }
-
-    /* ── Tabela de preços ── */
     .price-table-wrapper { overflow-x: auto; margin-top: 16px; }
     .price-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 700px; }
     .price-table th { background: var(--primary); color: #fff; padding: 8px; text-align: left; font-size: 11px; }
     .price-table td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; }
     .price-table tr:nth-child(even) { background: #f8fafc; }
     .category-row { background: #e2e8f0 !important; font-weight: 700; color: var(--dark); }
-
-    /* ── Misc ── */
     .logout-btn { background: #ef4444; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-    .divider { border-top: 1px solid #e2e8f0; margin: 16px 0; }
     .role-selector { display: flex; gap: 12px; margin: 16px 0; }
-    .role-card {
-      flex: 1;
-      border: 2px solid #e2e8f0;
-      border-radius: var(--radius);
-      padding: 16px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.2s;
-    }
+    .role-card { flex: 1; border: 2px solid #e2e8f0; border-radius: var(--radius); padding: 16px; text-align: center; cursor: pointer; transition: 0.2s; }
     .role-card.selected { border-color: var(--primary); background: rgba(79,70,229,0.05); }
     .role-card h3 { font-size: 16px; margin-bottom: 4px; }
     .role-card p { font-size: 12px; color: var(--text-light); }
-
     #map { height: 300px; width: 100%; border-radius: var(--radius); margin-bottom: 16px; }
     .service-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
     .service-item select { flex: 1; }
     .loading { opacity: 0.7; pointer-events: none; }
-
-    /* ── Responsive ── */
+    /* ── Perfil ── */
+    .profile-section { background: var(--white); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 20px; }
+    .profile-section h3 { font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; display: flex; align-items: center; gap: 8px; }
+    .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .profile-grid .full { grid-column: 1 / -1; }
+    .avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .avatar-circle { width: 96px; height: 96px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 36px; overflow: hidden; cursor: pointer; border: 3px solid var(--primary); }
+    .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
+    .logo-rect { width: 180px; height: 80px; border-radius: 10px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-light); overflow: hidden; border: 2px dashed #c7d2fe; cursor: pointer; }
+    .logo-rect img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+    .avatar-upload-btn { font-size: 12px; color: var(--primary); font-weight: 600; background: none; border: none; cursor: pointer; text-decoration: underline; }
+    .profile-save-bar { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
     @media (max-width: 600px) {
       .hero h1 { font-size: 26px; }
       .header { padding: 12px 16px; }
       .btn-header { padding: 8px 14px; font-size: 12px; }
+      .profile-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ═══════════════════════════
-       LANDING PAGE
-  ═══════════════════════════ -->
+  <!-- LANDING PAGE -->
   <div id="landingPage">
     <header class="header" role="banner">
       <a href="#" class="logo" aria-label="VoltCalc Pro - página inicial">⚡ VoltCalc <span>Pro</span></a>
-      <nav class="header-btns" aria-label="Navegação principal">
+      <nav class="header-btns">
         <button class="btn-header" id="showLoginModal" aria-haspopup="dialog">Login</button>
         <button class="btn-header filled" id="showSignupModal" aria-haspopup="dialog">Criar Conta</button>
       </nav>
     </header>
-
     <main>
       <section class="hero" aria-labelledby="heroTitle">
         <h1 id="heroTitle">Calculadora Elétrica <span>Profissional</span></h1>
         <p>Ferramenta completa para eletricistas, engenheiros e técnicos. Baseada na <strong>NBR 5410</strong>.</p>
-
         <div class="hero-cards" role="list">
-          <div class="hero-card" role="listitem">
-            <div class="icon" aria-hidden="true">⚡</div>
-            <h3>Cálculo de Potência</h3>
-            <p>Corrente, tensão e fator de potência</p>
-          </div>
-          <div class="hero-card" role="listitem">
-            <div class="icon" aria-hidden="true">📉</div>
-            <h3>Queda de Tensão</h3>
-            <p>Dimensionamento conforme norma</p>
-          </div>
-          <div class="hero-card" role="listitem">
-            <div class="icon" aria-hidden="true">📚</div>
-            <h3>Histórico</h3>
-            <p>Salve e acesse seus cálculos</p>
-          </div>
-          <div class="hero-card" role="listitem">
-            <div class="icon" aria-hidden="true">🔌</div>
-            <h3>Especificações</h3>
-            <p>Bitola, disjuntor e distância máxima</p>
-          </div>
+          <div class="hero-card" role="listitem"><div class="icon" aria-hidden="true">⚡</div><h3>Cálculo de Potência</h3><p>Corrente, tensão e fator de potência</p></div>
+          <div class="hero-card" role="listitem"><div class="icon" aria-hidden="true">📉</div><h3>Queda de Tensão</h3><p>Dimensionamento conforme norma</p></div>
+          <div class="hero-card" role="listitem"><div class="icon" aria-hidden="true">📚</div><h3>Histórico</h3><p>Salve e acesse seus cálculos</p></div>
+          <div class="hero-card" role="listitem"><div class="icon" aria-hidden="true">🔌</div><h3>Especificações</h3><p>Bitola, disjuntor e distância máxima</p></div>
         </div>
-
         <div class="video-section" aria-labelledby="videoTitle">
           <h3 id="videoTitle">🎬 Conheça o VoltCalc Pro</h3>
           <div class="video-container">
-            <!-- Substitua VIDEO_ID_AQUI pelo ID real do vídeo no YouTube -->
-            <iframe
-              id="videoYoutube"
-              src=""
-              title="Apresentação do VoltCalc Pro"
-              allowfullscreen
-              loading="lazy"
-            ></iframe>
+            <!-- Substitua VIDEO_ID_AQUI pelo ID real do vídeo -->
+            <iframe id="videoYoutube" src="" title="Apresentação do VoltCalc Pro" allowfullscreen loading="lazy"></iframe>
           </div>
-          <p style="text-align:center; margin-top:12px; font-size:13px; color:var(--text-light);">
-            Inscreva-se no canal para mais conteúdo
-          </p>
+          <p style="text-align:center;margin-top:12px;font-size:13px;color:var(--text-light);">Inscreva-se no canal para mais conteúdo</p>
         </div>
       </section>
     </main>
   </div>
 
-  <!-- ═══════════════════════════
-       MODAIS LOGIN / CADASTRO
-  ═══════════════════════════ -->
-  <div
-    class="modal-overlay"
-    id="modalOverlay"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="modalActiveTitle"
-  >
-    <!-- Modal Login -->
+  <!-- MODAIS -->
+  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalActiveTitle">
     <div class="modal" id="modalLogin" style="display:none;">
-      <button class="modal-close" id="closeLoginBtn" aria-label="Fechar modal de login">&times;</button>
+      <button class="modal-close" id="closeLoginBtn" aria-label="Fechar">&times;</button>
       <h2 id="modalActiveTitle">🔐 Entrar</h2>
-
       <div class="role-selector" role="group" aria-label="Tipo de usuário">
-        <div class="role-card selected" data-role="profissional" id="loginRoleProfissional"
-             tabindex="0" role="radio" aria-checked="true">
-          <h3>👨‍🔧 Profissional</h3>
-          <p>Eletricista / Engenheiro</p>
-        </div>
-        <div class="role-card" data-role="cliente" id="loginRoleCliente"
-             tabindex="0" role="radio" aria-checked="false">
-          <h3>🏠 Cliente</h3>
-          <p>Buscar orçamento</p>
-        </div>
+        <div class="role-card selected" data-role="profissional" id="loginRoleProfissional" tabindex="0" role="radio" aria-checked="true"><h3>👨‍🔧 Profissional</h3><p>Eletricista / Engenheiro</p></div>
+        <div class="role-card" data-role="cliente" id="loginRoleCliente" tabindex="0" role="radio" aria-checked="false"><h3>🏠 Cliente</h3><p>Buscar orçamento</p></div>
       </div>
-
-      <div class="form-group">
-        <label for="loginEmail">Email</label>
-        <input type="email" id="loginEmail" placeholder="seu@email.com" required autocomplete="email">
-      </div>
-      <div class="form-group">
-        <label for="loginSenha">Senha</label>
-        <input type="password" id="loginSenha" placeholder="••••••" required minlength="6" autocomplete="current-password">
-      </div>
+      <div class="form-group"><label for="loginEmail">Email</label><input type="email" id="loginEmail" placeholder="seu@email.com" required autocomplete="email"></div>
+      <div class="form-group"><label for="loginSenha">Senha</label><input type="password" id="loginSenha" placeholder="••••••" required minlength="6" autocomplete="current-password"></div>
       <button class="btn-primary" id="btnLogin">Entrar</button>
       <div class="error-msg" id="erroLogin" role="alert" aria-live="assertive"></div>
-
-      <div style="display:flex; align-items:center; margin:16px 0; color:var(--text-light); font-size:12px;" aria-hidden="true">
-        <span style="flex:1; height:1px; background:#e2e8f0;"></span>
-        <span style="padding:0 10px;">ou</span>
-        <span style="flex:1; height:1px; background:#e2e8f0;"></span>
+      <div style="display:flex;align-items:center;margin:16px 0;color:var(--text-light);font-size:12px;" aria-hidden="true">
+        <span style="flex:1;height:1px;background:#e2e8f0;"></span><span style="padding:0 10px;">ou</span><span style="flex:1;height:1px;background:#e2e8f0;"></span>
       </div>
-
-      <button class="btn-google" id="btnGoogle" aria-label="Entrar com conta Google">
+      <button class="btn-google" id="btnGoogle" aria-label="Entrar com Google">
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -451,160 +170,80 @@
         </svg>
         Entrar com Google
       </button>
-
-      <p style="text-align:center; margin-top:14px; font-size:13px;">
-        Não tem conta?
-        <button style="background:none; border:none; color:var(--primary); font-weight:700; cursor:pointer; font-size:13px;" id="goToSignup">Cadastre-se</button>
-      </p>
+      <p style="text-align:center;margin-top:14px;font-size:13px;">Não tem conta? <button style="background:none;border:none;color:var(--primary);font-weight:700;cursor:pointer;font-size:13px;" id="goToSignup">Cadastre-se</button></p>
     </div>
-
-    <!-- Modal Cadastro -->
     <div class="modal" id="modalCadastro" style="display:none;">
-      <button class="modal-close" id="closeSignupBtn" aria-label="Fechar modal de cadastro">&times;</button>
+      <button class="modal-close" id="closeSignupBtn" aria-label="Fechar">&times;</button>
       <h2>📝 Criar Conta</h2>
-
       <div class="role-selector" role="group" aria-label="Tipo de usuário">
-        <div class="role-card selected" data-role="profissional" id="signupRoleProfissional"
-             tabindex="0" role="radio" aria-checked="true">
-          <h3>👨‍🔧 Profissional</h3>
-          <p>Eletricista / Engenheiro</p>
-        </div>
-        <div class="role-card" data-role="cliente" id="signupRoleCliente"
-             tabindex="0" role="radio" aria-checked="false">
-          <h3>🏠 Cliente</h3>
-          <p>Buscar orçamento</p>
-        </div>
+        <div class="role-card selected" data-role="profissional" id="signupRoleProfissional" tabindex="0" role="radio" aria-checked="true"><h3>👨‍🔧 Profissional</h3><p>Eletricista / Engenheiro</p></div>
+        <div class="role-card" data-role="cliente" id="signupRoleCliente" tabindex="0" role="radio" aria-checked="false"><h3>🏠 Cliente</h3><p>Buscar orçamento</p></div>
       </div>
-
-      <div class="form-group">
-        <label for="cadNome">Nome</label>
-        <input type="text" id="cadNome" placeholder="Seu nome completo" required minlength="2" autocomplete="name">
-      </div>
-      <div class="form-group">
-        <label for="cadEmail">Email</label>
-        <input type="email" id="cadEmail" placeholder="seu@email.com" required autocomplete="email">
-      </div>
-      <div class="form-group">
-        <label for="cadSenha">Senha</label>
-        <input type="password" id="cadSenha" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
-      </div>
+      <div class="form-group"><label for="cadNome">Nome</label><input type="text" id="cadNome" placeholder="Seu nome completo" required minlength="2" autocomplete="name"></div>
+      <div class="form-group"><label for="cadEmail">Email</label><input type="email" id="cadEmail" placeholder="seu@email.com" required autocomplete="email"></div>
+      <div class="form-group"><label for="cadSenha">Senha</label><input type="password" id="cadSenha" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password"></div>
       <button class="btn-primary" id="btnCadastro">Cadastrar</button>
       <div class="error-msg" id="erroCadastro" role="alert" aria-live="assertive"></div>
-
-      <p style="text-align:center; margin-top:14px; font-size:13px;">
-        Já tem conta?
-        <button style="background:none; border:none; color:var(--primary); font-weight:700; cursor:pointer; font-size:13px;" id="goToLogin">Entrar</button>
-      </p>
+      <p style="text-align:center;margin-top:14px;font-size:13px;">Já tem conta? <button style="background:none;border:none;color:var(--primary);font-weight:700;cursor:pointer;font-size:13px;" id="goToLogin">Entrar</button></p>
     </div>
   </div>
 
-  <!-- ═══════════════════════════
-       ÁREA DO PROFISSIONAL
-  ═══════════════════════════ -->
+  <!-- ÁREA DO PROFISSIONAL -->
   <div class="app-screen" id="profissionalScreen">
     <div class="flex-between mb-20">
       <span class="screen-title">👋 <span id="profDisplayName"></span></span>
-      <button class="logout-btn" id="btnLogoutProf" aria-label="Sair da conta">Sair</button>
+      <button class="logout-btn" id="btnLogoutProf" aria-label="Sair">Sair</button>
     </div>
-
     <div class="tabs" role="tablist" aria-label="Ferramentas do profissional" id="profTabs">
-      <button class="tab active" role="tab" aria-selected="true"  aria-controls="tab-corrente"     data-tab="corrente">⚡ Corrente</button>
-      <button class="tab"        role="tab" aria-selected="false" aria-controls="tab-queda"        data-tab="queda">📉 Queda</button>
-      <button class="tab"        role="tab" aria-selected="false" aria-controls="tab-orcamento"    data-tab="orcamento">📋 Orçamento</button>
+      <button class="tab active" role="tab" aria-selected="true"  aria-controls="tab-orcamento"    data-tab="orcamento">📋 Orçamento</button>
       <button class="tab"        role="tab" aria-selected="false" aria-controls="tab-precos"       data-tab="precos">💰 Preços</button>
       <button class="tab"        role="tab" aria-selected="false" aria-controls="tab-solicitacoes" data-tab="solicitacoes">📩 Solicitações</button>
       <button class="tab"        role="tab" aria-selected="false" aria-controls="tab-historico"    data-tab="historico">📚 Histórico</button>
       <button class="tab"        role="tab" aria-selected="false" aria-controls="tab-perfil"       data-tab="perfil">👤 Perfil</button>
     </div>
-
-    <div class="tab-content active" id="tab-corrente"     role="tabpanel"></div>
-    <div class="tab-content"        id="tab-queda"        role="tabpanel"></div>
-    <div class="tab-content"        id="tab-orcamento"    role="tabpanel"></div>
+    <div class="tab-content active" id="tab-orcamento"    role="tabpanel"></div>
     <div class="tab-content"        id="tab-precos"       role="tabpanel"></div>
     <div class="tab-content"        id="tab-solicitacoes" role="tabpanel"></div>
     <div class="tab-content"        id="tab-historico"    role="tabpanel"></div>
     <div class="tab-content"        id="tab-perfil"       role="tabpanel"></div>
   </div>
 
-  <!-- ═══════════════════════════
-       ÁREA DO CLIENTE
-  ═══════════════════════════ -->
+  <!-- ÁREA DO CLIENTE -->
   <div class="app-screen" id="clienteScreen">
     <div class="flex-between mb-20">
       <span class="screen-title">🏠 <span id="cliDisplayName"></span></span>
-      <button class="logout-btn" id="btnLogoutCli" aria-label="Sair da conta">Sair</button>
+      <button class="logout-btn" id="btnLogoutCli" aria-label="Sair">Sair</button>
     </div>
-
     <div class="tabs" role="tablist" aria-label="Área do cliente" id="clienteTabs">
       <button class="tab active" role="tab" aria-selected="true"  aria-controls="tab-perfil-cli"    data-tab="perfil-cli">👤 Perfil</button>
       <button class="tab"        role="tab" aria-selected="false" aria-controls="tab-orcamento-cli" data-tab="orcamento-cli">📋 Orçamento</button>
       <button class="tab"        role="tab" aria-selected="false" aria-controls="tab-pedidos-cli"   data-tab="pedidos-cli">📚 Meus Pedidos</button>
-      <button class="tab"        role="tab" aria-selected="false" aria-controls="tab-servicos-cli"  data-tab="servicos-cli">📖 Serviços</button>
     </div>
-
     <div class="tab-content active" id="tab-perfil-cli"    role="tabpanel"></div>
     <div class="tab-content"        id="tab-orcamento-cli" role="tabpanel"></div>
     <div class="tab-content"        id="tab-pedidos-cli"   role="tabpanel"></div>
-    <div class="tab-content"        id="tab-servicos-cli"  role="tabpanel"></div>
   </div>
 
-  <!-- ═══════════════════════════
-       JAVASCRIPT
-  ═══════════════════════════ -->
   <script>
     window.addEventListener('DOMContentLoaded', () => {
-      // ⚠️ SEGURANÇA: Restrinja esta chave no Google Cloud Console
-      // (HTTP referrers → seu domínio) e configure regras no Firestore.
       firebase.initializeApp({
-        apiKey:            "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
-        authDomain:        "voltcalc-pro.firebaseapp.com",
-        projectId:         "voltcalc-pro",
-        storageBucket:     "voltcalc-pro.appspot.com",
+        apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
+        authDomain: "voltcalc-pro.firebaseapp.com",
+        projectId: "voltcalc-pro",
+        storageBucket: "voltcalc-pro.appspot.com",
         messagingSenderId: "411208955318",
-        appId:             "1:411208955318:web:8735802bf0f4ac8a1a3d17"
+        appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
       });
       window.auth = firebase.auth();
-      window.db   = firebase.firestore();
+      window.db = firebase.firestore();
       initApp();
     });
 
-    let currentUser     = null;
-    let loginRole       = 'profissional';
-    let signupRole      = 'profissional';
-    let map             = null;
-    let mapInitialized  = false;
-    let leafletLoaded   = false;
-    let clienteTabsInit = false;
-
-    const tabelaCondutores = {
-      'PVC': { '1.5':17.5,'2.5':24,'4':32,'6':41,'10':57,'16':76,'25':99 },
-      'EPR': { '1.5':22,  '2.5':30,'4':40,'6':52,'10':72,'16':96,'25':125 }
-    };
-    const quedaUnitaria = {
-      cobre: { 1.5:23.0, 2.5:14.0, 4:8.7, 6:5.8, 10:3.5, 16:2.2, 25:1.4 }
-    };
-
-    const servicosList = [
-      "INSTALAÇÃO DE INTERRUPTOR COMPLETO PULSADOR",
-      "INSTALAÇÃO DE INTERRUPTOR THREE-WAY OU FOUR-WAY",
-      "INSTALAÇÃO DE INTERRUPTOR DUPLO OU BIFILAR",
-      "INSTALAÇÃO DE INTERRUPTOR TOMADA (Juntos)",
-      "INSTALAÇÃO DE ARANDELA PENDENTE OU SPOT COMUM",
-      "INSTALAÇÃO DE LÂMPADA FLUORESCENTE (TUBO)",
-      "INSTALAÇÃO DE CORES POLIVANTE",
-      "INSTALAÇÃO DE LUSTRES GRANDES",
-      "INSTALAÇÃO DE REFLETOR DE JARDIM",
-      "INSTALAÇÃO DE REFLETOR DE POSTE COMUM",
-      "INSTALAÇÃO DE REFLETOR DE POSTE COM LÂMPADA VAPOR",
-      "INSTALAÇÃO DE REATOR DE LÂMPADA A VAPOR",
-      "INSTALAÇÃO DE FOTOCÉLULA OU SENSOR DE PRESENÇA",
-      "INSTALAÇÃO DE REFLETOR LED FOTOCÉLULA SENSOR DE PRESENÇA"
-    ];
+    let currentUser = null, loginRole = 'profissional', signupRole = 'profissional';
+    let map = null, mapInitialized = false, leafletLoaded = false, clienteTabsInit = false;
 
     function initApp() {
-      setupModalTriggers();
-      setupRoleSelectors();
-      setupTabNavigation();
+      setupModalTriggers(); setupRoleSelectors(); setupTabNavigation();
       auth.onAuthStateChanged(user => {
         currentUser = user;
         if (user) {
@@ -612,100 +251,81 @@
             const role = doc.exists ? (doc.data().role || 'profissional') : 'profissional';
             showScreen(role, user.displayName || user.email);
           });
-        } else {
-          showLanding();
-        }
+        } else { showLanding(); }
       });
     }
 
-    function openModal(modalId) {
-      document.getElementById('modalLogin').style.display    = 'none';
+    function openModal(id) {
+      document.getElementById('modalLogin').style.display = 'none';
       document.getElementById('modalCadastro').style.display = 'none';
-      document.getElementById(modalId).style.display         = 'block';
+      document.getElementById(id).style.display = 'block';
       document.getElementById('modalOverlay').classList.add('open');
-      const first = document.getElementById(modalId).querySelector('input, button, [tabindex="0"]');
+      const first = document.getElementById(id).querySelector('input, button, [tabindex="0"]');
       if (first) setTimeout(() => first.focus(), 50);
     }
-
     function closeModal() {
       document.getElementById('modalOverlay').classList.remove('open');
-      document.getElementById('modalLogin').style.display    = 'none';
+      document.getElementById('modalLogin').style.display = 'none';
       document.getElementById('modalCadastro').style.display = 'none';
     }
 
     function setupModalTriggers() {
-      document.getElementById('showLoginModal').addEventListener('click',  () => openModal('modalLogin'));
+      document.getElementById('showLoginModal').addEventListener('click', () => openModal('modalLogin'));
       document.getElementById('showSignupModal').addEventListener('click', () => openModal('modalCadastro'));
-      document.getElementById('closeLoginBtn').addEventListener('click',   closeModal);
-      document.getElementById('closeSignupBtn').addEventListener('click',  closeModal);
-      document.getElementById('goToSignup').addEventListener('click',      () => openModal('modalCadastro'));
-      document.getElementById('goToLogin').addEventListener('click',       () => openModal('modalLogin'));
-      document.getElementById('modalOverlay').addEventListener('click', e => {
-        if (e.target === document.getElementById('modalOverlay')) closeModal();
-      });
+      document.getElementById('closeLoginBtn').addEventListener('click', closeModal);
+      document.getElementById('closeSignupBtn').addEventListener('click', closeModal);
+      document.getElementById('goToSignup').addEventListener('click', () => openModal('modalCadastro'));
+      document.getElementById('goToLogin').addEventListener('click', () => openModal('modalLogin'));
+      document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === document.getElementById('modalOverlay')) closeModal(); });
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-      document.getElementById('btnLogin').addEventListener('click',    handleLogin);
+      document.getElementById('btnLogin').addEventListener('click', handleLogin);
       document.getElementById('btnCadastro').addEventListener('click', handleCadastro);
-      document.getElementById('btnGoogle').addEventListener('click',   handleGoogle);
+      document.getElementById('btnGoogle').addEventListener('click', handleGoogle);
       document.getElementById('btnLogoutProf').addEventListener('click', () => auth.signOut());
-      document.getElementById('btnLogoutCli').addEventListener('click',  () => auth.signOut());
+      document.getElementById('btnLogoutCli').addEventListener('click', () => auth.signOut());
     }
 
     function setupRoleSelectors() {
-      setupRoleGroup('modalLogin',    ['loginRoleProfissional','loginRoleCliente'],   r => { loginRole  = r; });
+      setupRoleGroup('modalLogin', ['loginRoleProfissional','loginRoleCliente'], r => { loginRole = r; });
       setupRoleGroup('modalCadastro', ['signupRoleProfissional','signupRoleCliente'], r => { signupRole = r; });
     }
-
     function setupRoleGroup(modalId, ids, onSelect) {
       ids.forEach(id => {
         const el = document.getElementById(id);
         const activate = () => {
           const role = el.dataset.role;
-          document.querySelectorAll('#' + modalId + ' .role-card').forEach(card => {
-            const sel = card.dataset.role === role;
-            card.classList.toggle('selected', sel);
-            card.setAttribute('aria-checked', sel ? 'true' : 'false');
+          document.querySelectorAll('#' + modalId + ' .role-card').forEach(c => {
+            const s = c.dataset.role === role;
+            c.classList.toggle('selected', s);
+            c.setAttribute('aria-checked', s ? 'true' : 'false');
           });
           onSelect(role);
         };
-        el.addEventListener('click',   activate);
+        el.addEventListener('click', activate);
         el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') activate(); });
       });
     }
 
-    function showError(id, msg) {
-      const el = document.getElementById(id);
-      el.textContent = msg;
-      el.classList.add('active');
-    }
-    function clearError(id) {
-      const el = document.getElementById(id);
-      el.textContent = '';
-      el.classList.remove('active');
-    }
+    function showError(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('active'); }
+    function clearError(id) { const el = document.getElementById(id); el.textContent = ''; el.classList.remove('active'); }
 
     async function handleLogin() {
       clearError('erroLogin');
       const email = document.getElementById('loginEmail').value.trim();
-      const senha  = document.getElementById('loginSenha').value;
+      const senha = document.getElementById('loginSenha').value;
       if (!email || !senha) return showError('erroLogin', 'Preencha email e senha.');
       const btn = document.getElementById('btnLogin');
       btn.disabled = true; btn.textContent = 'Entrando…';
-      try {
-        await auth.signInWithEmailAndPassword(email, senha);
-        closeModal();
-      } catch {
-        showError('erroLogin', 'Email ou senha incorretos.');
-      } finally {
-        btn.disabled = false; btn.textContent = 'Entrar';
-      }
+      try { await auth.signInWithEmailAndPassword(email, senha); closeModal(); }
+      catch { showError('erroLogin', 'Email ou senha incorretos.'); }
+      finally { btn.disabled = false; btn.textContent = 'Entrar'; }
     }
 
     async function handleCadastro() {
       clearError('erroCadastro');
-      const nome  = document.getElementById('cadNome').value.trim();
+      const nome = document.getElementById('cadNome').value.trim();
       const email = document.getElementById('cadEmail').value.trim();
-      const senha  = document.getElementById('cadSenha').value;
+      const senha = document.getElementById('cadSenha').value;
       if (!nome || !email || !senha) return showError('erroCadastro', 'Preencha todos os campos.');
       if (senha.length < 6) return showError('erroCadastro', 'Senha deve ter ao menos 6 caracteres.');
       const btn = document.getElementById('btnCadastro');
@@ -713,52 +333,40 @@
       try {
         const cred = await auth.createUserWithEmailAndPassword(email, senha);
         await cred.user.updateProfile({ displayName: nome });
-        await db.collection('users').doc(cred.user.uid).set({
-          nome, email, role: signupRole, createdAt: new Date()
-        });
+        await db.collection('users').doc(cred.user.uid).set({ nome, email, role: signupRole, createdAt: new Date() });
         closeModal();
-      } catch(e) {
-        showError('erroCadastro', e.message || 'Erro ao criar conta.');
-      } finally {
-        btn.disabled = false; btn.textContent = 'Cadastrar';
-      }
+      } catch(e) { showError('erroCadastro', e.message || 'Erro ao criar conta.'); }
+      finally { btn.disabled = false; btn.textContent = 'Cadastrar'; }
     }
 
     async function handleGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider();
       try {
         const result = await auth.signInWithPopup(provider);
-        const user   = result.user;
-        const doc    = await db.collection('users').doc(user.uid).get();
-        if (!doc.exists) {
-          await db.collection('users').doc(user.uid).set({
-            nome: user.displayName, email: user.email, role: loginRole, createdAt: new Date()
-          });
-        }
+        const user = result.user;
+        const doc = await db.collection('users').doc(user.uid).get();
+        if (!doc.exists) await db.collection('users').doc(user.uid).set({ nome: user.displayName, email: user.email, role: loginRole, createdAt: new Date() });
         closeModal();
-      } catch {
-        showError('erroLogin', 'Erro ao entrar com Google.');
-      }
+      } catch { showError('erroLogin', 'Erro ao entrar com Google.'); }
     }
 
     function showLanding() {
-      document.getElementById('landingPage').style.display        = 'block';
+      document.getElementById('landingPage').style.display = 'block';
       document.getElementById('profissionalScreen').style.display = 'none';
-      document.getElementById('clienteScreen').style.display      = 'none';
+      document.getElementById('clienteScreen').style.display = 'none';
     }
 
     function showScreen(role, displayName) {
       document.getElementById('landingPage').style.display = 'none';
       if (role === 'profissional') {
         document.getElementById('profissionalScreen').style.display = 'block';
-        document.getElementById('clienteScreen').style.display      = 'none';
-        document.getElementById('profDisplayName').textContent      = displayName;
-        renderCorrenteTab();
-        renderQuedaTab();
+        document.getElementById('clienteScreen').style.display = 'none';
+        document.getElementById('profDisplayName').textContent = displayName;
+        renderPerfilProfTab();
       } else {
-        document.getElementById('clienteScreen').style.display      = 'block';
+        document.getElementById('clienteScreen').style.display = 'block';
         document.getElementById('profissionalScreen').style.display = 'none';
-        document.getElementById('cliDisplayName').textContent       = displayName;
+        document.getElementById('cliDisplayName').textContent = displayName;
         if (!clienteTabsInit) { renderClienteTabs(); clienteTabsInit = true; }
       }
     }
@@ -769,13 +377,8 @@
           const btn = e.target.closest('.tab');
           if (!btn) return;
           const tabId = btn.dataset.tab;
-          tabList.querySelectorAll('.tab').forEach(t => {
-            t.classList.toggle('active', t === btn);
-            t.setAttribute('aria-selected', t === btn ? 'true' : 'false');
-          });
-          document.querySelectorAll('.tab-content').forEach(panel => {
-            panel.classList.toggle('active', panel.id === 'tab-' + tabId);
-          });
+          tabList.querySelectorAll('.tab').forEach(t => { t.classList.toggle('active', t === btn); t.setAttribute('aria-selected', t === btn ? 'true' : 'false'); });
+          document.querySelectorAll('.tab-content').forEach(p => { p.classList.toggle('active', p.id === 'tab-' + tabId); });
           if (tabId === 'perfil' && !leafletLoaded) loadLeaflet();
         });
       });
@@ -783,157 +386,275 @@
 
     function loadLeaflet() {
       leafletLoaded = true;
-      const link = document.createElement('link');
-      link.rel   = 'stylesheet';
-      link.href  = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-      document.head.appendChild(link);
-      const script  = document.createElement('script');
-      script.src    = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      script.onload = () => { if (!mapInitialized) initMap(); };
-      document.head.appendChild(script);
+      const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(link);
+      const script = document.createElement('script'); script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'; script.onload = () => { if (!mapInitialized) initMap(); }; document.head.appendChild(script);
     }
-
     function initMap() {
       const el = document.getElementById('map');
       if (!el || mapInitialized) return;
       mapInitialized = true;
       map = L.map('map').setView([-15.8, -47.9], 5);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-      }).addTo(map);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
     }
 
-    function renderCorrenteTab() {
-      document.getElementById('tab-corrente').innerHTML = `
-        <h2 style="margin-bottom:16px;">⚡ Cálculo de Corrente</h2>
-        <div class="form-group">
-          <label for="potencia">Potência (W)</label>
-          <input type="number" id="potencia" placeholder="Ex: 1500" min="0" required>
+    function setupImagePreview(inputId, previewId) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      input.addEventListener('change', () => {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => { document.getElementById(previewId).innerHTML = `<img src="${e.target.result}" alt="preview">`; };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // ════════════════════════════════════════
+    // PERFIL PROFISSIONAL
+    // ════════════════════════════════════════
+    function renderPerfilProfTab() {
+      const estados = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+      document.getElementById('tab-perfil').innerHTML = `
+        <h2 style="margin-bottom:20px;">👤 Meu Perfil</h2>
+
+        <div class="profile-section">
+          <h3>🏷️ Tipo de Conta</h3>
+          <div class="role-selector" style="margin:0;">
+            <div class="role-card selected" id="tipoEletricista"><h3>👨‍🔧 Eletricista</h3><p>Profissional autônomo</p></div>
+            <div class="role-card" id="tipoEmpresa"><h3>🏢 Empresa</h3><p>Pessoa jurídica</p></div>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="tensao">Tensão (V)</label>
-          <select id="tensao">
-            <option value="127">127V (monofásico)</option>
-            <option value="220" selected>220V (monofásico)</option>
-            <option value="380">380V (trifásico)</option>
-          </select>
+
+        <div class="profile-section">
+          <h3>🖼️ Logomarca da Empresa</h3>
+          <div class="avatar-wrap">
+            <div class="logo-rect" id="logoPreview" onclick="document.getElementById('logoInput').click()">🏢 Clique para enviar logo</div>
+            <input type="file" id="logoInput" accept="image/*" style="display:none">
+            <button class="avatar-upload-btn" onclick="document.getElementById('logoInput').click()">Alterar logomarca</button>
+            <p style="font-size:11px;color:var(--text-light);">PNG ou JPG · recomendado 400×200px</p>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="fp">Fator de Potência</label>
-          <input type="number" id="fp" value="0.9" min="0.1" max="1" step="0.01" required>
+
+        <div class="profile-section">
+          <h3>👤 Dados Pessoais</h3>
+          <div class="avatar-wrap" style="margin-bottom:16px;">
+            <div class="avatar-circle" id="fotoProfPreview" onclick="document.getElementById('fotoProfInput').click()">👤</div>
+            <input type="file" id="fotoProfInput" accept="image/*" style="display:none">
+            <button class="avatar-upload-btn" onclick="document.getElementById('fotoProfInput').click()">Alterar foto</button>
+          </div>
+          <div class="profile-grid">
+            <div class="form-group"><label for="profNome">Nome completo</label><input type="text" id="profNome" placeholder="Seu nome"></div>
+            <div class="form-group"><label for="profApelido">Apelido / Nome de trabalho</label><input type="text" id="profApelido" placeholder="Ex: Zé Eletricista"></div>
+            <div class="form-group"><label for="profCpf">CPF</label><input type="text" id="profCpf" placeholder="000.000.000-00" maxlength="14"></div>
+            <div class="form-group"><label for="profNascimento">Data de nascimento</label><input type="date" id="profNascimento"></div>
+            <div class="form-group"><label for="profTelefone">Telefone / WhatsApp</label><input type="tel" id="profTelefone" placeholder="(00) 90000-0000"></div>
+            <div class="form-group"><label for="profEmail">E-mail de contato</label><input type="email" id="profEmail" placeholder="seu@email.com"></div>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="isolamento">Isolamento do Condutor</label>
-          <select id="isolamento">
-            <option value="PVC">PVC (termoplástico)</option>
-            <option value="EPR">EPR (borracha etileno-propileno)</option>
-          </select>
+
+        <div class="profile-section">
+          <h3>🏢 Dados da Empresa</h3>
+          <div class="profile-grid">
+            <div class="form-group"><label for="profEmpresa">Razão social / Nome fantasia</label><input type="text" id="profEmpresa" placeholder="Nome da empresa"></div>
+            <div class="form-group"><label for="profCnpj">CNPJ</label><input type="text" id="profCnpj" placeholder="00.000.000/0000-00" maxlength="18"></div>
+            <div class="form-group full"><label for="profDescricao">Descrição dos serviços</label><textarea id="profDescricao" rows="3" placeholder="Ex: Instalações elétricas residenciais e comerciais..."></textarea></div>
+          </div>
         </div>
-        <button class="btn-primary" id="btnCalcCorrente">Calcular</button>
-        <div class="result-card" id="resultCorrente" style="display:none;" aria-live="polite"></div>
+
+        <div class="profile-section">
+          <h3>📍 Endereço / Área de Atuação</h3>
+          <div class="profile-grid">
+            <div class="form-group"><label for="profCep">CEP</label><input type="text" id="profCep" placeholder="00000-000" maxlength="9"></div>
+            <div class="form-group"><label for="profCidade">Cidade</label><input type="text" id="profCidade" placeholder="Sua cidade"></div>
+            <div class="form-group"><label for="profEstado">Estado</label><select id="profEstado"><option value="">Selecione</option>\({estados.map(s=>`<option value="\){s}">${s}</option>`).join('')}</select></div>
+            <div class="form-group"><label for="profRaio">Raio de atendimento (km)</label><input type="number" id="profRaio" placeholder="Ex: 30" min="1"></div>
+            <div class="form-group full"><label for="profEndereco">Endereço completo</label><input type="text" id="profEndereco" placeholder="Rua, número, bairro"></div>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>🎓 Formação & Certificações</h3>
+          <div class="profile-grid">
+            <div class="form-group"><label for="profCrea">CREA / Registro profissional</label><input type="text" id="profCrea" placeholder="Ex: CREA-SP 000000"></div>
+            <div class="form-group"><label for="profExperiencia">Anos de experiência</label><input type="number" id="profExperiencia" placeholder="Ex: 10" min="0"></div>
+            <div class="form-group full"><label for="profEspecialidades">Especialidades</label><input type="text" id="profEspecialidades" placeholder="Ex: Instalações residenciais, SPDA, automação..."></div>
+            <div class="form-group full"><label for="profCertificados">Certificados / Cursos</label><textarea id="profCertificados" rows="2" placeholder="Ex: NR-10, NR-35, SENAI Eletricidade Industrial..."></textarea></div>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>🌐 Redes Sociais & Contato</h3>
+          <div class="profile-grid">
+            <div class="form-group"><label for="profInstagram">Instagram</label><input type="text" id="profInstagram" placeholder="@seuusuario"></div>
+            <div class="form-group"><label for="profSite">Site / Portfólio</label><input type="url" id="profSite" placeholder="https://..."></div>
+          </div>
+        </div>
+
+        <div class="profile-save-bar">
+          <button class="btn-sm btn-sm--danger" id="btnCancelarProf">Cancelar</button>
+          <button class="btn-sm" id="btnSalvarProf">💾 Salvar Perfil</button>
+        </div>
+        <div class="error-msg" id="erroPerfilProf" role="alert" aria-live="assertive" style="margin-top:12px;"></div>
       `;
-      document.getElementById('btnCalcCorrente').addEventListener('click', calcularCorrente);
-    }
 
-    function calcularCorrente() {
-      const P   = parseFloat(document.getElementById('potencia').value);
-      const V   = parseFloat(document.getElementById('tensao').value);
-      const fp  = parseFloat(document.getElementById('fp').value);
-      const iso = document.getElementById('isolamento').value;
-      const result = document.getElementById('resultCorrente');
-      if (!P || !V || !fp) {
-        result.style.display = 'block';
-        result.innerHTML = '<p style="color:#dc2626;">Preencha todos os campos corretamente.</p>';
-        return;
+      setupImagePreview('logoInput', 'logoPreview');
+      setupImagePreview('fotoProfInput', 'fotoProfPreview');
+
+      document.getElementById('tipoEletricista').addEventListener('click', () => {
+        document.getElementById('tipoEletricista').classList.add('selected');
+        document.getElementById('tipoEmpresa').classList.remove('selected');
+      });
+      document.getElementById('tipoEmpresa').addEventListener('click', () => {
+        document.getElementById('tipoEmpresa').classList.add('selected');
+        document.getElementById('tipoEletricista').classList.remove('selected');
+      });
+
+      if (currentUser) {
+        db.collection('users').doc(currentUser.uid).get().then(doc => {
+          if (!doc.exists) return;
+          const d = doc.data();
+          ['profNome','profApelido','profCpf','profNascimento','profTelefone','profEmail','profEmpresa','profCnpj',
+           'profDescricao','profCep','profCidade','profEstado','profRaio','profEndereco','profCrea',
+           'profExperiencia','profEspecialidades','profCertificados','profInstagram','profSite'].forEach(f => {
+            const el = document.getElementById(f); if (el && d[f]) el.value = d[f];
+          });
+          if (d.tipoProf === 'empresa') { document.getElementById('tipoEmpresa').classList.add('selected'); document.getElementById('tipoEletricista').classList.remove('selected'); }
+          if (d.fotoProf) document.getElementById('fotoProfPreview').innerHTML = `<img src="${d.fotoProf}" alt="foto">`;
+          if (d.logoEmpresa) document.getElementById('logoPreview').innerHTML = `<img src="${d.logoEmpresa}" alt="logo">`;
+        });
       }
-      const I      = V === 380 ? P / (Math.sqrt(3) * V * fp) : P / (V * fp);
-      const tabela = tabelaCondutores[iso];
-      const bits   = Object.keys(tabela).map(Number).sort((a,b) => a - b);
-      const bitola = bits.find(b => tabela[String(b)] >= I) || bits[bits.length - 1];
-      const disj   = Math.ceil(I * 1.25 / 5) * 5;
-      result.style.display = 'block';
-      result.innerHTML = `
-        <h3 style="margin-bottom:12px; color:var(--primary);">📊 Resultado</h3>
-        <p><strong>Corrente calculada:</strong> ${I.toFixed(2)} A</p>
-        <p><strong>Bitola recomendada:</strong> \({bitola} mm² (\){iso})</p>
-        <p><strong>Disjuntor sugerido:</strong> ${disj} A</p>
-        <p style="font-size:12px; color:var(--text-light); margin-top:8px;">
-          ⚠ Verifique sempre as condições de instalação conforme NBR 5410.
-        </p>
-      `;
-      if (currentUser) saveHistorico({ tipo:'corrente', P, V, fp, iso, I:I.toFixed(2), bitola, disj });
+
+      document.getElementById('btnSalvarProf').addEventListener('click', () => {
+        if (!currentUser) return;
+        const tipo = document.getElementById('tipoEmpresa').classList.contains('selected') ? 'empresa' : 'eletricista';
+        const dados = { tipoProf: tipo };
+        ['profNome','profApelido','profCpf','profNascimento','profTelefone','profEmail','profEmpresa','profCnpj',
+         'profDescricao','profCep','profCidade','profEstado','profRaio','profEndereco','profCrea',
+         'profExperiencia','profEspecialidades','profCertificados','profInstagram','profSite'].forEach(f => {
+          const el = document.getElementById(f); if (el) dados[f] = el.value;
+        });
+        const btn = document.getElementById('btnSalvarProf');
+        btn.disabled = true; btn.textContent = 'Salvando…';
+        db.collection('users').doc(currentUser.uid).set(dados, { merge: true })
+          .then(() => { btn.textContent = '✅ Salvo!'; setTimeout(() => { btn.disabled = false; btn.textContent = '💾 Salvar Perfil'; }, 2000); })
+          .catch(e => { document.getElementById('erroPerfilProf').textContent = 'Erro: ' + e.message; document.getElementById('erroPerfilProf').classList.add('active'); btn.disabled = false; btn.textContent = '💾 Salvar Perfil'; });
+      });
     }
 
-    function renderQuedaTab() {
-      const bitolaOpts = Object.keys(quedaUnitaria.cobre)
-        .map(b => `<option value="\({b}">\){b} mm²</option>`).join('');
-      document.getElementById('tab-queda').innerHTML = `
-        <h2 style="margin-bottom:16px;">📉 Queda de Tensão</h2>
-        <div class="form-group">
-          <label for="qdCorrente">Corrente (A)</label>
-          <input type="number" id="qdCorrente" placeholder="Ex: 10" min="0" required>
-        </div>
-        <div class="form-group">
-          <label for="qdComp">Comprimento do circuito (m)</label>
-          <input type="number" id="qdComp" placeholder="Ex: 20" min="0" required>
-        </div>
-        <div class="form-group">
-          <label for="qdBitola">Bitola (mm²)</label>
-          <select id="qdBitola">${bitolaOpts}</select>
-        </div>
-        <div class="form-group">
-          <label for="qdTensao">Tensão nominal (V)</label>
-          <select id="qdTensao">
-            <option value="127">127V</option>
-            <option value="220" selected>220V</option>
-          </select>
-        </div>
-        <button class="btn-primary" id="btnCalcQueda">Calcular</button>
-        <div class="result-card" id="resultQueda" style="display:none;" aria-live="polite"></div>
-      `;
-      document.getElementById('btnCalcQueda').addEventListener('click', calcularQueda);
-    }
+    // ════════════════════════════════════════
+    // ÁREA DO CLIENTE
+    // ════════════════════════════════════════
+    function renderClienteTabs() {
+      const estados = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 
-    function calcularQueda() {
-      const I      = parseFloat(document.getElementById('qdCorrente').value);
-      const L      = parseFloat(document.getElementById('qdComp').value);
-      const bitola = parseFloat(document.getElementById('qdBitola').value);
-      const Vn     = parseFloat(document.getElementById('qdTensao').value);
-      const result = document.getElementById('resultQueda');
-      if (!I || !L) {
-        result.style.display = 'block';
-        result.innerHTML = '<p style="color:#dc2626;">Preencha corrente e comprimento.</p>';
-        return;
+      document.getElementById('tab-perfil-cli').innerHTML = `
+        <h2 style="margin-bottom:20px;">👤 Meu Perfil</h2>
+
+        <div class="profile-section">
+          <h3>📷 Foto de Perfil</h3>
+          <div class="avatar-wrap">
+            <div class="avatar-circle" id="fotoCliPreview" onclick="document.getElementById('fotoCliInput').click()">👤</div>
+            <input type="file" id="fotoCliInput" accept="image/*" style="display:none">
+            <button class="avatar-upload-btn" onclick="document.getElementById('fotoCliInput').click()">Alterar foto</button>
+            <p style="font-size:11px;color:var(--text-light);">JPG ou PNG · máx 2MB</p>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>👤 Dados Pessoais</h3>
+          <div class="profile-grid">
+            <div class="form-group"><label for="cliNome">Nome completo</label><input type="text" id="cliNome" placeholder="Seu nome completo"></div>
+            <div class="form-group"><label for="cliApelido">Como prefere ser chamado(a)</label><input type="text" id="cliApelido" placeholder="Apelido ou nome social"></div>
+            <div class="form-group"><label for="cliCpf">CPF</label><input type="text" id="cliCpf" placeholder="000.000.000-00" maxlength="14"></div>
+            <div class="form-group"><label for="cliNascimento">Data de nascimento</label><input type="date" id="cliNascimento"></div>
+            <div class="form-group"><label for="cliTelefone">Telefone / WhatsApp</label><input type="tel" id="cliTelefone" placeholder="(00) 90000-0000"></div>
+            <div class="form-group"><label for="cliEmail">E-mail</label><input type="email" id="cliEmail" placeholder="seu@email.com"></div>
+            <div class="form-group full"><label for="cliSexo">Gênero</label>
+              <select id="cliSexo"><option value="">Prefiro não informar</option><option value="M">Masculino</option><option value="F">Feminino</option><option value="NB">Não-binário</option><option value="O">Outro</option></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>📍 Endereço</h3>
+          <div class="profile-grid">
+            <div class="form-group"><label for="cliCep">CEP</label><input type="text" id="cliCep" placeholder="00000-000" maxlength="9"></div>
+            <div class="form-group"><label for="cliCidade">Cidade</label><input type="text" id="cliCidade" placeholder="Sua cidade"></div>
+            <div class="form-group"><label for="cliEstado">Estado</label><select id="cliEstado"><option value="">Selecione</option>\({estados.map(s=>`<option value="\){s}">${s}</option>`).join('')}</select></div>
+            <div class="form-group"><label for="cliBairro">Bairro</label><input type="text" id="cliBairro" placeholder="Seu bairro"></div>
+            <div class="form-group full"><label for="cliEndereco">Endereço completo</label><input type="text" id="cliEndereco" placeholder="Rua, número, complemento"></div>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>🏠 Tipo de Imóvel</h3>
+          <div class="profile-grid">
+            <div class="form-group"><label for="cliTipoImovel">Tipo</label>
+              <select id="cliTipoImovel"><option value="">Selecione</option><option value="casa">Casa</option><option value="apartamento">Apartamento</option><option value="comercial">Comercial</option><option value="industrial">Industrial</option><option value="rural">Rural</option></select>
+            </div>
+            <div class="form-group"><label for="cliAreaM2">Área aproximada (m²)</label><input type="number" id="cliAreaM2" placeholder="Ex: 80" min="1"></div>
+            <div class="form-group full"><label for="cliObsImovel">Observações sobre o imóvel</label><textarea id="cliObsImovel" rows="2" placeholder="Ex: Casa antiga, fiação original, precisa de revisão geral..."></textarea></div>
+          </div>
+        </div>
+
+        <div class="profile-section">
+          <h3>⚙️ Preferências de Atendimento</h3>
+          <div class="profile-grid">
+            <div class="form-group"><label for="cliHorario">Horário preferido</label>
+              <select id="cliHorario"><option value="">Sem preferência</option><option value="manha">Manhã (8h–12h)</option><option value="tarde">Tarde (12h–18h)</option><option value="noite">Noite (18h–22h)</option><option value="fds">Fins de semana</option></select>
+            </div>
+            <div class="form-group"><label for="cliUrgencia">Urgência típica</label>
+              <select id="cliUrgencia"><option value="">Normal</option><option value="urgente">Urgente (mesmo dia)</option><option value="programado">Programado (agendado)</option></select>
+            </div>
+            <div class="form-group full"><label for="cliObs">Observações gerais</label><textarea id="cliObs" rows="2" placeholder="Alguma informação importante para o profissional..."></textarea></div>
+          </div>
+        </div>
+
+        <div class="profile-save-bar">
+          <button class="btn-sm btn-sm--danger" id="btnCancelarCli">Cancelar</button>
+          <button class="btn-sm" id="btnSalvarCli">💾 Salvar Perfil</button>
+        </div>
+        <div class="error-msg" id="erroPerfilCli" role="alert" aria-live="assertive" style="margin-top:12px;"></div>
+      `;
+
+      setupImagePreview('fotoCliInput', 'fotoCliPreview');
+
+      if (currentUser) {
+        db.collection('users').doc(currentUser.uid).get().then(doc => {
+          if (!doc.exists) return;
+          const d = doc.data();
+          ['cliNome','cliApelido','cliCpf','cliNascimento','cliTelefone','cliEmail','cliSexo',
+           'cliCep','cliCidade','cliEstado','cliBairro','cliEndereco','cliTipoImovel',
+           'cliAreaM2','cliObsImovel','cliHorario','cliUrgencia','cliObs'].forEach(f => {
+            const el = document.getElementById(f); if (el && d[f]) el.value = d[f];
+          });
+          if (d.fotoCli) document.getElementById('fotoCliPreview').innerHTML = `<img src="${d.fotoCli}" alt="foto">`;
+        });
       }
-      const qu     = quedaUnitaria.cobre[bitola];
-      const deltaV = (I * L * qu) / 1000;
-      const pct    = (deltaV / Vn) * 100;
-      const ok     = pct <= 4;
-      result.style.display = 'block';
-      result.innerHTML = `
-        <h3 style="margin-bottom:12px; color:var(--primary);">📊 Resultado</h3>
-        <p><strong>Queda de tensão:</strong> ${deltaV.toFixed(2)} V</p>
-        <p><strong>Percentual:</strong> ${pct.toFixed(2)}%</p>
-        <p style="color:${ok ? '#16a34a' : '#dc2626'}; font-weight:700; margin-top:8px;">
-          ${ok ? '✅ Dentro do limite NBR 5410 (≤4%)' : '❌ Acima do limite NBR 5410 (>4%) — considere aumentar a bitola'}
-        </p>
-      `;
+
+      document.getElementById('btnSalvarCli').addEventListener('click', () => {
+        if (!currentUser) return;
+        const dados = {};
+        ['cliNome','cliApelido','cliCpf','cliNascimento','cliTelefone','cliEmail','cliSexo',
+         'cliCep','cliCidade','cliEstado','cliBairro','cliEndereco','cliTipoImovel',
+         'cliAreaM2','cliObsImovel','cliHorario','cliUrgencia','cliObs'].forEach(f => {
+          const el = document.getElementById(f); if (el) dados[f] = el.value;
+        });
+        const btn = document.getElementById('btnSalvarCli');
+        btn.disabled = true; btn.textContent = 'Salvando…';
+        db.collection('users').doc(currentUser.uid).set(dados, { merge: true })
+          .then(() => { btn.textContent = '✅ Salvo!'; setTimeout(() => { btn.disabled = false; btn.textContent = '💾 Salvar Perfil'; }, 2000); })
+          .catch(e => { document.getElementById('erroPerfilCli').textContent = 'Erro: ' + e.message; document.getElementById('erroPerfilCli').classList.add('active'); btn.disabled = false; btn.textContent = '💾 Salvar Perfil'; });
+      });
+
+      document.getElementById('tab-orcamento-cli').innerHTML = '<p style="color:var(--text-light);padding:16px;">Solicitar orçamento em construção.</p>';
+      document.getElementById('tab-pedidos-cli').innerHTML   = '<p style="color:var(--text-light);padding:16px;">Meus pedidos em construção.</p>';
     }
 
     function saveHistorico(data) {
       if (!currentUser) return;
-      db.collection('users').doc(currentUser.uid).collection('historico').add({
-        ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).catch(console.error);
+      db.collection('users').doc(currentUser.uid).collection('historico').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(console.error);
     }
-
-    function renderClienteTabs() {
-      document.getElementById('tab-perfil-cli').innerHTML    = '<p style="color:var(--text-light);">Perfil do cliente em construção.</p>';
-      document.getElementById('tab-orcamento-cli').innerHTML = '<p style="color:var(--text-light);">Solicitar orçamento em construção.</p>';
-      document.getElementById('tab-pedidos-cli').innerHTML   = '<p style="color:var(--text-light);">Meus pedidos em construção.</p>';
-      document.getElementById('tab-servicos-cli').innerHTML  = '<p style="color:var(--text-light);">Catálogo de serviços em construção.</p>';
-    }
-
   </script>
 </body>
 </html>
