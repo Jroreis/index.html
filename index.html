@@ -8,12 +8,17 @@
   <meta property="og:title" content="VoltCalc Pro - NBR 5410">
   <meta property="og:description" content="Ferramenta completa para eletricistas e engenheiros. Cálculo de potência, queda de tensão e dimensionamento conforme norma.">
   <meta property="og:type" content="website">
-  <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script defer src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- Firebase: sem defer para garantir disponibilidade antes do script principal -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root {
       --primary: #4f46e5; --primary-dark: #3730a3; --secondary: #f59e0b;
@@ -39,7 +44,7 @@
     .hero-card .icon { font-size: 36px; margin-bottom: 12px; }
     .hero-card h3 { font-size: 16px; font-weight: 700; color: var(--dark); }
     .hero-card p { font-size: 13px; color: var(--text-light); }
-    .video-section { background: var(--white); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); }
+    .video-section { background: var(--white); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin: 0 auto; }
     .video-section h3 { font-size: 18px; margin-bottom: 16px; color: var(--dark); }
     .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; }
     .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
@@ -92,7 +97,6 @@
     .service-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
     .service-item select { flex: 1; }
     .loading { opacity: 0.7; pointer-events: none; }
-    /* ── Perfil ── */
     .profile-section { background: var(--white); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 20px; }
     .profile-section h3 { font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; display: flex; align-items: center; gap: 8px; }
     .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -117,10 +121,10 @@
   <!-- LANDING PAGE -->
   <div id="landingPage">
     <header class="header" role="banner">
-      <a href="#" class="logo" aria-label="VoltCalc Pro - página inicial">⚡ VoltCalc <span>Pro</span></a>
+      <a href="#" class="logo">⚡ VoltCalc <span>Pro</span></a>
       <nav class="header-btns">
-        <button class="btn-header" id="showLoginModal" aria-haspopup="dialog">Login</button>
-        <button class="btn-header filled" id="showSignupModal" aria-haspopup="dialog">Criar Conta</button>
+        <button class="btn-header" id="showLoginModal">Login</button>
+        <button class="btn-header filled" id="showSignupModal">Criar Conta</button>
       </nav>
     </header>
     <main>
@@ -172,6 +176,7 @@
       </button>
       <p style="text-align:center;margin-top:14px;font-size:13px;">Não tem conta? <button style="background:none;border:none;color:var(--primary);font-weight:700;cursor:pointer;font-size:13px;" id="goToSignup">Cadastre-se</button></p>
     </div>
+
     <div class="modal" id="modalCadastro" style="display:none;">
       <button class="modal-close" id="closeSignupBtn" aria-label="Fechar">&times;</button>
       <h2>📝 Criar Conta</h2>
@@ -192,7 +197,7 @@
   <div class="app-screen" id="profissionalScreen">
     <div class="flex-between mb-20">
       <span class="screen-title">👋 <span id="profDisplayName"></span></span>
-      <button class="logout-btn" id="btnLogoutProf" aria-label="Sair">Sair</button>
+      <button class="logout-btn" id="btnLogoutProf">Sair</button>
     </div>
     <div class="tabs" role="tablist" aria-label="Ferramentas do profissional" id="profTabs">
       <button class="tab active" role="tab" aria-selected="true"  aria-controls="tab-orcamento"    data-tab="orcamento">📋 Orçamento</button>
@@ -212,7 +217,7 @@
   <div class="app-screen" id="clienteScreen">
     <div class="flex-between mb-20">
       <span class="screen-title">🏠 <span id="cliDisplayName"></span></span>
-      <button class="logout-btn" id="btnLogoutCli" aria-label="Sair">Sair</button>
+      <button class="logout-btn" id="btnLogoutCli">Sair</button>
     </div>
     <div class="tabs" role="tablist" aria-label="Área do cliente" id="clienteTabs">
       <button class="tab active" role="tab" aria-selected="true"  aria-controls="tab-perfil-cli"    data-tab="perfil-cli">👤 Perfil</button>
@@ -225,22 +230,32 @@
   </div>
 
   <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      firebase.initializeApp({
-        apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
-        authDomain: "voltcalc-pro.firebaseapp.com",
-        projectId: "voltcalc-pro",
-        storageBucket: "voltcalc-pro.appspot.com",
-        messagingSenderId: "411208955318",
-        appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
-      });
-      window.auth = firebase.auth();
-      window.db = firebase.firestore();
-      initApp();
+    // ⚠️ Restrinja esta chave no Google Cloud Console (HTTP referrers → seu domínio)
+    firebase.initializeApp({
+      apiKey:            "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
+      authDomain:        "voltcalc-pro.firebaseapp.com",
+      projectId:         "voltcalc-pro",
+      storageBucket:     "voltcalc-pro.appspot.com",
+      messagingSenderId: "411208955318",
+      appId:             "1:411208955318:web:8735802bf0f4ac8a1a3d17"
     });
+    const auth = firebase.auth();
+    const db   = firebase.firestore();
+
+    window.addEventListener('DOMContentLoaded', () => { initApp(); });
 
     let currentUser = null, loginRole = 'profissional', signupRole = 'profissional';
     let map = null, mapInitialized = false, leafletLoaded = false, clienteTabsInit = false;
+
+    const servicosList = [
+      "INSTALAÇÃO DE INTERRUPTOR COMPLETO PULSADOR","INSTALAÇÃO DE INTERRUPTOR THREE-WAY OU FOUR-WAY",
+      "INSTALAÇÃO DE INTERRUPTOR DUPLO OU BIFILAR","INSTALAÇÃO DE INTERRUPTOR TOMADA (Juntos)",
+      "INSTALAÇÃO DE ARANDELA PENDENTE OU SPOT COMUM","INSTALAÇÃO DE LÂMPADA FLUORESCENTE (TUBO)",
+      "INSTALAÇÃO DE CORES POLIVANTE","INSTALAÇÃO DE LUSTRES GRANDES","INSTALAÇÃO DE REFLETOR DE JARDIM",
+      "INSTALAÇÃO DE REFLETOR DE POSTE COMUM","INSTALAÇÃO DE REFLETOR DE POSTE COM LÂMPADA VAPOR",
+      "INSTALAÇÃO DE REATOR DE LÂMPADA A VAPOR","INSTALAÇÃO DE FOTOCÉLULA OU SENSOR DE PRESENÇA",
+      "INSTALAÇÃO DE REFLETOR LED FOTOCÉLULA SENSOR DE PRESENÇA"
+    ];
 
     function initApp() {
       setupModalTriggers(); setupRoleSelectors(); setupTabNavigation();
@@ -255,38 +270,38 @@
       });
     }
 
-    function openModal(id) {
-      document.getElementById('modalLogin').style.display = 'none';
+    function openModal(modalId) {
+      document.getElementById('modalLogin').style.display    = 'none';
       document.getElementById('modalCadastro').style.display = 'none';
-      document.getElementById(id).style.display = 'block';
+      document.getElementById(modalId).style.display         = 'block';
       document.getElementById('modalOverlay').classList.add('open');
-      const first = document.getElementById(id).querySelector('input, button, [tabindex="0"]');
+      const first = document.getElementById(modalId).querySelector('input, button, [tabindex="0"]');
       if (first) setTimeout(() => first.focus(), 50);
     }
     function closeModal() {
       document.getElementById('modalOverlay').classList.remove('open');
-      document.getElementById('modalLogin').style.display = 'none';
+      document.getElementById('modalLogin').style.display    = 'none';
       document.getElementById('modalCadastro').style.display = 'none';
     }
 
     function setupModalTriggers() {
-      document.getElementById('showLoginModal').addEventListener('click', () => openModal('modalLogin'));
+      document.getElementById('showLoginModal').addEventListener('click',  () => openModal('modalLogin'));
       document.getElementById('showSignupModal').addEventListener('click', () => openModal('modalCadastro'));
-      document.getElementById('closeLoginBtn').addEventListener('click', closeModal);
-      document.getElementById('closeSignupBtn').addEventListener('click', closeModal);
-      document.getElementById('goToSignup').addEventListener('click', () => openModal('modalCadastro'));
-      document.getElementById('goToLogin').addEventListener('click', () => openModal('modalLogin'));
+      document.getElementById('closeLoginBtn').addEventListener('click',   closeModal);
+      document.getElementById('closeSignupBtn').addEventListener('click',  closeModal);
+      document.getElementById('goToSignup').addEventListener('click',      () => openModal('modalCadastro'));
+      document.getElementById('goToLogin').addEventListener('click',       () => openModal('modalLogin'));
       document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === document.getElementById('modalOverlay')) closeModal(); });
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-      document.getElementById('btnLogin').addEventListener('click', handleLogin);
+      document.getElementById('btnLogin').addEventListener('click',    handleLogin);
       document.getElementById('btnCadastro').addEventListener('click', handleCadastro);
-      document.getElementById('btnGoogle').addEventListener('click', handleGoogle);
-      document.getElementById('btnLogoutProf').addEventListener('click', () => auth.signOut());
-      document.getElementById('btnLogoutCli').addEventListener('click', () => auth.signOut());
+      document.getElementById('btnGoogle').addEventListener('click',   handleGoogle);
+      document.getElementById('btnLogoutProf').addEventListener('click', () => firebase.auth().signOut());
+      document.getElementById('btnLogoutCli').addEventListener('click',  () => firebase.auth().signOut());
     }
 
     function setupRoleSelectors() {
-      setupRoleGroup('modalLogin', ['loginRoleProfissional','loginRoleCliente'], r => { loginRole = r; });
+      setupRoleGroup('modalLogin',    ['loginRoleProfissional','loginRoleCliente'],   r => { loginRole  = r; });
       setupRoleGroup('modalCadastro', ['signupRoleProfissional','signupRoleCliente'], r => { signupRole = r; });
     }
     function setupRoleGroup(modalId, ids, onSelect) {
@@ -317,13 +332,13 @@
       const btn = document.getElementById('btnLogin');
       btn.disabled = true; btn.textContent = 'Entrando…';
       try { await auth.signInWithEmailAndPassword(email, senha); closeModal(); }
-      catch { showError('erroLogin', 'Email ou senha incorretos.'); }
+      catch (e) { showError('erroLogin', 'Email ou senha incorretos. (' + (e.code || '') + ')'); }
       finally { btn.disabled = false; btn.textContent = 'Entrar'; }
     }
 
     async function handleCadastro() {
       clearError('erroCadastro');
-      const nome = document.getElementById('cadNome').value.trim();
+      const nome  = document.getElementById('cadNome').value.trim();
       const email = document.getElementById('cadEmail').value.trim();
       const senha = document.getElementById('cadSenha').value;
       if (!nome || !email || !senha) return showError('erroCadastro', 'Preencha todos os campos.');
@@ -347,26 +362,26 @@
         const doc = await db.collection('users').doc(user.uid).get();
         if (!doc.exists) await db.collection('users').doc(user.uid).set({ nome: user.displayName, email: user.email, role: loginRole, createdAt: new Date() });
         closeModal();
-      } catch { showError('erroLogin', 'Erro ao entrar com Google.'); }
+      } catch(e) { showError('erroLogin', 'Erro ao entrar com Google: ' + (e.code || e.message)); }
     }
 
     function showLanding() {
-      document.getElementById('landingPage').style.display = 'block';
+      document.getElementById('landingPage').style.display        = 'block';
       document.getElementById('profissionalScreen').style.display = 'none';
-      document.getElementById('clienteScreen').style.display = 'none';
+      document.getElementById('clienteScreen').style.display      = 'none';
     }
 
     function showScreen(role, displayName) {
       document.getElementById('landingPage').style.display = 'none';
       if (role === 'profissional') {
         document.getElementById('profissionalScreen').style.display = 'block';
-        document.getElementById('clienteScreen').style.display = 'none';
-        document.getElementById('profDisplayName').textContent = displayName;
+        document.getElementById('clienteScreen').style.display      = 'none';
+        document.getElementById('profDisplayName').textContent      = displayName;
         renderPerfilProfTab();
       } else {
-        document.getElementById('clienteScreen').style.display = 'block';
+        document.getElementById('clienteScreen').style.display      = 'block';
         document.getElementById('profissionalScreen').style.display = 'none';
-        document.getElementById('cliDisplayName').textContent = displayName;
+        document.getElementById('cliDisplayName').textContent       = displayName;
         if (!clienteTabsInit) { renderClienteTabs(); clienteTabsInit = true; }
       }
     }
@@ -401,22 +416,25 @@
       const input = document.getElementById(inputId);
       if (!input) return;
       input.addEventListener('change', () => {
-        const file = input.files[0];
-        if (!file) return;
+        const file = input.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = e => { document.getElementById(previewId).innerHTML = `<img src="${e.target.result}" alt="preview">`; };
         reader.readAsDataURL(file);
       });
     }
 
-    // ════════════════════════════════════════
+    function saveHistorico(data) {
+      if (!currentUser) return;
+      db.collection('users').doc(currentUser.uid).collection('historico').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(console.error);
+    }
+
+    // ════════════════════════════════════
     // PERFIL PROFISSIONAL
-    // ════════════════════════════════════════
+    // ════════════════════════════════════
     function renderPerfilProfTab() {
       const estados = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
       document.getElementById('tab-perfil').innerHTML = `
         <h2 style="margin-bottom:20px;">👤 Meu Perfil</h2>
-
         <div class="profile-section">
           <h3>🏷️ Tipo de Conta</h3>
           <div class="role-selector" style="margin:0;">
@@ -424,7 +442,6 @@
             <div class="role-card" id="tipoEmpresa"><h3>🏢 Empresa</h3><p>Pessoa jurídica</p></div>
           </div>
         </div>
-
         <div class="profile-section">
           <h3>🖼️ Logomarca da Empresa</h3>
           <div class="avatar-wrap">
@@ -434,7 +451,6 @@
             <p style="font-size:11px;color:var(--text-light);">PNG ou JPG · recomendado 400×200px</p>
           </div>
         </div>
-
         <div class="profile-section">
           <h3>👤 Dados Pessoais</h3>
           <div class="avatar-wrap" style="margin-bottom:16px;">
@@ -451,7 +467,6 @@
             <div class="form-group"><label for="profEmail">E-mail de contato</label><input type="email" id="profEmail" placeholder="seu@email.com"></div>
           </div>
         </div>
-
         <div class="profile-section">
           <h3>🏢 Dados da Empresa</h3>
           <div class="profile-grid">
@@ -460,7 +475,6 @@
             <div class="form-group full"><label for="profDescricao">Descrição dos serviços</label><textarea id="profDescricao" rows="3" placeholder="Ex: Instalações elétricas residenciais e comerciais..."></textarea></div>
           </div>
         </div>
-
         <div class="profile-section">
           <h3>📍 Endereço / Área de Atuação</h3>
           <div class="profile-grid">
@@ -471,7 +485,6 @@
             <div class="form-group full"><label for="profEndereco">Endereço completo</label><input type="text" id="profEndereco" placeholder="Rua, número, bairro"></div>
           </div>
         </div>
-
         <div class="profile-section">
           <h3>🎓 Formação & Certificações</h3>
           <div class="profile-grid">
@@ -481,58 +494,42 @@
             <div class="form-group full"><label for="profCertificados">Certificados / Cursos</label><textarea id="profCertificados" rows="2" placeholder="Ex: NR-10, NR-35, SENAI Eletricidade Industrial..."></textarea></div>
           </div>
         </div>
-
         <div class="profile-section">
           <h3>🌐 Redes Sociais & Contato</h3>
           <div class="profile-grid">
             <div class="form-group"><label for="profInstagram">Instagram</label><input type="text" id="profInstagram" placeholder="@seuusuario"></div>
-            <div class="form-group"><label for="profSite">Site / Portfólio</label><input type="url" id="profSite" placeholder="https://..."></div>
+            <div class="form-group"><label for="profSite">Site / Portfólio</label><input type="url" id="profSite" placeholder="URL do seu site"></div>
           </div>
         </div>
-
         <div class="profile-save-bar">
           <button class="btn-sm btn-sm--danger" id="btnCancelarProf">Cancelar</button>
           <button class="btn-sm" id="btnSalvarProf">💾 Salvar Perfil</button>
         </div>
         <div class="error-msg" id="erroPerfilProf" role="alert" aria-live="assertive" style="margin-top:12px;"></div>
       `;
-
       setupImagePreview('logoInput', 'logoPreview');
       setupImagePreview('fotoProfInput', 'fotoProfPreview');
-
-      document.getElementById('tipoEletricista').addEventListener('click', () => {
-        document.getElementById('tipoEletricista').classList.add('selected');
-        document.getElementById('tipoEmpresa').classList.remove('selected');
-      });
-      document.getElementById('tipoEmpresa').addEventListener('click', () => {
-        document.getElementById('tipoEmpresa').classList.add('selected');
-        document.getElementById('tipoEletricista').classList.remove('selected');
-      });
-
+      document.getElementById('tipoEletricista').addEventListener('click', () => { document.getElementById('tipoEletricista').classList.add('selected'); document.getElementById('tipoEmpresa').classList.remove('selected'); });
+      document.getElementById('tipoEmpresa').addEventListener('click', () => { document.getElementById('tipoEmpresa').classList.add('selected'); document.getElementById('tipoEletricista').classList.remove('selected'); });
       if (currentUser) {
         db.collection('users').doc(currentUser.uid).get().then(doc => {
           if (!doc.exists) return;
           const d = doc.data();
           ['profNome','profApelido','profCpf','profNascimento','profTelefone','profEmail','profEmpresa','profCnpj',
            'profDescricao','profCep','profCidade','profEstado','profRaio','profEndereco','profCrea',
-           'profExperiencia','profEspecialidades','profCertificados','profInstagram','profSite'].forEach(f => {
-            const el = document.getElementById(f); if (el && d[f]) el.value = d[f];
-          });
+           'profExperiencia','profEspecialidades','profCertificados','profInstagram','profSite'].forEach(f => { const el = document.getElementById(f); if (el && d[f]) el.value = d[f]; });
           if (d.tipoProf === 'empresa') { document.getElementById('tipoEmpresa').classList.add('selected'); document.getElementById('tipoEletricista').classList.remove('selected'); }
           if (d.fotoProf) document.getElementById('fotoProfPreview').innerHTML = `<img src="${d.fotoProf}" alt="foto">`;
           if (d.logoEmpresa) document.getElementById('logoPreview').innerHTML = `<img src="${d.logoEmpresa}" alt="logo">`;
         });
       }
-
       document.getElementById('btnSalvarProf').addEventListener('click', () => {
         if (!currentUser) return;
         const tipo = document.getElementById('tipoEmpresa').classList.contains('selected') ? 'empresa' : 'eletricista';
         const dados = { tipoProf: tipo };
         ['profNome','profApelido','profCpf','profNascimento','profTelefone','profEmail','profEmpresa','profCnpj',
          'profDescricao','profCep','profCidade','profEstado','profRaio','profEndereco','profCrea',
-         'profExperiencia','profEspecialidades','profCertificados','profInstagram','profSite'].forEach(f => {
-          const el = document.getElementById(f); if (el) dados[f] = el.value;
-        });
+         'profExperiencia','profEspecialidades','profCertificados','profInstagram','profSite'].forEach(f => { const el = document.getElementById(f); if (el) dados[f] = el.value; });
         const btn = document.getElementById('btnSalvarProf');
         btn.disabled = true; btn.textContent = 'Salvando…';
         db.collection('users').doc(currentUser.uid).set(dados, { merge: true })
@@ -541,15 +538,13 @@
       });
     }
 
-    // ════════════════════════════════════════
+    // ════════════════════════════════════
     // ÁREA DO CLIENTE
-    // ════════════════════════════════════════
+    // ════════════════════════════════════
     function renderClienteTabs() {
       const estados = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
-
       document.getElementById('tab-perfil-cli').innerHTML = `
         <h2 style="margin-bottom:20px;">👤 Meu Perfil</h2>
-
         <div class="profile-section">
           <h3>📷 Foto de Perfil</h3>
           <div class="avatar-wrap">
@@ -559,7 +554,6 @@
             <p style="font-size:11px;color:var(--text-light);">JPG ou PNG · máx 2MB</p>
           </div>
         </div>
-
         <div class="profile-section">
           <h3>👤 Dados Pessoais</h3>
           <div class="profile-grid">
@@ -574,7 +568,6 @@
             </div>
           </div>
         </div>
-
         <div class="profile-section">
           <h3>📍 Endereço</h3>
           <div class="profile-grid">
@@ -585,7 +578,6 @@
             <div class="form-group full"><label for="cliEndereco">Endereço completo</label><input type="text" id="cliEndereco" placeholder="Rua, número, complemento"></div>
           </div>
         </div>
-
         <div class="profile-section">
           <h3>🏠 Tipo de Imóvel</h3>
           <div class="profile-grid">
@@ -593,10 +585,9 @@
               <select id="cliTipoImovel"><option value="">Selecione</option><option value="casa">Casa</option><option value="apartamento">Apartamento</option><option value="comercial">Comercial</option><option value="industrial">Industrial</option><option value="rural">Rural</option></select>
             </div>
             <div class="form-group"><label for="cliAreaM2">Área aproximada (m²)</label><input type="number" id="cliAreaM2" placeholder="Ex: 80" min="1"></div>
-            <div class="form-group full"><label for="cliObsImovel">Observações sobre o imóvel</label><textarea id="cliObsImovel" rows="2" placeholder="Ex: Casa antiga, fiação original, precisa de revisão geral..."></textarea></div>
+            <div class="form-group full"><label for="cliObsImovel">Observações sobre o imóvel</label><textarea id="cliObsImovel" rows="2" placeholder="Ex: Casa antiga, fiação original..."></textarea></div>
           </div>
         </div>
-
         <div class="profile-section">
           <h3>⚙️ Preferências de Atendimento</h3>
           <div class="profile-grid">
@@ -609,51 +600,37 @@
             <div class="form-group full"><label for="cliObs">Observações gerais</label><textarea id="cliObs" rows="2" placeholder="Alguma informação importante para o profissional..."></textarea></div>
           </div>
         </div>
-
         <div class="profile-save-bar">
           <button class="btn-sm btn-sm--danger" id="btnCancelarCli">Cancelar</button>
           <button class="btn-sm" id="btnSalvarCli">💾 Salvar Perfil</button>
         </div>
         <div class="error-msg" id="erroPerfilCli" role="alert" aria-live="assertive" style="margin-top:12px;"></div>
       `;
-
       setupImagePreview('fotoCliInput', 'fotoCliPreview');
-
       if (currentUser) {
         db.collection('users').doc(currentUser.uid).get().then(doc => {
           if (!doc.exists) return;
           const d = doc.data();
           ['cliNome','cliApelido','cliCpf','cliNascimento','cliTelefone','cliEmail','cliSexo',
            'cliCep','cliCidade','cliEstado','cliBairro','cliEndereco','cliTipoImovel',
-           'cliAreaM2','cliObsImovel','cliHorario','cliUrgencia','cliObs'].forEach(f => {
-            const el = document.getElementById(f); if (el && d[f]) el.value = d[f];
-          });
+           'cliAreaM2','cliObsImovel','cliHorario','cliUrgencia','cliObs'].forEach(f => { const el = document.getElementById(f); if (el && d[f]) el.value = d[f]; });
           if (d.fotoCli) document.getElementById('fotoCliPreview').innerHTML = `<img src="${d.fotoCli}" alt="foto">`;
         });
       }
-
       document.getElementById('btnSalvarCli').addEventListener('click', () => {
         if (!currentUser) return;
         const dados = {};
         ['cliNome','cliApelido','cliCpf','cliNascimento','cliTelefone','cliEmail','cliSexo',
          'cliCep','cliCidade','cliEstado','cliBairro','cliEndereco','cliTipoImovel',
-         'cliAreaM2','cliObsImovel','cliHorario','cliUrgencia','cliObs'].forEach(f => {
-          const el = document.getElementById(f); if (el) dados[f] = el.value;
-        });
+         'cliAreaM2','cliObsImovel','cliHorario','cliUrgencia','cliObs'].forEach(f => { const el = document.getElementById(f); if (el) dados[f] = el.value; });
         const btn = document.getElementById('btnSalvarCli');
         btn.disabled = true; btn.textContent = 'Salvando…';
         db.collection('users').doc(currentUser.uid).set(dados, { merge: true })
           .then(() => { btn.textContent = '✅ Salvo!'; setTimeout(() => { btn.disabled = false; btn.textContent = '💾 Salvar Perfil'; }, 2000); })
           .catch(e => { document.getElementById('erroPerfilCli').textContent = 'Erro: ' + e.message; document.getElementById('erroPerfilCli').classList.add('active'); btn.disabled = false; btn.textContent = '💾 Salvar Perfil'; });
       });
-
       document.getElementById('tab-orcamento-cli').innerHTML = '<p style="color:var(--text-light);padding:16px;">Solicitar orçamento em construção.</p>';
       document.getElementById('tab-pedidos-cli').innerHTML   = '<p style="color:var(--text-light);padding:16px;">Meus pedidos em construção.</p>';
-    }
-
-    function saveHistorico(data) {
-      if (!currentUser) return;
-      db.collection('users').doc(currentUser.uid).collection('historico').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(console.error);
     }
   </script>
 </body>
