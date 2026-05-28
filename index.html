@@ -11,7 +11,7 @@
   <meta property="og:description" content="Ferramenta completa para eletricistas e engenheiros. Cálculo de potência, queda de tensão e dimensionamento conforme norma.">
   <meta property="og:type" content="website">
 
-  <!-- Firebase: sem defer para garantir disponibilidade antes do script principal -->
+  <!-- Firebase: scripts carregados no head para disponibilidade imediata -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -21,502 +21,321 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Leaflet: carregado via JS apenas quando necessário -->
-
   <style>
     :root {
-      --primary: #4f46e5;
-      --primary-dark: #3730a3;
-      --secondary: #f59e0b;
-      --dark: #1e293b;
-      --light: #f8fafc;
-      --text: #1e293b;
-      --text-light: #4b5563;
-      --white: #ffffff;
-      --radius: 12px;
-      --shadow: 0 4px 6px rgba(0,0,0,0.05);
+      --primary: #4f46e5; --primary-dark: #3730a3; --secondary: #f59e0b;
+      --dark: #1e293b; --light: #f8fafc; --text: #1e293b; --text-light: #4b5563;
+      --white: #ffffff; --radius: 12px; --shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Inter', 'Segoe UI', sans-serif;
-      background: var(--light);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    .header {
-      background: var(--white);
-      box-shadow: var(--shadow);
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .logo {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--primary);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    body { font-family: 'Inter', 'Segoe UI', sans-serif; background: var(--light); color: var(--text); line-height: 1.6; }
+    .header { background: var(--white); box-shadow: var(--shadow); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .logo { font-size: 22px; font-weight: 800; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; }
     .logo span { color: var(--secondary); }
     .header-btns { display: flex; gap: 12px; }
-    .btn-header {
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: 0.2s;
-      background: transparent;
-      border: 2px solid var(--primary);
-      color: var(--primary);
-    }
+    .btn-header { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; background: transparent; border: 2px solid var(--primary); color: var(--primary); }
     .btn-header.filled { background: var(--primary); color: #fff; }
     .btn-header:hover { opacity: 0.9; transform: translateY(-1px); }
-
-    .hero {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 60px 24px;
-      text-align: center;
-    }
+    .hero { max-width: 900px; margin: 0 auto; padding: 60px 24px; text-align: center; }
     .hero h1 { font-size: 36px; font-weight: 800; color: var(--dark); }
     .hero h1 span { color: var(--primary); }
     .hero p { font-size: 18px; color: var(--text-light); margin: 16px 0 32px; }
-    .hero-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 40px;
-    }
-    .hero-card {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 24px 16px;
-      box-shadow: var(--shadow);
-      text-align: center;
-      transition: 0.2s;
-    }
+    .hero-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 40px; }
+    .hero-card { background: var(--white); border-radius: var(--radius); padding: 24px 16px; box-shadow: var(--shadow); text-align: center; transition: 0.2s; }
     .hero-card:hover { transform: translateY(-4px); }
     .hero-card .icon { font-size: 36px; margin-bottom: 12px; }
     .hero-card h3 { font-size: 16px; font-weight: 700; color: var(--dark); }
     .hero-card p { font-size: 13px; color: var(--text-light); }
-
-    .video-section {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: var(--shadow);
-      margin: 0 auto;
-    }
+    .video-section { background: var(--white); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin: 0 auto; }
     .video-section h3 { font-size: 18px; margin-bottom: 16px; color: var(--dark); }
-    .video-container {
-      position: relative;
-      padding-bottom: 56.25%;
-      height: 0;
-      overflow: hidden;
-      border-radius: 8px;
-    }
-    .video-container iframe {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      border: none;
-    }
-
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
+    .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
     .modal-overlay.open { display: flex; }
-    .modal {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 32px 24px;
-      max-width: 400px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      position: relative;
-    }
+    .modal { background: var(--white); border-radius: var(--radius); padding: 32px 24px; max-width: 400px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; }
     .modal h2 { text-align: center; margin-bottom: 16px; }
-    .modal-close {
-      position: absolute;
-      top: 12px; right: 16px;
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: var(--text-light);
-      line-height: 1;
-    }
+    .modal-close { position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light); line-height: 1; }
     .modal-close:hover { color: var(--dark); }
-
-    .btn-google {
-      background: var(--white);
-      color: var(--text);
-      border: 1.5px solid #e2e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    .btn-google { background: var(--white); color: var(--text); border: 1.5px solid #e2e8f0; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
     .btn-google:hover { background: #f8fafc; }
-
     .app-screen { display: none; max-width: 900px; margin: 0 auto; padding: 30px 20px; }
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
     .mb-20 { margin-bottom: 20px; }
     .screen-title { font-weight: 700; font-size: 18px; }
-
-    .tabs {
-      display: flex;
-      overflow-x: auto;
-      flex-wrap: nowrap;
-      -webkit-overflow-scrolling: touch;
-      border-bottom: 2px solid #e2e8f0;
-      margin-bottom: 24px;
-      gap: 4px;
-      scrollbar-width: none;
-    }
+    .tabs { display: flex; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; border-bottom: 2px solid #e2e8f0; margin-bottom: 24px; gap: 4px; scrollbar-width: none; }
     .tabs::-webkit-scrollbar { display: none; }
-    .tab {
-      padding: 10px 14px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-light);
-      cursor: pointer;
-      border: none;
-      border-bottom: 3px solid transparent;
-      white-space: nowrap;
-      background: none;
-      transition: 0.2s;
-      flex-shrink: 0;
-    }
+    .tab { padding: 10px 14px; font-size: 14px; font-weight: 600; color: var(--text-light); cursor: pointer; border: none; border-bottom: 3px solid transparent; white-space: nowrap; background: none; transition: 0.2s; flex-shrink: 0; }
     .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
     .tab-content { display: none; animation: fadeIn 0.3s; }
     .tab-content.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 5px; }
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 14px;
-      font-family: inherit;
-      transition: border-color 0.2s;
-    }
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
-    }
-    .form-group input:invalid:not(:placeholder-shown) { border-color: #ef4444; }
-
-    .btn-primary {
-      width: 100%;
-      padding: 14px;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-family: inherit; transition: border-color 0.2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+    .btn-primary { width: 100%; padding: 14px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
     .btn-primary:hover { background: var(--primary-dark); }
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    .btn-sm {
-      padding: 8px 16px;
-      font-size: 13px;
-      width: auto;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background: var(--primary);
-      color: #fff;
-      transition: 0.2s;
-    }
+    .btn-sm { padding: 8px 16px; font-size: 13px; width: auto; border: none; border-radius: 6px; cursor: pointer; background: var(--primary); color: #fff; transition: 0.2s; }
     .btn-sm:hover { opacity: 0.9; }
     .btn-sm--danger { background: #ef4444; }
-
-    .result-card {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-top: 20px;
-      box-shadow: var(--shadow);
-    }
-    .error-msg {
-      background: #fef2f2;
-      color: #dc2626;
-      padding: 10px;
-      border-radius: 6px;
-      margin-top: 8px;
-      display: none;
-    }
+    .error-msg { background: #fef2f2; color: #dc2626; padding: 10px; border-radius: 6px; margin-top: 8px; display: none; }
     .error-msg.active { display: block; }
-
-    .price-table-wrapper { overflow-x: auto; margin-top: 16px; }
-    .price-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 700px; }
-    .price-table th { background: var(--primary); color: #fff; padding: 8px; text-align: left; font-size: 11px; }
-    .price-table td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; }
-    .price-table tr:nth-child(even) { background: #f8fafc; }
-    .category-row { background: #e2e8f0 !important; font-weight: 700; color: var(--dark); }
-
     .logout-btn { background: #ef4444; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-    .divider { border-top: 1px solid #e2e8f0; margin: 16px 0; }
     .role-selector { display: flex; gap: 12px; margin: 16px 0; }
-    .role-card {
-      flex: 1;
-      border: 2px solid #e2e8f0;
-      border-radius: var(--radius);
-      padding: 16px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.2s;
-    }
+    .role-card { flex: 1; border: 2px solid #e2e8f0; border-radius: var(--radius); padding: 16px; text-align: center; cursor: pointer; transition: 0.2s; }
     .role-card.selected { border-color: var(--primary); background: rgba(79,70,229,0.05); }
     .role-card h3 { font-size: 16px; margin-bottom: 4px; }
     .role-card p { font-size: 12px; color: var(--text-light); }
-
     #map { height: 300px; width: 100%; border-radius: var(--radius); margin-bottom: 16px; }
-    .service-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-    .service-item select { flex: 1; }
-    .loading { opacity: 0.7; pointer-events: none; }
-
-    .profile-section {
-      background: var(--white); border-radius: var(--radius); padding: 24px;
-      box-shadow: var(--shadow); margin-bottom: 20px;
-    }
-    .profile-section h3 {
-      font-size: 15px; font-weight: 700; color: var(--primary);
-      margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;
-      display: flex; align-items: center; gap: 8px;
-    }
+    .profile-section { background: var(--white); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 20px; }
+    .profile-section h3 { font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; display: flex; align-items: center; gap: 8px; }
     .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media (max-width: 600px) { .profile-grid { grid-template-columns: 1fr; } }
     .profile-grid .full { grid-column: 1 / -1; }
-
-    .avatar-wrap {
-      display: flex; flex-direction: column; align-items: center; gap: 12px;
-      margin-bottom: 24px;
-    }
-    .avatar-circle {
-      width: 96px; height: 96px; border-radius: 50%; background: #e2e8f0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 36px; overflow: hidden; position: relative; cursor: pointer;
-      border: 3px solid var(--primary);
-    }
+    .avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .avatar-circle { width: 96px; height: 96px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 36px; overflow: hidden; cursor: pointer; border: 3px solid var(--primary); }
     .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
-    .logo-rect {
-      width: 180px; height: 80px; border-radius: 10px; background: #e2e8f0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; color: var(--text-light); overflow: hidden;
-      border: 2px dashed #c7d2fe; cursor: pointer; position: relative;
-    }
+    .logo-rect { width: 180px; height: 80px; border-radius: 10px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-light); overflow: hidden; border: 2px dashed #c7d2fe; cursor: pointer; }
     .logo-rect img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
-    .avatar-upload-btn {
-      font-size: 12px; color: var(--primary); font-weight: 600;
-      background: none; border: none; cursor: pointer; text-decoration: underline;
-    }
-    .profile-save-bar {
-      display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px;
-    }
-    .badge-tipo {
-      display: inline-block; padding: 3px 10px; border-radius: 20px;
-      font-size: 11px; font-weight: 700; background: rgba(79,70,229,0.1);
-      color: var(--primary); margin-bottom: 4px;
-    }
-
-    @media (max-width: 600px) {
-      .hero h1 { font-size: 26px; }
-      .header { padding: 12px 16px; }
-      .btn-header { padding: 8px 14px; font-size: 12px; }
-    }
+    .avatar-upload-btn { font-size: 12px; color: var(--primary); font-weight: 600; background: none; border: none; cursor: pointer; text-decoration: underline; }
+    .profile-save-bar { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
+    @media (max-width: 600px) { .hero h1 { font-size: 26px; } .header { padding: 12px 16px; } .btn-header { padding: 8px 14px; font-size: 12px; } .profile-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
 
   <!-- LANDING PAGE -->
   <div id="landingPage">
-    <header class="header" role="banner">
-      <a href="#" class="logo" aria-label="VoltCalc Pro - página inicial">⚡ VoltCalc <span>Pro</span></a>
-      <nav class="header-btns" aria-label="Navegação principal">
-        <button class="btn-header" id="showLoginModal" aria-haspopup="dialog">Login</button>
-        <button class="btn-header filled" id="showSignupModal" aria-haspopup="dialog">Criar Conta</button>
+    <header class="header">
+      <a href="#" class="logo">⚡ VoltCalc <span>Pro</span></a>
+      <nav class="header-btns">
+        <button class="btn-header" id="showLoginModal">Login</button>
+        <button class="btn-header filled" id="showSignupModal">Criar Conta</button>
       </nav>
     </header>
-
     <main>
-      <section class="hero" aria-labelledby="heroTitle">
-        <h1 id="heroTitle">Calculadora Elétrica <span>Profissional</span></h1>
+      <section class="hero">
+        <h1>Calculadora Elétrica <span>Profissional</span></h1>
         <p>Ferramenta completa para eletricistas, engenheiros e técnicos. Baseada na <strong>NBR 5410</strong>.</p>
-
-        <div class="hero-cards" role="list">
-          <div class="hero-card" role="listitem">
-            <div class="icon" aria-hidden="true">⚡</div>
-            <h3>Cálculo de Potência</h3>
-            <p>Corrente, tensão e fator de potência</p>
-          </div>
-          <div class="hero-card" role="listitem">
-            <div class="icon" aria-hidden="true">📉</div>
-            <h3>Queda de Tensão</h3>
-            <p>Dimensionamento conforme norma</p>
-          </div>
-          <div class="hero-card" role="listitem">
-            <div class="icon" aria-hidden="true">📚</div>
-            <h3>Histórico</h3>
-            <p>Salve e acesse seus cálculos</p>
-          </div>
-          <div class="hero-card" role="listitem">
-            <div class="icon" aria-hidden="true">🔌</div>
-            <h3>Especificações</h3>
-            <p>Bitola, disjuntor e distância máxima</p>
-          </div>
+        <div class="hero-cards">
+          <div class="hero-card"><div class="icon">⚡</div><h3>Cálculo de Potência</h3><p>Corrente e carga</p></div>
+          <div class="hero-card"><div class="icon">📉</div><h3>Queda de Tensão</h3><p>Dimensionamento</p></div>
+          <div class="hero-card"><div class="icon">📚</div><h3>Histórico</h3><p>Salve cálculos</p></div>
+          <div class="hero-card"><div class="icon">🔌</div><h3>Especificações</h3><p>Bitola e disjuntor</p></div>
         </div>
-
-        <div class="video-section" aria-labelledby="videoTitle">
-          <h3 id="videoTitle">🎬 Conheça o VoltCalc Pro</h3>
+        <div class="video-section">
+          <h3>🎬 Conheça o VoltCalc Pro</h3>
           <div class="video-container">
-            <!-- Substitua VIDEO_ID_AQUI pelo ID real do vídeo no YouTube -->
-            <iframe
-              id="videoYoutube"
-              src=""
-              title="Apresentação do VoltCalc Pro"
-              allowfullscreen
-              loading="lazy"
-            ></iframe>
+            <iframe src="" title="Apresentação do VoltCalc Pro" allowfullscreen loading="lazy"></iframe>
           </div>
-          <p style="text-align:center; margin-top:12px; font-size:13px; color:var(--text-light);">
-            Inscreva-se no canal para mais conteúdo
-          </p>
         </div>
       </section>
     </main>
   </div>
 
   <!-- MODAIS -->
-  <div class="modal-overlay" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalActiveTitle">
-
-    <!-- Modal Login -->
+  <div class="modal-overlay" id="modalOverlay">
     <div class="modal" id="modalLogin" style="display:none;">
-      <button class="modal-close" id="closeLoginBtn" aria-label="Fechar modal de login">&times;</button>
-      <h2 id="modalActiveTitle">🔐 Entrar</h2>
-
-      <div class="role-selector" role="group" aria-label="Tipo de usuário">
-        <div class="role-card selected" data-role="profissional" id="loginRoleProfissional" tabindex="0" role="radio" aria-checked="true">
-          <h3>👨‍🔧 Profissional</h3><p>Eletricista / Engenheiro</p>
-        </div>
-        <div class="role-card" data-role="cliente" id="loginRoleCliente" tabindex="0" role="radio" aria-checked="false">
-          <h3>🏠 Cliente</h3><p>Buscar orçamento</p>
-        </div>
+      <button class="modal-close" id="closeLoginBtn">&times;</button>
+      <h2>🔐 Entrar</h2>
+      <div class="role-selector">
+        <div class="role-card selected" data-role="profissional" id="loginRoleProfissional" tabindex="0"><h3>👨‍🔧 Profissional</h3></div>
+        <div class="role-card" data-role="cliente" id="loginRoleCliente" tabindex="0"><h3>🏠 Cliente</h3></div>
       </div>
-
-      <div class="form-group">
-        <label for="loginEmail">Email</label>
-        <input type="email" id="loginEmail" placeholder="seu@email.com" required autocomplete="email">
-      </div>
-      <div class="form-group">
-        <label for="loginSenha">Senha</label>
-        <input type="password" id="loginSenha" placeholder="••••••" required minlength="6" autocomplete="current-password">
-      </div>
+      <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="seu@email.com"></div>
+      <div class="form-group"><label>Senha</label><input type="password" id="loginSenha" placeholder="••••••"></div>
       <button class="btn-primary" id="btnLogin">Entrar</button>
-      <div class="error-msg" id="erroLogin" role="alert" aria-live="assertive"></div>
-
-      <div style="display:flex; align-items:center; margin:16px 0; color:var(--text-light); font-size:12px;" aria-hidden="true">
-        <span style="flex:1; height:1px; background:#e2e8f0;"></span>
-        <span style="padding:0 10px;">ou</span>
-        <span style="flex:1; height:1px; background:#e2e8f0;"></span>
-      </div>
-
-      <button class="btn-google" id="btnGoogle" aria-label="Entrar com conta Google">
-        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-        </svg>
-        Entrar com Google
-      </button>
-
-      <p style="text-align:center; margin-top:14px; font-size:13px;">
-        Não tem conta?
-        <button style="background:none; border:none; color:var(--primary); font-weight:700; cursor:pointer; font-size:13px;" id="goToSignup">Cadastre-se</button>
-      </p>
+      <div class="error-msg" id="erroLogin"></div>
+      <p style="text-align:center; margin-top:14px; font-size:13px;">Não tem conta? <button style="background:none; border:none; color:var(--primary); font-weight:700; cursor:pointer;" id="goToSignup">Cadastre-se</button></p>
     </div>
 
-    <!-- Modal Cadastro -->
     <div class="modal" id="modalCadastro" style="display:none;">
-      <button class="modal-close" id="closeSignupBtn" aria-label="Fechar modal de cadastro">&times;</button>
+      <button class="modal-close" id="closeSignupBtn">&times;</button>
       <h2>📝 Criar Conta</h2>
-
-      <div class="role-selector" role="group" aria-label="Tipo de usuário">
-        <div class="role-card selected" data-role="profissional" id="signupRoleProfissional" tabindex="0" role="radio" aria-checked="true">
-          <h3>👨‍🔧 Profissional</h3><p>Eletricista / Engenheiro</p>
-        </div>
-        <div class="role-card" data-role="cliente" id="signupRoleCliente" tabindex="0" role="radio" aria-checked="false">
-          <h3>🏠 Cliente</h3><p>Buscar orçamento</p>
-        </div>
+      <div class="role-selector">
+        <div class="role-card selected" data-role="profissional" id="signupRoleProfissional" tabindex="0"><h3>👨‍🔧 Profissional</h3></div>
+        <div class="role-card" data-role="cliente" id="signupRoleCliente" tabindex="0"><h3>🏠 Cliente</h3></div>
       </div>
-
-      <div class="form-group">
-        <label for="cadNome">Nome</label>
-        <input type="text" id="cadNome" placeholder="Seu nome completo" required minlength="2" autocomplete="name">
-      </div>
-      <div class="form-group">
-        <label for="cadEmail">Email</label>
-        <input type="email" id="cadEmail" placeholder="seu@email.com" required autocomplete="email">
-      </div>
-      <div class="form-group">
-        <label for="cadSenha">Senha</label>
-        <input type="password" id="cadSenha" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
-      </div>
+      <div class="form-group"><label>Nome</label><input type="text" id="cadNome" placeholder="Nome completo"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="cadEmail" placeholder="seu@email.com"></div>
+      <div class="form-group"><label>Senha</label><input type="password" id="cadSenha" placeholder="Mínimo 6 dígitos"></div>
       <button class="btn-primary" id="btnCadastro">Cadastrar</button>
-      <div class="error-msg" id="erroCadastro" role="alert" aria-live="assertive"></div>
-
-      <p style="text-align:center; margin-top:14px; font-size:13px;">
-        Já tem conta?
-        <button style="background:none; border:none; color:var(--primary); font-weight:700; cursor:pointer; font-size:13px;" id="goToLogin">Entrar</button>
-      </p>
+      <div class="error-msg" id="erroCadastro"></div>
+      <p style="text-align:center; margin-top:14px; font-size:13px;">Já tem conta? <button style="background:none; border:none; color:var(--primary); font-weight:700; cursor:pointer;" id="goToLogin">Entrar</button></p>
     </div>
   </div>
 
-  <!-- ÁREA DO PROFISSIONAL -->
+  <!-- ÁREA PROFISSIONAL -->
   <div class="app-screen" id="profissionalScreen">
     <div class="flex-between mb-20">
       <span class="screen-title">👋 <span id="profDisplayName"></span></span>
-      <button class="logout-btn" id="btnLogoutProf" aria-label="Sair da conta">Sair</button>
+      <button class="logout-btn" id="btnLogoutProf">Sair</button>
     </div>
-    <div class="tabs" role="tablist" aria-label="Ferramentas do profissional" id="profTabs">
-      <button class="tab active" role="tab" aria-selected="true"  aria-controls="tab-orcamento"    data-tab="orcamento">📋 Orçamento</button>
-      <button class="tab"        role="tab" aria-selected="false" aria-controls="tab-precos"       data-tab="precos">💰 Preços</button>
-      <button class="tab"        role="tab" aria-selected="false" aria-controls="tab-solicitacoes" data-tab="solicitacoes">📩 Solicitações</button>
-      <button class="tab"        role="tab" aria-select
+    <div class="tabs" id="profTabs">
+      <button class="tab active" data-tab="orcamento">📋 Orçamento</button>
+      <button class="tab" data-tab="precos">💰 Preços</button>
+      <button class="tab" data-tab="solicitacoes">📩 Solicitações</button>
+      <button class="tab" data-tab="perfil">👤 Perfil</button>
+    </div>
+    <div class="tab-content active" id="tab-orcamento"></div>
+    <div class="tab-content" id="tab-precos"></div>
+    <div class="tab-content" id="tab-solicitacoes"></div>
+    <div class="tab-content" id="tab-perfil"></div>
+  </div>
+
+  <!-- ÁREA CLIENTE -->
+  <div class="app-screen" id="clienteScreen">
+    <div class="flex-between mb-20">
+      <span class="screen-title">🏠 <span id="cliDisplayName"></span></span>
+      <button class="logout-btn" id="btnLogoutCli">Sair</button>
+    </div>
+    <div class="tabs" id="clienteTabs">
+      <button class="tab active" data-tab="perfil-cli">👤 Perfil</button>
+      <button class="tab" data-tab="orcamento-cli">📋 Orçamento</button>
+    </div>
+    <div class="tab-content active" id="tab-perfil-cli"></div>
+    <div class="tab-content" id="tab-orcamento-cli"></div>
+  </div>
+
+<script>
+  var auth, db;
+  var currentUser = null;
+  var loginRole = 'profissional';
+  var signupRole = 'profissional';
+  var mapInitialized = false;
+  var leafletLoaded = false;
+  var clienteTabsInit = false;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    try {
+      firebase.initializeApp({
+        apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
+        authDomain: "voltcalc-pro.firebaseapp.com",
+        projectId: "voltcalc-pro",
+        storageBucket: "voltcalc-pro.appspot.com",
+        messagingSenderId: "411208955318",
+        appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
+      });
+      auth = firebase.auth();
+      db = firebase.firestore();
+      initApp();
+    } catch (e) { console.error("Firebase Init Error:", e); }
+  });
+
+  function initApp() {
+    setupModalTriggers();
+    setupRoleSelectors();
+    setupTabNavigation();
+    
+    auth.onAuthStateChanged(function(user) {
+      currentUser = user;
+      if (user) {
+        db.collection('users').doc(user.uid).get().then(function(doc) {
+          var role = (doc.exists && doc.data().role) ? doc.data().role : 'profissional';
+          showScreen(role, user.displayName || user.email);
+        }).catch(function() {
+          showScreen('profissional', user.displayName || user.email);
+        });
+      } else {
+        showLanding();
+      }
+    });
+  }
+
+  function openModal(id) {
+    document.getElementById('modalLogin').style.display = 'none';
+    document.getElementById('modalCadastro').style.display = 'none';
+    var m = document.getElementById(id);
+    if (m) {
+      m.style.display = 'block';
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  function setupModalTriggers() {
+    document.getElementById('showLoginModal').onclick = function() { openModal('modalLogin'); };
+    document.getElementById('showSignupModal').onclick = function() { openModal('modalCadastro'); };
+    document.getElementById('closeLoginBtn').onclick = closeModal;
+    document.getElementById('closeSignupBtn').onclick = closeModal;
+    document.getElementById('goToSignup').onclick = function() { openModal('modalCadastro'); };
+    document.getElementById('goToLogin').onclick = function() { openModal('modalLogin'); };
+    document.getElementById('modalOverlay').onclick = function(e) {
+      if (e.target.id === 'modalOverlay') closeModal();
+    };
+    
+    document.getElementById('btnLogin').onclick = handleLogin;
+    document.getElementById('btnCadastro').onclick = handleCadastro;
+    
+    var bp = document.getElementById('btnLogoutProf');
+    if (bp) bp.onclick = function() { auth.signOut(); };
+    var bc = document.getElementById('btnLogoutCli');
+    if (bc) bc.onclick = function() { auth.signOut(); };
+  }
+
+  function handleLogin() {
+    clearError('erroLogin');
+    var email = document.getElementById('loginEmail').value.trim();
+    var senha = document.getElementById('loginSenha').value;
+    if (!email || !senha) { showError('erroLogin', 'Preencha email e senha.'); return; }
+    
+    var btn = document.getElementById('btnLogin');
+    btn.disabled = true;
+    btn.textContent = 'Entrando...';
+    
+    auth.signInWithEmailAndPassword(email, senha)
+      .then(function() { closeModal(); })
+      .catch(function(err) {
+        showError('erroLogin', 'Email ou senha incorretos.');
+      })
+      .finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+      });
+  }
+
+  function handleCadastro() {
+    clearError('erroCadastro');
+    var nome = document.getElementById('cadNome').value.trim();
+    var email = document.getElementById('cadEmail').value.trim();
+    var senha = document.getElementById('cadSenha').value;
+    if (!nome || !email || !senha) { showError('erroCadastro', 'Preencha todos os campos.'); return; }
+    if (senha.length < 6) { showError('erroCadastro', 'Senha curta (min 6).'); return; }
+    
+    var btn = document.getElementById('btnCadastro');
+    btn.disabled = true;
+    btn.textContent = 'Cadastrando...';
+    
+    auth.createUserWithEmailAndPassword(email, senha)
+      .then(function(cred) {
+        return cred.user.updateProfile({ displayName: nome }).then(function() {
+          return db.collection('users').doc(cred.user.uid).set({
+            nome: nome, email: email, role: signupRole, createdAt: new Date()
+          });
+        });
+      })
+      .then(function() { closeModal(); })
+      .catch(function(err) { showError('erroCadastro', err.message); })
+      .finally(function() { btn.disabled = false; btn.textContent = 'Cadastrar'; });
+  }
+
+  function setupRoleSelectors() {
+    var lp = document.getElementById('loginRoleProfissional');
+    var lc = document.getElementById('loginRoleCliente');
+    if (lp && lc) {
+      lp.onclick = function() { loginRole = 'profissional'; updateRoleUI('modalLogin', 'profissional'); };
+      lc.onclick = function() { loginRole = 'cliente'; updateRoleUI('modalLogin', 'cliente'); };
+    }
+    var sp = document.getElementById('signupRoleProfissional');
+    var sc = document.getElementById('signupRoleCliente');
+    if (sp && sc) {
+      sp.onclick = function() { signupRole = 'profissional'; updateRoleUI('modalCadastro', 'profissional'); };
+      sc.onclick = function() { signupRole = 'cliente'; updateRoleUI('modalCadastro', 'cliente'); };
+    }
+  }
+
+  function updateRoleUI(modalId, role) {
+    var cards = docume
