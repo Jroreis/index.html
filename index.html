@@ -114,9 +114,6 @@
     .btn-main:hover { transform: scale(1.05); box-shadow: var(--shadow); }
 
     .features-section { padding: 80px 24px; max-width: 1200px; margin: 0 auto; }
-    .section-title { text-align: center; margin-bottom: 60px; }
-    .section-title h2 { font-size: 32px; font-weight: 800; color: var(--dark); }
-
     .features-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -140,18 +137,6 @@
     .feature-card h3 { font-size: 20px; margin-bottom: 16px; color: var(--dark); }
     .feature-card p { color: var(--text-light); font-size: 15px; }
 
-    /* ── App Screens & Tabs ── */
-    .app-screen { display: none; max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
-    .tabs { display: flex; gap: 8px; border-bottom: 2px solid #e2e8f0; margin-bottom: 32px; overflow-x: auto; }
-    .tab {
-      padding: 12px 24px; font-weight: 600; cursor: pointer; border: none; background: none;
-      border-bottom: 3px solid transparent; color: var(--text-light); white-space: nowrap; transition: 0.2s;
-    }
-    .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; animation: slideUp 0.4s ease-out; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
     /* ── Modals ── */
     .modal-overlay {
       display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
@@ -167,27 +152,27 @@
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; }
     .form-group input { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-family: inherit; }
-    .btn-primary { width: 100%; padding: 16px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; }
+    .btn-primary { width: 100%; padding: 16px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.3s; }
     .error-msg { background: #fee2e2; color: #b91c1c; padding: 12px; border-radius: 8px; margin-top: 12px; font-size: 14px; display: none; }
     .error-msg.active { display: block; }
-
     .role-selector { display: flex; gap: 12px; margin-bottom: 24px; }
-    .role-card {
-      flex: 1; border: 2px solid #e2e8f0; border-radius: 16px; padding: 16px;
-      text-align: center; cursor: pointer; transition: 0.2s;
-    }
+    .role-card { flex: 1; border: 2px solid #e2e8f0; border-radius: 16px; padding: 16px; text-align: center; cursor: pointer; transition: 0.2s; }
     .role-card.selected { border-color: var(--primary); background: rgba(79, 70, 229, 0.05); }
 
-    /* ── Tabela de Preços ── */
-    .ptable-wrap { overflow-x: auto; margin-top: 20px; border-radius: 12px; border: 1px solid #e2e8f0; }
+    /* ── App Screens & Tabela ── */
+    .app-screen { display: none; max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
+    .tabs { display: flex; gap: 8px; border-bottom: 2px solid #e2e8f0; margin-bottom: 32px; overflow-x: auto; }
+    .tab { padding: 12px 24px; font-weight: 600; cursor: pointer; background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-light); white-space: nowrap; }
+    .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .ptable-wrap { overflow-x: auto; margin-top: 20px; border: 1px solid #e2e8f0; border-radius: 12px; }
     .ptable { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
     .ptable th { background: var(--primary); color: #fff; padding: 12px; text-align: left; }
     .ptable td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; }
-    .ptable tr:nth-child(even) { background: #f8fafc; }
     .cat-row { background: #1e293b !important; color: #fff; font-weight: 700; }
     .mn { color: #16a34a; } .mx { color: #dc2626; } .md { color: var(--primary); font-weight: 700; }
-
-    .logout-btn { background: #ef4444; color: #fff; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; }
+    .logout-btn { background: #ef4444; color: #fff; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; }
     .profile-section { background: #fff; padding: 24px; border-radius: 16px; box-shadow: var(--shadow); }
   </style>
 </head>
@@ -206,7 +191,7 @@
   <div id="landingPage">
     <section class="hero-robust">
       <h1>Sua carreira na elétrica levada a <span>outro nível</span>.</h1>
-      <p>Gerencie orçamentos, consulte tabelas de preços atualizadas para 2026 e conecte-se com clientes de forma profissional.</p>
+      <p>Gerencie orçamentos, consulte tabelas de preços de mão de obra para 2026 e conecte-se com clientes com profissionalismo.</p>
       <div class="hero-actions">
         <button class="btn-main primary" onclick="openModal('modalCadastro')">Sou Profissional</button>
         <button class="btn-main secondary" onclick="openModal('modalLogin')">Sou Cliente</button>
@@ -214,24 +199,21 @@
     </section>
 
     <section class="features-section">
-      <div class="section-title">
-        <h2>Tudo o que você precisa em um só lugar</h2>
-      </div>
       <div class="features-grid">
         <div class="feature-card">
           <div class="feature-icon">💰</div>
           <h3>Preços Atualizados</h3>
-          <p>Tabela completa de mão de obra baseada nos padrões de mercado mais recentes.</p>
+          <p>Tabela completa baseada nos padrões de mercado mais recentes para 2026.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">📝</div>
-          <h3>Orçamentos Rápidos</h3>
-          <p>Crie propostas profissionais e envie para seus clientes em poucos minutos.</p>
+          <h3>Gestão de Serviços</h3>
+          <p>Crie orçamentos profissionais e organize suas propostas com facilidade.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">🤝</div>
-          <h3>Novas Oportunidades</h3>
-          <p>Plataforma preparada para conectar sua agenda com quem precisa de serviços elétricos.</p>
+          <h3>Novas Parcerias</h3>
+          <p>Uma plataforma preparada para aproximar você de quem busca serviços elétricos.</p>
         </div>
       </div>
     </section>
@@ -241,42 +223,45 @@
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal" id="modalLogin" style="display:none;">
       <button class="modal-close" onclick="closeModal()">&times;</button>
-      <h2 style="margin-bottom: 24px;">Acesse sua conta</h2>
+      <h2 style="margin-bottom: 24px;">Bem-vindo</h2>
       <div class="role-selector">
         <div class="role-card selected" id="loginRoleProfissional">👨‍🔧 Profissional</div>
         <div class="role-card" id="loginRoleCliente">🏠 Cliente</div>
       </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="loginEmail" placeholder="seu@email.com">
-      </div>
-      <div class="form-group">
-        <label>Senha</label>
-        <input type="password" id="loginSenha" placeholder="••••••••">
-      </div>
+      <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="seu@email.com"></div>
+      <div class="form-group"><label>Senha</label><input type="password" id="loginSenha" placeholder="••••••••"></div>
+      
       <button class="btn-primary" id="btnLogin">Entrar agora</button>
+
+      <button class="btn-header" id="btnGoogle" style="width: 100%; margin-top: 10px; border-color: #ddd; color: #444; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; height: 50px;">
+        Entrar com Google
+      </button>
+
+      <p style="text-align: center; margin-top: 15px; font-size: 13px;">
+        <a href="#" id="btnResetPassword" style="color: var(--text-light); text-decoration: none;">Esqueci minha senha</a>
+      </p>
       <div class="error-msg" id="erroLogin"></div>
     </div>
 
     <div class="modal" id="modalCadastro" style="display:none;">
       <button class="modal-close" onclick="closeModal()">&times;</button>
-      <h2 style="margin-bottom: 24px;">Criar nova conta</h2>
+      <h2 style="margin-bottom: 24px;">Começar agora</h2>
       <div class="role-selector">
         <div class="role-card selected" id="signupRoleProfissional">👨‍🔧 Profissional</div>
         <div class="role-card" id="signupRoleCliente">🏠 Cliente</div>
       </div>
-      <div class="form-group"><label>Nome</label><input type="text" id="cadNome"></div>
+      <div class="form-group"><label>Nome Completo</label><input type="text" id="cadNome"></div>
       <div class="form-group"><label>Email</label><input type="email" id="cadEmail"></div>
       <div class="form-group"><label>Senha</label><input type="password" id="cadSenha"></div>
-      <button class="btn-primary" id="btnCadastro">Cadastrar conta</button>
+      <button class="btn-primary" id="btnCadastro">Criar conta</button>
       <div class="error-msg" id="erroCadastro"></div>
     </div>
   </div>
 
-  <!-- TELAS DO APP -->
+  <!-- ÁREA LOGADA -->
   <div class="app-screen" id="profissionalScreen">
-    <div class="flex-between" style="margin-bottom: 30px;">
-      <h2>Painel do <span id="profDisplayName"></span></h2>
+    <div class="flex-between" style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+      <h2>Painel de <span id="profDisplayName"></span></h2>
       <button class="logout-btn" onclick="auth.signOut()">Sair</button>
     </div>
     <div class="tabs">
@@ -288,8 +273,8 @@
   </div>
 
   <div class="app-screen" id="clienteScreen">
-    <div class="flex-between" style="margin-bottom: 30px;">
-      <h2>Olá, <span id="cliDisplayName"></span></h2>
+    <div class="flex-between" style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+      <h2>Bem-vindo, <span id="cliDisplayName"></span></h2>
       <button class="logout-btn" onclick="auth.signOut()">Sair</button>
     </div>
     <div class="tabs">
@@ -316,11 +301,11 @@
       auth = firebase.auth();
       db = firebase.firestore();
 
-      // Login/Cadastro Listeners
       document.getElementById('btnLogin').onclick = handleLogin;
       document.getElementById('btnCadastro').onclick = handleCadastro;
+      document.getElementById('btnGoogle').onclick = handleGoogle;
+      document.getElementById('btnResetPassword').onclick = handleResetPassword;
 
-      // Role Selectors
       document.getElementById('loginRoleProfissional').onclick = function() { loginRole = 'profissional'; updateRoleUI('modalLogin', 'profissional'); };
       document.getElementById('loginRoleCliente').onclick = function() { loginRole = 'cliente'; updateRoleUI('modalLogin', 'cliente'); };
       document.getElementById('signupRoleProfissional').onclick = function() { signupRole = 'profissional'; updateRoleUI('modalCadastro', 'profissional'); };
@@ -334,40 +319,49 @@
             var role = (doc.exists && doc.data().role) ? doc.data().role : 'profissional';
             showScreen(role, user.displayName || user.email);
           });
-        } else {
-          showLanding();
-        }
+        } else { showLanding(); }
       });
     });
 
     function handleLogin() {
-      var email = document.getElementById('loginEmail').value.trim();
-      var senha = document.getElementById('loginSenha').value;
-      if (!email || !senha) { showError('erroLogin', 'Preencha todos os campos.'); return; }
-      
+      var e = document.getElementById('loginEmail').value.trim();
+      var s = document.getElementById('loginSenha').value;
+      if (!e || !s) { showError('erroLogin', 'Preencha os campos.'); return; }
       document.getElementById('btnLogin').disabled = true;
-      auth.signInWithEmailAndPassword(email, senha)
-        .then(function() { closeModal(); })
-        .catch(function() { showError('erroLogin', 'Dados de acesso incorretos.'); })
+      auth.signInWithEmailAndPassword(e, s).then(function() { closeModal(); })
+        .catch(function() { showError('erroLogin', 'Email ou senha incorretos.'); })
         .finally(function() { document.getElementById('btnLogin').disabled = false; });
     }
 
     function handleCadastro() {
-      var nome = document.getElementById('cadNome').value.trim();
-      var email = document.getElementById('cadEmail').value.trim();
-      var senha = document.getElementById('cadSenha').value;
-      if (!nome || !email || !senha) { showError('erroCadastro', 'Preencha todos os campos.'); return; }
-
+      var n = document.getElementById('cadNome').value.trim();
+      var e = document.getElementById('cadEmail').value.trim();
+      var s = document.getElementById('cadSenha').value;
+      if (!n || !e || !s) { showError('erroCadastro', 'Preencha tudo.'); return; }
       document.getElementById('btnCadastro').disabled = true;
-      auth.createUserWithEmailAndPassword(email, senha)
-        .then(function(cred) {
-          return cred.user.updateProfile({ displayName: nome }).then(function() {
-            return db.collection('users').doc(cred.user.uid).set({ nome: nome, email: email, role: signupRole });
-          });
-        })
-        .then(function() { closeModal(); })
-        .catch(function(e) { showError('erroCadastro', e.message); })
-        .finally(function() { document.getElementById('btnCadastro').disabled = false; });
+      auth.createUserWithEmailAndPassword(e, s).then(function(cred) {
+        return cred.user.updateProfile({ displayName: n }).then(function() {
+          return db.collection('users').doc(cred.user.uid).set({ nome: n, email: e, role: signupRole });
+        });
+      }).then(function() { closeModal(); }).catch(function(err) { showError('erroCadastro', err.message); })
+      .finally(function() { document.getElementById('btnCadastro').disabled = false; });
+    }
+
+    function handleGoogle() {
+      var p = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(p).then(function(res) {
+        var u = res.user;
+        return db.collection('users').doc(u.uid).get().then(function(doc) {
+          if (!doc.exists) return db.collection('users').doc(u.uid).set({ nome: u.displayName, email: u.email, role: loginRole });
+        });
+      }).then(function() { closeModal(); }).catch(function(err) { showError('erroLogin', err.message); });
+    }
+
+    function handleResetPassword() {
+      var email = document.getElementById('loginEmail').value.trim();
+      if (!email) { showError('erroLogin', 'Informe o email acima primeiro.'); return; }
+      auth.sendPasswordResetEmail(email).then(function() { alert('Email de recuperação enviado!'); })
+        .catch(function(err) { showError('erroLogin', err.message); });
     }
 
     function openModal(id) {
@@ -379,21 +373,21 @@
 
     function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
 
-    function updateRoleUI(modalId, role) {
-      var cards = document.querySelectorAll('#' + modalId + ' .role-card');
-      cards[0].classList.toggle('selected', role === 'profissional');
-      cards[1].classList.toggle('selected', role === 'cliente');
+    function updateRoleUI(mid, role) {
+      var cs = document.querySelectorAll('#' + mid + ' .role-card');
+      cs[0].classList.toggle('selected', role === 'profissional');
+      cs[1].classList.toggle('selected', role === 'cliente');
     }
 
     function setupTabNavigation() {
       document.querySelectorAll('.tab').forEach(function(tab) {
         tab.onclick = function() {
-          var container = tab.closest('.app-screen');
-          container.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+          var screen = tab.closest('.app-screen');
+          screen.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
           tab.classList.add('active');
           var target = tab.getAttribute('data-tab');
-          container.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
-          container.querySelector('#tab-' + target).classList.add('active');
+          screen.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+          screen.querySelector('#tab-' + target).classList.add('active');
         };
       });
     }
@@ -412,7 +406,7 @@
         document.getElementById('profissionalScreen').style.display = 'block';
         document.getElementById('profDisplayName').textContent = name;
         renderPrecosTab();
-        renderPerfilProfTab(name);
+        document.getElementById('tab-perfil').innerHTML = '<div class="profile-section"><h3>Dados do Profissional</h3><p>Nome: '+name+'</p></div>';
       } else {
         document.getElementById('clienteScreen').style.display = 'block';
         document.getElementById('cliDisplayName').textContent = name;
@@ -424,27 +418,11 @@
       var h = '<h2>💰 Tabela de Preços 2026</h2><div class="ptable-wrap"><table class="ptable"><thead><tr><th>Serviço</th><th>Mín</th><th>Máx</th><th>Méd</th></tr></thead><tbody>';
       function r(d,n,x,m){ return '<tr><td>'+d+'</td><td class="mn">'+n+'</td><td class="mx">'+x+'</td><td class="md">'+m+'</td></tr>'; }
       function c(l){ return '<tr class="cat-row"><td colspan="4">'+l+'</td></tr>'; }
-      h += c('💡 ILUMINAÇÃO');
-      h += r('Interruptor simples','R\( 55','R\) 80','R$ 68');
-      h += r('Luminária / Arandela','R\( 75','R\) 110','R$ 93');
-      h += c('🔌 PONTOS');
-      h += r('Tomada simples','R\( 45','R\) 70','R$ 58');
-      h += r('Chuveiro elétrico','R\( 105','R\) 125','R$ 115');
-      h += c('⚡ QUADROS');
-      h += r('Montagem QDC 6/12 circ.','R\( 650','R\) 1.000','R$ 825');
+      h += c('💡 ILUMINAÇÃO'); h += r('Interruptor simples','R\( 55','R\) 80','R$ 68'); h += r('Arandela/Pendente','R\( 75','R\) 110','R$ 93');
+      h += c('🔌 PONTOS'); h += r('Tomada simples','R\( 45','R\) 70','R$ 58'); h += r('Chuveiro elétrico','R\( 105','R\) 125','R$ 115');
+      h += c('⚡ QUADROS'); h += r('Montagem QDC','R\( 650','R\) 1.500','R$ 925');
       h += '</tbody></table></div>';
       document.getElementById('tab-precos').innerHTML = h;
     }
 
-    function renderPerfilProfTab(name) {
-      document.getElementById('tab-perfil').innerHTML = '<div class="profile-section"><h3>Dados Pessoais</h3><p>Nome: '+name+'</p><p>Status: Profissional Verificado</p></div>';
-    }
-
-    function showError(id, msg) {
-      var el = document.getElementById(id);
-      el.textContent = msg;
-      el.classList.add('active');
-    }
-  </script>
-</body>
-</html>
+    function showErr
