@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VoltCalc Pro - Soluções em Elétrica</title>
+  <title>VoltCalc Pro - A Plataforma do Profissional da Elétrica</title>
 
   <!-- SEO & Open Graph -->
-  <meta name="description" content="A plataforma definitiva para profissionais da elétrica e clientes.">
+  <meta name="description" content="A ferramenta definitiva para eletricistas: orçamentos, tabelas de preços e conexão com clientes.">
   <meta property="og:title" content="VoltCalc Pro">
-  <meta property="og:description" content="Gestão de orçamentos e tabela de preços 2026.">
-  <meta property="og:type" content="website">
+  <meta property="og:description" content="Gestão de serviços elétricos com conformidade NBR 5410.">
 
   <!-- Firebase (Compat Mode) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -19,7 +18,7 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -32,150 +31,124 @@
       --text-light: #64748b;
       --white: #ffffff;
       --radius: 16px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--light);
-      color: var(--text);
-      line-height: 1.6;
-    }
+    body { font-family: 'Inter', sans-serif; background: var(--light); color: var(--text); line-height: 1.6; overflow-x: hidden; }
 
     /* ── Header ── */
     .header {
       background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
       padding: 14px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 1000;
       border-bottom: 1px solid #e2e8f0;
     }
-    .logo {
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--primary);
-      text-decoration: none;
-    }
+    .logo { font-size: 24px; font-weight: 800; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; }
     .logo span { color: var(--secondary); }
     .header-btns { display: flex; gap: 12px; }
     .btn-header {
-      padding: 8px 18px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: 0.3s;
-      border: 2px solid var(--primary);
-      color: var(--primary);
-      background: transparent;
+      padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s;
+      border: 2px solid var(--primary); color: var(--primary); background: transparent;
     }
     .btn-header.filled { background: var(--primary); color: #fff; }
-    .btn-header:hover { transform: translateY(-1px); }
+    .btn-header:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
 
-    /* ── Landing Page Robusta ── */
-    .hero-robust {
-      padding: 80px 24px;
-      text-align: center;
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    /* ── Professional Landing Page ── */
+    .hero { padding: 100px 24px 60px; text-align: center; background: radial-gradient(circle at top right, #eef2ff, #f8fafc); position: relative; }
+    .hero h1 { font-size: clamp(36px, 8vw, 64px); font-weight: 800; color: var(--dark); margin-bottom: 24px; line-height: 1.1; letter-spacing: -0.02em; }
+    .hero h1 span { color: var(--primary); }
+    .hero p { font-size: clamp(18px, 4vw, 22px); max-width: 800px; margin: 0 auto 40px; color: var(--text-light); }
+    .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    
+    .btn-hero {
+      padding: 18px 36px; border-radius: 14px; font-weight: 700; font-size: 18px; cursor: pointer; transition: 0.3s; border: none; display: flex; align-items: center; gap: 10px;
     }
-    .hero-robust h1 {
-      font-size: clamp(32px, 7vw, 52px);
-      font-weight: 800;
-      color: var(--dark);
-      margin-bottom: 20px;
-      line-height: 1.2;
-    }
-    .hero-robust h1 span { color: var(--primary); }
-    .hero-robust p {
-      font-size: clamp(16px, 4vw, 19px);
-      max-width: 700px;
-      margin: 0 auto 35px;
-      color: var(--text-light);
-    }
-    .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-    .btn-main {
-      padding: 14px 28px;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 17px;
-      cursor: pointer;
-      transition: 0.3s;
-      border: none;
-    }
-    .btn-main.primary { background: var(--primary); color: #fff; }
-    .btn-main.secondary { background: var(--white); color: var(--primary); border: 2px solid var(--primary); }
+    .btn-hero.primary { background: var(--primary); color: #fff; box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); }
+    .btn-hero.secondary { background: var(--white); color: var(--primary); border: 2px solid var(--primary); }
+    .btn-hero:hover { transform: translateY(-3px); scale: 1.02; }
 
-    .features-section { padding: 60px 24px; max-width: 1100px; margin: 0 auto; }
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-    }
-    .feature-card {
-      background: var(--white);
-      padding: 30px;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      border: 1px solid #f1f5f9;
-    }
-    .feature-icon {
-      width: 50px; height: 50px;
-      background: rgba(79, 70, 229, 0.1);
-      color: var(--primary);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px; margin-bottom: 20px;
-    }
-    .feature-card h3 { font-size: 19px; margin-bottom: 12px; color: var(--dark); }
-    .feature-card p { color: var(--text-light); font-size: 14px; }
+    .stats-bar { padding: 60px 24px; display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; max-width: 1200px; margin: 0 auto; }
+    .stat-item { text-align: center; }
+    .stat-value { font-size: 32px; font-weight: 800; color: var(--primary); display: block; }
+    .stat-label { font-size: 14px; color: var(--text-light); font-weight: 600; text-transform: uppercase; }
+
+    .section-padding { padding: 80px 24px; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; max-width: 1200px; margin: 0 auto; }
+    .feature-card { background: var(--white); padding: 48px; border-radius: 24px; box-shadow: var(--shadow); border: 1px solid #f1f5f9; transition: 0.3s; }
+    .feature-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-lg); }
+    .feature-icon { width: 64px; height: 64px; background: #eef2ff; color: var(--primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 32px; }
+    .feature-card h3 { font-size: 22px; margin-bottom: 16px; color: var(--dark); font-weight: 700; }
+    .feature-card p { color: var(--text-light); font-size: 16px; }
 
     /* ── Modals ── */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-      z-index: 200; align-items: center; justify-content: center; padding: 20px;
-      backdrop-filter: blur(4px);
-    }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px); }
     .modal-overlay.open { display: flex; }
-    .modal {
-      background: var(--white); border-radius: 20px; padding: 35px;
-      max-width: 420px; width: 100%; position: relative;
-    }
-    .modal-close { position: absolute; top: 15px; right: 15px; font-size: 22px; cursor: pointer; background: none; border: none; color: #94a3b8; }
-    .form-group { margin-bottom: 18px; }
-    .form-group label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; }
-    .form-group input { width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-family: inherit; }
-    .btn-primary { width: 100%; padding: 14px; background: var(--primary); color: #fff; border: none; border-radius: 10px; font-weight: 700; font-size: 16px; cursor: pointer; }
-    .btn-google { width: 100%; margin-top: 10px; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .error-msg { background: #fee2e2; color: #b91c1c; padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 13px; display: none; }
-    .error-msg.active { display: block; }
-    .role-selector { display: flex; gap: 10px; margin-bottom: 20px; }
-    .role-card { flex: 1; border: 2px solid #e2e8f0; border-radius: 12px; padding: 12px; text-align: center; cursor: pointer; font-size: 14px; font-weight: 600; }
-    .role-card.selected { border-color: var(--primary); background: rgba(79, 70, 229, 0.05); color: var(--primary); }
+    .modal { background: var(--white); border-radius: 24px; padding: 40px; max-width: 480px; width: 100%; position: relative; box-shadow: var(--shadow-lg); }
+    .modal-close { position: absolute; top: 20px; right: 20px; font-size: 28px; cursor: pointer; background: none; border: none; color: #94a3b8; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: var(--dark); }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-family: inherit; font-size: 15px; transition: 0.2s; }
+    .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+    
+    .btn-primary { width: 100%; padding: 16px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-google { width: 100%; margin-top: 12px; background: #fff; border: 2.5px solid #e2e8f0; border-radius: 12px; padding: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; }
+    .btn-google:hover { background: #f8fafc; border-color: #cbd5e1; }
+    
+    .role-selector { display: flex; gap: 12px; margin-bottom: 24px; }
+    .role-card { flex: 1; border: 2px solid #e2e8f0; border-radius: 16px; padding: 16px; text-align: center; cursor: pointer; transition: 0.2s; font-weight: 700; font-size: 15px; }
+    .role-card.selected { border-color: var(--primary); background: #eef2ff; color: var(--primary); }
 
-    /* ── App Content ── */
-    .app-screen { display: none; max-width: 960px; margin: 0 auto; padding: 40px 24px; }
-    .flex-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-    .tabs { display: flex; gap: 6px; border-bottom: 2px solid #e2e8f0; margin-bottom: 25px; overflow-x: auto; }
-    .tab { padding: 10px 20px; font-weight: 600; cursor: pointer; background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-light); white-space: nowrap; font-size: 14px; }
-    .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    /* ── App Screen Layout ── */
+    .app-screen { display: none; max-width: 1200px; margin: 0 auto; padding: 40px 24px; animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .flex-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+    .tabs { display: flex; gap: 8px; border-bottom: 2px solid #e2e8f0; margin-bottom: 32px; overflow-x: auto; padding-bottom: 2px; }
+    .tab { padding: 12px 24px; font-weight: 600; cursor: pointer; background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-light); white-space: nowrap; font-size: 15px; transition: 0.2s; }
+    .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: #eef2ff; border-radius: 10px 10px 0 0; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-    .logout-btn { background: #ef4444; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .logout-btn { background: #fee2e2; color: #dc2626; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 700; transition: 0.2s; }
+    .logout-btn:hover { background: #fecaca; }
 
-    /* ── Tabela ── */
-    .ptable-wrap { overflow-x: auto; margin-top: 15px; border: 1px solid #e2e8f0; border-radius: 10px; }
-    .ptable { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 550px; }
-    .ptable th { background: var(--primary); color: #fff; padding: 10px; text-align: left; }
-    .ptable td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; }
-    .cat-row { background: #1e293b; color: #fff; font-weight: 700; }
-    .mn { color: #16a34a; } .mx { color: #dc2626; } .md { color: var(--primary); font-weight: 700; }
+    /* ── Profile & Cards ── */
+    .card { background: var(--white); border-radius: 20px; padding: 32px; box-shadow: var(--shadow); border: 1px solid #f1f5f9; margin-bottom: 24px; }
+    .card h3 { font-size: 20px; font-weight: 700; margin-bottom: 24px; color: var(--dark); display: flex; align-items: center; gap: 10px; }
+    .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .profile-grid .full { grid-column: 1 / -1; }
+
+    /* ── Mural & Solicitations ── */
+    .mural-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px; }
+    .request-card { background: var(--white); border-radius: 16px; padding: 24px; box-shadow: var(--shadow); border-left: 6px solid var(--primary); }
+    .request-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; }
+    .status-open { background: #ecfdf5; color: #059669; }
+    .status-closed { background: #f3f4f6; color: #6b7280; }
+
+    /* ── Orçamento System ── */
+    .orc-form-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
+    .orc-item-list { border-top: 1px solid #e2e8f0; padding-top: 24px; }
+    .orc-item { display: grid; grid-template-columns: 3fr 1fr 1fr 1fr auto; gap: 12px; margin-bottom: 12px; align-items: center; }
+    .btn-add-item { background: #eef2ff; color: var(--primary); border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 700; cursor: pointer; margin-top: 16px; }
+    .total-box { font-size: 24px; font-weight: 800; color: var(--primary); text-align: right; margin-top: 24px; padding: 24px; background: #f8fafc; border-radius: 16px; }
+
+    /* ── Tabela de Preços ── */
+    .ptable-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: var(--shadow); }
+    .ptable { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 700px; }
+    .ptable th { background: var(--primary); color: #fff; padding: 16px; text-align: left; font-weight: 700; }
+    .ptable td { padding: 14px 16px; border-bottom: 1px solid #e2e8f0; background: var(--white); }
+    .cat-row { background: #1e293b !important; color: #fff; font-weight: 800; text-transform: uppercase; }
+    .mn { color: #059669; font-weight: 600; } .mx { color: #dc2626; font-weight: 600; } .md { color: var(--primary); font-weight: 800; }
+
+    @media (max-width: 768px) { .orc-form-grid { grid-template-columns: 1fr; } .orc-item { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -184,167 +157,229 @@
   <header class="header">
     <a href="/" class="logo">⚡ VoltCalc<span>Pro</span></a>
     <div class="header-btns" id="authBtns">
-      <button class="btn-header" id="headerLoginBtn">Entrar</button>
-      <button class="btn-header filled" id="headerSignupBtn">Cadastrar</button>
+      <button class="btn-header" onclick="openModal('modalLogin')">Entrar</button>
+      <button class="btn-header filled" onclick="openModal('modalCadastro')">Cadastrar Agora</button>
     </div>
   </header>
 
   <!-- LANDING PAGE -->
   <div id="landingPage">
-    <section class="hero-robust">
-      <h1>Sua carreira na elétrica em <span>outro patamar</span>.</h1>
-      <p>A ferramenta definitiva para orçamentos rápidos, tabelas de preços atualizadas e conexão profissional.</p>
+    <section class="hero">
+      <h1>A plataforma onde o <span>eletricista profissional</span> gerencia tudo.</h1>
+      <p>Orçamentos em 2 minutos, tabelas de preços atualizadas para 2026 e conexão direta com quem precisa de qualidade.</p>
       <div class="hero-actions">
-        <button class="btn-main primary" onclick="openModal('modalCadastro')">Sou Profissional</button>
-        <button class="btn-main secondary" onclick="openModal('modalLogin')">Sou Cliente</button>
+        <button class="btn-hero primary" onclick="openModal('modalCadastro')">Quero ser Profissional</button>
+        <button class="btn-hero secondary" onclick="openModal('modalLogin')">Sou Cliente</button>
       </div>
     </section>
-    <section class="features-section">
+
+    <div class="stats-bar">
+      <div class="stat-item"><span class="stat-value">5.000+</span><span class="stat-label">Profissionais Ativos</span></div>
+      <div class="stat-item"><span class="stat-value">2026</span><span class="stat-label">Tabela Atualizada</span></div>
+      <div class="stat-item"><span class="stat-value">12.000+</span><span class="stat-label">Orçamentos Gerados</span></div>
+    </div>
+
+    <section class="section-padding features-section">
       <div class="features-grid">
         <div class="feature-card">
           <div class="feature-icon">💰</div>
-          <h3>Preços 2026</h3>
-          <p>Acesse valores de mercado atualizados para mão de obra.</p>
+          <h3>Preços 2026 Sem Erros</h3>
+          <p>Tabela completa de mão de obra para iluminação, quadros e instalações complexas. Valores revisados por especialistas.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">📑</div>
-          <h3>Orçamentos</h3>
-          <p>Organize suas propostas com clareza e profissionalismo.</p>
+          <h3>Orçamentos que Vendem</h3>
+          <p>Interface intuitiva para criar propostas detalhadas. Adicione serviços sugeridos ou preços personalizados em segundos.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">🏢</div>
-          <h3>Perfil Digital</h3>
-          <p>Tenha seu perfil profissional acessível para novos clientes.</p>
+          <div class="feature-icon">🤝</div>
+          <h3>Mural de Oportunidades</h3>
+          <p>Veja pedidos de clientes em sua região em tempo real. Responda diretamente e feche mais negócios.</p>
         </div>
       </div>
     </section>
   </div>
 
-  <!-- MODAL LOGIN -->
+  <!-- MODAIS -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal" id="modalLogin" style="display:none;">
       <button class="modal-close" onclick="closeModal()">&times;</button>
-      <h2 style="margin-bottom: 20px;">Entrar</h2>
+      <h2 style="margin-bottom: 12px; font-weight: 800;">Fazer Login</h2>
+      <p style="color: var(--text-light); margin-bottom: 32px; font-weight: 500;">Escolha seu perfil para entrar.</p>
+      
       <div class="role-selector">
         <div class="role-card selected" id="loginRoleProf">👨‍🔧 Profissional</div>
         <div class="role-card" id="loginRoleCli">🏠 Cliente</div>
       </div>
-      <div class="form-group"><label>Email</label><input type="email" id="loginEmail"></div>
-      <div class="form-group"><label>Senha</label><input type="password" id="loginSenha"></div>
-      <button class="btn-primary" id="btnLogin">Entrar</button>
-      <button class="btn-google" id="btnGoogle">Entrar com Google</button>
-      <p style="text-align: center; margin-top: 15px; font-size: 13px;">
-        <a href="#" id="btnReset" style="color: var(--text-light); text-decoration: none;">Esqueci minha senha</a>
+      <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="exemplo@email.com"></div>
+      <div class="form-group"><label>Senha</label><input type="password" id="loginSenha" placeholder="••••••••"></div>
+      <button class="btn-primary" id="btnLogin">Entrar no Painel</button>
+      <button class="btn-google" id="btnGoogle">Continuar com Google</button>
+      <p style="text-align: center; margin-top: 20px; font-size: 14px; font-weight: 600;">
+        <a href="#" id="btnReset" style="color: var(--primary); text-decoration: none;">Esqueci minha senha</a>
       </p>
-      <div class="error-msg" id="erroLogin"></div>
     </div>
 
-    <!-- MODAL CADASTRO -->
     <div class="modal" id="modalCadastro" style="display:none;">
       <button class="modal-close" onclick="closeModal()">&times;</button>
-      <h2 style="margin-bottom: 20px;">Criar Conta</h2>
+      <h2 style="margin-bottom: 32px; font-weight: 800;">Criar sua Conta</h2>
       <div class="role-selector">
         <div class="role-card selected" id="signupRoleProf">👨‍🔧 Profissional</div>
         <div class="role-card" id="signupRoleCli">🏠 Cliente</div>
       </div>
       <div class="form-group"><label>Nome Completo</label><input type="text" id="cadNome"></div>
       <div class="form-group"><label>Email</label><input type="email" id="cadEmail"></div>
-      <div class="form-group"><label>Senha</label><input type="password" id="cadSenha"></div>
-      <button class="btn-primary" id="btnSignup">Cadastrar</button>
-      <div class="error-msg" id="erroCad"></div>
+      <div class="form-group"><label>Senha</label><input type="password" id="cadSenha" placeholder="Mínimo 6 caracteres"></div>
+      <button class="btn-primary" id="btnSignup">Cadastrar Grátis</button>
     </div>
   </div>
 
-  <!-- TELAS DO APP -->
+  <!-- APP PROFESSIONALS -->
   <div class="app-screen" id="profScreen">
     <div class="flex-header">
-      <h2>Painel de <span id="profName"></span></h2>
-      <button class="logout-btn" onclick="auth.signOut()">Sair</button>
+      <h2>Painel do <span id="profNameSpan"></span></h2>
+      <button class="logout-btn" onclick="auth.signOut()">Encerrar Sessão</button>
     </div>
     <div class="tabs">
-      <div class="tab active" data-tab="precos">💰 Preços</div>
+      <div class="tab active" data-tab="orc">📋 Novo Orçamento</div>
+      <div class="tab" data-tab="precos">💰 Tabela de Preços</div>
+      <div class="tab" data-tab="solicitacoes">📩 Mural de Pedidos</div>
+      <div class="tab" data-tab="hist-prof">📚 Histórico</div>
       <div class="tab" data-tab="perfil">👤 Perfil</div>
     </div>
-    <div class="tab-content active" id="tab-precos"></div>
+
+    <div class="tab-content active" id="tab-orc">
+      <div class="card">
+        <h3>📄 Gerador de Novo Orçamento</h3>
+        <div class="orc-form-grid">
+          <div>
+            <div class="profile-grid">
+              <div class="form-group"><label>Nome do Cliente</label><input id="orcCliNome"></div>
+              <div class="form-group"><label>Telefone</label><input id="orcCliTel"></div>
+              <div class="form-group full"><label>Endereço do Serviço</label><input id="orcCliEnd"></div>
+            </div>
+            <div class="orc-item-list" id="orcItemsContainer"></div>
+            <button class="btn-add-item" id="btnAddOrcItem">+ Adicionar Serviço da Tabela</button>
+            <button class="btn-add-item" style="background:#f1f5f9; color:#475569;" id="btnAddCustomItem">+ Adicionar Serviço Personalizado</button>
+          </div>
+          <div>
+            <div class="card" style="position: sticky; top: 100px;">
+              <h4>Resumo Financeiro</h4>
+              <div class="total-box">Total: R$ <span id="orcTotalValue">0,00</span></div>
+              <button class="btn-primary" style="margin-top:20px;" id="btnSaveOrc">Salvar Orçamento</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-precos"></div>
+
+    <div class="tab-content" id="tab-solicitacoes">
+      <h3>📢 Mural Global de Solicitações</h3>
+      <p style="margin-bottom:24px; color:var(--text-light);">Veja o que os clientes estão precisando e entre em contato.</p>
+      <div class="mural-grid" id="profMuralContainer"></div>
+    </div>
+
+    <div class="tab-content" id="tab-hist-prof">
+      <h3>📚 Histórico de Orçamentos</h3>
+      <div id="profHistContainer"></div>
+    </div>
+
     <div class="tab-content" id="tab-perfil"></div>
   </div>
 
+  <!-- APP CLIENTS -->
   <div class="app-screen" id="cliScreen">
     <div class="flex-header">
-      <h2>Olá, <span id="cliName"></span></h2>
+      <h2>Área do Cliente: <span id="cliNameSpan"></span></h2>
       <button class="logout-btn" onclick="auth.signOut()">Sair</button>
     </div>
     <div class="tabs">
-      <div class="tab active" data-tab="cli-perfil">👤 Perfil</div>
-      <div class="tab" data-tab="cli-orc">📋 Orçamento</div>
+      <div class="tab active" data-tab="pedidos">📋 Meus Pedidos</div>
+      <div class="tab" data-tab="nova-sol">📩 Nova Solicitação</div>
+      <div class="tab" data-tab="cli-hist">📚 Histórico</div>
+      <div class="tab" data-tab="cli-perfil">👤 Perfil</div>
     </div>
-    <div class="tab-content active" id="tab-cli-perfil"></div>
-    <div class="tab-content" id="tab-cli-orc"></div>
+
+    <div class="tab-content active" id="tab-pedidos">
+      <div class="mural-grid" id="cliOrdersContainer"></div>
+    </div>
+    <div class="tab-content" id="tab-nova-sol">
+      <div class="card" style="max-width: 600px; margin: 0 auto;">
+        <h3>Postar Nova Necessidade</h3>
+        <div class="form-group"><label>O que você precisa?</label><textarea id="solDesc" rows="4" placeholder="Ex: Preciso instalar 3 arandelas e trocar um disjuntor..."></textarea></div>
+        <div class="form-group"><label>Cidade/Bairro</label><input id="solLoc"></div>
+        <button class="btn-primary" id="btnPostSol">Publicar no Mural</button>
+      </div>
+    </div>
+    <div class="tab-content" id="tab-cli-hist">
+      <div id="cliHistContainer"></div>
+    </div>
+    <div class="tab-content" id="tab-cli-perfil"></div>
   </div>
 
   <script>
     var auth, db;
     var loginRole = 'profissional', signupRole = 'profissional';
+    var currentUser = null;
+    var orcItems = [];
 
     document.addEventListener('DOMContentLoaded', function() {
-      try {
-        firebase.initializeApp({
-          apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
-          authDomain: "voltcalc-pro.firebaseapp.com",
-          projectId: "voltcalc-pro",
-          storageBucket: "voltcalc-pro.appspot.com",
-          messagingSenderId: "411208955318",
-          appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
-        });
-        auth = firebase.auth();
-        db = firebase.firestore();
-        
-        document.getElementById('headerLoginBtn').onclick = function() { openModal('modalLogin'); };
-        document.getElementById('headerSignupBtn').onclick = function() { openModal('modalCadastro'); };
-        
-        document.getElementById('loginRoleProf').onclick = function() { loginRole = 'profissional'; updateUI('modalLogin', 'profissional'); };
-        document.getElementById('loginRoleCli').onclick = function() { loginRole = 'cliente'; updateUI('modalLogin', 'cliente'); };
-        document.getElementById('signupRoleProf').onclick = function() { signupRole = 'profissional'; updateUI('modalCadastro', 'profissional'); };
-        document.getElementById('signupRoleCli').onclick = function() { signupRole = 'cliente'; updateUI('modalCadastro', 'cliente'); };
+      firebase.initializeApp({
+        apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
+        authDomain: "voltcalc-pro.firebaseapp.com",
+        projectId: "voltcalc-pro",
+        storageBucket: "voltcalc-pro.appspot.com",
+        messagingSenderId: "411208955318",
+        appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
+      });
+      auth = firebase.auth();
+      db = firebase.firestore();
 
-        document.getElementById('btnLogin').onclick = handleLogin;
-        document.getElementById('btnSignup').onclick = handleSignup;
-        document.getElementById('btnGoogle').onclick = handleGoogle;
-        document.getElementById('btnReset').onclick = handleReset;
+      document.getElementById('btnLogin').onclick = handleLogin;
+      document.getElementById('btnSignup').onclick = handleSignup;
+      document.getElementById('btnGoogle').onclick = handleGoogle;
+      document.getElementById('btnReset').onclick = handleReset;
+      
+      document.getElementById('loginRoleProf').onclick = function() { loginRole = 'profissional'; updateUI('modalLogin', 'profissional'); };
+      document.getElementById('loginRoleCli').onclick = function() { loginRole = 'cliente'; updateUI('modalLogin', 'cliente'); };
+      document.getElementById('signupRoleProf').onclick = function() { signupRole = 'profissional'; updateUI('modalCadastro', 'profissional'); };
+      document.getElementById('signupRoleCli').onclick = function() { signupRole = 'cliente'; updateUI('modalCadastro', 'cliente'); };
 
-        setupTabs();
+      document.getElementById('btnAddOrcItem').onclick = function() { addOrcItem(true); };
+      document.getElementById('btnAddCustomItem').onclick = function() { addOrcItem(false); };
+      document.getElementById('btnSaveOrc').onclick = saveOrc;
+      document.getElementById('btnPostSol').onclick = postSolicitation;
 
-        auth.onAuthStateChanged(function(user) {
-          if (user) {
-            db.collection('users').doc(user.uid).get().then(function(doc) {
-              var role = (doc.exists && doc.data().role) ? doc.data().role : 'profissional';
-              showApp(role, user.displayName || user.email);
-            });
-          } else {
-            showLanding();
-          }
-        });
-      } catch (e) { console.error(e); }
+      setupTabs();
+
+      auth.onAuthStateChanged(function(user) {
+        currentUser = user;
+        if (user) {
+          db.collection('users').doc(user.uid).get().then(function(doc) {
+            var role = (doc.exists && doc.data().role) ? doc.data().role : 'profissional';
+            showApp(role, user.displayName || user.email);
+          });
+        } else { showLanding(); }
+      });
     });
 
     function handleLogin() {
       var e = document.getElementById('loginEmail').value.trim();
       var s = document.getElementById('loginSenha').value;
-      if (!e || !s) { alert('Preencha os campos.'); return; }
-      auth.signInWithEmailAndPassword(e, s).then(closeModal).catch(function(err) {
-        document.getElementById('erroLogin').textContent = 'Erro ao entrar.';
-        document.getElementById('erroLogin').classList.add('active');
-      });
+      if (!e || !s) { alert('Acesse com email e senha.'); return; }
+      auth.signInWithEmailAndPassword(e, s).then(closeModal).catch(function(err) { alert('Erro: ' + err.message); });
     }
 
     function handleSignup() {
       var n = document.getElementById('cadNome').value.trim();
       var e = document.getElementById('cadEmail').value.trim();
       var s = document.getElementById('cadSenha').value;
-      if (!n || !e || !s) { alert('Preencha tudo.'); return; }
+      if (!n || !e || !s) { alert('Campos obrigatórios.'); return; }
       auth.createUserWithEmailAndPassword(e, s).then(function(cred) {
         return cred.user.updateProfile({ displayName: n }).then(function() {
-          return db.collection('users').doc(cred.user.uid).set({ nome: n, email: e, role: signupRole });
+          return db.collection('users').doc(cred.user.uid).set({ nome: n, email: e, role: signupRole, createdAt: new Date() });
         });
       }).then(closeModal).catch(function(err) { alert(err.message); });
     }
@@ -354,15 +389,15 @@
       auth.signInWithPopup(p).then(function(res) {
         var u = res.user;
         return db.collection('users').doc(u.uid).get().then(function(doc) {
-          if (!doc.exists) return db.collection('users').doc(u.uid).set({ nome: u.displayName, email: u.email, role: loginRole });
+          if (!doc.exists) return db.collection('users').doc(u.uid).set({ nome: u.displayName, email: u.email, role: loginRole, createdAt: new Date() });
         });
-      }).then(closeModal);
+      }).then(closeModal).catch(function(err) { alert(err.message); });
     }
 
     function handleReset() {
       var e = document.getElementById('loginEmail').value.trim();
-      if (!e) { alert('Digite seu email no campo acima.'); return; }
-      auth.sendPasswordResetEmail(e).then(function() { alert('Email enviado!'); });
+      if (!e) { alert('Insira seu email.'); return; }
+      auth.sendPasswordResetEmail(e).then(function() { alert('Email de recuperação enviado!'); });
     }
 
     function openModal(id) {
@@ -371,7 +406,6 @@
       document.getElementById(id).style.display = 'block';
       document.getElementById('modalOverlay').classList.add('open');
     }
-
     function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
 
     function updateUI(mid, role) {
@@ -392,14 +426,17 @@
       document.getElementById('authBtns').style.display = 'none';
       if (role === 'profissional') {
         document.getElementById('profScreen').style.display = 'block';
-        document.getElementById('profName').textContent = name;
-        renderPrecos();
-        document.getElementById('tab-perfil').innerHTML = '<h3>Meu Perfil</h3><p>Nome: '+name+'</p>';
+        document.getElementById('profNameSpan').textContent = name;
+        renderPrecosTable();
+        renderProfileForm('tab-perfil', 'profissional');
+        loadProfessionalMural();
+        loadHistory('profHistContainer', 'profissional');
       } else {
         document.getElementById('cliScreen').style.display = 'block';
-        document.getElementById('cliName').textContent = name;
-        document.getElementById('tab-cli-perfil').innerHTML = '<h3>Perfil Cliente</h3><p>Nome: '+name+'</p>';
-        document.getElementById('tab-cli-orc').innerHTML = '<h3>Solicitar Orçamento</h3><p>Em breve.</p>';
+        document.getElementById('cliNameSpan').textContent = name;
+        renderProfileForm('tab-cli-perfil', 'cliente');
+        loadClientOrders();
+        loadHistory('cliHistContainer', 'cliente');
       }
     }
 
@@ -416,15 +453,103 @@
       });
     }
 
-    function renderPrecos() {
-      var h = '<h2>💰 Tabela de Preços 2026</h2><div class="ptable-wrap"><table class="ptable"><thead><tr><th>Serviço</th><th>Mín</th><th>Máx</th><th>Méd</th></tr></thead><tbody>';
-      function r(d,n,x,m){ return '<tr><td>'+d+'</td><td class="mn">'+n+'</td><td class="mx">'+x+'</td><td class="md">'+m+'</td></tr>'; }
-      function c(l){ return '<tr class="cat-row"><td colspan="4">'+l+'</td></tr>'; }
-      h += c('💡 ILUMINAÇÃO'); h += r('Interruptor simples','R\( 55','R\) 80','R$ 68'); h += r('Lustre Grande','R\( 160','R\) 200','R$ 180');
-      h += c('🔌 PONTOS'); h += r('Tomada simples','R\( 45','R\) 70','R$ 58'); h += r('Chuveiro elétrico','R\( 105','R\) 125','R$ 115');
-      h += c('⚡ QUADROS'); h += r('Montagem QDC','R\( 650','R\) 1.500','R$ 925');
+    var priceData = [
+      { cat: '💡 ILUMINAÇÃO', items: [
+        { d: 'Interruptor simples / pulsador', mn: 55, mx: 80, md: 68 },
+        { d: 'Interruptor 3-way ou 4-way', mn: 70, mx: 90, md: 80 },
+        { d: 'Arandela, pendente ou spot', mn: 75, mx: 110, md: 93 },
+        { d: 'Lustre grande', mn: 160, mx: 200, md: 180 }
+      ]},
+      { cat: '🔌 PONTOS', items: [
+        { d: 'Tomada simples', mn: 45, mx: 70, md: 58 },
+        { d: 'Chuveiro elétrico simples', mn: 105, mx: 125, md: 115 },
+        { d: 'Ventilador de teto', mn: 160, mx: 200, md: 180 }
+      ]},
+      { cat: '⚡ QUADROS E PROTEÇÃO', items: [
+        { d: 'Substituição disjuntor mono', mn: 60, mx: 80, md: 70 },
+        { d: 'Instalação de IDR / DPS', mn: 120, mx: 170, md: 145 },
+        { d: 'Montagem QDC 6-12 circuitos', mn: 650, mx: 1000, md: 825 }
+      ]}
+    ];
+
+    function renderPrecosTable() {
+      var h = '<h2>💰 Tabela Mão de Obra 2026</h2><div class="ptable-wrap"><table class="ptable"><thead><tr><th>Serviço</th><th>Mín</th><th>Máx</th><th>Méd</th></tr></thead><tbody>';
+      priceData.forEach(function(c) {
+        h += '<tr class="cat-row"><td colspan="4">'+c.cat+'</td></tr>';
+        c.items.forEach(function(i) {
+          h += '<tr><td>'+i.d+'</td><td class="mn">R\( '+i.mn+'</td><td class="mx">R\) '+i.mx+'</td><td class="md">R$ '+i.md+'</td></tr>';
+        });
+      });
       h += '</tbody></table></div>';
       document.getElementById('tab-precos').innerHTML = h;
+    }
+
+    function addOrcItem(isSuggested) {
+      var id = Date.now();
+      var div = document.createElement('div');
+      div.className = 'orc-item';
+      div.id = 'item-' + id;
+      var select = isSuggested ? '<select class="orc-sel-suggest"><option value="">Selecione...</option>' : '<input placeholder="Descrição do serviço" class="orc-desc-custom">';
+      if(isSuggested) priceData.forEach(function(c) { c.items.forEach(function(i) { select += '<option value="'+i.md+'">'+i.d+'</option>'; }); });
+      if(isSuggested) select += '</select>';
+      div.innerHTML = select + '<input type="number" value="1" class="orc-qty"><input type="number" class="orc-val" placeholder="R$ Unit"><div class="orc-row-total">R$ 0,00</div><button onclick="removeOrcItem('+id+')" style="color:#ef4444;border:none;background:none;cursor:pointer;font-weight:800;">✕</button>';
+      document.getElementById('orcItemsContainer').appendChild(div);
+      if (isSuggested) div.querySelector('.orc-sel-suggest').onchange = function(e) { div.querySelector('.orc-val').value = e.target.value; updateOrcTotals(); };
+      div.querySelector('.orc-qty').oninput = updateOrcTotals;
+      div.querySelector('.orc-val').oninput = updateOrcTotals;
+    }
+
+    function removeOrcItem(id) { document.getElementById('item-' + id).remove(); updateOrcTotals(); }
+
+    function updateOrcTotals() {
+      var total = 0;
+      document.querySelectorAll('.orc-item').forEach(function(el) {
+        var q = parseFloat(el.querySelector('.orc-qty').value) || 0, v = parseFloat(el.querySelector('.orc-val').value) || 0, t = q * v;
+        el.querySelector('.orc-row-total').textContent = 'R$ ' + t.toFixed(2); total += t;
+      });
+      document.getElementById('orcTotalValue').textContent = total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    }
+
+    function saveOrc() {
+      var n = document.getElementById('orcCliNome').value; if (!n) { alert('Informe o cliente.'); return; }
+      db.collection('budgets').add({ profId: currentUser.uid, clientName: n, total: document.getElementById('orcTotalValue').textContent, createdAt: new Date() }).then(function() { alert('Salvo!'); location.reload(); });
+    }
+
+    function postSolicitation() {
+      var d = document.getElementById('solDesc').value, l = document.getElementById('solLoc').value; if (!d) return;
+      db.collection('requests').add({ clientId: currentUser.uid, clientName: currentUser.displayName, desc: d, loc: l, status: 'open', createdAt: new Date() }).then(function() { alert('Publicado!'); loadClientOrders(); });
+    }
+
+    function loadProfessionalMural() {
+      db.collection('requests').where('status', '==', 'open').orderBy('createdAt', 'desc').get().then(function(qs) {
+        var h = ''; qs.forEach(function(doc) { var d = doc.data(); h += '<div class="request-card"><h4>'+d.clientName+'</h4><p>'+d.desc+'</p><small>📍 '+d.loc+'</small></div>'; });
+        document.getElementById('profMuralContainer').innerHTML = h || '<p>Sem pedidos.</p>';
+      });
+    }
+
+    function loadClientOrders() {
+      db.collection('requests').where('clientId', '==', currentUser.uid).orderBy('createdAt', 'desc').get().then(function(qs) {
+        var h = ''; qs.forEach(function(doc) { var d = doc.data(); h += '<div class="request-card"><h4>Pedido em '+d.loc+'</h4><p>'+d.desc+'</p></div>'; });
+        document.getElementById('cliOrdersContainer').innerHTML = h || '<p>Você não tem pedidos.</p>';
+      });
+    }
+
+    function loadHistory(containerId, role) {
+      var q = role === 'profissional' ? db.collection('budgets').where('profId', '==', currentUser.uid) : db.collection('budgets').where('clientName', '==', currentUser.displayName);
+      q.orderBy('createdAt', 'desc').get().then(function(qs) {
+        var h = '<div class="ptable-wrap"><table class="ptable"><thead><tr><th>Data</th><th>Cliente</th><th>Total</th></tr></thead><tbody>';
+        qs.forEach(function(doc) { var d = doc.data(); h += '<tr><td>'+d.createdAt.toDate().toLocaleDateString()+'</td><td>'+d.clientName+'</td><td class="md">R$ '+d.total+'</td></tr>'; });
+        document.getElementById(containerId).innerHTML = h + '</tbody></table></div>';
+      });
+    }
+
+    function renderProfileForm(tid, role) {
+      var h = '<div class="card"><h3>👤 Perfil</h3><div class="profile-grid"><div class="form-group"><label>Nome</label><input id="pNom"></div><div class="form-group"><label>Telefone</label><input id="pTel"></div><div class="form-group"><label>CPF/CNPJ</label><input id="pDoc"></div><div class="form-group"><label>Cidade</label><input id="pCid"></div>';
+      if(role==='profissional') h+='<div class="form-group"><label>CREA/CFT</label><input id="pReg"></div><div class="form-group"><label>Anos Exp.</label><input id="pExp"></div><div class="form-group full"><label>Especialidades</label><textarea id="pEsp"></textarea></div>';
+      h+='</div><button class="btn-primary" id="btnSaveProfile">Salvar</button></div>';
+      document.getElementById(tid).innerHTML = h;
+      db.collection('users').doc(currentUser.uid).get().then(function(doc) { if(doc.exists){ var d=doc.data(); document.getElementById('pNom').value=d.nome||''; document.getElementById('pTel').value=d.tel||''; document.getElementById('pDoc').value=d.doc||''; document.getElementById('pCid').value=d.cid||''; if(role==='profissional'){ document.getElementById('pReg').value=d.reg||''; document.getElementById('pExp').value=d.exp||''; document.getElementById('pEsp').value=d.esp||''; } } });
+      document.getElementById('btnSaveProfile').onclick = function() { var upd = { nome: document.getElementById('pNom').value, tel: document.getElementById('pTel').value, doc: document.getElementById('pDoc').value, cid: document.getElementById('pCid').value }; if(role==='profissional'){ upd.reg=document.getElementById('pReg').value; upd.exp=document.getElementById('pExp').value; upd.esp=document.getElementById('pEsp').value; } db.collection('users').doc(currentUser.uid).update(upd).then(function(){alert('Salvo!');}); };
     }
   </script>
 </body>
