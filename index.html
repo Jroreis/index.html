@@ -116,29 +116,51 @@
     /* ── Profile & Cards ── */
     .card { background: var(--white); border-radius: 20px; padding: 32px; box-shadow: var(--shadow); border: 1px solid #f1f5f9; margin-bottom: 24px; }
     .card h3 { font-size: 20px; font-weight: 700; margin-bottom: 24px; color: var(--dark); display: flex; align-items: center; gap: 10px; }
-    .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
     .profile-grid .full { grid-column: 1 / -1; }
-
-    /* ── Mural & Solicitations ── */
-    .mural-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px; }
-    .request-card { background: var(--white); border-radius: 16px; padding: 24px; box-shadow: var(--shadow); border-left: 6px solid var(--primary); }
 
     /* ── Orçamento System ── */
     .orc-form-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
-    .orc-item-list { border-top: 1px solid #e2e8f0; padding-top: 24px; }
-    .orc-item { display: grid; grid-template-columns: 3fr 1fr 1fr 1fr auto; gap: 12px; margin-bottom: 12px; align-items: center; }
-    .btn-add-item { background: #eef2ff; color: var(--primary); border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 700; cursor: pointer; margin-top: 16px; }
-    .total-box { font-size: 24px; font-weight: 800; color: var(--primary); text-align: right; margin-top: 24px; padding: 24px; background: #f8fafc; border-radius: 16px; }
+    .orc-item-list { border-top: 1px solid #e2e8f0; padding-top: 24px; margin-top: 20px; }
+    .orc-item { display: grid; grid-template-columns: 3fr 1fr 1fr 1fr auto; gap: 12px; margin-bottom: 12px; align-items: center; background: #f8fafc; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; }
+    .btn-add-item { background: #eef2ff; color: var(--primary); border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 700; cursor: pointer; margin-top: 16px; transition: 0.2s; }
+    .btn-add-item:hover { background: #e0e7ff; }
+    .summary-box { background: #f8fafc; padding: 20px; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 16px; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 15px; color: var(--text-light); }
+    .summary-row.total { border-top: 2px dashed #cbd5e1; padding-top: 12px; margin-top: 12px; font-size: 22px; font-weight: 800; color: var(--primary); }
+    .btn-secondary-action { width: 100%; padding: 14px; background: #fff; border: 2px solid #e2e8f0; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 12px; transition: 0.2s; }
+    .btn-secondary-action:hover { background: #f1f5f9; border-color: #cbd5e1; }
 
     /* ── Tabela de Preços ── */
     .ptable-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: var(--shadow); }
     .ptable { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 700px; }
     .ptable th { background: var(--primary); color: #fff; padding: 16px; text-align: left; font-weight: 700; }
     .ptable td { padding: 14px 16px; border-bottom: 1px solid #e2e8f0; background: var(--white); }
-    .cat-row { background: #1e293b !important; color: #fff; font-weight: 800; text-transform: uppercase; }
+    .cat-row { background: #1e293b !important; color: #fff; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
     .mn { color: #059669; font-weight: 600; } .mx { color: #dc2626; font-weight: 600; } .md { color: var(--primary); font-weight: 800; }
 
-    @media (max-width: 768px) { .orc-form-grid { grid-template-columns: 1fr; } .orc-item { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) { 
+      .orc-form-grid { grid-template-columns: 1fr; } 
+      .orc-item { grid-template-columns: 1fr; gap: 8px; } 
+    }
+
+    /* ── Impressão de Orçamento Profissional (PDF) ── */
+    @media print {
+      body { background: #fff; color: #000; font-size: 12px; }
+      .header, .tabs, .logout-btn, .btn-add-item, .btn-primary, .btn-secondary-action, .orc-item button, #authBtns { display: none !important; }
+      .app-screen { padding: 0; margin: 0; display: block !important; }
+      .tab-content { display: none !important; }
+      .tab-content.active { display: block !important; }
+      .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
+      .orc-form-grid { grid-template-columns: 1fr !important; }
+      .orc-item { grid-template-columns: 3fr 1fr 1fr 1fr !important; background: none; border: none; border-bottom: 1px solid #000; padding: 6px 0; border-radius: 0; }
+      .orc-item select, .orc-item input { border: none !important; background: none !important; pointer-events: none; -webkit-appearance: none; appearance: none; padding: 0 !important; font-size: 12px; color: #000 !important; }
+      .form-group input, .form-group textarea { border: none !important; border-bottom: 1px solid #ccc !important; background: none !important; pointer-events: none; padding: 4px 0 !important; }
+      .summary-box { border: 1px solid #000 !important; background: none !important; }
+      .summary-row.total { color: #000 !important; }
+      .print-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 30px; }
+    }
+    .print-header { display: none; }
   </style>
 </head>
 <body>
@@ -154,7 +176,7 @@
   <div id="landingPage">
     <section class="hero">
       <h1>A plataforma onde o <span>eletricista profissional</span> gerencia tudo.</h1>
-      <p>Orçamentos em 2 minutos, tabelas de preços atualizadas para 2026 e gestão completa dos seus serviços.</p>
+      <p>Orçamentos em 2 minutos, tabelas de preços baseadas na Engehall e gestão completa dos seus serviços.</p>
       <div class="hero-actions">
         <button class="btn-hero primary" onclick="openModal('modalCadastro')">Cadastrar Meu Painel</button>
         <button class="btn-hero secondary" onclick="openModal('modalLogin')">Fazer Login</button>
@@ -163,7 +185,7 @@
 
     <div class="stats-bar">
       <div class="stat-item"><span class="stat-value">5.000+</span><span class="stat-label">Profissionais Ativos</span></div>
-      <div class="stat-item"><span class="stat-value">2026</span><span class="stat-label">Tabela Atualizada</span></div>
+      <div class="stat-item"><span class="stat-value">Engehall</span><span class="stat-label">Tabela de Referência</span></div>
       <div class="stat-item"><span class="stat-value">12.000+</span><span class="stat-label">Orçamentos Gerados</span></div>
     </div>
 
@@ -171,13 +193,13 @@
       <div class="features-grid">
         <div class="feature-card">
           <div class="feature-icon">💰</div>
-          <h3>Preços 2026 Sem Erros</h3>
-          <p>Tabela completa de mão de obra para iluminação, quadros e instalações complexas. Valores revisados por especialistas.</p>
+          <h3>Valores Sincronizados</h3>
+          <p>Tabela completa de mão de obra para iluminação, tomadas e quadros baseada nas melhores referências do mercado técnico.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">📑</div>
-          <h3>Orçamentos que Vendem</h3>
-          <p>Interface intuitiva para criar propostas detalhadas. Adicione serviços sugeridos ou preços personalizados em segundos.</p>
+          <h3>Orçamentos de Elite</h3>
+          <p>Interface intuitiva para criar propostas detalhadas com cálculo automático de descontos e geração direta de arquivos de impressão.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">🛠️</div>
@@ -214,10 +236,23 @@
   </div>
 
   <div class="app-screen" id="profScreen">
+    
+    <div class="print-header">
+      <div>
+        <h1 style="font-size: 28px; font-weight: 800; color:#000;">⚡ ORÇAMENTO ELÉTRICO</h1>
+        <p style="font-size: 14px; margin-top: 4px;">Plataforma VoltCalc Pro</p>
+      </div>
+      <div style="text-align: right;">
+        <h3 id="printProfName" style="font-weight: 700;"></h3>
+        <p id="printProfDoc"></p>
+      </div>
+    </div>
+
     <div class="flex-header">
       <h2>Painel do <span id="profNameSpan"></span></h2>
       <button class="logout-btn" onclick="auth.signOut()">Encerrar Sessão</button>
     </div>
+    
     <div class="tabs">
       <div class="tab active" data-tab="orc">📋 Novo Orçamento</div>
       <div class="tab" data-tab="precos">💰 Tabela de Preços</div>
@@ -233,17 +268,37 @@
             <div class="profile-grid">
               <div class="form-group"><label>Nome do Cliente</label><input id="orcCliNome"></div>
               <div class="form-group"><label>Telefone</label><input id="orcCliTel"></div>
+              <div class="form-group"><label>Data de Validade</label><input type="date" id="orcValidDate"></div>
               <div class="form-group full"><label>Endereço do Serviço</label><input id="orcCliEnd"></div>
             </div>
+            
             <div class="orc-item-list" id="orcItemsContainer"></div>
-            <button class="btn-add-item" id="btnAddOrcItem">+ Adicionar Serviço da Tabela</button>
+            
+            <button class="btn-add-item" id="btnAddOrcItem">+ Adicionar Serviço da Tabela Engehall</button>
             <button class="btn-add-item" style="background:#f1f5f9; color:#475569;" id="btnAddCustomItem">+ Adicionar Serviço Personalizado</button>
+            
+            <div class="form-group" style="margin-top: 24px;">
+              <label>Observações / Condições de Pagamento</label>
+              <textarea id="orcObs" rows="4" placeholder="Ex: 50% de entrada e 50% na conclusão da entrega técnica. Garantia de 1 ano sobre a mão de obra."></textarea>
+            </div>
           </div>
+          
           <div>
             <div class="card" style="position: sticky; top: 100px;">
               <h4>Resumo Financeiro</h4>
-              <div class="total-box">Total: R$ <span id="orcTotalValue">0,00</span></div>
-              <button class="btn-primary" style="margin-top:20px;" id="btnSaveOrc">Salvar Orçamento</button>
+              <div style="margin: 20px 0 10px 0;">
+                <div class="form-group">
+                  <label>Desconto (%)</label>
+                  <input type="number" id="orcDiscount" value="0" min="0" max="100">
+                </div>
+              </div>
+              <div class="summary-box">
+                <div class="summary-row"><span>Subtotal:</span><span>R$ <span id="orcSubtotalValue">0,00</span></span></div>
+                <div class="summary-row"><span>Desconto:</span><span>R$ <span id="orcDiscountValue">0,00</span></span></div>
+                <div class="summary-row total"><span>Total:</span><span>R$ <span id="orcTotalValue">0,00</span></span></div>
+              </div>
+              <button class="btn-primary" id="btnSaveOrc">Salvar no Histórico</button>
+              <button class="btn-secondary-action" onclick="window.print()">🖨️ Imprimir / Gerar PDF</button>
             </div>
           </div>
         </div>
@@ -285,6 +340,7 @@
       document.getElementById('btnAddOrcItem').onclick = function() { addOrcItem(true); };
       document.getElementById('btnAddCustomItem').onclick = function() { addOrcItem(false); };
       document.getElementById('btnSaveOrc').onclick = saveOrc;
+      document.getElementById('orcDiscount').oninput = updateOrcTotals;
 
       setupTabs();
 
@@ -352,6 +408,7 @@
       document.getElementById('authBtns').style.display = 'none';
       document.getElementById('profScreen').style.display = 'block';
       document.getElementById('profNameSpan').textContent = name;
+      document.getElementById('printProfName').textContent = name;
       renderPrecosTable();
       renderProfileForm('tab-perfil');
       loadHistory('profHistContainer');
@@ -370,31 +427,34 @@
       });
     }
 
+    // TABELA ATUALIZADA ENGEHALL COM PREÇOS DE REFERÊNCIA DE MÃO DE OBRA
     var priceData = [
       { cat: '💡 ILUMINAÇÃO', items: [
-        { d: 'Interruptor simples / pulsador', mn: 55, mx: 80, md: 68 },
-        { d: 'Interruptor 3-way ou 4-way', mn: 70, mx: 90, md: 80 },
-        { d: 'Arandela, pendente ou spot', mn: 75, mx: 110, md: 93 },
-        { d: 'Lustre grande', mn: 160, mx: 200, md: 180 }
+        { d: 'Interruptor simples / pulsador', mn: 50, mx: 75, md: 62 },
+        { d: 'Interruptor 3-way ou 4-way', mn: 65, mx: 90, md: 77 },
+        { d: 'Spot ou luminária LED embutida', mn: 60, mx: 100, md: 80 },
+        { d: 'Luminária de emergência de embutir', mn: 65, mx: 95, md: 80 },
+        { d: 'Fotocélula ou sensor de presença', mn: 85, mx: 130, md: 107 }
       ]},
-      { cat: '🔌 PONTOS', items: [
-        { d: 'Tomada simples', mn: 45, mx: 70, md: 58 },
-        { d: 'Chuveiro elétrico simples', mn: 105, mx: 125, md: 115 },
-        { d: 'Ventilador de teto', mn: 160, mx: 200, md: 180 }
+      { cat: '🔌 TOMADAS E PONTOS DE UTILIZAÇÃO', items: [
+        { d: 'Instalação / Troca de tomada simples', mn: 45, mx: 130, md: 87 },
+        { d: 'Passagem de fiação nova (por ponto)', mn: 150, mx: 350, md: 250 },
+        { d: 'Ventilador de teto', mn: 120, mx: 250, md: 185 },
+        { d: 'Chuveiro elétrico básico', mn: 150, mx: 300, md: 225 },
+        { d: 'Circuito exclusivo para Ar Condicionado', mn: 400, mx: 1200, md: 800 }
       ]},
       { cat: '⚡ QUADROS E PROTEÇÃO', items: [
-        { d: 'Substituição disjuntor mono', mn: 60, mx: 80, md: 70 },
-        { d: 'Instalação de IDR / DPS', mn: 120, mx: 170, md: 145 },
-        { d: 'Montagem QDC 6-12 circuitos', mn: 650, mx: 1000, md: 825 }
+        { d: 'Substituição disjuntor monopolar', mn: 55, mx: 130, md: 92 },
+        { d: 'Montagem/Troca completa QDC Residencial', mn: 600, mx: 1800, md: 1200 }
       ]}
     ];
 
     function renderPrecosTable() {
-      var h = '<h2>💰 Tabela Mão de Obra 2026</h2><div class="ptable-wrap"><table class="ptable"><thead><tr><th>Serviço</th><th>Mín</th><th>Máx</th><th>Méd</th></tr></thead><tbody>';
+      var h = '<h2>💰 Tabela Mão de Obra (Referência Engehall)</h2><div class="ptable-wrap"><table class="ptable"><thead><tr><th>Serviço</th><th>Mín</th><th>Máx</th><th>Méd</th></tr></thead><tbody>';
       priceData.forEach(function(c) {
         h += '<tr class="cat-row"><td colspan="4">'+c.cat+'</td></tr>';
         c.items.forEach(function(i) {
-          h += '<tr><td>'+i.d+'</td><td class="mn">R$ '+i.mn+'</td><td class="mx">R$ '+i.mx+'</td><td class="md">R$ '+i.md+'</td></tr>';
+          h += '<tr><td>'+i.d+'</td><td class="mn">R$ '+i.mn.toFixed(2)+'</td><td class="mx">R$ '+i.mx.toFixed(2)+'</td><td class="md">R$ '+i.md.toFixed(2)+'</td></tr>';
         });
       });
       h += '</tbody></table></div>';
@@ -406,10 +466,10 @@
       var div = document.createElement('div');
       div.className = 'orc-item';
       div.id = 'item-' + id;
-      var select = isSuggested ? '<select class="orc-sel-suggest"><option value="">Selecione...</option>' : '<input placeholder="Descrição do serviço" class="orc-desc-custom">';
+      var select = isSuggested ? '<select class="orc-sel-suggest"><option value="">Selecione o serviço...</option>' : '<input placeholder="Descrição do serviço personalizado" class="orc-desc-custom">';
       if(isSuggested) priceData.forEach(function(c) { c.items.forEach(function(i) { select += '<option value="'+i.md+'">'+i.d+'</option>'; }); });
       if(isSuggested) select += '</select>';
-      div.innerHTML = select + '<input type="number" value="1" class="orc-qty"><input type="number" class="orc-val" placeholder="R$ Unit"><div class="orc-row-total">R$ 0,00</div><button onclick="removeOrcItem('+id+')" style="color:#ef4444;border:none;background:none;cursor:pointer;font-weight:800;">✕</button>';
+      div.innerHTML = select + '<input type="number" value="1" min="1" class="orc-qty" style="width:70px; text-align:center;"><input type="number" class="orc-val" placeholder="R$ Unit"><div class="orc-row-total" style="font-weight:700;">R$ 0,00</div><button onclick="removeOrcItem('+id+')" style="color:#ef4444;border:none;background:none;cursor:pointer;font-weight:800;font-size:16px;">✕</button>';
       document.getElementById('orcItemsContainer').appendChild(div);
       if (isSuggested) div.querySelector('.orc-sel-suggest').onchange = function(e) { div.querySelector('.orc-val').value = e.target.value; updateOrcTotals(); };
       div.querySelector('.orc-qty').oninput = updateOrcTotals;
@@ -419,17 +479,27 @@
     function removeOrcItem(id) { document.getElementById('item-' + id).remove(); updateOrcTotals(); }
 
     function updateOrcTotals() {
-      var total = 0;
+      var subtotal = 0;
       document.querySelectorAll('.orc-item').forEach(function(el) {
         var q = parseFloat(el.querySelector('.orc-qty').value) || 0, v = parseFloat(el.querySelector('.orc-val').value) || 0, t = q * v;
-        el.querySelector('.orc-row-total').textContent = 'R$ ' + t.toFixed(2); total += t;
+        el.querySelector('.orc-row-total').textContent = 'R$ ' + t.toFixed(2); subtotal += t;
       });
-      document.getElementById('orcTotalValue').textContent = total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      
+      var discPerc = parseFloat(document.getElementById('orcDiscount').value) || 0;
+      if(discPerc > 100) discPerc = 100;
+      if(discPerc < 0) discPerc = 0;
+      
+      var discValue = subtotal * (discPerc / 100);
+      var total = subtotal - discValue;
+
+      document.getElementById('orcSubtotalValue').textContent = subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('orcDiscountValue').textContent = discValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('orcTotalValue').textContent = total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     function saveOrc() {
       var n = document.getElementById('orcCliNome').value; if (!n) { alert('Informe o cliente.'); return; }
-      db.collection('budgets').add({ profId: currentUser.uid, clientName: n, total: document.getElementById('orcTotalValue').textContent, createdAt: new Date() }).then(function() { alert('Salvo!'); location.reload(); });
+      db.collection('budgets').add({ profId: currentUser.uid, clientName: n, total: document.getElementById('orcTotalValue').textContent, createdAt: new Date() }).then(function() { alert('Orçamento salvo com sucesso!'); location.reload(); });
     }
 
     function loadHistory(containerId) {
@@ -441,7 +511,7 @@
     }
 
     function renderProfileForm(tid) {
-      var h = '<div class="card"><h3>👤 Perfil Profissional</h3><div class="profile-grid"><div class="form-group"><label>Nome</label><input id="pNom"></div><div class="form-group"><label>Telefone</label><input id="pTel"></div><div class="form-group"><label>CPF/CNPJ</label><input id="pDoc"></div><div class="form-group"><label>Cidade</label><input id="pCid"></div>';
+      var h = '<div class="card"><h3>👤 Perfil Profissional</h3><div class="profile-grid"><div class="form-group"><label>Nome / Empresa</label><input id="pNom"></div><div class="form-group"><label>Telefone</label><input id="pTel"></div><div class="form-group"><label>CPF/CNPJ</label><input id="pDoc"></div><div class="form-group"><label>Cidade</label><input id="pCid"></div>';
       h+='<div class="form-group"><label>CREA/CFT</label><input id="pReg"></div><div class="form-group"><label>Anos Exp.</label><input id="pExp"></div><div class="form-group full"><label>Especialidades</label><textarea id="pEsp"></textarea></div>';
       h+='</div><button class="btn-primary" id="btnSaveProfile">Salvar</button></div>';
       document.getElementById(tid).innerHTML = h;
@@ -456,6 +526,7 @@
           document.getElementById('pReg').value=d.reg||''; 
           document.getElementById('pExp').value=d.exp||''; 
           document.getElementById('pEsp').value=d.esp||''; 
+          document.getElementById('printProfDoc').textContent = d.doc ? 'Doc: ' + d.doc : '';
         } 
       });
       
@@ -469,7 +540,11 @@
           exp: document.getElementById('pExp').value, 
           esp: document.getElementById('pEsp').value 
         }; 
-        db.collection('users').doc(currentUser.uid).update(upd).then(function(){alert('Salvo!');}); 
+        db.collection('users').doc(currentUser.uid).update(upd).then(function(){
+          alert('Perfil atualizado!');
+          document.getElementById('printProfName').textContent = upd.nome;
+          document.getElementById('printProfDoc').textContent = upd.doc ? 'Doc: ' + upd.doc : '';
+        }); 
       };
     }
   </script>
