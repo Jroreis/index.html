@@ -5,17 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VoltCalc Pro - A Plataforma do Profissional da Elétrica</title>
 
-  <!-- SEO & Open Graph -->
-  <meta name="description" content="A ferramenta definitiva para eletricistas: orçamentos, tabelas de preços e conexão com clientes.">
+  <meta name="description" content="A ferramenta definitiva para eletricistas: orçamentos, tabelas de preços e gestão profissional.">
   <meta property="og:title" content="VoltCalc Pro">
   <meta property="og:description" content="Gestão de serviços elétricos com conformidade NBR 5410.">
 
-  <!-- Firebase (Compat Mode) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -103,10 +100,6 @@
     .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
     .btn-google { width: 100%; margin-top: 12px; background: #fff; border: 2.5px solid #e2e8f0; border-radius: 12px; padding: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; }
     .btn-google:hover { background: #f8fafc; border-color: #cbd5e1; }
-    
-    .role-selector { display: flex; gap: 12px; margin-bottom: 24px; }
-    .role-card { flex: 1; border: 2px solid #e2e8f0; border-radius: 16px; padding: 16px; text-align: center; cursor: pointer; transition: 0.2s; font-weight: 700; font-size: 15px; }
-    .role-card.selected { border-color: var(--primary); background: #eef2ff; color: var(--primary); }
 
     /* ── App Screen Layout ── */
     .app-screen { display: none; max-width: 1200px; margin: 0 auto; padding: 40px 24px; animation: fadeIn 0.4s ease-out; }
@@ -129,9 +122,6 @@
     /* ── Mural & Solicitations ── */
     .mural-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px; }
     .request-card { background: var(--white); border-radius: 16px; padding: 24px; box-shadow: var(--shadow); border-left: 6px solid var(--primary); }
-    .request-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; }
-    .status-open { background: #ecfdf5; color: #059669; }
-    .status-closed { background: #f3f4f6; color: #6b7280; }
 
     /* ── Orçamento System ── */
     .orc-form-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
@@ -153,7 +143,6 @@
 </head>
 <body>
 
-  <!-- HEADER -->
   <header class="header">
     <a href="/" class="logo">⚡ VoltCalc<span>Pro</span></a>
     <div class="header-btns" id="authBtns">
@@ -162,14 +151,13 @@
     </div>
   </header>
 
-  <!-- LANDING PAGE -->
   <div id="landingPage">
     <section class="hero">
       <h1>A plataforma onde o <span>eletricista profissional</span> gerencia tudo.</h1>
-      <p>Orçamentos em 2 minutos, tabelas de preços atualizadas para 2026 e conexão direta com quem precisa de qualidade.</p>
+      <p>Orçamentos em 2 minutos, tabelas de preços atualizadas para 2026 e gestão completa dos seus serviços.</p>
       <div class="hero-actions">
-        <button class="btn-hero primary" onclick="openModal('modalCadastro')">Quero ser Profissional</button>
-        <button class="btn-hero secondary" onclick="openModal('modalLogin')">Sou Cliente</button>
+        <button class="btn-hero primary" onclick="openModal('modalCadastro')">Cadastrar Meu Painel</button>
+        <button class="btn-hero secondary" onclick="openModal('modalLogin')">Fazer Login</button>
       </div>
     </section>
 
@@ -192,25 +180,20 @@
           <p>Interface intuitiva para criar propostas detalhadas. Adicione serviços sugeridos ou preços personalizados em segundos.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">🤝</div>
-          <h3>Mural de Oportunidades</h3>
-          <p>Veja pedidos de clientes em sua região em tempo real. Responda diretamente e feche mais negócios.</p>
+          <div class="feature-icon">🛠️</div>
+          <h3>Gestão Eficiente</h3>
+          <p>Mantenha o histórico de todos os seus valores, dados de clientes atendidos e propostas salvas em nuvem segura.</p>
         </div>
       </div>
     </section>
   </div>
 
-  <!-- MODAIS -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal" id="modalLogin" style="display:none;">
       <button class="modal-close" onclick="closeModal()">&times;</button>
       <h2 style="margin-bottom: 12px; font-weight: 800;">Fazer Login</h2>
-      <p style="color: var(--text-light); margin-bottom: 32px; font-weight: 500;">Escolha seu perfil para entrar.</p>
+      <p style="color: var(--text-light); margin-bottom: 32px; font-weight: 500;">Acesse seu painel técnico de orçamentos.</p>
       
-      <div class="role-selector">
-        <div class="role-card selected" id="loginRoleProf">👨‍🔧 Profissional</div>
-        <div class="role-card" id="loginRoleCli">🏠 Cliente</div>
-      </div>
       <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="exemplo@email.com"></div>
       <div class="form-group"><label>Senha</label><input type="password" id="loginSenha" placeholder="••••••••"></div>
       <button class="btn-primary" id="btnLogin">Entrar no Painel</button>
@@ -222,11 +205,7 @@
 
     <div class="modal" id="modalCadastro" style="display:none;">
       <button class="modal-close" onclick="closeModal()">&times;</button>
-      <h2 style="margin-bottom: 32px; font-weight: 800;">Criar sua Conta</h2>
-      <div class="role-selector">
-        <div class="role-card selected" id="signupRoleProf">👨‍🔧 Profissional</div>
-        <div class="role-card" id="signupRoleCli">🏠 Cliente</div>
-      </div>
+      <h2 style="margin-bottom: 32px; font-weight: 800;">Criar sua Conta Profissional</h2>
       <div class="form-group"><label>Nome Completo</label><input type="text" id="cadNome"></div>
       <div class="form-group"><label>Email</label><input type="email" id="cadEmail"></div>
       <div class="form-group"><label>Senha</label><input type="password" id="cadSenha" placeholder="Mínimo 6 caracteres"></div>
@@ -234,7 +213,6 @@
     </div>
   </div>
 
-  <!-- APP PROFESSIONALS -->
   <div class="app-screen" id="profScreen">
     <div class="flex-header">
       <h2>Painel do <span id="profNameSpan"></span></h2>
@@ -243,7 +221,6 @@
     <div class="tabs">
       <div class="tab active" data-tab="orc">📋 Novo Orçamento</div>
       <div class="tab" data-tab="precos">💰 Tabela de Preços</div>
-      <div class="tab" data-tab="solicitacoes">📩 Mural de Pedidos</div>
       <div class="tab" data-tab="hist-prof">📚 Histórico</div>
       <div class="tab" data-tab="perfil">👤 Perfil</div>
     </div>
@@ -275,12 +252,6 @@
 
     <div class="tab-content" id="tab-precos"></div>
 
-    <div class="tab-content" id="tab-solicitacoes">
-      <h3>📢 Mural Global de Solicitações</h3>
-      <p style="margin-bottom:24px; color:var(--text-light);">Veja o que os clientes estão precisando e entre em contato.</p>
-      <div class="mural-grid" id="profMuralContainer"></div>
-    </div>
-
     <div class="tab-content" id="tab-hist-prof">
       <h3>📚 Histórico de Orçamentos</h3>
       <div id="profHistContainer"></div>
@@ -289,41 +260,10 @@
     <div class="tab-content" id="tab-perfil"></div>
   </div>
 
-  <!-- APP CLIENTS -->
-  <div class="app-screen" id="cliScreen">
-    <div class="flex-header">
-      <h2>Área do Cliente: <span id="cliNameSpan"></span></h2>
-      <button class="logout-btn" onclick="auth.signOut()">Sair</button>
-    </div>
-    <div class="tabs">
-      <div class="tab active" data-tab="pedidos">📋 Meus Pedidos</div>
-      <div class="tab" data-tab="nova-sol">📩 Nova Solicitação</div>
-      <div class="tab" data-tab="cli-hist">📚 Histórico</div>
-      <div class="tab" data-tab="cli-perfil">👤 Perfil</div>
-    </div>
-
-    <div class="tab-content active" id="tab-pedidos">
-      <div class="mural-grid" id="cliOrdersContainer"></div>
-    </div>
-    <div class="tab-content" id="tab-nova-sol">
-      <div class="card" style="max-width: 600px; margin: 0 auto;">
-        <h3>Postar Nova Necessidade</h3>
-        <div class="form-group"><label>O que você precisa?</label><textarea id="solDesc" rows="4" placeholder="Ex: Preciso instalar 3 arandelas e trocar um disjuntor..."></textarea></div>
-        <div class="form-group"><label>Cidade/Bairro</label><input id="solLoc"></div>
-        <button class="btn-primary" id="btnPostSol">Publicar no Mural</button>
-      </div>
-    </div>
-    <div class="tab-content" id="tab-cli-hist">
-      <div id="cliHistContainer"></div>
-    </div>
-    <div class="tab-content" id="tab-cli-perfil"></div>
-  </div>
-
   <script>
     var auth, db;
     var loginRole = 'profissional', signupRole = 'profissional';
     var currentUser = null;
-    var orcItems = [];
 
     document.addEventListener('DOMContentLoaded', function() {
       firebase.initializeApp({
@@ -341,16 +281,10 @@
       document.getElementById('btnSignup').onclick = handleSignup;
       document.getElementById('btnGoogle').onclick = handleGoogle;
       document.getElementById('btnReset').onclick = handleReset;
-      
-      document.getElementById('loginRoleProf').onclick = function() { loginRole = 'profissional'; updateUI('modalLogin', 'profissional'); };
-      document.getElementById('loginRoleCli').onclick = function() { loginRole = 'cliente'; updateUI('modalLogin', 'cliente'); };
-      document.getElementById('signupRoleProf').onclick = function() { signupRole = 'profissional'; updateUI('modalCadastro', 'profissional'); };
-      document.getElementById('signupRoleCli').onclick = function() { signupRole = 'cliente'; updateUI('modalCadastro', 'cliente'); };
 
       document.getElementById('btnAddOrcItem').onclick = function() { addOrcItem(true); };
       document.getElementById('btnAddCustomItem').onclick = function() { addOrcItem(false); };
       document.getElementById('btnSaveOrc').onclick = saveOrc;
-      document.getElementById('btnPostSol').onclick = postSolicitation;
 
       setupTabs();
 
@@ -358,8 +292,7 @@
         currentUser = user;
         if (user) {
           db.collection('users').doc(user.uid).get().then(function(doc) {
-            var role = (doc.exists && doc.data().role) ? doc.data().role : 'profissional';
-            showApp(role, user.displayName || user.email);
+            showApp('profissional', user.displayName || user.email);
           });
         } else { showLanding(); }
       });
@@ -408,36 +341,20 @@
     }
     function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
 
-    function updateUI(mid, role) {
-      var cards = document.querySelectorAll('#' + mid + ' .role-card');
-      cards[0].classList.toggle('selected', role === 'profissional');
-      cards[1].classList.toggle('selected', role === 'cliente');
-    }
-
     function showLanding() {
       document.getElementById('landingPage').style.display = 'block';
       document.getElementById('profScreen').style.display = 'none';
-      document.getElementById('cliScreen').style.display = 'none';
       document.getElementById('authBtns').style.display = 'flex';
     }
 
     function showApp(role, name) {
       document.getElementById('landingPage').style.display = 'none';
       document.getElementById('authBtns').style.display = 'none';
-      if (role === 'profissional') {
-        document.getElementById('profScreen').style.display = 'block';
-        document.getElementById('profNameSpan').textContent = name;
-        renderPrecosTable();
-        renderProfileForm('tab-perfil', 'profissional');
-        loadProfessionalMural();
-        loadHistory('profHistContainer', 'profissional');
-      } else {
-        document.getElementById('cliScreen').style.display = 'block';
-        document.getElementById('cliNameSpan').textContent = name;
-        renderProfileForm('tab-cli-perfil', 'cliente');
-        loadClientOrders();
-        loadHistory('cliHistContainer', 'cliente');
-      }
+      document.getElementById('profScreen').style.display = 'block';
+      document.getElementById('profNameSpan').textContent = name;
+      renderPrecosTable();
+      renderProfileForm('tab-perfil');
+      loadHistory('profHistContainer');
     }
 
     function setupTabs() {
@@ -477,7 +394,7 @@
       priceData.forEach(function(c) {
         h += '<tr class="cat-row"><td colspan="4">'+c.cat+'</td></tr>';
         c.items.forEach(function(i) {
-          h += '<tr><td>'+i.d+'</td><td class="mn">R\( '+i.mn+'</td><td class="mx">R\) '+i.mx+'</td><td class="md">R$ '+i.md+'</td></tr>';
+          h += '<tr><td>'+i.d+'</td><td class="mn">R$ '+i.mn+'</td><td class="mx">R$ '+i.mx+'</td><td class="md">R$ '+i.md+'</td></tr>';
         });
       });
       h += '</tbody></table></div>';
@@ -515,41 +432,45 @@
       db.collection('budgets').add({ profId: currentUser.uid, clientName: n, total: document.getElementById('orcTotalValue').textContent, createdAt: new Date() }).then(function() { alert('Salvo!'); location.reload(); });
     }
 
-    function postSolicitation() {
-      var d = document.getElementById('solDesc').value, l = document.getElementById('solLoc').value; if (!d) return;
-      db.collection('requests').add({ clientId: currentUser.uid, clientName: currentUser.displayName, desc: d, loc: l, status: 'open', createdAt: new Date() }).then(function() { alert('Publicado!'); loadClientOrders(); });
-    }
-
-    function loadProfessionalMural() {
-      db.collection('requests').where('status', '==', 'open').orderBy('createdAt', 'desc').get().then(function(qs) {
-        var h = ''; qs.forEach(function(doc) { var d = doc.data(); h += '<div class="request-card"><h4>'+d.clientName+'</h4><p>'+d.desc+'</p><small>📍 '+d.loc+'</small></div>'; });
-        document.getElementById('profMuralContainer').innerHTML = h || '<p>Sem pedidos.</p>';
-      });
-    }
-
-    function loadClientOrders() {
-      db.collection('requests').where('clientId', '==', currentUser.uid).orderBy('createdAt', 'desc').get().then(function(qs) {
-        var h = ''; qs.forEach(function(doc) { var d = doc.data(); h += '<div class="request-card"><h4>Pedido em '+d.loc+'</h4><p>'+d.desc+'</p></div>'; });
-        document.getElementById('cliOrdersContainer').innerHTML = h || '<p>Você não tem pedidos.</p>';
-      });
-    }
-
-    function loadHistory(containerId, role) {
-      var q = role === 'profissional' ? db.collection('budgets').where('profId', '==', currentUser.uid) : db.collection('budgets').where('clientName', '==', currentUser.displayName);
-      q.orderBy('createdAt', 'desc').get().then(function(qs) {
+    function loadHistory(containerId) {
+      db.collection('budgets').where('profId', '==', currentUser.uid).orderBy('createdAt', 'desc').get().then(function(qs) {
         var h = '<div class="ptable-wrap"><table class="ptable"><thead><tr><th>Data</th><th>Cliente</th><th>Total</th></tr></thead><tbody>';
         qs.forEach(function(doc) { var d = doc.data(); h += '<tr><td>'+d.createdAt.toDate().toLocaleDateString()+'</td><td>'+d.clientName+'</td><td class="md">R$ '+d.total+'</td></tr>'; });
         document.getElementById(containerId).innerHTML = h + '</tbody></table></div>';
       });
     }
 
-    function renderProfileForm(tid, role) {
-      var h = '<div class="card"><h3>👤 Perfil</h3><div class="profile-grid"><div class="form-group"><label>Nome</label><input id="pNom"></div><div class="form-group"><label>Telefone</label><input id="pTel"></div><div class="form-group"><label>CPF/CNPJ</label><input id="pDoc"></div><div class="form-group"><label>Cidade</label><input id="pCid"></div>';
-      if(role==='profissional') h+='<div class="form-group"><label>CREA/CFT</label><input id="pReg"></div><div class="form-group"><label>Anos Exp.</label><input id="pExp"></div><div class="form-group full"><label>Especialidades</label><textarea id="pEsp"></textarea></div>';
+    function renderProfileForm(tid) {
+      var h = '<div class="card"><h3>👤 Perfil Profissional</h3><div class="profile-grid"><div class="form-group"><label>Nome</label><input id="pNom"></div><div class="form-group"><label>Telefone</label><input id="pTel"></div><div class="form-group"><label>CPF/CNPJ</label><input id="pDoc"></div><div class="form-group"><label>Cidade</label><input id="pCid"></div>';
+      h+='<div class="form-group"><label>CREA/CFT</label><input id="pReg"></div><div class="form-group"><label>Anos Exp.</label><input id="pExp"></div><div class="form-group full"><label>Especialidades</label><textarea id="pEsp"></textarea></div>';
       h+='</div><button class="btn-primary" id="btnSaveProfile">Salvar</button></div>';
       document.getElementById(tid).innerHTML = h;
-      db.collection('users').doc(currentUser.uid).get().then(function(doc) { if(doc.exists){ var d=doc.data(); document.getElementById('pNom').value=d.nome||''; document.getElementById('pTel').value=d.tel||''; document.getElementById('pDoc').value=d.doc||''; document.getElementById('pCid').value=d.cid||''; if(role==='profissional'){ document.getElementById('pReg').value=d.reg||''; document.getElementById('pExp').value=d.exp||''; document.getElementById('pEsp').value=d.esp||''; } } });
-      document.getElementById('btnSaveProfile').onclick = function() { var upd = { nome: document.getElementById('pNom').value, tel: document.getElementById('pTel').value, doc: document.getElementById('pDoc').value, cid: document.getElementById('pCid').value }; if(role==='profissional'){ upd.reg=document.getElementById('pReg').value; upd.exp=document.getElementById('pExp').value; upd.esp=document.getElementById('pEsp').value; } db.collection('users').doc(currentUser.uid).update(upd).then(function(){alert('Salvo!');}); };
+      
+      db.collection('users').doc(currentUser.uid).get().then(function(doc) { 
+        if(doc.exists){ 
+          var d=doc.data(); 
+          document.getElementById('pNom').value=d.nome||''; 
+          document.getElementById('pTel').value=d.tel||''; 
+          document.getElementById('pDoc').value=d.doc||''; 
+          document.getElementById('pCid').value=d.cid||''; 
+          document.getElementById('pReg').value=d.reg||''; 
+          document.getElementById('pExp').value=d.exp||''; 
+          document.getElementById('pEsp').value=d.esp||''; 
+        } 
+      });
+      
+      document.getElementById('btnSaveProfile').onclick = function() { 
+        var upd = { 
+          nome: document.getElementById('pNom').value, 
+          tel: document.getElementById('pTel').value, 
+          doc: document.getElementById('pDoc').value, 
+          cid: document.getElementById('pCid').value,
+          reg: document.getElementById('pReg').value, 
+          exp: document.getElementById('pExp').value, 
+          esp: document.getElementById('pEsp').value 
+        }; 
+        db.collection('users').doc(currentUser.uid).update(upd).then(function(){alert('Salvo!');}); 
+      };
     }
   </script>
 </body>
