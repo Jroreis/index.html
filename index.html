@@ -72,7 +72,7 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      opacity: 0.03; /* Opacidade bem baixa para não atrapalhar a leitura */
+      opacity: 0.03;
       z-index: -1;
       pointer-events: none;
     }
@@ -147,10 +147,28 @@
     .modal-overlay.open { display: flex; }
     .modal { background: var(--white); border-radius: 24px; padding: 40px; max-width: 480px; width: 100%; position: relative; box-shadow: var(--shadow-lg); }
     .modal-close { position: absolute; top: 20px; right: 20px; font-size: 28px; cursor: pointer; background: none; border: none; color: #94a3b8; }
+    
+    /* ── Melhoria Visual: Inputs e Selects mais elegantes ── */
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: var(--dark); }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-family: inherit; font-size: 15px; transition: 0.2s; background: rgba(255,255,255,0.8); }
-    .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+    .form-group input, .form-group select, .form-group textarea { 
+      width: 100%; 
+      padding: 14px 16px; 
+      border-radius: 10px; 
+      border: 1px solid #cbd5e1; 
+      background: #f8fafc;
+      font-family: inherit; 
+      font-size: 15px; 
+      color: var(--dark);
+      transition: all 0.2s ease; 
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { 
+      outline: none; 
+      border-color: var(--neon-green); 
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(57, 255, 20, 0.15); 
+    }
     
     .btn-primary { width: 100%; padding: 16px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
     .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
@@ -175,47 +193,120 @@
     .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
     .profile-grid .full { grid-column: 1 / -1; }
 
-    /* ── Orçamento System ── */
+    /* ── Orçamento System: Caixas mais uniformes ── */
     .orc-form-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
     .orc-item-list { border-top: 1px solid #e2e8f0; padding-top: 24px; margin-top: 20px; }
-    .orc-item { display: grid; grid-template-columns: 3fr 1fr 1fr 1fr auto; gap: 12px; margin-bottom: 12px; align-items: center; background: rgba(248, 250, 252, 0.9); padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; }
-    .btn-add-item { background: #eef2ff; color: var(--primary); border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: 700; cursor: pointer; margin-top: 16px; transition: 0.2s; }
+    .orc-item { 
+      display: grid; 
+      grid-template-columns: 3fr 1fr 1fr 1fr auto; 
+      gap: 16px; 
+      margin-bottom: 16px; 
+      align-items: center; 
+      background: #ffffff; 
+      padding: 16px; 
+      border-radius: 12px; 
+      border: 1px solid #cbd5e1; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .orc-item input, .orc-item select {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 14px;
+      width: 100%;
+      color: var(--dark);
+      transition: 0.2s;
+    }
+    .orc-item input:focus, .orc-item select:focus {
+      border-color: var(--neon-green);
+      background: #ffffff;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(57, 255, 20, 0.1);
+    }
+    
+    .btn-add-item { background: #eef2ff; color: var(--primary); border: none; padding: 14px; border-radius: 10px; width: 100%; font-weight: 700; cursor: pointer; margin-top: 16px; transition: 0.2s; font-size: 15px; }
     .btn-add-item:hover { background: #e0e7ff; }
-    .summary-box { background: rgba(248, 250, 252, 0.9); padding: 20px; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 16px; }
-    .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 15px; color: var(--text-light); }
-    .summary-row.total { border-top: 2px dashed #cbd5e1; padding-top: 12px; margin-top: 12px; font-size: 22px; font-weight: 800; color: var(--primary); }
-    .btn-secondary-action { width: 100%; padding: 14px; background: #fff; border: 2px solid #e2e8f0; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 12px; transition: 0.2s; }
+    .summary-box { background: rgba(248, 250, 252, 0.9); padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 16px; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 15px; color: var(--text-light); }
+    .summary-row.total { border-top: 2px dashed #cbd5e1; padding-top: 14px; margin-top: 14px; font-size: 24px; font-weight: 800; color: var(--primary); }
+    .btn-secondary-action { width: 100%; padding: 16px; background: #fff; border: 2px solid #e2e8f0; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 12px; transition: 0.2s; }
     .btn-secondary-action:hover { background: #f1f5f9; border-color: #cbd5e1; }
 
-    /* ── Tabela de Preços ── */
+    /* ── Tabela de Preços e Histórico (Ações) ── */
     .ptable-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: var(--shadow); background: #fff; }
     .ptable { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 700px; }
     .ptable th { background: var(--primary); color: #fff; padding: 16px; text-align: left; font-weight: 700; }
-    .ptable td { padding: 14px 16px; border-bottom: 1px solid #e2e8f0; background: var(--white); }
+    .ptable td { padding: 14px 16px; border-bottom: 1px solid #e2e8f0; background: var(--white); vertical-align: middle; }
     .cat-row { background: #1e293b !important; color: #fff; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
     .mn { color: #059669; font-weight: 600; } .mx { color: #dc2626; font-weight: 600; } .md { color: var(--primary); font-weight: 800; }
+
+    .btn-action-icon {
+      background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 12px; 
+      cursor: pointer; margin-right: 6px; font-size: 16px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .btn-action-icon:hover { background: #e2e8f0; transform: scale(1.05); }
 
     @media (max-width: 768px) { 
       .orc-form-grid { grid-template-columns: 1fr; } 
       .orc-item { grid-template-columns: 1fr; gap: 8px; } 
     }
 
-    /* ── Impressão de Orçamento Profissional (PDF) ── */
+    /* ── Impressão de Orçamento Profissional (PDF) APRIMORADA ── */
+    .print-only { display: none; }
+    
     @media print {
-      body { background: #fff; color: #000; font-size: 12px; }
+      @page { margin: 1.5cm; }
+      body { background: #fff; color: #000; font-size: 13px; }
       .bg-overlay { display: none !important; }
+      
+      /* Marca d'água robusta no rodapé */
+      body::after {
+        content: "Documento gerado por VoltCalc Pro - A Plataforma do Profissional da Elétrica | www.voltcalcpro.com";
+        position: fixed;
+        bottom: 0px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        font-size: 11px;
+        color: #94a3b8;
+        border-top: 1px solid #cbd5e1;
+        padding-top: 10px;
+        font-weight: 600;
+      }
+
       .header, .tabs, .logout-btn, .btn-add-item, .btn-primary, .btn-secondary-action, .orc-item button, #authBtns { display: none !important; }
       .app-screen { padding: 0; margin: 0; display: block !important; }
       .tab-content { display: none !important; }
       .tab-content.active { display: block !important; }
+      
       .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
       .orc-form-grid { grid-template-columns: 1fr !important; }
-      .orc-item { grid-template-columns: 3fr 1fr 1fr 1fr !important; background: none; border: none; border-bottom: 1px solid #000; padding: 6px 0; border-radius: 0; }
-      .orc-item select, .orc-item input { border: none !important; background: none !important; pointer-events: none; -webkit-appearance: none; appearance: none; padding: 0 !important; font-size: 12px; color: #000 !important; }
-      .form-group input, .form-group textarea { border: none !important; border-bottom: 1px solid #ccc !important; background: none !important; pointer-events: none; padding: 4px 0 !important; }
-      .summary-box { border: 1px solid #000 !important; background: none !important; }
-      .summary-row.total { color: #000 !important; }
-      .print-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 30px; }
+      
+      /* Formatando o Cabeçalho de Cliente para a Impressão */
+      .profile-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; border: 1px solid #000; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+      .profile-grid .full { grid-column: 1 / -1 !important; }
+      .form-group { margin-bottom: 5px !important; }
+      
+      /* Formatando a Lista de Itens como Tabela */
+      .print-only { display: grid !important; }
+      .orc-items-header { 
+        display: grid; grid-template-columns: 4fr 1fr 1fr 1fr; 
+        font-weight: 800; border-bottom: 2px solid #000; 
+        padding-bottom: 8px; margin-bottom: 8px; font-size: 14px;
+      }
+      .orc-item-list { border: none !important; margin-top: 0 !important; padding-top: 0 !important; }
+      .orc-item { 
+        display: grid; grid-template-columns: 4fr 1fr 1fr 1fr !important; 
+        background: none !important; border: none !important; border-bottom: 1px solid #ccc !important; 
+        padding: 8px 0 !important; box-shadow: none !important; border-radius: 0 !important; gap: 10px;
+      }
+      .orc-item select, .orc-item input { border: none !important; background: none !important; pointer-events: none; -webkit-appearance: none; appearance: none; padding: 0 !important; font-size: 13px; color: #000 !important; }
+      .form-group input, .form-group textarea { border: none !important; border-bottom: 1px dashed #ccc !important; background: none !important; pointer-events: none; padding: 4px 0 !important; border-radius: 0 !important; }
+      
+      .summary-box { border: 1px solid #000 !important; background: none !important; width: 50%; margin-left: auto; margin-top: 20px; }
+      .summary-row.total { color: #000 !important; border-top: 2px solid #000; }
+      .print-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 25px; }
     }
     .print-header { display: none; }
   </style>
@@ -340,6 +431,13 @@
               <div class="form-group full"><label>Endereço do Serviço</label><input id="orcCliEnd"></div>
             </div>
             
+            <div class="orc-items-header print-only">
+              <span>Descrição do Serviço</span>
+              <span style="text-align:center;">Qtd</span>
+              <span>V. Unitário</span>
+              <span style="text-align:right;">Subtotal</span>
+            </div>
+
             <div class="orc-item-list" id="orcItemsContainer"></div>
             
             <button class="btn-add-item" id="btnAddOrcItem">+ Adicionar Serviço da Tabela Nacional</button>
@@ -377,6 +475,7 @@
 
     <div class="tab-content" id="tab-hist-prof">
       <h3>📚 Histórico de Orçamentos</h3>
+      <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, reimprima ou envie diretamente pelo WhatsApp.</p>
       <div id="profHistContainer"></div>
     </div>
 
@@ -388,6 +487,7 @@
     var loginRole = 'profissional', signupRole = 'profissional';
     var currentUser = null;
     var base64LogoToSave = ""; 
+    var globalSavedBudgets = []; // Variável para armazenar o histórico globalmente e permitir cliques
 
     document.addEventListener('DOMContentLoaded', function() {
       firebase.initializeApp({
@@ -552,19 +652,32 @@
       document.getElementById('tab-precos').innerHTML = h;
     }
 
-    function addOrcItem(isSuggested) {
+    // Adaptado para aceitar preenchimento automático durante re-impressão
+    function addOrcItem(isSuggested, presetDesc, presetQty, presetVal) {
       var id = Date.now();
       var div = document.createElement('div');
       div.className = 'orc-item';
       div.id = 'item-' + id;
-      var select = isSuggested ? '<select class="orc-sel-suggest"><option value="">Selecione o serviço...</option>' : '<input placeholder="Descrição do serviço personalizado" class="orc-desc-custom">';
-      if(isSuggested) priceData.forEach(function(c) { c.items.forEach(function(i) { select += '<option value="'+i.md+'">'+i.d+'</option>'; }); });
-      if(isSuggested) select += '</select>';
-      div.innerHTML = select + '<input type="number" value="1" min="1" class="orc-qty" style="width:70px; text-align:center;"><input type="number" class="orc-val" placeholder="R$ Unit"><div class="orc-row-total" style="font-weight:700;">R$ 0,00</div><button onclick="removeOrcItem('+id+')" style="color:#ef4444;border:none;background:none;cursor:pointer;font-weight:800;font-size:16px;">✕</button>';
+      
+      var descHtml = '';
+      if(isSuggested) {
+        descHtml = '<select class="orc-sel-suggest"><option value="">Selecione o serviço...</option>';
+        priceData.forEach(function(c) { c.items.forEach(function(i) { descHtml += '<option value="'+i.md+'">'+i.d+'</option>'; }); });
+        descHtml += '</select>';
+      } else {
+        descHtml = '<input placeholder="Descrição do serviço personalizado" class="orc-desc-custom" value="'+(presetDesc||'')+'">';
+      }
+      
+      var qVal = presetQty || 1;
+      var vVal = presetVal || '';
+      
+      div.innerHTML = descHtml + '<input type="number" value="'+qVal+'" min="1" class="orc-qty" style="width:100%; text-align:center;"><input type="number" class="orc-val" placeholder="R$ Unit" value="'+vVal+'"><div class="orc-row-total" style="font-weight:800; text-align:right;">R$ 0,00</div><button onclick="removeOrcItem('+id+')" style="color:#ef4444;border:none;background:none;cursor:pointer;font-weight:800;font-size:18px;">✕</button>';
       document.getElementById('orcItemsContainer').appendChild(div);
+      
       if (isSuggested) div.querySelector('.orc-sel-suggest').onchange = function(e) { div.querySelector('.orc-val').value = e.target.value; updateOrcTotals(); };
       div.querySelector('.orc-qty').oninput = updateOrcTotals;
       div.querySelector('.orc-val').oninput = updateOrcTotals;
+      updateOrcTotals(); // forçar cálculo inicial
     }
 
     function removeOrcItem(id) { document.getElementById('item-' + id).remove(); updateOrcTotals(); }
@@ -573,7 +686,8 @@
       var subtotal = 0;
       document.querySelectorAll('.orc-item').forEach(function(el) {
         var q = parseFloat(el.querySelector('.orc-qty').value) || 0, v = parseFloat(el.querySelector('.orc-val').value) || 0, t = q * v;
-        el.querySelector('.orc-row-total').textContent = 'R$ ' + t.toFixed(2); subtotal += t;
+        el.querySelector('.orc-row-total').textContent = 'R$ ' + t.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); 
+        subtotal += t;
       });
       
       var discPerc = parseFloat(document.getElementById('orcDiscount').value) || 0;
@@ -589,20 +703,45 @@
     }
 
     function saveOrc() {
-      var n = document.getElementById('orcCliNome').value; if (!n) { alert('Informe o cliente.'); return; }
-      db.collection('budgets').add({ 
+      var n = document.getElementById('orcCliNome').value; if (!n) { alert('Informe o nome do cliente.'); return; }
+      
+      // Capturando os itens dinâmicos para salvar no BD para que o histórico funcione
+      var itemsToSave = [];
+      document.querySelectorAll('.orc-item').forEach(function(el) {
+        var q = el.querySelector('.orc-qty').value;
+        var v = el.querySelector('.orc-val').value;
+        var s = el.querySelector('.orc-sel-suggest');
+        var c = el.querySelector('.orc-desc-custom');
+        var desc = s ? s.options[s.selectedIndex].text : (c ? c.value : '');
+        itemsToSave.push({ desc: desc, qty: q, val: v });
+      });
+
+      var orcData = { 
         profId: currentUser.uid, 
         clientName: n, 
+        clientTel: document.getElementById('orcCliTel').value,
+        validDate: document.getElementById('orcValidDate').value,
+        address: document.getElementById('orcCliEnd').value,
+        obs: document.getElementById('orcObs').value,
+        discountRaw: document.getElementById('orcDiscount').value,
+        subtotal: document.getElementById('orcSubtotalValue').textContent,
+        discount: document.getElementById('orcDiscountValue').textContent,
         total: document.getElementById('orcTotalValue').textContent, 
+        items: itemsToSave,
         createdAt: new Date() 
-      }).then(function() { 
+      };
+
+      db.collection('budgets').add(orcData).then(function() { 
         alert('Orçamento salvo com sucesso!'); 
         loadHistory('profHistContainer');
+        
+        // Limpando campos após salvar
         document.getElementById('orcCliNome').value = "";
         document.getElementById('orcCliTel').value = "";
         document.getElementById('orcCliEnd').value = "";
         document.getElementById('orcItemsContainer').innerHTML = "";
         updateOrcTotals();
+        
       }).catch(function(e){ alert("Erro ao salvar: "+e.message); });
     }
 
@@ -618,21 +757,25 @@
         }
         
         var listDocs = [];
-        qs.forEach(function(doc) {
-          listDocs.push(doc.data());
-        });
+        qs.forEach(function(doc) { listDocs.push(doc.data()); });
 
-        // Ordenação garantida localmente via Javascript (resolve problemas de índices do Firebase)
         listDocs.sort(function(a, b) {
           var tA = (a.createdAt && typeof a.createdAt.toDate === 'function') ? a.createdAt.toDate().getTime() : 0;
           var tB = (b.createdAt && typeof b.createdAt.toDate === 'function') ? b.createdAt.toDate().getTime() : 0;
           return tB - tA;
         });
+        
+        globalSavedBudgets = listDocs; // Salvar globalmente para usar nos cliques
 
-        var h = '<div class="ptable-wrap"><table class="ptable"><thead><tr><th>Data</th><th>Cliente</th><th>Total</th></tr></thead><tbody>';
-        listDocs.forEach(function(d) { 
+        var h = '<div class="ptable-wrap"><table class="ptable"><thead><tr><th>Data</th><th>Cliente</th><th>Total</th><th style="text-align:right;">Ações</th></tr></thead><tbody>';
+        listDocs.forEach(function(d, index) { 
           var dataFormatada = (d.createdAt && typeof d.createdAt.toDate === 'function') ? d.createdAt.toDate().toLocaleDateString('pt-BR') : 'N/A';
-          h += '<tr><td>'+dataFormatada+'</td><td>'+(d.clientName || 'N/A')+'</td><td class="md">R$ '+(d.total || '0,00')+'</td></tr>'; 
+          h += '<tr><td>'+dataFormatada+'</td><td>'+(d.clientName || 'N/A')+'</td><td class="md">R$ '+(d.total || '0,00')+'</td>';
+          // Botões de Ação Dinâmicos
+          h += '<td style="text-align:right;">';
+          h += '<button class="btn-action-icon" onclick="actionReprint('+index+')" title="Re-imprimir / Gerar PDF">🖨️</button>';
+          h += '<button class="btn-action-icon" onclick="actionShareWpp('+index+')" title="Enviar para o WhatsApp">📱</button>';
+          h += '</td></tr>'; 
         });
         container.innerHTML = h + '</tbody></table></div>';
       }).catch(function(err) {
@@ -640,6 +783,50 @@
         container.innerHTML = '<p style="color:var(--text-light);">As regras de permissão do banco não liberaram a leitura.</p>';
       });
     }
+
+    // ── FUNÇÕES DE INTERAÇÃO DO HISTÓRICO ──
+    window.actionReprint = function(index) {
+      var b = globalSavedBudgets[index];
+      if(!b) return;
+      
+      // Preencher formulário principal com os dados do histórico
+      document.getElementById('orcCliNome').value = b.clientName || '';
+      document.getElementById('orcCliTel').value = b.clientTel || '';
+      document.getElementById('orcValidDate').value = b.validDate || '';
+      document.getElementById('orcCliEnd').value = b.address || '';
+      document.getElementById('orcObs').value = b.obs || '';
+      document.getElementById('orcDiscount').value = b.discountRaw || 0;
+      
+      document.getElementById('orcItemsContainer').innerHTML = ''; // Limpar atual
+      
+      // Recriar Itens
+      if(b.items && b.items.length > 0) {
+        b.items.forEach(function(item) {
+          addOrcItem(false, item.desc, item.qty, item.val);
+        });
+      } else {
+        // Fallback caso seja um orçamento muito antigo sem itens salvos
+        addOrcItem(false, 'Orçamento Antigo (Detalhes ausentes)', 1, parseFloat(b.total.replace('.','').replace(',','.')));
+      }
+      
+      // Mudar aba para "Novo Orçamento"
+      document.querySelector('.tab[data-tab="orc"]').click();
+      
+      // Disparar impressão
+      setTimeout(function(){ window.print(); }, 500);
+    };
+
+    window.actionShareWpp = function(index) {
+      var b = globalSavedBudgets[index];
+      if(!b) return;
+      var text = "⚡ *Orçamento Elétrico*\n\n";
+      text += "*Cliente:* " + (b.clientName || 'N/A') + "\n";
+      text += "*Total do Serviço:* R$ " + (b.total || '0,00') + "\n\n";
+      text += "_Gerado via Plataforma VoltCalc Pro_";
+      
+      var url = "https://wa.me/?text=" + encodeURIComponent(text);
+      window.open(url, '_blank');
+    };
 
     function renderProfileForm(tid) {
       var h = `
