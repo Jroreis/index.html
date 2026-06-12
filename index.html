@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VoltCalc Pro - A Plataforma do Profissional da Elétrica</title>
 
-  <!-- Otimização SEO Google Avançada -->
   <meta name="description" content="A ferramenta definitiva para eletricistas: orçamentos profissionais, tabelas de preços de elétrica 2026 completas e gestão técnica de instalações residenciais e industriais.">
   <meta name="keywords" content="orçamento elétrico, eletricista, tabela de preços elétrica 2026, serviços elétricos, NBR 5410, VoltCalc Pro, instalações elétricas, quadro de distribuição, cálculo elétrico">
   <meta name="robots" content="index, follow">
@@ -26,17 +25,14 @@
   }
   </script>
 
-  <!-- Firebase (Compat Mode) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Google AdSense Base Script (SUBSTITUA PELO SEU CÓDIGO CA-PUB) -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
 
   <style>
@@ -391,7 +387,6 @@
 
   <div class="bg-overlay"></div>
 
-  <!-- HEADER -->
   <header class="header">
     <a href="/" class="logo" id="headerLogoContainer">
       <img src="1000488411.webp" alt="VoltCalc Logo" onerror="this.style.display='none'">
@@ -403,7 +398,6 @@
     </div>
   </header>
 
-  <!-- LANDING PAGE -->
   <main id="landingPage">
     <section class="hero">
       <h1>A plataforma onde o <span>eletricista profissional</span> gerencia tudo.</h1>
@@ -414,7 +408,6 @@
       </div>
     </section>
 
-    <!-- Seção do Vídeo Institucional da Plataforma -->
     <section class="video-container">
       <div class="video-wrapper">
         <video controls poster="1000488411.webp">
@@ -450,8 +443,18 @@
       </div>
     </section>
 
-    <!-- Rodapé -->
-    <footer style="text-align: center; padding: 24px; color: var(--text-light); font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 40px; background: rgba(255,255,255,0.7);">
+    <footer style="text-align: center; padding: 32px 24px; color: var(--text-light); font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 40px; background: rgba(255,255,255,0.85); backdrop-filter: blur(4px);">
+      <div style="max-width: 500px; margin: 0 auto 24px auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
+        <p style="font-weight: 700; color: var(--dark); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          ☕ Apoie o Projeto VoltCalc Pro
+        </p>
+        <p style="font-size: 12px; margin-bottom: 10px; color: var(--text-light);">Gostou da ferramenta? Contribua com qualquer valor para ajudar a manter o servidor ativo!</p>
+        <div style="display: inline-block; background: #fff; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: monospace; font-size: 12px; color: #334155; user-select: all; cursor: pointer; font-weight: bold;" title="Clique de três vezes para selecionar tudo">
+          6065c213-d0f5-4119-baeb-a580e1a96910
+        </div>
+        <span style="display: block; font-size: 10px; color: var(--text-light); margin-top: 4px; font-weight: 600;">Chave Aleatória Pix</span>
+      </div>
+
       <p>&copy; 2026 VoltCalc Pro. Todos os direitos reservados.</p>
       <p style="margin-top: 8px;">
         <a href="#" onclick="openModal('modalTermos')" style="color: var(--primary); text-decoration: none; font-weight: 600; margin: 0 10px;">Termos de Uso</a> |
@@ -460,7 +463,6 @@
     </footer>
   </main>
 
-  <!-- MODAIS -->
   <div class="modal-overlay" id="modalOverlay">
     
     <div class="modal" id="modalLogin" style="display:none;">
@@ -513,10 +515,8 @@
 
   </div>
 
-  <!-- APP SCREEN -->
   <div class="app-screen" id="profScreen">
     
-    <!-- Cabeçalho PDF -->
     <div class="print-header">
       <div style="display:flex; align-items:center; gap: 16px;">
         <div id="printLogoContainer" style="display:none; width: 80px; height: 80px;">
@@ -535,7 +535,6 @@
       </div>
     </div>
 
-    <!-- Título do Painel com Input de Edição Inline Dinâmica -->
     <div class="flex-header">
       <div style="display: flex; align-items: center; gap: 8px;">
         <span style="font-size: 28px; font-weight: 800; color: var(--dark);">Painel do</span>
@@ -554,7 +553,6 @@
     <div class="tab-content active" id="tab-orc">
       <article class="card">
         <h3 id="orcFormHeaderTitle">📄 Gerador de Novo Orçamento</h3>
-        <!-- ID Invisível para controle do Orçamento em edição -->
         <input type="hidden" id="currentEditingBudgetId" value="">
         
         <div class="orc-form-grid">
@@ -1206,7 +1204,6 @@
           return;
         }
         
-        // ── CORREÇÃO: CREA opcional (só valida se tiver conteúdo digitado) ──
         if (cleanReg.length > 0 && cleanReg.length < 3) {
           alert('Se optar por informar o CREA/CFT, insira um registro consistente.');
           return;
@@ -1224,7 +1221,7 @@
         }; 
 
         db.collection('users').doc(currentUser.uid).set(upd, { merge: true }).then(function(){
-          alert('Perfil estruturado e atualizado com sucesso!');
+          alert('Perfil estruturado e updated com sucesso!');
           document.getElementById('profNameTitleInput').value = upd.nome;
           document.getElementById('printProfName').textContent = upd.nome;
           document.getElementById('printProfDoc').textContent = upd.doc ? 'Doc: ' + upd.doc : '';
