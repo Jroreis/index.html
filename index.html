@@ -11,7 +11,7 @@
   <meta name="author" content="VoltCalc Pro">
   <meta property="og:title" content="VoltCalc Pro - Gestão para Eletricistas">
   <meta property="og:description" content="Gestão completa de serviços elétricos com conformidade NBR 5410 e geração de propostas profissionais em PDF.">
-  <meta property="og:image" content="1000488419.webp">
+  <meta property="og:image" content="1000488411.webp">
   <link rel="canonical" href="https://www.voltcalcpro.com/">
   
   <script type="application/ld+json">
@@ -61,25 +61,25 @@
       position: relative;
     }
 
-    /* ── Camada de Fundo Corrigida (Transparência Uniforme) ── */
+    /* ── Camada de Fundo (Marca d'água com nova imagem) ── */
     .bg-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-image: url('1000488419.webp');
+      background-image: url('1000488411.webp');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      opacity: 0.05;
+      opacity: 0.03; /* Opacidade bem baixa para não atrapalhar a leitura */
       z-index: -1;
       pointer-events: none;
     }
 
     /* ── Header Ajustado ── */
     .header {
-      background: rgba(15, 23, 42, 0.95); /* Fundo escuro profissional para destacar o neon */
+      background: rgba(15, 23, 42, 0.95);
       backdrop-filter: blur(12px);
       padding: 14px 24px;
       display: flex;
@@ -106,7 +106,7 @@
       object-fit: contain; 
       border-radius: 6px;
     }
-    .logo span { color: var(--white); font-weight: 400; }
+    .logo span { color: var(--white); font-weight: 400; text-shadow: none; }
     .header-btns { display: flex; gap: 12px; }
     .btn-header {
       padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s;
@@ -226,7 +226,7 @@
 
   <header class="header">
     <a href="/" class="logo" id="headerLogoContainer">
-      <img src="1000488419.webp" alt="VoltCalc Logo" onerror="this.style.display='none'">
+      <img src="1000488411.webp" alt="VoltCalc Logo" onerror="this.style.display='none'">
       VoltCalc<span>Pro</span>
     </a>
     <div class="header-btns" id="authBtns">
@@ -606,7 +606,6 @@
       }).catch(function(e){ alert("Erro ao salvar: "+e.message); });
     }
 
-    /* ── Nova Função de Histórico Robustecida (Ordenação manual via JS) ── */
     function loadHistory(containerId) {
       var container = document.getElementById(containerId);
       if(!container) return;
@@ -623,7 +622,7 @@
           listDocs.push(doc.data());
         });
 
-        // Ordenação manual decrescente (mais recente primeiro) contornando bugs do Firebase
+        // Ordenação garantida localmente via Javascript (resolve problemas de índices do Firebase)
         listDocs.sort(function(a, b) {
           var tA = (a.createdAt && typeof a.createdAt.toDate === 'function') ? a.createdAt.toDate().getTime() : 0;
           var tB = (b.createdAt && typeof b.createdAt.toDate === 'function') ? b.createdAt.toDate().getTime() : 0;
@@ -638,7 +637,7 @@
         container.innerHTML = h + '</tbody></table></div>';
       }).catch(function(err) {
         console.error(err);
-        container.innerHTML = '<p style="color:var(--text-light);">Erro de permissão ou conexão ao carregar dados.</p>';
+        container.innerHTML = '<p style="color:var(--text-light);">As regras de permissão do banco não liberaram a leitura.</p>';
       });
     }
 
