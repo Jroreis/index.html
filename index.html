@@ -36,6 +36,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- Google AdSense Base Script (SUBSTITUA PELO SEU CÓDIGO CA-PUB) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+
   <style>
     :root {
       --primary: #4f46e5;
@@ -149,7 +152,7 @@
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px); }
     .modal-overlay.open { display: flex; }
     .modal { background: var(--white); border-radius: 24px; padding: 40px; max-width: 480px; width: 100%; position: relative; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
-    .modal-lg { max-width: 700px; } /* Para Termos e Privacidade */
+    .modal-lg { max-width: 700px; } 
     .modal-close { position: absolute; top: 20px; right: 20px; font-size: 28px; cursor: pointer; background: none; border: none; color: #94a3b8; }
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: var(--dark); }
@@ -242,7 +245,7 @@
       .orc-item { grid-template-columns: 1fr; gap: 8px; } 
     }
 
-    /* ── Impressão de Orçamento Profissional (PDF) 100% CORRIGIDA ── */
+    /* ── Impressão de Orçamento Profissional (PDF) ── */
     .print-only { display: none; }
     
     @media print {
@@ -250,9 +253,11 @@
       body { background: #fff; color: #000; font-size: 13px; line-height: 1.4; }
       .bg-overlay { display: none !important; }
       
-      /* Ocultando itens desnecessários da tela e focando apenas no documento */
+      /* Escondendo anúncios no PDF */
+      .ads-container, .adsbygoogle { display: none !important; }
+
       .header, .tabs, .logout-btn, .btn-add-item, .btn-primary, .btn-secondary-action, .orc-item button, #authBtns, footer { display: none !important; }
-      .flex-header, .card > h3 { display: none !important; } /* Oculta os títulos que poluem a tela */
+      .flex-header, .card > h3 { display: none !important; }
       
       .app-screen { padding: 0; margin: 0; display: block !important; }
       .tab-content { display: none !important; }
@@ -261,7 +266,7 @@
       .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
       .orc-form-grid { display: block !important; }
       
-      /* Formatando o Cabeçalho do Cliente: Compacto e Sem Caixas */
+      /* Formatando o Cabeçalho do Cliente */
       .profile-grid { 
         display: flex !important; 
         flex-wrap: wrap !important;
@@ -274,14 +279,28 @@
       .form-group { margin-bottom: 5px !important; flex: 1 1 45% !important; }
       .form-group.full { flex: 1 1 100% !important; }
       .form-group label { color: #475569 !important; font-size: 11px !important; margin-bottom: 2px !important; text-transform: uppercase; font-weight: 700 !important; }
-      .form-group input, .form-group textarea, .form-group select { 
-        background: transparent !important; border: none !important; border-bottom: 1px dotted #94a3b8 !important; 
-        padding: 0 0 4px 0 !important; font-size: 14px !important; color: #000 !important; 
-        font-weight: 600 !important; border-radius: 0 !important; box-shadow: none !important; height: auto !important;
-        appearance: none !important; -webkit-appearance: none !important; /* Remove seta do select */
-      }
       
-      /* Formatando a Lista de Itens como Tabela Limpa */
+      /* Forçando inputs a parecerem texto puro */
+      .form-group input, .form-group textarea, .form-group select, .orc-item input, .orc-item select { 
+        background: transparent !important; 
+        border: none !important; 
+        padding: 0 0 4px 0 !important; 
+        font-size: 14px !important; 
+        color: #000 !important; 
+        font-weight: 600 !important; 
+        border-radius: 0 !important; 
+        box-shadow: none !important; 
+        height: auto !important;
+        outline: none !important;
+        /* Removendo a seta dropdown de selects no mobile/desktop */
+        -webkit-appearance: none !important; 
+        -moz-appearance: none !important; 
+        appearance: none !important; 
+        background-image: none !important;
+      }
+      /* Fallback exclusivo para a seta no IE/Edge/Chrome antigo */
+      .form-group select::-ms-expand, .orc-item select::-ms-expand { display: none !important; }
+
       .print-only { display: grid !important; }
       .orc-items-header { 
         display: grid; grid-template-columns: 4fr 1fr 1fr 1fr; 
@@ -293,17 +312,15 @@
         display: grid; grid-template-columns: 4fr 1fr 1fr 1fr !important; 
         background: none !important; border: none !important; border-bottom: 1px solid #e2e8f0 !important; 
         padding: 6px 0 !important; box-shadow: none !important; border-radius: 0 !important; gap: 10px;
-        page-break-inside: avoid !important; /* Previne corte no meio da linha na página 2 */
+        page-break-inside: avoid !important; 
       }
       
-      /* Resumo Financeiro Compacto à direita */
       .summary-box { border: none !important; background: none !important; width: 40%; margin-left: auto; margin-top: 20px; padding: 0 !important; }
       .summary-row { margin-bottom: 6px !important; font-size: 14px !important; color: #000 !important; }
       .summary-row.total { color: #000 !important; border-top: 2px solid #000 !important; padding-top: 10px !important; }
       
       .print-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 25px; }
 
-      /* Marca d'água elegante no final de toda página */
       body::after {
         content: "Documento gerado e validado por VoltCalc Pro - A Plataforma do Profissional da Elétrica | www.voltcalcpro.com";
         position: fixed;
@@ -323,7 +340,6 @@
 </head>
 <body>
 
-  <!-- Camada de Plano de Fundo Dinâmico (Marca d'água) -->
   <div class="bg-overlay"></div>
 
   <!-- HEADER -->
@@ -338,7 +354,7 @@
     </div>
   </header>
 
-  <!-- LANDING PAGE (Visível apenas deslogado) -->
+  <!-- LANDING PAGE -->
   <main id="landingPage">
     <section class="hero">
       <h1>A plataforma onde o <span>eletricista profissional</span> gerencia tudo.</h1>
@@ -375,7 +391,7 @@
       </div>
     </section>
 
-    <!-- Rodapé Público com Links Legais -->
+    <!-- Rodapé -->
     <footer style="text-align: center; padding: 24px; color: var(--text-light); font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 40px; background: rgba(255,255,255,0.7);">
       <p>&copy; 2026 VoltCalc Pro. Todos os direitos reservados.</p>
       <p style="margin-top: 8px;">
@@ -388,7 +404,6 @@
   <!-- MODAIS -->
   <div class="modal-overlay" id="modalOverlay">
     
-    <!-- Modal Login -->
     <div class="modal" id="modalLogin" style="display:none;">
       <button class="modal-close" onclick="closeModal()">&times;</button>
       <h2>Fazer Login</h2>
@@ -400,7 +415,6 @@
       <p style="text-align: center; margin-top: 20px; font-size: 14px; font-weight: 600;"><a href="#" id="btnReset" style="color: var(--primary); text-decoration: none;">Esqueci minha senha</a></p>
     </div>
 
-    <!-- Modal Cadastro -->
     <div class="modal" id="modalCadastro" style="display:none;">
       <button class="modal-close" onclick="closeModal()">&times;</button>
       <h2 style="margin-bottom: 32px; font-weight: 800;">Criar Conta Profissional</h2>
@@ -410,7 +424,6 @@
       <button class="btn-primary" id="btnSignup">Cadastrar Grátis</button>
     </div>
 
-    <!-- Modal Termos de Uso -->
     <div class="modal modal-lg" id="modalTermos" style="display:none;">
       <button class="modal-close" onclick="closeModal()">&times;</button>
       <h2 style="font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 16px;">Termos de Uso</h2>
@@ -419,24 +432,23 @@
         <h3>1. Finalidade da Plataforma</h3>
         <p>O VoltCalc Pro é uma ferramenta de gestão e geração de orçamentos projetada para profissionais da área elétrica. Os valores sugeridos na plataforma são baseados em pesquisas de mercado nacional, servindo apenas como referência.</p>
         <h3>2. Responsabilidade Profissional</h3>
-        <p>A plataforma **não se responsabiliza** pela execução técnica, qualidade ou conformidade das instalações elétricas com a NBR 5410. Toda e qualquer responsabilidade civil e criminal sobre os serviços prestados aos clientes finais é inteiramente do profissional ou empresa que gerou o orçamento.</p>
+        <p>A plataforma não se responsabiliza pela execução técnica, qualidade ou conformidade das instalações elétricas com a NBR 5410. Toda responsabilidade civil e criminal é inteiramente do profissional.</p>
         <h3>3. Uso da Conta</h3>
-        <p>O usuário compromete-se a fornecer informações verdadeiras e assumir a responsabilidade pela guarda de suas senhas. Contas que violem o uso ético do sistema poderão ser suspensas.</p>
+        <p>O usuário compromete-se a fornecer informações verdadeiras e assumir a responsabilidade pela guarda de suas senhas.</p>
       </div>
     </div>
 
-    <!-- Modal Política de Privacidade -->
     <div class="modal modal-lg" id="modalPrivacidade" style="display:none;">
       <button class="modal-close" onclick="closeModal()">&times;</button>
       <h2 style="font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 16px;">Política de Privacidade</h2>
       <div class="legal-text">
         <p>O VoltCalc Pro valoriza sua privacidade e a proteção de seus dados (LGPD).</p>
         <h3>1. Coleta de Dados</h3>
-        <p>Coletamos seu nome, e-mail e as informações de perfil empresarial cadastradas para o funcionamento do gerador de PDFs. Os orçamentos são armazenados criptografados na nuvem (Google Firebase) para fornecer o seu histórico.</p>
+        <p>Coletamos seu nome, e-mail e as informações de perfil empresarial cadastradas para o funcionamento do gerador de PDFs. Os orçamentos são armazenados criptografados na nuvem (Google Firebase).</p>
         <h3>2. Uso das Informações</h3>
-        <p>Seus dados não são vendidos a terceiros. Eles são utilizados exclusivamente para o envio de e-mails de recuperação de senha, autenticação e para preencher automaticamente seus cabeçalhos comerciais no gerador de orçamento.</p>
+        <p>Seus dados não são vendidos a terceiros. Eles são utilizados exclusivamente para o envio de e-mails de recuperação de senha, autenticação e para preencher seus orçamentos.</p>
         <h3>3. Monetização e Cookies</h3>
-        <p>O site pode exibir anúncios através de parceiros como o Google AdSense. Esses fornecedores terceiros usam cookies para veicular anúncios com base em visitas anteriores do usuário ao nosso site ou a outros sites na internet. Você pode desativar a publicidade personalizada a qualquer momento nas configurações da sua conta do Google.</p>
+        <p>O site pode exibir anúncios através de parceiros como o Google AdSense, que utilizam cookies para veicular anúncios com base em visitas anteriores. Você pode desativar a publicidade personalizada a qualquer momento nas configurações do Google.</p>
       </div>
     </div>
 
@@ -445,7 +457,7 @@
   <!-- APP PROFESSIONALS -->
   <div class="app-screen" id="profScreen">
     
-    <!-- Cabeçalho visível exclusivamente na folha impressa/PDF -->
+    <!-- Cabeçalho PDF Limpo -->
     <div class="print-header">
       <div style="display:flex; align-items:center; gap: 16px;">
         <div id="printLogoContainer" style="display:none; width: 80px; height: 80px;">
@@ -453,7 +465,7 @@
         </div>
         <div>
           <h1 style="font-size: 24px; font-weight: 800; color:#000; text-transform: uppercase;">⚡ ORÇAMENTO ELÉTRICO</h1>
-          <p style="font-size: 14px; margin-top: 4px; font-weight: 600;" id="printCompanyName">Plataforma VoltCalc Pro</p>
+          <p style="font-size: 14px; margin-top: 4px; font-weight: 600;">Proposta de Prestação de Serviços</p>
         </div>
       </div>
       <div style="text-align: right; font-size: 13px;">
@@ -488,7 +500,6 @@
               <div class="form-group full"><label>Endereço do Serviço</label><input id="orcCliEnd"></div>
             </div>
             
-            <!-- Cabeçalho visível apenas na impressão -->
             <div class="orc-items-header print-only">
               <span>Descrição do Serviço</span>
               <span style="text-align:center;">Qtd</span>
@@ -533,7 +544,7 @@
 
     <div class="tab-content" id="tab-hist-prof">
       <h3>📚 Histórico de Orçamentos</h3>
-      <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, reimprima ou envie o detalhamento diretamente pelo WhatsApp.</p>
+      <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, reimprima, envie via WhatsApp ou exclua registros indesejados.</p>
       <div id="profHistContainer"></div>
     </div>
 
@@ -632,7 +643,6 @@
       document.getElementById('authBtns').style.display = 'none';
       document.getElementById('profScreen').style.display = 'block';
       document.getElementById('profNameSpan').textContent = name;
-      document.getElementById('printProfName').textContent = name;
       renderPrecosTable();
       renderProfileForm('tab-perfil');
       loadHistory('profHistContainer');
@@ -809,7 +819,11 @@
         }
         
         var listDocs = [];
-        qs.forEach(function(doc) { listDocs.push(doc.data()); });
+        qs.forEach(function(doc) { 
+          var d = doc.data();
+          d.id = doc.id; // Guarda a ID real do firebase
+          listDocs.push(d); 
+        });
 
         listDocs.sort(function(a, b) {
           var tA = (a.createdAt && typeof a.createdAt.toDate === 'function') ? a.createdAt.toDate().getTime() : 0;
@@ -825,7 +839,8 @@
           h += '<tr><td>'+dataFormatada+'</td><td>'+(d.clientName || 'N/A')+'</td><td class="md">R$ '+(d.total || '0,00')+'</td>';
           h += '<td style="text-align:right;">';
           h += '<button class="btn-action-icon" onclick="actionReprint('+index+')" title="Re-imprimir / Gerar PDF">🖨️</button>';
-          h += '<button class="btn-action-icon" onclick="actionShareWpp('+index+')" title="Enviar detalhamento via WhatsApp">📱</button>';
+          h += '<button class="btn-action-icon" onclick="actionShareWpp('+index+')" title="Enviar via WhatsApp">📱</button>';
+          h += '<button class="btn-action-icon" onclick="actionDelete(\''+d.id+'\')" title="Excluir Orçamento" style="color: #dc2626;">🗑️</button>';
           h += '</td></tr>'; 
         });
         container.innerHTML = h + '</tbody></table></div>';
@@ -906,6 +921,17 @@
       window.open(url, '_blank');
     };
 
+    window.actionDelete = function(docId) {
+      if(confirm('Tem certeza que deseja excluir este orçamento do seu histórico? Esta ação não pode ser desfeita.')) {
+        db.collection('budgets').doc(docId).delete().then(function() {
+          alert('Orçamento excluído com sucesso!');
+          loadHistory('profHistContainer');
+        }).catch(function(error) {
+          alert('Erro ao excluir orçamento: ' + error.message);
+        });
+      }
+    };
+
     function renderProfileForm(tid) {
       var h = `
         <div class="card">
@@ -969,7 +995,7 @@
             document.getElementById('printLogoContainer').style.display = 'block';
           }
 
-          document.getElementById('printCompanyName').textContent = d.nome || 'Plataforma VoltCalc Pro';
+          document.getElementById('printProfName').textContent = d.nome;
           document.getElementById('printProfDoc').textContent = d.doc ? 'Doc: ' + d.doc : '';
           document.getElementById('printProfPix').textContent = d.pix ? 'PIX para pgto: ' + d.pix : '';
           document.getElementById('printProfTel').textContent = d.tel ? 'Contato: ' + d.tel : '';
@@ -990,7 +1016,6 @@
         db.collection('users').doc(currentUser.uid).set(upd, { merge: true }).then(function(){
           alert('Perfil atualizado com sucesso!');
           document.getElementById('printProfName').textContent = upd.nome;
-          document.getElementById('printCompanyName').textContent = upd.nome || 'Plataforma VoltCalc Pro';
           document.getElementById('printProfDoc').textContent = upd.doc ? 'Doc: ' + upd.doc : '';
           document.getElementById('printProfPix').textContent = upd.pix ? 'PIX para pgto: ' + upd.pix : '';
           document.getElementById('printProfTel').textContent = upd.tel ? 'Contato: ' + upd.tel : '';
