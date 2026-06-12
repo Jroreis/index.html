@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VoltCalc Pro - A Plataforma do Profissional da Elétrica</title>
 
+  <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="description" content="A ferramenta definitiva para eletricistas: orçamentos profissionais, tabelas de preços de elétrica 2026 completas e gestão técnica de instalações residenciais e industriais.">
   <meta name="keywords" content="orçamento elétrico, eletricista, tabela de preços elétrica 2026, serviços elétricos, NBR 5410, VoltCalc Pro, instalações elétricas, quadro de distribuição, cálculo elétrico">
   <meta name="robots" content="index, follow">
@@ -211,7 +212,6 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .flex-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
     
-    /* Input Inline editável para o Nome do Painel */
     .editable-panel-title {
       font-size: 28px;
       font-weight: 800;
@@ -306,7 +306,6 @@
     }
     .btn-action-icon:hover { background: #e2e8f0; transform: scale(1.05); }
 
-    /* Estilo do Botão Pix do Rodapé */
     .btn-pix-donation {
       background: #059669; 
       color: #fff; 
@@ -971,7 +970,7 @@
         }).catch(function(e){ alert("Erro ao atualizar: "+e.message); });
       } else { 
         db.collection('budgets').add(orcData).then(function() { 
-          alert('Orçamento salvo com sucesso!'); 
+          alert('Orçamento saved com sucesso!'); 
           clearOrcFormState();
           loadHistory('profHistContainer');
         }).catch(function(e){ alert("Erro ao salvar: "+e.message); });
@@ -1176,7 +1175,6 @@
     }
 
     function renderProfileForm(tid) {
-      // Injeção da estrutura de apoio Pix também no rodapé dinâmico do Perfil
       var h = `
         <div class="card">
           <h3>👤 Perfil Profissional e Empresa</h3>
