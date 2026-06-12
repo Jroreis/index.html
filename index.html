@@ -347,7 +347,6 @@
       auth.onAuthStateChanged(function(user) {
         currentUser = user;
         if (user) {
-          // Correção de Refresh: Abre a tela imediatamente, sem esperar travar no carregamento de coleções
           showApp('profissional', user.displayName || user.email);
         } else { showLanding(); }
       });
@@ -501,12 +500,10 @@
     }
 
     function loadHistory(containerId) {
-      // Tenta ordenar por data desc (Exige Índice Composto no console do Firebase)
       db.collection('budgets').where('profId', '==', currentUser.uid).orderBy('createdAt', 'desc').get().then(function(qs) {
         renderHistoryRows(qs, containerId);
       }).catch(function(err) {
         console.warn("Falta criar o índice composto no console Firebase para ordenação. Carregando modo padrão sem ordenação.", err);
-        // Fallback: Se o índice composto não foi criado no console, carrega os dados sem quebrar a interface
         db.collection('budgets').where('profId', '==', currentUser.uid).get().then(function(qs) {
           renderHistoryRows(qs, containerId);
         }).catch(function(e){
@@ -556,7 +553,7 @@
           esp: document.getElementById('pEsp').value 
         }; 
         db.collection('users').doc(currentUser.uid).set(upd, { merge: true }).then(function(){
-          alert('Perfil atualizado!');
+          alert('Perfil updated!');
           document.getElementById('printProfName').textContent = upd.nome;
           document.getElementById('printProfDoc').textContent = upd.doc ? 'Doc: ' + upd.doc : '';
         }).catch(function(e){ alert("Erro ao salvar perfil: "+e.message); }); 
