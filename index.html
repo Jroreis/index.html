@@ -131,7 +131,7 @@
     .btn-hero.secondary { background: var(--white); color: var(--primary); border: 2px solid var(--primary); }
     .btn-hero:hover { transform: translateY(-3px); scale: 1.02; }
 
-    /* Seção do Vídeo Institucional da Plataforma */
+    /* Seção do Vídeo Institucional */
     .video-container {
       max-width: 850px;
       margin: 0 auto 40px;
@@ -199,8 +199,9 @@
     
     .btn-primary { width: 100%; padding: 16px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
     .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
-    .btn-google { width: 100%; margin-top: 12px; background: #fff; border: 2.5px solid #e2e8f0; border-radius: 12px; padding: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; }
+    .btn-google { width: 100%; margin-top: 12px; background: #fff; border: 2.5px solid #e2e8f0; border-radius: 12px; padding: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; transition: 0.2s; }
     .btn-google:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .btn-google:disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
 
     .legal-text h3 { margin: 20px 0 10px; font-size: 18px; color: var(--dark); }
     .legal-text p { margin-bottom: 12px; font-size: 14px; color: var(--text-light); line-height: 1.6; }
@@ -210,7 +211,6 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .flex-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
     
-    /* Input Inline editável para o Nome do Painel */
     .editable-panel-title {
       font-size: 28px;
       font-weight: 800;
@@ -304,6 +304,24 @@
       cursor: pointer; margin-right: 6px; font-size: 16px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center;
     }
     .btn-action-icon:hover { background: #e2e8f0; transform: scale(1.05); }
+
+    /* Estilo do Botão Pix do Rodapé */
+    .btn-pix-donation {
+      background: #059669; 
+      color: #fff; 
+      border: none; 
+      padding: 10px 20px; 
+      border-radius: 8px; 
+      font-weight: 700; 
+      cursor: pointer; 
+      font-size: 14px; 
+      transition: 0.2s; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 8px; 
+      margin-top: 8px;
+    }
+    .btn-pix-donation:hover { background: #047857; transform: translateY(-1px); }
 
     @media (max-width: 768px) { 
       .orc-form-grid { grid-template-columns: 1fr; } 
@@ -448,11 +466,10 @@
         <p style="font-weight: 700; color: var(--dark); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
           ☕ Apoie o Projeto VoltCalc Pro
         </p>
-        <p style="font-size: 12px; margin-bottom: 10px; color: var(--text-light);">Gostou da ferramenta? Contribua com qualquer valor para ajudar a manter o servidor ativo!</p>
-        <div style="display: inline-block; background: #fff; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: monospace; font-size: 12px; color: #334155; user-select: all; cursor: pointer; font-weight: bold;" title="Clique de três vezes para selecionar tudo">
-          6065c213-d0f5-4119-baeb-a580e1a96910
-        </div>
-        <span style="display: block; font-size: 10px; color: var(--text-light); margin-top: 4px; font-weight: 600;">Chave Aleatória Pix</span>
+        <p style="font-size: 12px; color: var(--text-light);">Gostou da ferramenta? Contribua com qualquer valor para ajudar a manter o servidor ativo!</p>
+        <button onclick="copiarChavePix()" class="btn-pix-donation">
+          📋 Copiar Chave PIX
+        </button>
       </div>
 
       <p>&copy; 2026 VoltCalc Pro. Todos os direitos reservados.</p>
@@ -645,7 +662,6 @@
       document.getElementById('btnSaveOrc').onclick = saveOrc;
       document.getElementById('orcDiscount').oninput = updateOrcTotals;
 
-      // Sincronização em tempo real da edição do título do painel
       document.getElementById('profNameTitleInput').onchange = function(e) {
         var newName = e.target.value.trim();
         if(newName && currentUser) {
@@ -694,14 +710,47 @@
       }).then(closeModal).catch(function(err) { alert(err.message); });
     }
 
+    // ── FUNÇÃO GOOGLE LOGIN CORRIGIDA E ESTABILIZADA CONTRA TRAVAMENTOS ──
     function handleGoogle() {
+      var btn = document.getElementById('btnGoogle');
+      var originalText = btn.textContent;
+      btn.textContent = "Conectando ao Google...";
+      btn.disabled = true; // Impede cliques múltiplos e quebra de sessão
+      
       var p = new firebase.auth.GoogleAuthProvider();
+      p.addScope('profile');
+      p.addScope('email');
+      
       auth.signInWithPopup(p).then(function(res) {
         var u = res.user;
         return db.collection('users').doc(u.uid).get().then(function(doc) {
-          if (!doc.exists) return db.collection('users').doc(u.uid).set({ nome: u.displayName, email: u.email, role: loginRole, createdAt: new Date() });
+          if (!doc.exists) {
+            return db.collection('users').doc(u.uid).set({ 
+              nome: u.displayName || "Profissional", 
+              email: u.email, 
+              role: loginRole, 
+              createdAt: new Date() 
+            });
+          }
         });
-      }).then(closeModal).catch(function(err) { alert(err.message); });
+      }).then(function() {
+        btn.textContent = originalText;
+        btn.disabled = false;
+        closeModal();
+      }).catch(function(err) { 
+        btn.textContent = originalText;
+        btn.disabled = false;
+        console.error("Erro Firebase Auth:", err);
+        
+        // Tratamento explicativo de exceções do navegador para o usuário
+        if(err.code === "auth/popup-blocked") {
+          alert('O bloqueador de pop-ups do seu navegador impediu a abertura da janela. Por favor, autorize a abertura de pop-ups para este site.');
+        } else if(err.code === "auth/unauthorized-domain") {
+          alert('Este domínio não está autorizado no Console do Firebase. Adicione "voltcalcpro.com" nas configurações de Autenticação.');
+        } else {
+          alert('Erro na conexão com o Google: ' + err.message);
+        }
+      });
     }
 
     function handleReset() {
@@ -891,13 +940,13 @@
 
       var docId = document.getElementById('currentEditingBudgetId').value;
 
-      if(docId) { // Se tiver ID, atualiza o orçamento existente (Edição)
+      if(docId) { 
         db.collection('budgets').doc(docId).set(orcData, { merge: true }).then(function() {
           alert('Orçamento atualizado com sucesso!');
           clearOrcFormState();
           loadHistory('profHistContainer');
         }).catch(function(e){ alert("Erro ao atualizar: "+e.message); });
-      } else { // Senão, cria um novo registro
+      } else { 
         db.collection('budgets').add(orcData).then(function() { 
           alert('Orçamento salvo com sucesso!'); 
           clearOrcFormState();
@@ -964,18 +1013,15 @@
       });
     }
 
-    // ── MÓDULO DE EDIÇÃO DO ORÇAMENTO DO HISTÓRICO ──
     window.actionEditOrc = function(index) {
       var b = globalSavedBudgets[index];
       if(!b) return;
 
-      // Altera o estado do formulário para Edição Ativa
       document.getElementById('currentEditingBudgetId').value = b.id;
       document.getElementById('orcFormHeaderTitle').textContent = "✏️ Editando Orçamento Cadastrado";
       document.getElementById('btnSaveOrc').textContent = "Atualizar Dados";
       document.getElementById('btnCancelEditStyle').style.display = "block";
 
-      // Preenche os campos do cabeçalho do formulário
       document.getElementById('orcCliNome').value = b.clientName || '';
       document.getElementById('orcCliTel').value = b.clientTel || '';
       document.getElementById('orcValidDate').value = b.validDate || '';
@@ -985,17 +1031,14 @@
       
       document.getElementById('orcItemsContainer').innerHTML = ''; 
 
-      // Re-adiciona e injeta cada um dos itens antigos salvos no formulário ativo
       if(b.items && b.items.length > 0) {
         b.items.forEach(function(item) {
-          // Detecta se era da tabela sugerida ou customizado
           var isNationalPreset = false;
           priceData.forEach(function(c) { c.items.forEach(function(p) { if(item.desc === p.d) isNationalPreset = true; }); });
           addOrcItem(isNationalPreset, item.desc, item.qty, item.val);
         });
       }
       
-      // Muda a aba de navegação de volta para o painel de Gerador de Novo Orçamento
       document.querySelector('.tab[data-tab="orc"]').click();
       updateOrcTotals();
     };
@@ -1080,6 +1123,35 @@
         });
       }
     };
+
+    // ── FUNÇÃO DO BOTÃO DE COPIAR CHAVE PIX DO RODAPÉ ──
+    window.copiarChavePix = function() {
+      var chave = "6065c213-d0f5-4119-baeb-a580e1a96910";
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(chave).then(function() {
+          alert('Chave aleatória PIX copiada com sucesso!');
+        }).catch(function() {
+          fallbackCopiarTexto(chave);
+        });
+      } else {
+        fallbackCopiarTexto(chave);
+      }
+    };
+
+    function fallbackCopiarTexto(text) {
+      var input = document.createElement('input');
+      input.value = text;
+      input.style.position = 'fixed'; 
+      document.body.appendChild(input);
+      input.select();
+      try {
+        document.execCommand('copy');
+        alert('Chave aleatória PIX copiada com sucesso!');
+      } catch (err) {
+        alert('Não foi possível copiar automaticamente. Selecione a chave manualmente: ' + text);
+      }
+      document.body.removeChild(input);
+    }
 
     function renderProfileForm(tid) {
       var h = `
@@ -1221,7 +1293,7 @@
         }; 
 
         db.collection('users').doc(currentUser.uid).set(upd, { merge: true }).then(function(){
-          alert('Perfil estruturado e updated com sucesso!');
+          alert('Perfil estruturado e atualizado com sucesso!');
           document.getElementById('profNameTitleInput').value = upd.nome;
           document.getElementById('printProfName').textContent = upd.nome;
           document.getElementById('printProfDoc').textContent = upd.doc ? 'Doc: ' + upd.doc : '';
