@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VoltCalc Pro - A Plataforma do Profissional da Elétrica</title>
 
-  <!-- Otimização SEO Google Avançada -->
   <meta name="description" content="A ferramenta definitiva para eletricistas: orçamentos profissionais, tabelas de preços de elétrica 2026 completas e gestão técnica de instalações residenciais e industriais.">
   <meta name="keywords" content="orçamento elétrico, eletricista, tabela de preços elétrica 2026, serviços elétricos, NBR 5410, VoltCalc Pro, instalações elétricas, quadro de distribuição, cálculo elétrico">
   <meta name="robots" content="index, follow">
@@ -26,17 +25,14 @@
   }
   </script>
 
-  <!-- Firebase (Compat Mode) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Google AdSense Base Script (SUBSTITUA PELO SEU CÓDIGO CA-PUB) -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
 
   <style>
@@ -67,7 +63,7 @@
       position: relative;
     }
 
-    /* ── Camada de Fundo (Marca d'água com nova imagem) ── */
+    /* ── Camada de Fundo (Marca d'água) ── */
     .bg-overlay {
       position: fixed;
       top: 0;
@@ -122,7 +118,7 @@
     .btn-header:hover { transform: translateY(-1px); box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
 
     /* ── Professional Landing Page ── */
-    .hero { padding: 100px 24px 60px; text-align: center; position: relative; }
+    .hero { padding: 100px 24px 40px; text-align: center; position: relative; }
     .hero h1 { font-size: clamp(36px, 8vw, 64px); font-weight: 800; color: var(--dark); margin-bottom: 24px; line-height: 1.1; letter-spacing: -0.02em; }
     .hero h1 span { color: var(--primary); }
     .hero p { font-size: clamp(18px, 4vw, 22px); max-width: 800px; margin: 0 auto 40px; color: var(--text-light); }
@@ -135,12 +131,37 @@
     .btn-hero.secondary { background: var(--white); color: var(--primary); border: 2px solid var(--primary); }
     .btn-hero:hover { transform: translateY(-3px); scale: 1.02; }
 
-    .stats-bar { padding: 60px 24px; display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; max-width: 1200px; margin: 0 auto; }
+    /* Seção do Vídeo Institucional da Plataforma */
+    .video-container {
+      max-width: 850px;
+      margin: 0 auto 40px;
+      padding: 0 24px;
+    }
+    .video-wrapper {
+      position: relative;
+      padding-bottom: 56.25%; /* Proporção 16:9 */
+      height: 0;
+      overflow: hidden;
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      border: 2px solid #cbd5e1;
+      background: var(--dark);
+    }
+    .video-wrapper video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .stats-bar { padding: 40px 24px; display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; max-width: 1200px; margin: 0 auto; }
     .stat-item { text-align: center; }
     .stat-value { font-size: 32px; font-weight: 800; color: var(--primary); display: block; }
     .stat-label { font-size: 14px; color: var(--text-light); font-weight: 600; text-transform: uppercase; }
 
-    .section-padding { padding: 80px 24px; }
+    .section-padding { padding: 60px 24px; }
     .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; max-width: 1200px; margin: 0 auto; }
     .feature-card { background: rgba(255, 255, 255, 0.95); padding: 48px; border-radius: 24px; box-shadow: var(--shadow); border: 1px solid #f1f5f9; transition: 0.3s; backdrop-filter: blur(10px); }
     .feature-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-lg); }
@@ -148,23 +169,39 @@
     .feature-card h3 { font-size: 22px; margin-bottom: 16px; color: var(--dark); font-weight: 700; }
     .feature-card p { color: var(--text-light); font-size: 16px; }
 
-    /* ── Modals (Login, Cadastro, Termos) ── */
+    /* ── Modais ── */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px); }
     .modal-overlay.open { display: flex; }
     .modal { background: var(--white); border-radius: 24px; padding: 40px; max-width: 480px; width: 100%; position: relative; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
     .modal-lg { max-width: 700px; } 
     .modal-close { position: absolute; top: 20px; right: 20px; font-size: 28px; cursor: pointer; background: none; border: none; color: #94a3b8; }
+    
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: var(--dark); }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-family: inherit; font-size: 15px; transition: 0.2s; background: rgba(255,255,255,0.8); }
-    .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
+    .form-group input, .form-group select, .form-group textarea { 
+      width: 100%; 
+      padding: 14px 16px; 
+      border-radius: 10px; 
+      border: 1px solid #cbd5e1; 
+      background: #f8fafc;
+      font-family: inherit; 
+      font-size: 15px; 
+      color: var(--dark);
+      transition: all 0.2s ease; 
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { 
+      outline: none; 
+      border-color: var(--neon-green); 
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(57, 255, 20, 0.15); 
+    }
     
     .btn-primary { width: 100%; padding: 16px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
     .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
     .btn-google { width: 100%; margin-top: 12px; background: #fff; border: 2.5px solid #e2e8f0; border-radius: 12px; padding: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; }
     .btn-google:hover { background: #f8fafc; border-color: #cbd5e1; }
 
-    /* Textos Legais Modal */
     .legal-text h3 { margin: 20px 0 10px; font-size: 18px; color: var(--dark); }
     .legal-text p { margin-bottom: 12px; font-size: 14px; color: var(--text-light); line-height: 1.6; }
 
@@ -226,7 +263,7 @@
     .btn-secondary-action { width: 100%; padding: 16px; background: #fff; border: 2px solid #e2e8f0; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 12px; transition: 0.2s; }
     .btn-secondary-action:hover { background: #f1f5f9; border-color: #cbd5e1; }
 
-    /* ── Tabela de Preços e Histórico (Ações) ── */
+    /* ── Tabela de Preços e Histórico ── */
     .ptable-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: var(--shadow); background: #fff; }
     .ptable { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 700px; }
     .ptable th { background: var(--primary); color: #fff; padding: 16px; text-align: left; font-weight: 700; }
@@ -252,21 +289,15 @@
       @page { margin: 1cm; size: A4 portrait; }
       body { background: #fff; color: #000; font-size: 13px; line-height: 1.4; }
       .bg-overlay { display: none !important; }
-      
-      /* Escondendo anúncios no PDF */
-      .ads-container, .adsbygoogle { display: none !important; }
-
+      .ads-container, .adsbygoogle, .video-container { display: none !important; }
       .header, .tabs, .logout-btn, .btn-add-item, .btn-primary, .btn-secondary-action, .orc-item button, #authBtns, footer { display: none !important; }
       .flex-header, .card > h3 { display: none !important; }
-      
       .app-screen { padding: 0; margin: 0; display: block !important; }
       .tab-content { display: none !important; }
       .tab-content.active { display: block !important; }
-      
       .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
       .orc-form-grid { display: block !important; }
       
-      /* Formatando o Cabeçalho do Cliente */
       .profile-grid { 
         display: flex !important; 
         flex-wrap: wrap !important;
@@ -280,25 +311,12 @@
       .form-group.full { flex: 1 1 100% !important; }
       .form-group label { color: #475569 !important; font-size: 11px !important; margin-bottom: 2px !important; text-transform: uppercase; font-weight: 700 !important; }
       
-      /* Forçando inputs a parecerem texto puro */
       .form-group input, .form-group textarea, .form-group select, .orc-item input, .orc-item select { 
-        background: transparent !important; 
-        border: none !important; 
-        padding: 0 0 4px 0 !important; 
-        font-size: 14px !important; 
-        color: #000 !important; 
-        font-weight: 600 !important; 
-        border-radius: 0 !important; 
-        box-shadow: none !important; 
-        height: auto !important;
-        outline: none !important;
-        /* Removendo a seta dropdown de selects no mobile/desktop */
-        -webkit-appearance: none !important; 
-        -moz-appearance: none !important; 
-        appearance: none !important; 
-        background-image: none !important;
+        background: transparent !important; border: none !important; padding: 0 0 4px 0 !important; 
+        font-size: 14px !important; color: #000 !important; font-weight: 600 !important; 
+        border-radius: 0 !important; box-shadow: none !important; height: auto !important; outline: none !important;
+        -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; background-image: none !important;
       }
-      /* Fallback exclusivo para a seta no IE/Edge/Chrome antigo */
       .form-group select::-ms-expand, .orc-item select::-ms-expand { display: none !important; }
 
       .print-only { display: grid !important; }
@@ -318,7 +336,6 @@
       .summary-box { border: none !important; background: none !important; width: 40%; margin-left: auto; margin-top: 20px; padding: 0 !important; }
       .summary-row { margin-bottom: 6px !important; font-size: 14px !important; color: #000 !important; }
       .summary-row.total { color: #000 !important; border-top: 2px solid #000 !important; padding-top: 10px !important; }
-      
       .print-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 25px; }
 
       body::after {
@@ -342,7 +359,6 @@
 
   <div class="bg-overlay"></div>
 
-  <!-- HEADER -->
   <header class="header">
     <a href="/" class="logo" id="headerLogoContainer">
       <img src="1000488411.webp" alt="VoltCalc Logo" onerror="this.style.display='none'">
@@ -354,7 +370,6 @@
     </div>
   </header>
 
-  <!-- LANDING PAGE -->
   <main id="landingPage">
     <section class="hero">
       <h1>A plataforma onde o <span>eletricista profissional</span> gerencia tudo.</h1>
@@ -362,6 +377,15 @@
       <div class="hero-actions">
         <button class="btn-hero primary" onclick="openModal('modalCadastro')">Cadastrar Meu Painel</button>
         <button class="btn-hero secondary" onclick="openModal('modalLogin')">Fazer Login</button>
+      </div>
+    </section>
+
+    <section class="video-container">
+      <div class="video-wrapper">
+        <video controls poster="1000488411.webp">
+          <source src="video.mp4" type="video/mp4">
+          Seu navegador não suporta a exibição de vídeos nativos.
+        </video>
       </div>
     </section>
 
@@ -391,7 +415,6 @@
       </div>
     </section>
 
-    <!-- Rodapé -->
     <footer style="text-align: center; padding: 24px; color: var(--text-light); font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 40px; background: rgba(255,255,255,0.7);">
       <p>&copy; 2026 VoltCalc Pro. Todos os direitos reservados.</p>
       <p style="margin-top: 8px;">
@@ -401,7 +424,6 @@
     </footer>
   </main>
 
-  <!-- MODAIS -->
   <div class="modal-overlay" id="modalOverlay">
     
     <div class="modal" id="modalLogin" style="display:none;">
@@ -410,7 +432,7 @@
       <p style="color: var(--text-light); margin-bottom: 32px; font-weight: 500;">Acesse seu painel técnico de orçamentos.</p>
       <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="exemplo@email.com"></div>
       <div class="form-group"><label>Senha</label><input type="password" id="loginSenha" placeholder="••••••••"></div>
-      <button class="btn-primary" id="btnLogin">Entrar no Painel</button>
+      <button class="btn-primary" id="btnLogin">Entrar no Panel</button>
       <button class="btn-google" id="btnGoogle">Continuar com Google</button>
       <p style="text-align: center; margin-top: 20px; font-size: 14px; font-weight: 600;"><a href="#" id="btnReset" style="color: var(--primary); text-decoration: none;">Esqueci minha senha</a></p>
     </div>
@@ -454,10 +476,8 @@
 
   </div>
 
-  <!-- APP PROFESSIONALS -->
   <div class="app-screen" id="profScreen">
     
-    <!-- Cabeçalho PDF Limpo -->
     <div class="print-header">
       <div style="display:flex; align-items:center; gap: 16px;">
         <div id="printLogoContainer" style="display:none; width: 80px; height: 80px;">
@@ -821,7 +841,7 @@
         var listDocs = [];
         qs.forEach(function(doc) { 
           var d = doc.data();
-          d.id = doc.id; // Guarda a ID real do firebase
+          d.id = doc.id; 
           listDocs.push(d); 
         });
 
@@ -850,7 +870,6 @@
       });
     }
 
-    // ── FUNÇÕES DE INTERAÇÃO DO HISTÓRICO ──
     window.actionReprint = function(index) {
       var b = globalSavedBudgets[index];
       if(!b) return;
@@ -861,7 +880,6 @@
       document.getElementById('orcCliEnd').value = b.address || '';
       document.getElementById('orcObs').value = b.obs || '';
       document.getElementById('orcDiscount').value = b.discountRaw || 0;
-      
       document.getElementById('orcItemsContainer').innerHTML = ''; 
       
       if(b.items && b.items.length > 0) {
@@ -951,9 +969,9 @@
 
           <div class="profile-grid">
             <div class="form-group full"><label>Nome / Razão Social da Empresa</label><input id="pNom"></div>
-            <div class="form-group"><label>Telefone / WhatsApp</label><input id="pTel"></div>
-            <div class="form-group"><label>CPF/CNPJ</label><input id="pDoc"></div>
-            <div class="form-group"><label>Registro (CREA/CFT)</label><input id="pReg"></div>
+            <div class="form-group"><label>Telefone / WhatsApp</label><input id="pTel" placeholder="(00) 00000-0000"></div>
+            <div class="form-group"><label>CPF / CNPJ</label><input id="pDoc" placeholder="000.000.000-00"></div>
+            <div class="form-group"><label>Registro Profissional (CREA / CFT)</label><input id="pReg" placeholder="Apenas letras e números"></div>
             <div class="form-group"><label>Chave PIX (Para receber adiantamentos)</label><input id="pPix" placeholder="Ex: CNPJ, Email, Celular"></div>
             <div class="form-group full"><label>Endereço Completo (Rua, Nº, Bairro, CEP)</label><input id="pEnd"></div>
             <div class="form-group full"><label>Site ou Instagram</label><input id="pSite" placeholder="Ex: @minhaempresa"></div>
@@ -964,6 +982,47 @@
       `;
       document.getElementById(tid).innerHTML = h;
       
+      var telInput = document.getElementById('pTel');
+      var docInput = document.getElementById('pDoc');
+      var regInput = document.getElementById('pReg');
+
+      // ── MÁSCARAS E VALIDAÇÃO EM TEMPO REAL (Rejeita negativos, símbolos e letras inválidas) ──
+      telInput.oninput = function() {
+        var v = telInput.value.replace(/\D/g, ''); // Remove tudo que não for número (bloqueia letras e negativos)
+        if (v.length > 11) v = v.substring(0, 11);
+        if (v.length > 6) {
+          telInput.value = '(' + v.substring(0, 2) + ') ' + v.substring(2, 7) + '-' + v.substring(7);
+        } else if (v.length > 2) {
+          telInput.value = '(' + v.substring(0, 2) + ') ' + v.substring(2);
+        } else if (v.length > 0) {
+          telInput.value = '(' + v;
+        }
+      };
+
+      docInput.oninput = function() {
+        var v = docInput.value.replace(/\D/g, ''); // Limpa letras, espaços e sinais negativos
+        if (v.length > 14) v = v.substring(0, 14);
+        
+        if (v.length <= 11) { // Formata como CPF
+          if (v.length > 9) {
+            docInput.value = v.substring(0, 3) + '.' + v.substring(3, 6) + '.' + v.substring(6, 9) + '-' + v.substring(9);
+          } else if (v.length > 6) {
+            docInput.value = v.substring(0, 3) + '.' + v.substring(3, 6) + '.' + v.substring(6);
+          } else if (v.length > 3) {
+            docInput.value = v.substring(0, 3) + '.' + v.substring(3);
+          } else {
+            docInput.value = v;
+          }
+        } else { // Formata como CNPJ
+          docInput.value = v.substring(0, 2) + '.' + v.substring(2, 5) + '.' + v.substring(5, 8) + '/' + v.substring(8, 12) + '-' + v.substring(12);
+        }
+      };
+
+      regInput.oninput = function() {
+        // Bloqueia qualquer caractere especial, traços, espaços ou sinais negativos
+        regInput.value = regInput.value.replace(/[^a-zA-Z0-9]/g, '');
+      };
+
       document.getElementById('pLogoInput').addEventListener('change', function(e) {
         var file = e.target.files[0];
         if(file) {
@@ -1003,18 +1062,37 @@
       }).catch(function(e){ console.log("Perfil inicial vazio."); });
       
       document.getElementById('btnSaveProfile').onclick = function() { 
+        var cleanTel = telInput.value.replace(/\D/g, '');
+        var cleanDoc = docInput.value.replace(/\D/g, '');
+        var cleanReg = regInput.value.trim();
+
+        // ── VERIFICAÇÕES DE CONSISTÊNCIA DE DADOS REAIS ANTES DE SALVAR ──
+        if (cleanTel.length < 10) {
+          alert('Por favor, informe um número de Telefone/WhatsApp real contendo o DDD.');
+          return;
+        }
+        if (cleanDoc.length !== 11 && cleanDoc.length !== 14) {
+          alert('Documento inválido. Certifique-se de digitar um CPF real (11 dígitos) ou CNPJ real (14 dígitos).');
+          return;
+        }
+        if (cleanReg.length < 3) {
+          alert('Por favor, informe um registro do CREA/CFT válido e consistente.');
+          return;
+        }
+
         var upd = { 
           nome: document.getElementById('pNom').value, 
-          tel: document.getElementById('pTel').value, 
-          doc: document.getElementById('pDoc').value, 
-          reg: document.getElementById('pReg').value, 
+          tel: telInput.value, 
+          doc: docInput.value, 
+          reg: cleanReg, 
           pix: document.getElementById('pPix').value, 
           end: document.getElementById('pEnd').value, 
           site: document.getElementById('pSite').value, 
           logoBase64: base64LogoToSave
         }; 
+
         db.collection('users').doc(currentUser.uid).set(upd, { merge: true }).then(function(){
-          alert('Perfil atualizado com sucesso!');
+          alert('Perfil estruturado e atualizado com sucesso!');
           document.getElementById('printProfName').textContent = upd.nome;
           document.getElementById('printProfDoc').textContent = upd.doc ? 'Doc: ' + upd.doc : '';
           document.getElementById('printProfPix').textContent = upd.pix ? 'PIX para pgto: ' + upd.pix : '';
