@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VoltCalc Pro - A Plataforma do Profissional da Elétrica</title>
 
+  <!-- Otimização SEO Google Avançada -->
   <meta name="description" content="A ferramenta definitiva para eletricistas: orçamentos profissionais, tabelas de preços de elétrica 2026 completas e gestão técnica de instalações residenciais e industriais.">
   <meta name="keywords" content="orçamento elétrico, eletricista, tabela de preços elétrica 2026, serviços elétricos, NBR 5410, VoltCalc Pro, instalações elétricas, quadro de distribuição, cálculo elétrico">
   <meta name="robots" content="index, follow">
@@ -25,14 +26,17 @@
   }
   </script>
 
+  <!-- Firebase (Compat Mode) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- Google AdSense Base Script (SUBSTITUA PELO SEU CÓDIGO CA-PUB) -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
 
   <style>
@@ -139,7 +143,7 @@
     }
     .video-wrapper {
       position: relative;
-      padding-bottom: 56.25%; /* Proporção 16:9 */
+      padding-bottom: 56.25%; 
       height: 0;
       overflow: hidden;
       border-radius: 20px;
@@ -209,6 +213,34 @@
     .app-screen { display: none; max-width: 1200px; margin: 0 auto; padding: 40px 24px; animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .flex-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+    
+    /* Input Inline editável para o Nome do Painel */
+    .editable-panel-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--dark);
+      border: 1px dashed transparent;
+      background: transparent;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-family: inherit;
+      width: auto;
+      max-width: 500px;
+      transition: all 0.2s;
+    }
+    .editable-panel-title:hover {
+      border-color: var(--primary);
+      background: rgba(79, 70, 229, 0.05);
+      cursor: pointer;
+    }
+    .editable-panel-title:focus {
+      outline: none;
+      border-style: solid;
+      border-color: var(--neon-green);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(57, 255, 20, 0.2);
+    }
+
     .tabs { display: flex; gap: 8px; border-bottom: 2px solid #e2e8f0; margin-bottom: 32px; overflow-x: auto; padding-bottom: 2px; }
     .tab { padding: 12px 24px; font-weight: 600; cursor: pointer; background: rgba(255, 255, 255, 0.6); border: none; border-bottom: 3px solid transparent; color: var(--text-light); white-space: nowrap; font-size: 15px; transition: 0.2s; border-radius: 10px 10px 0 0; }
     .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: #eef2ff; }
@@ -359,6 +391,7 @@
 
   <div class="bg-overlay"></div>
 
+  <!-- HEADER -->
   <header class="header">
     <a href="/" class="logo" id="headerLogoContainer">
       <img src="1000488411.webp" alt="VoltCalc Logo" onerror="this.style.display='none'">
@@ -370,6 +403,7 @@
     </div>
   </header>
 
+  <!-- LANDING PAGE -->
   <main id="landingPage">
     <section class="hero">
       <h1>A plataforma onde o <span>eletricista profissional</span> gerencia tudo.</h1>
@@ -380,6 +414,7 @@
       </div>
     </section>
 
+    <!-- Seção do Vídeo Institucional da Plataforma -->
     <section class="video-container">
       <div class="video-wrapper">
         <video controls poster="1000488411.webp">
@@ -415,6 +450,7 @@
       </div>
     </section>
 
+    <!-- Rodapé -->
     <footer style="text-align: center; padding: 24px; color: var(--text-light); font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 40px; background: rgba(255,255,255,0.7);">
       <p>&copy; 2026 VoltCalc Pro. Todos os direitos reservados.</p>
       <p style="margin-top: 8px;">
@@ -424,6 +460,7 @@
     </footer>
   </main>
 
+  <!-- MODAIS -->
   <div class="modal-overlay" id="modalOverlay">
     
     <div class="modal" id="modalLogin" style="display:none;">
@@ -432,7 +469,7 @@
       <p style="color: var(--text-light); margin-bottom: 32px; font-weight: 500;">Acesse seu painel técnico de orçamentos.</p>
       <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="exemplo@email.com"></div>
       <div class="form-group"><label>Senha</label><input type="password" id="loginSenha" placeholder="••••••••"></div>
-      <button class="btn-primary" id="btnLogin">Entrar no Panel</button>
+      <button class="btn-primary" id="btnLogin">Entrar no Painel</button>
       <button class="btn-google" id="btnGoogle">Continuar com Google</button>
       <p style="text-align: center; margin-top: 20px; font-size: 14px; font-weight: 600;"><a href="#" id="btnReset" style="color: var(--primary); text-decoration: none;">Esqueci minha senha</a></p>
     </div>
@@ -450,7 +487,7 @@
       <button class="modal-close" onclick="closeModal()">&times;</button>
       <h2 style="font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 16px;">Termos de Uso</h2>
       <div class="legal-text">
-        <p>Bem-vindo ao VoltCalc Pro. Ao utilizar nossa plataforma, você concorda com os seguintes termos:</p>
+        <p>Aproveite os recursos do VoltCalc Pro. Ao utilizar nossa plataforma, você concorda com os seguintes termos:</p>
         <h3>1. Finalidade da Plataforma</h3>
         <p>O VoltCalc Pro é uma ferramenta de gestão e geração de orçamentos projetada para profissionais da área elétrica. Os valores sugeridos na plataforma são baseados em pesquisas de mercado nacional, servindo apenas como referência.</p>
         <h3>2. Responsabilidade Profissional</h3>
@@ -476,8 +513,10 @@
 
   </div>
 
+  <!-- APP SCREEN -->
   <div class="app-screen" id="profScreen">
     
+    <!-- Cabeçalho PDF -->
     <div class="print-header">
       <div style="display:flex; align-items:center; gap: 16px;">
         <div id="printLogoContainer" style="display:none; width: 80px; height: 80px;">
@@ -496,8 +535,12 @@
       </div>
     </div>
 
+    <!-- Título do Painel com Input de Edição Inline Dinâmica -->
     <div class="flex-header">
-      <h2>Painel do <span id="profNameSpan"></span></h2>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 28px; font-weight: 800; color: var(--dark);">Painel do</span>
+        <input type="text" id="profNameTitleInput" class="editable-panel-title" title="Clique para editar seu nome diretamente por aqui">
+      </div>
       <button class="logout-btn" onclick="auth.signOut()">Encerrar Sessão</button>
     </div>
     
@@ -510,7 +553,10 @@
 
     <div class="tab-content active" id="tab-orc">
       <article class="card">
-        <h3>📄 Gerador de Novo Orçamento</h3>
+        <h3 id="orcFormHeaderTitle">📄 Gerador de Novo Orçamento</h3>
+        <!-- ID Invisível para controle do Orçamento em edição -->
+        <input type="hidden" id="currentEditingBudgetId" value="">
+        
         <div class="orc-form-grid">
           <div>
             <div class="profile-grid">
@@ -553,6 +599,7 @@
                 <div class="summary-row total"><span>Total:</span><span>R$ <span id="orcTotalValue">0,00</span></span></div>
               </div>
               <button class="btn-primary" id="btnSaveOrc">Salvar no Histórico</button>
+              <button class="btn-secondary-action" id="btnCancelEditStyle" style="display:none; background:#94a3b8; color:#fff;" onclick="clearOrcFormState()">Cancelar Edição</button>
               <button class="btn-secondary-action" onclick="window.print()">🖨️ Imprimir / Gerar PDF</button>
             </div>
           </div>
@@ -564,7 +611,7 @@
 
     <div class="tab-content" id="tab-hist-prof">
       <h3>📚 Histórico de Orçamentos</h3>
-      <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, reimprima, envie via WhatsApp ou exclua registros indesejados.</p>
+      <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, altere dados estruturais, reimprima, envie via WhatsApp ou exclua registros indesejados.</p>
       <div id="profHistContainer"></div>
     </div>
 
@@ -600,12 +647,32 @@
       document.getElementById('btnSaveOrc').onclick = saveOrc;
       document.getElementById('orcDiscount').oninput = updateOrcTotals;
 
+      // Sincronização em tempo real da edição do título do painel
+      document.getElementById('profNameTitleInput').onchange = function(e) {
+        var newName = e.target.value.trim();
+        if(newName && currentUser) {
+          db.collection('users').doc(currentUser.uid).set({ nome: newName }, { merge: true }).then(function() {
+            document.getElementById('printProfName').textContent = newName;
+            var inputProfile = document.getElementById('pNom');
+            if(inputProfile) inputProfile.value = newName;
+          });
+        }
+      };
+
       setupTabs();
 
       auth.onAuthStateChanged(function(user) {
         currentUser = user;
         if (user) {
-          showApp('profissional', user.displayName || user.email);
+          db.collection('users').doc(user.uid).get().then(function(doc) {
+            var nameToDisplay = user.displayName || user.email;
+            if(doc.exists && doc.data().nome) {
+              nameToDisplay = doc.data().nome;
+            }
+            showApp('profissional', nameToDisplay);
+          }).catch(function() {
+            showApp('profissional', user.displayName || user.email);
+          });
         } else { showLanding(); }
       });
     });
@@ -662,7 +729,7 @@
       document.getElementById('landingPage').style.display = 'none';
       document.getElementById('authBtns').style.display = 'none';
       document.getElementById('profScreen').style.display = 'block';
-      document.getElementById('profNameSpan').textContent = name;
+      document.getElementById('profNameTitleInput').value = name;
       renderPrecosTable();
       renderProfileForm('tab-perfil');
       loadHistory('profHistContainer');
@@ -740,7 +807,7 @@
     }
 
     function addOrcItem(isSuggested, presetDesc, presetQty, presetVal) {
-      var id = Date.now();
+      var id = Date.now() + Math.floor(Math.random() * 1000);
       var div = document.createElement('div');
       div.className = 'orc-item';
       div.id = 'item-' + id;
@@ -748,7 +815,12 @@
       var descHtml = '';
       if(isSuggested) {
         descHtml = '<select class="orc-sel-suggest"><option value="">Selecione o serviço...</option>';
-        priceData.forEach(function(c) { c.items.forEach(function(i) { descHtml += '<option value="'+i.md+'">'+i.d+'</option>'; }); });
+        priceData.forEach(function(c) { 
+          c.items.forEach(function(i) { 
+            var sel = (presetDesc && presetDesc.includes(i.d)) ? 'selected' : '';
+            descHtml += '<option value="'+i.md+'" '+sel+'>'+i.d+'</option>'; 
+          }); 
+        });
         descHtml += '</select>';
       } else {
         descHtml = '<input placeholder="Descrição do serviço personalizado" class="orc-desc-custom" value="'+(presetDesc||'')+'">';
@@ -760,7 +832,10 @@
       div.innerHTML = descHtml + '<input type="number" value="'+qVal+'" min="1" class="orc-qty" style="width:100%; text-align:center;"><input type="number" class="orc-val" placeholder="R$ Unit" value="'+vVal+'"><div class="orc-row-total" style="font-weight:800; text-align:right;">R$ 0,00</div><button onclick="removeOrcItem('+id+')" style="color:#ef4444;border:none;background:none;cursor:pointer;font-weight:800;font-size:18px;">✕</button>';
       document.getElementById('orcItemsContainer').appendChild(div);
       
-      if (isSuggested) div.querySelector('.orc-sel-suggest').onchange = function(e) { div.querySelector('.orc-val').value = e.target.value; updateOrcTotals(); };
+      if (isSuggested) {
+        var selectEl = div.querySelector('.orc-sel-suggest');
+        selectEl.onchange = function(e) { div.querySelector('.orc-val').value = e.target.value; updateOrcTotals(); };
+      }
       div.querySelector('.orc-qty').oninput = updateOrcTotals;
       div.querySelector('.orc-val').oninput = updateOrcTotals;
       updateOrcTotals();
@@ -797,7 +872,7 @@
         var v = el.querySelector('.orc-val').value;
         var s = el.querySelector('.orc-sel-suggest');
         var c = el.querySelector('.orc-desc-custom');
-        var desc = s ? s.options[s.selectedIndex].text : (c ? c.value : '');
+        var desc = s && s.selectedIndex >= 0 ? s.options[s.selectedIndex].text : (c ? c.value : '');
         itemsToSave.push({ desc: desc, qty: q, val: v });
       });
 
@@ -816,15 +891,35 @@
         createdAt: new Date() 
       };
 
-      db.collection('budgets').add(orcData).then(function() { 
-        alert('Orçamento salvo com sucesso!'); 
-        loadHistory('profHistContainer');
-        document.getElementById('orcCliNome').value = "";
-        document.getElementById('orcCliTel').value = "";
-        document.getElementById('orcCliEnd').value = "";
-        document.getElementById('orcItemsContainer').innerHTML = "";
-        updateOrcTotals();
-      }).catch(function(e){ alert("Erro ao salvar: "+e.message); });
+      var docId = document.getElementById('currentEditingBudgetId').value;
+
+      if(docId) { // Se tiver ID, atualiza o orçamento existente (Edição)
+        db.collection('budgets').doc(docId).set(orcData, { merge: true }).then(function() {
+          alert('Orçamento atualizado com sucesso!');
+          clearOrcFormState();
+          loadHistory('profHistContainer');
+        }).catch(function(e){ alert("Erro ao atualizar: "+e.message); });
+      } else { // Senão, cria um novo registro
+        db.collection('budgets').add(orcData).then(function() { 
+          alert('Orçamento salvo com sucesso!'); 
+          clearOrcFormState();
+          loadHistory('profHistContainer');
+        }).catch(function(e){ alert("Erro ao salvar: "+e.message); });
+      }
+    }
+
+    function clearOrcFormState() {
+      document.getElementById('currentEditingBudgetId').value = "";
+      document.getElementById('orcFormHeaderTitle').textContent = "📄 Gerador de Novo Orçamento";
+      document.getElementById('btnSaveOrc').textContent = "Salvar no Histórico";
+      document.getElementById('btnCancelEditStyle').style.display = "none";
+      document.getElementById('orcCliNome').value = "";
+      document.getElementById('orcCliTel').value = "";
+      document.getElementById('orcCliEnd').value = "";
+      document.getElementById('orcObs').value = "";
+      document.getElementById('orcDiscount').value = "0";
+      document.getElementById('orcItemsContainer').innerHTML = "";
+      updateOrcTotals();
     }
 
     function loadHistory(containerId) {
@@ -858,6 +953,7 @@
           var dataFormatada = (d.createdAt && typeof d.createdAt.toDate === 'function') ? d.createdAt.toDate().toLocaleDateString('pt-BR') : 'N/A';
           h += '<tr><td>'+dataFormatada+'</td><td>'+(d.clientName || 'N/A')+'</td><td class="md">R$ '+(d.total || '0,00')+'</td>';
           h += '<td style="text-align:right;">';
+          h += '<button class="btn-action-icon" onclick="actionEditOrc('+index+')" title="Editar Orçamento">✏️</button>';
           h += '<button class="btn-action-icon" onclick="actionReprint('+index+')" title="Re-imprimir / Gerar PDF">🖨️</button>';
           h += '<button class="btn-action-icon" onclick="actionShareWpp('+index+')" title="Enviar via WhatsApp">📱</button>';
           h += '<button class="btn-action-icon" onclick="actionDelete(\''+d.id+'\')" title="Excluir Orçamento" style="color: #dc2626;">🗑️</button>';
@@ -870,6 +966,42 @@
       });
     }
 
+    // ── MÓDULO DE EDIÇÃO DO ORÇAMENTO DO HISTÓRICO ──
+    window.actionEditOrc = function(index) {
+      var b = globalSavedBudgets[index];
+      if(!b) return;
+
+      // Altera o estado do formulário para Edição Ativa
+      document.getElementById('currentEditingBudgetId').value = b.id;
+      document.getElementById('orcFormHeaderTitle').textContent = "✏️ Editando Orçamento Cadastrado";
+      document.getElementById('btnSaveOrc').textContent = "Atualizar Dados";
+      document.getElementById('btnCancelEditStyle').style.display = "block";
+
+      // Preenche os campos do cabeçalho do formulário
+      document.getElementById('orcCliNome').value = b.clientName || '';
+      document.getElementById('orcCliTel').value = b.clientTel || '';
+      document.getElementById('orcValidDate').value = b.validDate || '';
+      document.getElementById('orcCliEnd').value = b.address || '';
+      document.getElementById('orcObs').value = b.obs || '';
+      document.getElementById('orcDiscount').value = b.discountRaw || 0;
+      
+      document.getElementById('orcItemsContainer').innerHTML = ''; 
+
+      // Re-adiciona e injeta cada um dos itens antigos salvos no formulário ativo
+      if(b.items && b.items.length > 0) {
+        b.items.forEach(function(item) {
+          // Detecta se era da tabela sugerida ou customizado
+          var isNationalPreset = false;
+          priceData.forEach(function(c) { c.items.forEach(function(p) { if(item.desc === p.d) isNationalPreset = true; }); });
+          addOrcItem(isNationalPreset, item.desc, item.qty, item.val);
+        });
+      }
+      
+      // Muda a aba de navegação de volta para o painel de Gerador de Novo Orçamento
+      document.querySelector('.tab[data-tab="orc"]').click();
+      updateOrcTotals();
+    };
+
     window.actionReprint = function(index) {
       var b = globalSavedBudgets[index];
       if(!b) return;
@@ -880,6 +1012,7 @@
       document.getElementById('orcCliEnd').value = b.address || '';
       document.getElementById('orcObs').value = b.obs || '';
       document.getElementById('orcDiscount').value = b.discountRaw || 0;
+      
       document.getElementById('orcItemsContainer').innerHTML = ''; 
       
       if(b.items && b.items.length > 0) {
@@ -971,7 +1104,7 @@
             <div class="form-group full"><label>Nome / Razão Social da Empresa</label><input id="pNom"></div>
             <div class="form-group"><label>Telefone / WhatsApp</label><input id="pTel" placeholder="(00) 00000-0000"></div>
             <div class="form-group"><label>CPF / CNPJ</label><input id="pDoc" placeholder="000.000.000-00"></div>
-            <div class="form-group"><label>Registro Profissional (CREA / CFT)</label><input id="pReg" placeholder="Apenas letras e números"></div>
+            <div class="form-group"><label>Registro Profissional (CREA / CFT) - Opcional</label><input id="pReg" placeholder="Opcional - Apenas letras e números"></div>
             <div class="form-group"><label>Chave PIX (Para receber adiantamentos)</label><input id="pPix" placeholder="Ex: CNPJ, Email, Celular"></div>
             <div class="form-group full"><label>Endereço Completo (Rua, Nº, Bairro, CEP)</label><input id="pEnd"></div>
             <div class="form-group full"><label>Site ou Instagram</label><input id="pSite" placeholder="Ex: @minhaempresa"></div>
@@ -986,9 +1119,8 @@
       var docInput = document.getElementById('pDoc');
       var regInput = document.getElementById('pReg');
 
-      // ── MÁSCARAS E VALIDAÇÃO EM TEMPO REAL (Rejeita negativos, símbolos e letras inválidas) ──
       telInput.oninput = function() {
-        var v = telInput.value.replace(/\D/g, ''); // Remove tudo que não for número (bloqueia letras e negativos)
+        var v = telInput.value.replace(/\D/g, ''); 
         if (v.length > 11) v = v.substring(0, 11);
         if (v.length > 6) {
           telInput.value = '(' + v.substring(0, 2) + ') ' + v.substring(2, 7) + '-' + v.substring(7);
@@ -1000,10 +1132,10 @@
       };
 
       docInput.oninput = function() {
-        var v = docInput.value.replace(/\D/g, ''); // Limpa letras, espaços e sinais negativos
+        var v = docInput.value.replace(/\D/g, ''); 
         if (v.length > 14) v = v.substring(0, 14);
         
-        if (v.length <= 11) { // Formata como CPF
+        if (v.length <= 11) { 
           if (v.length > 9) {
             docInput.value = v.substring(0, 3) + '.' + v.substring(3, 6) + '.' + v.substring(6, 9) + '-' + v.substring(9);
           } else if (v.length > 6) {
@@ -1013,13 +1145,12 @@
           } else {
             docInput.value = v;
           }
-        } else { // Formata como CNPJ
+        } else { 
           docInput.value = v.substring(0, 2) + '.' + v.substring(2, 5) + '.' + v.substring(5, 8) + '/' + v.substring(8, 12) + '-' + v.substring(12);
         }
       };
 
       regInput.oninput = function() {
-        // Bloqueia qualquer caractere especial, traços, espaços ou sinais negativos
         regInput.value = regInput.value.replace(/[^a-zA-Z0-9]/g, '');
       };
 
@@ -1066,7 +1197,6 @@
         var cleanDoc = docInput.value.replace(/\D/g, '');
         var cleanReg = regInput.value.trim();
 
-        // ── VERIFICAÇÕES DE CONSISTÊNCIA DE DADOS REAIS ANTES DE SALVAR ──
         if (cleanTel.length < 10) {
           alert('Por favor, informe um número de Telefone/WhatsApp real contendo o DDD.');
           return;
@@ -1075,8 +1205,10 @@
           alert('Documento inválido. Certifique-se de digitar um CPF real (11 dígitos) ou CNPJ real (14 dígitos).');
           return;
         }
-        if (cleanReg.length < 3) {
-          alert('Por favor, informe um registro do CREA/CFT válido e consistente.');
+        
+        // ── CORREÇÃO: CREA opcional (só valida se tiver conteúdo digitado) ──
+        if (cleanReg.length > 0 && cleanReg.length < 3) {
+          alert('Se optar por informar o CREA/CFT, insira um registro consistente.');
           return;
         }
 
@@ -1093,6 +1225,7 @@
 
         db.collection('users').doc(currentUser.uid).set(upd, { merge: true }).then(function(){
           alert('Perfil estruturado e atualizado com sucesso!');
+          document.getElementById('profNameTitleInput').value = upd.nome;
           document.getElementById('printProfName').textContent = upd.nome;
           document.getElementById('printProfDoc').textContent = upd.doc ? 'Doc: ' + upd.doc : '';
           document.getElementById('printProfPix').textContent = upd.pix ? 'PIX para pgto: ' + upd.pix : '';
