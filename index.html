@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VoltCalc Pro - A Plataforma do Profissional da Elétrica</title>
 
+  <!-- Otimização SEO Google Avançada -->
   <meta name="description" content="A ferramenta definitiva para eletricistas: orçamentos profissionais, tabelas de preços de elétrica 2026 completas e gestão técnica de instalações residenciais e industriais.">
   <meta name="keywords" content="orçamento elétrico, eletricista, tabela de preços elétrica 2026, serviços elétricos, NBR 5410, VoltCalc Pro, instalações elétricas, quadro de distribuição, cálculo elétrico">
   <meta name="robots" content="index, follow">
@@ -25,10 +26,12 @@
   }
   </script>
 
+  <!-- Firebase (Compat Mode) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -142,38 +145,25 @@
     .feature-card h3 { font-size: 22px; margin-bottom: 16px; color: var(--dark); font-weight: 700; }
     .feature-card p { color: var(--text-light); font-size: 16px; }
 
-    /* ── Modals ── */
+    /* ── Modals (Login, Cadastro, Termos) ── */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px); }
     .modal-overlay.open { display: flex; }
-    .modal { background: var(--white); border-radius: 24px; padding: 40px; max-width: 480px; width: 100%; position: relative; box-shadow: var(--shadow-lg); }
+    .modal { background: var(--white); border-radius: 24px; padding: 40px; max-width: 480px; width: 100%; position: relative; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
+    .modal-lg { max-width: 700px; } /* Para Termos e Privacidade */
     .modal-close { position: absolute; top: 20px; right: 20px; font-size: 28px; cursor: pointer; background: none; border: none; color: #94a3b8; }
-    
-    /* ── Melhoria Visual: Inputs e Selects mais elegantes ── */
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: var(--dark); }
-    .form-group input, .form-group select, .form-group textarea { 
-      width: 100%; 
-      padding: 14px 16px; 
-      border-radius: 10px; 
-      border: 1px solid #cbd5e1; 
-      background: #f8fafc;
-      font-family: inherit; 
-      font-size: 15px; 
-      color: var(--dark);
-      transition: all 0.2s ease; 
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
-    }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { 
-      outline: none; 
-      border-color: var(--neon-green); 
-      background: #ffffff;
-      box-shadow: 0 0 0 4px rgba(57, 255, 20, 0.15); 
-    }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-family: inherit; font-size: 15px; transition: 0.2s; background: rgba(255,255,255,0.8); }
+    .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); }
     
     .btn-primary { width: 100%; padding: 16px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
     .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
     .btn-google { width: 100%; margin-top: 12px; background: #fff; border: 2.5px solid #e2e8f0; border-radius: 12px; padding: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; }
     .btn-google:hover { background: #f8fafc; border-color: #cbd5e1; }
+
+    /* Textos Legais Modal */
+    .legal-text h3 { margin: 20px 0 10px; font-size: 18px; color: var(--dark); }
+    .legal-text p { margin-bottom: 12px; font-size: 14px; color: var(--text-light); line-height: 1.6; }
 
     /* ── App Screen Layout ── */
     .app-screen { display: none; max-width: 1200px; margin: 0 auto; padding: 40px 24px; animation: fadeIn 0.4s ease-out; }
@@ -193,7 +183,7 @@
     .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
     .profile-grid .full { grid-column: 1 / -1; }
 
-    /* ── Orçamento System: Caixas mais uniformes ── */
+    /* ── Orçamento System ── */
     .orc-form-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
     .orc-item-list { border-top: 1px solid #e2e8f0; padding-top: 24px; margin-top: 20px; }
     .orc-item { 
@@ -252,17 +242,70 @@
       .orc-item { grid-template-columns: 1fr; gap: 8px; } 
     }
 
-    /* ── Impressão de Orçamento Profissional (PDF) APRIMORADA ── */
+    /* ── Impressão de Orçamento Profissional (PDF) 100% CORRIGIDA ── */
     .print-only { display: none; }
     
     @media print {
-      @page { margin: 1.5cm; }
-      body { background: #fff; color: #000; font-size: 13px; }
+      @page { margin: 1cm; size: A4 portrait; }
+      body { background: #fff; color: #000; font-size: 13px; line-height: 1.4; }
       .bg-overlay { display: none !important; }
       
-      /* Marca d'água robusta no rodapé */
+      /* Ocultando itens desnecessários da tela e focando apenas no documento */
+      .header, .tabs, .logout-btn, .btn-add-item, .btn-primary, .btn-secondary-action, .orc-item button, #authBtns, footer { display: none !important; }
+      .flex-header, .card > h3 { display: none !important; } /* Oculta os títulos que poluem a tela */
+      
+      .app-screen { padding: 0; margin: 0; display: block !important; }
+      .tab-content { display: none !important; }
+      .tab-content.active { display: block !important; }
+      
+      .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
+      .orc-form-grid { display: block !important; }
+      
+      /* Formatando o Cabeçalho do Cliente: Compacto e Sem Caixas */
+      .profile-grid { 
+        display: flex !important; 
+        flex-wrap: wrap !important;
+        gap: 15px !important; 
+        border: none !important;
+        border-bottom: 2px solid #000 !important; 
+        padding: 0 0 15px 0 !important; 
+        margin-bottom: 20px !important; 
+      }
+      .form-group { margin-bottom: 5px !important; flex: 1 1 45% !important; }
+      .form-group.full { flex: 1 1 100% !important; }
+      .form-group label { color: #475569 !important; font-size: 11px !important; margin-bottom: 2px !important; text-transform: uppercase; font-weight: 700 !important; }
+      .form-group input, .form-group textarea, .form-group select { 
+        background: transparent !important; border: none !important; border-bottom: 1px dotted #94a3b8 !important; 
+        padding: 0 0 4px 0 !important; font-size: 14px !important; color: #000 !important; 
+        font-weight: 600 !important; border-radius: 0 !important; box-shadow: none !important; height: auto !important;
+        appearance: none !important; -webkit-appearance: none !important; /* Remove seta do select */
+      }
+      
+      /* Formatando a Lista de Itens como Tabela Limpa */
+      .print-only { display: grid !important; }
+      .orc-items-header { 
+        display: grid; grid-template-columns: 4fr 1fr 1fr 1fr; 
+        font-weight: 800; border-bottom: 2px solid #000; 
+        padding-bottom: 6px; margin-bottom: 6px; font-size: 12px; text-transform: uppercase;
+      }
+      .orc-item-list { border: none !important; margin-top: 0 !important; padding-top: 0 !important; }
+      .orc-item { 
+        display: grid; grid-template-columns: 4fr 1fr 1fr 1fr !important; 
+        background: none !important; border: none !important; border-bottom: 1px solid #e2e8f0 !important; 
+        padding: 6px 0 !important; box-shadow: none !important; border-radius: 0 !important; gap: 10px;
+        page-break-inside: avoid !important; /* Previne corte no meio da linha na página 2 */
+      }
+      
+      /* Resumo Financeiro Compacto à direita */
+      .summary-box { border: none !important; background: none !important; width: 40%; margin-left: auto; margin-top: 20px; padding: 0 !important; }
+      .summary-row { margin-bottom: 6px !important; font-size: 14px !important; color: #000 !important; }
+      .summary-row.total { color: #000 !important; border-top: 2px solid #000 !important; padding-top: 10px !important; }
+      
+      .print-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 25px; }
+
+      /* Marca d'água elegante no final de toda página */
       body::after {
-        content: "Documento gerado por VoltCalc Pro - A Plataforma do Profissional da Elétrica | www.voltcalcpro.com";
+        content: "Documento gerado e validado por VoltCalc Pro - A Plataforma do Profissional da Elétrica | www.voltcalcpro.com";
         position: fixed;
         bottom: 0px;
         left: 0;
@@ -274,47 +317,16 @@
         padding-top: 10px;
         font-weight: 600;
       }
-
-      .header, .tabs, .logout-btn, .btn-add-item, .btn-primary, .btn-secondary-action, .orc-item button, #authBtns { display: none !important; }
-      .app-screen { padding: 0; margin: 0; display: block !important; }
-      .tab-content { display: none !important; }
-      .tab-content.active { display: block !important; }
-      
-      .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
-      .orc-form-grid { grid-template-columns: 1fr !important; }
-      
-      /* Formatando o Cabeçalho de Cliente para a Impressão */
-      .profile-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; border: 1px solid #000; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-      .profile-grid .full { grid-column: 1 / -1 !important; }
-      .form-group { margin-bottom: 5px !important; }
-      
-      /* Formatando a Lista de Itens como Tabela */
-      .print-only { display: grid !important; }
-      .orc-items-header { 
-        display: grid; grid-template-columns: 4fr 1fr 1fr 1fr; 
-        font-weight: 800; border-bottom: 2px solid #000; 
-        padding-bottom: 8px; margin-bottom: 8px; font-size: 14px;
-      }
-      .orc-item-list { border: none !important; margin-top: 0 !important; padding-top: 0 !important; }
-      .orc-item { 
-        display: grid; grid-template-columns: 4fr 1fr 1fr 1fr !important; 
-        background: none !important; border: none !important; border-bottom: 1px solid #ccc !important; 
-        padding: 8px 0 !important; box-shadow: none !important; border-radius: 0 !important; gap: 10px;
-      }
-      .orc-item select, .orc-item input { border: none !important; background: none !important; pointer-events: none; -webkit-appearance: none; appearance: none; padding: 0 !important; font-size: 13px; color: #000 !important; }
-      .form-group input, .form-group textarea { border: none !important; border-bottom: 1px dashed #ccc !important; background: none !important; pointer-events: none; padding: 4px 0 !important; border-radius: 0 !important; }
-      
-      .summary-box { border: 1px solid #000 !important; background: none !important; width: 50%; margin-left: auto; margin-top: 20px; }
-      .summary-row.total { color: #000 !important; border-top: 2px solid #000; }
-      .print-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 25px; }
     }
     .print-header { display: none; }
   </style>
 </head>
 <body>
 
+  <!-- Camada de Plano de Fundo Dinâmico (Marca d'água) -->
   <div class="bg-overlay"></div>
 
+  <!-- HEADER -->
   <header class="header">
     <a href="/" class="logo" id="headerLogoContainer">
       <img src="1000488411.webp" alt="VoltCalc Logo" onerror="this.style.display='none'">
@@ -326,6 +338,7 @@
     </div>
   </header>
 
+  <!-- LANDING PAGE (Visível apenas deslogado) -->
   <main id="landingPage">
     <section class="hero">
       <h1>A plataforma onde o <span>eletricista profissional</span> gerencia tudo.</h1>
@@ -361,49 +374,93 @@
         </div>
       </div>
     </section>
+
+    <!-- Rodapé Público com Links Legais -->
+    <footer style="text-align: center; padding: 24px; color: var(--text-light); font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 40px; background: rgba(255,255,255,0.7);">
+      <p>&copy; 2026 VoltCalc Pro. Todos os direitos reservados.</p>
+      <p style="margin-top: 8px;">
+        <a href="#" onclick="openModal('modalTermos')" style="color: var(--primary); text-decoration: none; font-weight: 600; margin: 0 10px;">Termos de Uso</a> |
+        <a href="#" onclick="openModal('modalPrivacidade')" style="color: var(--primary); text-decoration: none; font-weight: 600; margin: 0 10px;">Política de Privacidade</a>
+      </p>
+    </footer>
   </main>
 
+  <!-- MODAIS -->
   <div class="modal-overlay" id="modalOverlay">
+    
+    <!-- Modal Login -->
     <div class="modal" id="modalLogin" style="display:none;">
       <button class="modal-close" onclick="closeModal()">&times;</button>
       <h2>Fazer Login</h2>
       <p style="color: var(--text-light); margin-bottom: 32px; font-weight: 500;">Acesse seu painel técnico de orçamentos.</p>
-      
       <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="exemplo@email.com"></div>
       <div class="form-group"><label>Senha</label><input type="password" id="loginSenha" placeholder="••••••••"></div>
       <button class="btn-primary" id="btnLogin">Entrar no Painel</button>
       <button class="btn-google" id="btnGoogle">Continuar com Google</button>
-      <p style="text-align: center; margin-top: 20px; font-size: 14px; font-weight: 600;">
-        <a href="#" id="btnReset" style="color: var(--primary); text-decoration: none;">Esqueci minha senha</a>
-      </p>
+      <p style="text-align: center; margin-top: 20px; font-size: 14px; font-weight: 600;"><a href="#" id="btnReset" style="color: var(--primary); text-decoration: none;">Esqueci minha senha</a></p>
     </div>
 
+    <!-- Modal Cadastro -->
     <div class="modal" id="modalCadastro" style="display:none;">
       <button class="modal-close" onclick="closeModal()">&times;</button>
-      <h2 style="margin-bottom: 32px; font-weight: 800;">Criar sua Conta Profissional</h2>
+      <h2 style="margin-bottom: 32px; font-weight: 800;">Criar Conta Profissional</h2>
       <div class="form-group"><label>Nome Completo</label><input type="text" id="cadNome"></div>
       <div class="form-group"><label>Email</label><input type="email" id="cadEmail"></div>
       <div class="form-group"><label>Senha</label><input type="password" id="cadSenha" placeholder="Mínimo 6 caracteres"></div>
       <button class="btn-primary" id="btnSignup">Cadastrar Grátis</button>
     </div>
+
+    <!-- Modal Termos de Uso -->
+    <div class="modal modal-lg" id="modalTermos" style="display:none;">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <h2 style="font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 16px;">Termos de Uso</h2>
+      <div class="legal-text">
+        <p>Bem-vindo ao VoltCalc Pro. Ao utilizar nossa plataforma, você concorda com os seguintes termos:</p>
+        <h3>1. Finalidade da Plataforma</h3>
+        <p>O VoltCalc Pro é uma ferramenta de gestão e geração de orçamentos projetada para profissionais da área elétrica. Os valores sugeridos na plataforma são baseados em pesquisas de mercado nacional, servindo apenas como referência.</p>
+        <h3>2. Responsabilidade Profissional</h3>
+        <p>A plataforma **não se responsabiliza** pela execução técnica, qualidade ou conformidade das instalações elétricas com a NBR 5410. Toda e qualquer responsabilidade civil e criminal sobre os serviços prestados aos clientes finais é inteiramente do profissional ou empresa que gerou o orçamento.</p>
+        <h3>3. Uso da Conta</h3>
+        <p>O usuário compromete-se a fornecer informações verdadeiras e assumir a responsabilidade pela guarda de suas senhas. Contas que violem o uso ético do sistema poderão ser suspensas.</p>
+      </div>
+    </div>
+
+    <!-- Modal Política de Privacidade -->
+    <div class="modal modal-lg" id="modalPrivacidade" style="display:none;">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <h2 style="font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 16px;">Política de Privacidade</h2>
+      <div class="legal-text">
+        <p>O VoltCalc Pro valoriza sua privacidade e a proteção de seus dados (LGPD).</p>
+        <h3>1. Coleta de Dados</h3>
+        <p>Coletamos seu nome, e-mail e as informações de perfil empresarial cadastradas para o funcionamento do gerador de PDFs. Os orçamentos são armazenados criptografados na nuvem (Google Firebase) para fornecer o seu histórico.</p>
+        <h3>2. Uso das Informações</h3>
+        <p>Seus dados não são vendidos a terceiros. Eles são utilizados exclusivamente para o envio de e-mails de recuperação de senha, autenticação e para preencher automaticamente seus cabeçalhos comerciais no gerador de orçamento.</p>
+        <h3>3. Monetização e Cookies</h3>
+        <p>O site pode exibir anúncios através de parceiros como o Google AdSense. Esses fornecedores terceiros usam cookies para veicular anúncios com base em visitas anteriores do usuário ao nosso site ou a outros sites na internet. Você pode desativar a publicidade personalizada a qualquer momento nas configurações da sua conta do Google.</p>
+      </div>
+    </div>
+
   </div>
 
+  <!-- APP PROFESSIONALS -->
   <div class="app-screen" id="profScreen">
     
+    <!-- Cabeçalho visível exclusivamente na folha impressa/PDF -->
     <div class="print-header">
       <div style="display:flex; align-items:center; gap: 16px;">
         <div id="printLogoContainer" style="display:none; width: 80px; height: 80px;">
            <img id="printLogoImage" src="" style="width:100%; height:100%; object-fit:contain; border-radius:8px;" alt="Logo da Empresa">
         </div>
         <div>
-          <h1 style="font-size: 28px; font-weight: 800; color:#000;">⚡ ORÇAMENTO ELÉTRICO</h1>
-          <p style="font-size: 14px; margin-top: 4px;" id="printCompanyName">Plataforma VoltCalc Pro</p>
+          <h1 style="font-size: 24px; font-weight: 800; color:#000; text-transform: uppercase;">⚡ ORÇAMENTO ELÉTRICO</h1>
+          <p style="font-size: 14px; margin-top: 4px; font-weight: 600;" id="printCompanyName">Plataforma VoltCalc Pro</p>
         </div>
       </div>
-      <div style="text-align: right;">
-        <h3 id="printProfName" style="font-weight: 700;"></h3>
+      <div style="text-align: right; font-size: 13px;">
+        <h3 id="printProfName" style="font-weight: 700; font-size: 16px;"></h3>
         <p id="printProfDoc"></p>
         <p id="printProfPix"></p>
+        <p id="printProfTel"></p>
       </div>
     </div>
 
@@ -431,6 +488,7 @@
               <div class="form-group full"><label>Endereço do Serviço</label><input id="orcCliEnd"></div>
             </div>
             
+            <!-- Cabeçalho visível apenas na impressão -->
             <div class="orc-items-header print-only">
               <span>Descrição do Serviço</span>
               <span style="text-align:center;">Qtd</span>
@@ -445,7 +503,7 @@
             
             <div class="form-group" style="margin-top: 24px;">
               <label>Observações / Condições de Pagamento</label>
-              <textarea id="orcObs" rows="4" placeholder="Ex: 50% de entrada e 50% na conclusão da entrega técnica. Garantia de 1 ano sobre a mão de obra."></textarea>
+              <textarea id="orcObs" rows="3" placeholder="Ex: 50% de entrada e 50% na conclusão da entrega técnica. Garantia de 1 ano sobre a mão de obra."></textarea>
             </div>
           </div>
           
@@ -475,7 +533,7 @@
 
     <div class="tab-content" id="tab-hist-prof">
       <h3>📚 Histórico de Orçamentos</h3>
-      <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, reimprima ou envie diretamente pelo WhatsApp.</p>
+      <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, reimprima ou envie o detalhamento diretamente pelo WhatsApp.</p>
       <div id="profHistContainer"></div>
     </div>
 
@@ -487,7 +545,7 @@
     var loginRole = 'profissional', signupRole = 'profissional';
     var currentUser = null;
     var base64LogoToSave = ""; 
-    var globalSavedBudgets = []; // Variável para armazenar o histórico globalmente e permitir cliques
+    var globalSavedBudgets = []; 
 
     document.addEventListener('DOMContentLoaded', function() {
       firebase.initializeApp({
@@ -557,8 +615,7 @@
     }
 
     function openModal(id) {
-      document.getElementById('modalLogin').style.display = 'none';
-      document.getElementById('modalCadastro').style.display = 'none';
+      document.querySelectorAll('.modal').forEach(function(m){ m.style.display='none'; });
       document.getElementById(id).style.display = 'block';
       document.getElementById('modalOverlay').classList.add('open');
     }
@@ -652,7 +709,6 @@
       document.getElementById('tab-precos').innerHTML = h;
     }
 
-    // Adaptado para aceitar preenchimento automático durante re-impressão
     function addOrcItem(isSuggested, presetDesc, presetQty, presetVal) {
       var id = Date.now();
       var div = document.createElement('div');
@@ -677,7 +733,7 @@
       if (isSuggested) div.querySelector('.orc-sel-suggest').onchange = function(e) { div.querySelector('.orc-val').value = e.target.value; updateOrcTotals(); };
       div.querySelector('.orc-qty').oninput = updateOrcTotals;
       div.querySelector('.orc-val').oninput = updateOrcTotals;
-      updateOrcTotals(); // forçar cálculo inicial
+      updateOrcTotals();
     }
 
     function removeOrcItem(id) { document.getElementById('item-' + id).remove(); updateOrcTotals(); }
@@ -705,7 +761,6 @@
     function saveOrc() {
       var n = document.getElementById('orcCliNome').value; if (!n) { alert('Informe o nome do cliente.'); return; }
       
-      // Capturando os itens dinâmicos para salvar no BD para que o histórico funcione
       var itemsToSave = [];
       document.querySelectorAll('.orc-item').forEach(function(el) {
         var q = el.querySelector('.orc-qty').value;
@@ -734,14 +789,11 @@
       db.collection('budgets').add(orcData).then(function() { 
         alert('Orçamento salvo com sucesso!'); 
         loadHistory('profHistContainer');
-        
-        // Limpando campos após salvar
         document.getElementById('orcCliNome').value = "";
         document.getElementById('orcCliTel').value = "";
         document.getElementById('orcCliEnd').value = "";
         document.getElementById('orcItemsContainer').innerHTML = "";
         updateOrcTotals();
-        
       }).catch(function(e){ alert("Erro ao salvar: "+e.message); });
     }
 
@@ -765,16 +817,15 @@
           return tB - tA;
         });
         
-        globalSavedBudgets = listDocs; // Salvar globalmente para usar nos cliques
+        globalSavedBudgets = listDocs; 
 
         var h = '<div class="ptable-wrap"><table class="ptable"><thead><tr><th>Data</th><th>Cliente</th><th>Total</th><th style="text-align:right;">Ações</th></tr></thead><tbody>';
         listDocs.forEach(function(d, index) { 
           var dataFormatada = (d.createdAt && typeof d.createdAt.toDate === 'function') ? d.createdAt.toDate().toLocaleDateString('pt-BR') : 'N/A';
           h += '<tr><td>'+dataFormatada+'</td><td>'+(d.clientName || 'N/A')+'</td><td class="md">R$ '+(d.total || '0,00')+'</td>';
-          // Botões de Ação Dinâmicos
           h += '<td style="text-align:right;">';
           h += '<button class="btn-action-icon" onclick="actionReprint('+index+')" title="Re-imprimir / Gerar PDF">🖨️</button>';
-          h += '<button class="btn-action-icon" onclick="actionShareWpp('+index+')" title="Enviar para o WhatsApp">📱</button>';
+          h += '<button class="btn-action-icon" onclick="actionShareWpp('+index+')" title="Enviar detalhamento via WhatsApp">📱</button>';
           h += '</td></tr>'; 
         });
         container.innerHTML = h + '</tbody></table></div>';
@@ -789,7 +840,6 @@
       var b = globalSavedBudgets[index];
       if(!b) return;
       
-      // Preencher formulário principal com os dados do histórico
       document.getElementById('orcCliNome').value = b.clientName || '';
       document.getElementById('orcCliTel').value = b.clientTel || '';
       document.getElementById('orcValidDate').value = b.validDate || '';
@@ -797,32 +847,60 @@
       document.getElementById('orcObs').value = b.obs || '';
       document.getElementById('orcDiscount').value = b.discountRaw || 0;
       
-      document.getElementById('orcItemsContainer').innerHTML = ''; // Limpar atual
+      document.getElementById('orcItemsContainer').innerHTML = ''; 
       
-      // Recriar Itens
       if(b.items && b.items.length > 0) {
         b.items.forEach(function(item) {
           addOrcItem(false, item.desc, item.qty, item.val);
         });
       } else {
-        // Fallback caso seja um orçamento muito antigo sem itens salvos
         addOrcItem(false, 'Orçamento Antigo (Detalhes ausentes)', 1, parseFloat(b.total.replace('.','').replace(',','.')));
       }
       
-      // Mudar aba para "Novo Orçamento"
       document.querySelector('.tab[data-tab="orc"]').click();
-      
-      // Disparar impressão
       setTimeout(function(){ window.print(); }, 500);
     };
 
     window.actionShareWpp = function(index) {
       var b = globalSavedBudgets[index];
       if(!b) return;
-      var text = "⚡ *Orçamento Elétrico*\n\n";
+
+      var text = "⚡ *ORÇAMENTO ELÉTRICO*\n";
+      text += "--------------------------------------\n";
       text += "*Cliente:* " + (b.clientName || 'N/A') + "\n";
-      text += "*Total do Serviço:* R$ " + (b.total || '0,00') + "\n\n";
-      text += "_Gerado via Plataforma VoltCalc Pro_";
+      if(b.clientTel) text += "*Telefone:* " + b.clientTel + "\n";
+      if(b.validDate) text += "*Validade:* " + b.validDate.split('-').reverse().join('/') + "\n";
+      if(b.address) text += "*Endereço:* " + b.address + "\n";
+      text += "--------------------------------------\n";
+      text += "*SERVIÇOS:*\n";
+
+      if(b.items && b.items.length > 0) {
+        b.items.forEach(function(item) {
+          var q = item.qty || 1;
+          var v = item.val || 0;
+          var t = q * v;
+          text += "▪ " + item.desc + "\n";
+          text += "  " + q + "x R$ " + parseFloat(v).toLocaleString('pt-BR', {minimumFractionDigits: 2}) + " = *R$ " + t.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + "*\n\n";
+        });
+      } else {
+        text += "▪ Orçamento sem detalhes de itens registrados.\n\n";
+      }
+
+      text += "--------------------------------------\n";
+      if(b.discountRaw && b.discountRaw > 0) {
+        text += "*Subtotal:* R$ " + (b.subtotal || '0,00') + "\n";
+        text += "*Desconto:* R$ " + (b.discount || '0,00') + " (" + b.discountRaw + "%)\n";
+      }
+      text += "👉 *TOTAL DO SERVIÇO:* R$ " + (b.total || '0,00') + "\n";
+      text += "--------------------------------------\n";
+
+      if(b.obs) {
+        text += "*Observações/Condições:*\n_" + b.obs + "_\n";
+        text += "--------------------------------------\n";
+      }
+
+      text += "\n_Gerado de forma confiável via VoltCalc Pro_\n";
+      text += "www.voltcalcpro.com";
       
       var url = "https://wa.me/?text=" + encodeURIComponent(text);
       window.open(url, '_blank');
@@ -832,7 +910,7 @@
       var h = `
         <div class="card">
           <h3>👤 Perfil Profissional e Empresa</h3>
-          <p style="color:var(--text-light); margin-bottom: 24px;">Configure os dados e a logo que aparecerão nos seus orçamentos em PDF.</p>
+          <p style="color:var(--text-light); margin-bottom: 24px;">Configure os dados e a logo que aparecerão nos seus orçamentos em PDF e WhatsApp.</p>
           
           <div style="display:flex; gap:20px; margin-bottom:32px; align-items: center; flex-wrap: wrap;">
             <div id="logoPreviewContainer" style="width: 100px; height: 100px; border-radius: 12px; border: 2px dashed #cbd5e1; display:flex; align-items:center; justify-content:center; overflow:hidden; background: #f8fafc;">
@@ -894,6 +972,7 @@
           document.getElementById('printCompanyName').textContent = d.nome || 'Plataforma VoltCalc Pro';
           document.getElementById('printProfDoc').textContent = d.doc ? 'Doc: ' + d.doc : '';
           document.getElementById('printProfPix').textContent = d.pix ? 'PIX para pgto: ' + d.pix : '';
+          document.getElementById('printProfTel').textContent = d.tel ? 'Contato: ' + d.tel : '';
         } 
       }).catch(function(e){ console.log("Perfil inicial vazio."); });
       
@@ -914,6 +993,7 @@
           document.getElementById('printCompanyName').textContent = upd.nome || 'Plataforma VoltCalc Pro';
           document.getElementById('printProfDoc').textContent = upd.doc ? 'Doc: ' + upd.doc : '';
           document.getElementById('printProfPix').textContent = upd.pix ? 'PIX para pgto: ' + upd.pix : '';
+          document.getElementById('printProfTel').textContent = upd.tel ? 'Contato: ' + upd.tel : '';
           if(upd.logoBase64) {
             document.getElementById('printLogoImage').src = upd.logoBase64;
             document.getElementById('printLogoContainer').style.display = 'block';
