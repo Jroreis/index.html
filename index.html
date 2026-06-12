@@ -347,9 +347,8 @@
       auth.onAuthStateChanged(function(user) {
         currentUser = user;
         if (user) {
-          db.collection('users').doc(user.uid).get().then(function(doc) {
-            showApp('profissional', user.displayName || user.email);
-          });
+          // Correção de Refresh: Abre a tela imediatamente, sem esperar travar no carregamento de coleções
+          showApp('profissional', user.displayName || user.email);
         } else { showLanding(); }
       });
     });
@@ -427,7 +426,6 @@
       });
     }
 
-    // TABELA ATUALIZADA ENGEHALL COM PREÇOS DE REFERÊNCIA DE MÃO DE OBRA
     var priceData = [
       { cat: '💡 ILUMINAÇÃO', items: [
         { d: 'Interruptor simples / pulsador', mn: 50, mx: 75, md: 62 },
@@ -499,15 +497,32 @@
 
     function saveOrc() {
       var n = document.getElementById('orcCliNome').value; if (!n) { alert('Informe o cliente.'); return; }
-      db.collection('budgets').add({ profId: currentUser.uid, clientName: n, total: document.getElementById('orcTotalValue').textContent, createdAt: new Date() }).then(function() { alert('Orçamento salvo com sucesso!'); location.reload(); });
+      db.collection('budgets').add({ profId: currentUser.uid, clientName: n, total: document.getElementById('orcTotalValue').textContent, createdAt: new Date() }).then(function() { alert('Orçamento salvo com sucesso!'); location.reload(); }).catch(function(e){ alert("Erro ao salvar: "+e.message); });
     }
 
     function loadHistory(containerId) {
+      // Tenta ordenar por data desc (Exige Índice Composto no console do Firebase)
       db.collection('budgets').where('profId', '==', currentUser.uid).orderBy('createdAt', 'desc').get().then(function(qs) {
-        var h = '<div class="ptable-wrap"><table class="ptable"><thead><tr><th>Data</th><th>Cliente</th><th>Total</th></tr></thead><tbody>';
-        qs.forEach(function(doc) { var d = doc.data(); h += '<tr><td>'+d.createdAt.toDate().toLocaleDateString()+'</td><td>'+d.clientName+'</td><td class="md">R$ '+d.total+'</td></tr>'; });
-        document.getElementById(containerId).innerHTML = h + '</tbody></table></div>';
+        renderHistoryRows(qs, containerId);
+      }).catch(function(err) {
+        console.warn("Falta criar o índice composto no console Firebase para ordenação. Carregando modo padrão sem ordenação.", err);
+        // Fallback: Se o índice composto não foi criado no console, carrega os dados sem quebrar a interface
+        db.collection('budgets').where('profId', '==', currentUser.uid).get().then(function(qs) {
+          renderHistoryRows(qs, containerId);
+        }).catch(function(e){
+          document.getElementById(containerId).innerHTML = '<p style="color:var(--text-light);">Erro ao carregar histórico de orçamentos.</p>';
+        });
       });
+    }
+
+    function renderHistoryRows(qs, containerId) {
+      var h = '<div class="ptable-wrap"><table class="ptable"><thead><tr><th>Data</th><th>Cliente</th><th>Total</th></tr></thead><tbody>';
+      qs.forEach(function(doc) { 
+        var d = doc.data(); 
+        var dataFormatada = (d.createdAt && typeof d.createdAt.toDate === 'function') ? d.createdAt.toDate().toLocaleDateString() : 'N/A';
+        h += '<tr><td>'+dataFormatada+'</td><td>'+(d.clientName || 'N/A')+'</td><td class="md">R$ '+(d.total || '0,00')+'</td></tr>'; 
+      });
+      document.getElementById(containerId).innerHTML = h + '</tbody></table></div>';
     }
 
     function renderProfileForm(tid) {
@@ -528,7 +543,7 @@
           document.getElementById('pEsp').value=d.esp||''; 
           document.getElementById('printProfDoc').textContent = d.doc ? 'Doc: ' + d.doc : '';
         } 
-      });
+      }).catch(function(e){ console.log("Perfil ainda vazio ou sem documento criado."); });
       
       document.getElementById('btnSaveProfile').onclick = function() { 
         var upd = { 
@@ -540,11 +555,11 @@
           exp: document.getElementById('pExp').value, 
           esp: document.getElementById('pEsp').value 
         }; 
-        db.collection('users').doc(currentUser.uid).update(upd).then(function(){
+        db.collection('users').doc(currentUser.uid).set(upd, { merge: true }).then(function(){
           alert('Perfil atualizado!');
           document.getElementById('printProfName').textContent = upd.nome;
           document.getElementById('printProfDoc').textContent = upd.doc ? 'Doc: ' + upd.doc : '';
-        }); 
+        }).catch(function(e){ alert("Erro ao salvar perfil: "+e.message); }); 
       };
     }
   </script>
