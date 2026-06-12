@@ -131,7 +131,7 @@
     .btn-hero.secondary { background: var(--white); color: var(--primary); border: 2px solid var(--primary); }
     .btn-hero:hover { transform: translateY(-3px); scale: 1.02; }
 
-    /* Seção do Vídeo Institucional */
+    /* Seção do Vídeo Institucional da Plataforma */
     .video-container {
       max-width: 850px;
       margin: 0 auto 40px;
@@ -211,6 +211,7 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .flex-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
     
+    /* Input Inline editável para o Nome do Painel */
     .editable-panel-title {
       font-size: 28px;
       font-weight: 800;
@@ -620,6 +621,18 @@
           </div>
         </div>
       </article>
+
+      <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 40px;">
+        <div style="max-width: 500px; margin: 0 auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
+          <p style="font-weight: 700; color: var(--dark); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            ☕ Apoie o Projeto VoltCalc Pro
+          </p>
+          <p style="font-size: 12px; color: var(--text-light);">Gostou da ferramenta? Contribua com qualquer valor para ajudar a manter o servidor ativo!</p>
+          <button onclick="copiarChavePix()" class="btn-pix-donation">
+            📋 Copiar Chave PIX
+          </button>
+        </div>
+      </footer>
     </div>
 
     <div class="tab-content" id="tab-precos"></div>
@@ -628,6 +641,18 @@
       <h3>📚 Histórico de Orçamentos</h3>
       <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, altere dados estruturais, reimprima, envie via WhatsApp ou exclua registros indesejados.</p>
       <div id="profHistContainer"></div>
+
+      <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 40px;">
+        <div style="max-width: 500px; margin: 0 auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
+          <p style="font-weight: 700; color: var(--dark); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            ☕ Apoie o Projeto VoltCalc Pro
+          </p>
+          <p style="font-size: 12px; color: var(--text-light);">Gostou da ferramenta? Contribua com qualquer valor para ajudar a manter o servidor ativo!</p>
+          <button onclick="copiarChavePix()" class="btn-pix-donation">
+            📋 Copiar Chave PIX
+          </button>
+        </div>
+      </footer>
     </div>
 
     <div class="tab-content" id="tab-perfil"></div>
@@ -710,12 +735,11 @@
       }).then(closeModal).catch(function(err) { alert(err.message); });
     }
 
-    // ── FUNÇÃO GOOGLE LOGIN CORRIGIDA E ESTABILIZADA CONTRA TRAVAMENTOS ──
     function handleGoogle() {
       var btn = document.getElementById('btnGoogle');
       var originalText = btn.textContent;
       btn.textContent = "Conectando ao Google...";
-      btn.disabled = true; // Impede cliques múltiplos e quebra de sessão
+      btn.disabled = true; 
       
       var p = new firebase.auth.GoogleAuthProvider();
       p.addScope('profile');
@@ -742,7 +766,6 @@
         btn.disabled = false;
         console.error("Erro Firebase Auth:", err);
         
-        // Tratamento explicativo de exceções do navegador para o usuário
         if(err.code === "auth/popup-blocked") {
           alert('O bloqueador de pop-ups do seu navegador impediu a abertura da janela. Por favor, autorize a abertura de pop-ups para este site.');
         } else if(err.code === "auth/unauthorized-domain") {
@@ -1124,7 +1147,6 @@
       }
     };
 
-    // ── FUNÇÃO DO BOTÃO DE COPIAR CHAVE PIX DO RODAPÉ ──
     window.copiarChavePix = function() {
       var chave = "6065c213-d0f5-4119-baeb-a580e1a96910";
       if (navigator.clipboard && window.isSecureContext) {
@@ -1148,12 +1170,13 @@
         document.execCommand('copy');
         alert('Chave aleatória PIX copiada com sucesso!');
       } catch (err) {
-        alert('Não foi possível copiar automaticamente. Selecione a chave manualmente: ' + text);
+        alert('Não foi possível copiar automaticamente. Chave: ' + text);
       }
       document.body.removeChild(input);
     }
 
     function renderProfileForm(tid) {
+      // Injeção da estrutura de apoio Pix também no rodapé dinâmico do Perfil
       var h = `
         <div class="card">
           <h3>👤 Perfil Profissional e Empresa</h3>
@@ -1182,6 +1205,18 @@
           
           <button class="btn-primary" id="btnSaveProfile" style="margin-top: 16px;">Salvar Perfil</button>
         </div>
+
+        <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 40px;">
+          <div style="max-width: 500px; margin: 0 auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
+            <p style="font-weight: 700; color: var(--dark); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              ☕ Apoie o Projeto VoltCalc Pro
+            </p>
+            <p style="font-size: 12px; color: var(--text-light);">Gostou da ferramenta? Contribua com qualquer valor para ajudar a manter o servidor ativo!</p>
+            <button onclick="copiarChavePix()" class="btn-pix-donation">
+              📋 Copiar Chave PIX
+            </button>
+          </div>
+        </footer>
       `;
       document.getElementById(tid).innerHTML = h;
       
