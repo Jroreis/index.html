@@ -24,7 +24,7 @@
     "@type": "WebApplication",
     "name": "VoltCalc Pro",
     "applicationCategory": "BusinessApplication",
-    "description": "Sistema completo para eletricistas autônomos e empresas gerarem orçamentos elétricos precisos com base na tabela nacional.",
+    "description": "Sistema completo para eletricistas autônomos e empresas gerarem orçamentos elétricos precisos com base da tabela nacional.",
     "operatingSystem": "All"
   }
   </script>
@@ -333,12 +333,12 @@
       .orc-item-row { grid-template-columns: 1fr; gap: 8px; } 
     }
 
-    /* ── Impressão de Orçamento Profissional (PDF) ── */
+    /* ── Impressão Técnica e Compacta de Orçamento Profissional (PDF) ── */
     .print-only { display: none; }
     
     @media print {
-      @page { margin: 1cm; size: A4 portrait; }
-      body { background: #fff; color: #000; font-size: 13px; line-height: 1.4; }
+      @page { margin: 0.8cm; size: A4 portrait; }
+      body { background: #fff; color: #000; font-size: 11px; line-height: 1.3; }
       .bg-overlay { display: none !important; }
       .ads-container, .adsbygoogle, .video-container { display: none !important; }
       .header, .tabs, .logout-btn, .btn-add-item, .btn-primary, .btn-secondary-action, .orc-item button, #authBtns, footer { display: none !important; }
@@ -352,19 +352,19 @@
       .profile-grid { 
         display: flex !important; 
         flex-wrap: wrap !important;
-        gap: 15px !important; 
+        gap: 10px !important; 
         border: none !important;
         border-bottom: 2px solid #000 !important; 
-        padding: 0 0 15px 0 !important; 
-        margin-bottom: 20px !important; 
+        padding: 0 0 10px 0 !important; 
+        margin-bottom: 15px !important; 
       }
-      .form-group { margin-bottom: 5px !important; flex: 1 1 45% !important; }
+      .form-group { margin-bottom: 3px !important; flex: 1 1 45% !important; }
       .form-group.full { flex: 1 1 100% !important; }
-      .form-group label { color: #475569 !important; font-size: 11px !important; margin-bottom: 2px !important; text-transform: uppercase; font-weight: 700 !important; }
+      .form-group label { color: #475569 !important; font-size: 10px !important; margin-bottom: 2px !important; text-transform: uppercase; font-weight: 700 !important; }
       
       .form-group input, .form-group textarea, .form-group select, .orc-item input, .orc-item select { 
-        background: transparent !important; border: none !important; padding: 0 0 4px 0 !important; 
-        font-size: 14px !important; color: #000 !important; font-weight: 600 !important; 
+        background: transparent !important; border: none !important; padding: 0 0 2px 0 !important; 
+        font-size: 12px !important; color: #000 !important; font-weight: 600 !important; 
         border-radius: 0 !important; box-shadow: none !important; height: auto !important; outline: none !important;
         -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; background-image: none !important;
       }
@@ -374,20 +374,29 @@
       .orc-items-header { 
         display: grid; grid-template-columns: 2fr 3fr 1fr 1fr 1fr; 
         font-weight: 800; border-bottom: 2px solid #000; 
-        padding-bottom: 6px; margin-bottom: 6px; font-size: 12px; text-transform: uppercase;
+        padding-bottom: 4px; margin-bottom: 4px; font-size: 11px; text-transform: uppercase;
       }
       .orc-item-list { border: none !important; margin-top: 0 !important; padding-top: 0 !important; }
+      
       .orc-item { 
-        display: grid; grid-template-columns: 2fr 3fr 1fr 1fr 1fr !important; 
-        background: none !important; border: none !important; border-bottom: 1px solid #e2e8f0 !important; 
-        padding: 6px 0 !important; box-shadow: none !important; border-radius: 0 !important; gap: 10px;
+        background: none !important; 
+        border: none !important; 
+        border-bottom: 1px solid #e2e8f0 !important; 
+        padding: 4px 0 !important; 
+        box-shadow: none !important; 
+        border-radius: 0 !important; 
+        margin-bottom: 8px !important;
         page-break-inside: avoid !important; 
       }
+      .orc-item-row {
+        display: grid; grid-template-columns: 2fr 3fr 1fr 1fr !important;
+        gap: 8px !important;
+      }
       
-      .summary-box { border: none !important; background: none !important; width: 40%; margin-left: auto; margin-top: 20px; padding: 0 !important; }
-      .summary-row { margin-bottom: 6px !important; font-size: 14px !important; color: #000 !important; }
-      .summary-row.total { color: #000 !important; border-top: 2px solid #000 !important; padding-top: 10px !important; }
-      .print-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 25px; }
+      .summary-box { border: none !important; background: none !important; width: 35%; margin-left: auto; margin-top: 10px; padding: 0 !important; }
+      .summary-row { margin-bottom: 4px !important; font-size: 12px !important; color: #000 !important; }
+      .summary-row.total { color: #000 !important; border-top: 2px solid #000 !important; padding-top: 6px !important; font-size: 14px !important;}
+      .print-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
 
       body::after {
         content: "Documento gerado e validado por VoltCalc Pro - A Plataforma do Profissional da Elétrica | www.voltcalcpro.com";
@@ -396,10 +405,10 @@
         left: 0;
         width: 100%;
         text-align: center;
-        font-size: 11px;
+        font-size: 9px;
         color: #94a3b8;
         border-top: 1px solid #cbd5e1;
-        padding-top: 10px;
+        padding-top: 6px;
         font-weight: 600;
       }
     }
@@ -980,7 +989,6 @@
         itemsToSave.push({ amb: a, descServ: ds, desc: desc, qty: q, val: v });
       });
 
-      // Consolidação Detalhada de Endereço
       var rua = document.getElementById('orcRua').value;
       var num = document.getElementById('orcNum').value;
       var bairro = document.getElementById('orcBairro').value;
@@ -1082,7 +1090,7 @@
           h += '<button class="btn-action-icon" onclick="actionReprint('+index+')" title="Re-imprimir / Gerar PDF">🖨️</button>';
           h += '<button class="btn-action-icon" onclick="actionShareWpp('+index+')" title="Enviar via WhatsApp">📱</button>';
           h += '<button class="btn-action-icon" onclick="actionDelete(\''+d.id+'\')" title="Excluir Orçamento" style="color: #dc2626;">🗑️</button>';
-          h += '</td></tr>'; 
+          h += '<</td></tr>'; 
         });
         container.innerHTML = h + '</tbody></table></div>';
       }).catch(function(err) {
@@ -1104,12 +1112,11 @@
       document.getElementById('orcCliTel').value = b.clientTel || '';
       document.getElementById('orcValidDate').value = b.validDate || '';
       
-      // Tenta quebrar o endereço salvo de volta nos campos
       if(b.address) {
         var parts = b.address.split(', ');
         var ruaNum = parts[0] ? parts[0].split(' Nº ') : [];
         document.getElementById('orcRua').value = ruaNum[0] || '';
-        document.getElementById('orcNum').value = ruaNum[1] || '';
+        document.getElementById('orcNum').value = ruaNum[1] ? ruaNum[1].replace('Nº ', '') : '';
         
         for(var i = 1; i < parts.length; i++) {
           if(parts[i].includes('CEP:')) {
@@ -1149,8 +1156,12 @@
       document.getElementById('orcCliTel').value = b.clientTel || '';
       document.getElementById('orcValidDate').value = b.validDate || '';
       
-      // Preenchimento de endereço
-      if (b.address) document.getElementById('orcRua').value = b.address; 
+      if (b.address) {
+        var parts = b.address.split(', ');
+        var ruaNum = parts[0] ? parts[0].split(' Nº ') : [];
+        document.getElementById('orcRua').value = ruaNum[0] || '';
+        document.getElementById('orcNum').value = ruaNum[1] ? ruaNum[1].replace('Nº ', '') : '';
+      }
       
       document.getElementById('orcObs').value = b.obs || '';
       document.getElementById('orcDiscount').value = b.discountRaw || 0;
@@ -1354,7 +1365,7 @@
       db.collection('users').doc(currentUser.uid).get().then(function(doc) { 
         if(doc.exists){ 
           var d=doc.data(); 
-          document.getElementById('Nom').value=d.nome||''; 
+          document.getElementById('pNom').value=d.nome||''; 
           document.getElementById('pTel').value=d.tel||''; 
           document.getElementById('pDoc').value=d.doc||''; 
           document.getElementById('pReg').value=d.reg||''; 
@@ -1396,7 +1407,7 @@
         }
 
         var upd = { 
-          nome: document.getElementById('Nom').value, 
+          nome: document.getElementById('pNom').value, 
           tel: telInput.value, 
           doc: docInput.value, 
           reg: cleanReg, 
