@@ -3,12 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Google Search Console Verification -->
   <meta name="google-site-verification" content="qZcnP8Fdd2iO7FYHrKEPCpcQsXRRJuO54okZPubQKVg" />
   
   <title>VoltCalc Pro - A Plataforma do Profissional da Elétrica</title>
 
-  <!-- Otimização SEO Google Avançada e Suporte ao Google Discover -->
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="description" content="A ferramenta definitiva para eletricistas: orçamentos profissionais, tabelas de preços de elétrica 2026 completas e gestão técnica de instalações residenciais e industriais.">
   <meta name="keywords" content="orçamento elétrico, eletricista, tabela de preços elétrica 2026, serviços elétricos, NBR 5410, VoltCalc Pro, instalações elétricas, quadro de distribuição, cálculo elétrico">
@@ -29,17 +27,14 @@
   }
   </script>
 
-  <!-- Firebase (Compat Mode) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Google AdSense Base Script (SUBSTITUA PELO SEU CÓDIGO CA-PUB) -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
 
   <style>
@@ -262,8 +257,8 @@
     .orc-item-list { border-top: 1px solid #e2e8f0; padding-top: 24px; margin-top: 20px; }
     .orc-item { 
       display: grid; 
-      grid-template-columns: 3fr 1fr 1fr 1fr auto; 
-      gap: 16px; 
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; 
+      gap: 12px; 
       margin-bottom: 16px; 
       align-items: center; 
       background: #ffffff; 
@@ -276,7 +271,7 @@
       background: #f8fafc;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      padding: 12px 14px;
+      padding: 10px 12px;
       font-size: 14px;
       width: 100%;
       color: var(--dark);
@@ -410,7 +405,6 @@
 
   <div class="bg-overlay"></div>
 
-  <!-- HEADER -->
   <header class="header">
     <a href="/" class="logo" id="headerLogoContainer">
       <img src="1000488411.webp" alt="VoltCalc Logo" onerror="this.style.display='none'">
@@ -422,7 +416,6 @@
     </div>
   </header>
 
-  <!-- LANDING PAGE -->
   <main id="landingPage">
     <section class="hero">
       <h1>A plataforma onde o <span>eletricista profissional</span> gerencia tudo.</h1>
@@ -433,7 +426,6 @@
       </div>
     </section>
 
-    <!-- Seção do Vídeo Institucional da Plataforma -->
     <section class="video-container">
       <div class="video-wrapper">
         <iframe 
@@ -474,7 +466,6 @@
       </div>
     </section>
 
-    <!-- Rodapé Público -->
     <footer style="text-align: center; padding: 32px 24px; color: var(--text-light); font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 40px; background: rgba(255,255,255,0.85); backdrop-filter: blur(4px);">
       <div style="max-width: 500px; margin: 0 auto 24px auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
         <p style="font-weight: 700; color: var(--dark); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
@@ -494,7 +485,6 @@
     </footer>
   </main>
 
-  <!-- MODAIS -->
   <div class="modal-overlay" id="modalOverlay">
     
     <div class="modal" id="modalLogin" style="display:none;">
@@ -514,7 +504,7 @@
       <div class="form-group"><label>Nome Completo</label><input type="text" id="cadNome"></div>
       <div class="form-group"><label>Email</label><input type="email" id="cadEmail"></div>
       <div class="form-group"><label>Senha</label><input type="password" id="cadSenha" placeholder="Mínimo 6 caracteres"></div>
-      <button class="btn-primary" id="btnSignup">Cadastrar Grátis</button>
+      <button class="btn-primary" id="btnSignup">Cadastrar Grítis</button>
     </div>
 
     <div class="modal modal-lg" id="modalTermos" style="display:none;">
@@ -547,10 +537,8 @@
 
   </div>
 
-  <!-- APP SCREEN -->
   <div class="app-screen" id="profScreen">
     
-    <!-- Cabeçalho PDF -->
     <div class="print-header">
       <div style="display:flex; align-items:center; gap: 16px;">
         <div id="printLogoContainer" style="display:none; width: 80px; height: 80px;">
@@ -569,7 +557,6 @@
       </div>
     </div>
 
-    <!-- Título do Painel -->
     <div class="flex-header">
       <div style="display: flex; align-items: center; gap: 8px;">
         <span style="font-size: 28px; font-weight: 800; color: var(--dark);">Painel do</span>
@@ -585,7 +572,6 @@
       <div class="tab" data-tab="perfil">👤 Perfil e Empresa</div>
     </nav>
 
-    <!-- ABA ORÇAMENTO -->
     <div class="tab-content active" id="tab-orc">
       <article class="card">
         <h3 id="orcFormHeaderTitle">📄 Gerador de Novo Orçamento</h3>
@@ -601,6 +587,7 @@
             </div>
             
             <div class="orc-items-header print-only">
+              <span>Ambiente</span>
               <span>Descrição do Serviço</span>
               <span style="text-align:center;">Qtd</span>
               <span>V. Unitário</span>
@@ -640,7 +627,6 @@
         </div>
       </article>
 
-      <!-- Apoio Pix na aba Orçamento -->
       <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 40px;">
         <div style="max-width: 500px; margin: 0 auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
           <p style="font-weight: 700; color: var(--dark); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
@@ -654,16 +640,13 @@
       </footer>
     </div>
 
-    <!-- ABA PREÇOS -->
     <div class="tab-content" id="tab-precos"></div>
 
-    <!-- ABA HISTÓRICO -->
     <div class="tab-content" id="tab-hist-prof">
       <h3>📚 Histórico de Orçamentos</h3>
       <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, altere dados estruturais, reimprima, envie via WhatsApp ou exclua registros indesejados.</p>
       <div id="profHistContainer"></div>
 
-      <!-- Apoio Pix na aba Histórico -->
       <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 40px;">
         <div style="max-width: 500px; margin: 0 auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
           <p style="font-weight: 700; color: var(--dark); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
@@ -677,7 +660,6 @@
       </footer>
     </div>
 
-    <!-- ABA PERFIL -->
     <div class="tab-content" id="tab-perfil"></div>
   </div>
 
@@ -899,7 +881,7 @@
       document.getElementById('tab-precos').innerHTML = h;
     }
 
-    function addOrcItem(isSuggested, presetDesc, presetQty, presetVal) {
+    function addOrcItem(isSuggested, presetDesc, presetQty, presetVal, presetAmb) {
       var id = Date.now() + Math.floor(Math.random() * 1000);
       var div = document.createElement('div');
       div.className = 'orc-item';
@@ -921,8 +903,9 @@
       
       var qVal = presetQty || 1;
       var vVal = presetVal || '';
+      var aVal = presetAmb || '';
       
-      div.innerHTML = descHtml + '<input type="number" value="'+qVal+'" min="1" class="orc-qty" style="width:100%; text-align:center;"><input type="number" class="orc-val" placeholder="R$ Unit" value="'+vVal+'"><div class="orc-row-total" style="font-weight:800; text-align:right;">R$ 0,00</div><button onclick="removeOrcItem('+id+')" style="color:#ef4444;border:none;background:none;cursor:pointer;font-weight:800;font-size:18px;">✕</button>';
+      div.innerHTML = '<input placeholder="Ex: Sala, Cozinha" class="orc-amb" value="'+aVal+'">' + descHtml + '<input type="number" value="'+qVal+'" min="1" class="orc-qty" style="width:100%; text-align:center;"><input type="number" class="orc-val" placeholder="R$ Unit" value="'+vVal+'"><div class="orc-row-total" style="font-weight:800; text-align:right;">R$ 0,00</div><button onclick="removeOrcItem('+id+')" style="color:#ef4444;border:none;background:none;cursor:pointer;font-weight:800;font-size:18px;">✕</button>';
       document.getElementById('orcItemsContainer').appendChild(div);
       
       if (isSuggested) {
@@ -961,12 +944,13 @@
       
       var itemsToSave = [];
       document.querySelectorAll('.orc-item').forEach(function(el) {
+        var a = el.querySelector('.orc-amb').value;
         var q = el.querySelector('.orc-qty').value;
         var v = el.querySelector('.orc-val').value;
         var s = el.querySelector('.orc-sel-suggest');
         var c = el.querySelector('.orc-desc-custom');
         var desc = s && s.selectedIndex >= 0 ? s.options[s.selectedIndex].text : (c ? c.value : '');
-        itemsToSave.push({ desc: desc, qty: q, val: v });
+        itemsToSave.push({ amb: a, desc: desc, qty: q, val: v });
       });
 
       var orcData = { 
@@ -1081,7 +1065,7 @@
         b.items.forEach(function(item) {
           var isNationalPreset = false;
           priceData.forEach(function(c) { c.items.forEach(function(p) { if(item.desc === p.d) isNationalPreset = true; }); });
-          addOrcItem(isNationalPreset, item.desc, item.qty, item.val);
+          addOrcItem(isNationalPreset, item.desc, item.qty, item.val, item.amb);
         });
       }
       
@@ -1104,10 +1088,10 @@
       
       if(b.items && b.items.length > 0) {
         b.items.forEach(function(item) {
-          addOrcItem(false, item.desc, item.qty, item.val);
+          addOrcItem(false, item.desc, item.qty, item.val, item.amb);
         });
       } else {
-        addOrcItem(false, 'Orçamento Antigo (Detalhes ausentes)', 1, parseFloat(b.total.replace('.','').replace(',','.')));
+        addOrcItem(false, 'Orçamento Antigo (Detalhes ausentes)', 1, parseFloat(b.total.replace('.','').replace(',','.')), '');
       }
       
       document.querySelector('.tab[data-tab="orc"]').click();
@@ -1132,6 +1116,7 @@
           var q = item.qty || 1;
           var v = item.val || 0;
           var t = q * v;
+          if(item.amb) text += "📍 *Ambiente:* " + item.amb + "\n";
           text += "▪ " + item.desc + "\n";
           text += "  " + q + "x R$ " + parseFloat(v).toLocaleString('pt-BR', {minimumFractionDigits: 2}) + " = *R$ " + t.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + "*\n\n";
         });
@@ -1365,7 +1350,6 @@
     }
   </script>
 
-  <!-- INÍCIO DO SISTEMA DE INSTALAÇÃO PWA -->
   <style>
     #pwa-install-banner {
       display: none;
@@ -1437,6 +1421,5 @@
       }
     });
   </script>
-  <!-- FIM DO SISTEMA DE INSTALAÇÃO PWA -->
-</body>
+  </body>
 </html>
