@@ -257,23 +257,26 @@
     /* ── Orçamento System ── */
     .orc-form-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
     .orc-item-list { border-top: 1px solid #e2e8f0; padding-top: 24px; margin-top: 20px; }
-    .orc-item { 
-      display: grid; 
-      grid-template-columns: 1.5fr 1.5fr 1fr 1fr 1fr 1fr auto; 
-      gap: 10px; 
-      margin-bottom: 16px; 
-      align-items: center; 
-      background: #ffffff; 
-      padding: 12px; 
-      border-radius: 12px; 
-      border: 1px solid #cbd5e1; 
+    
+    .orc-item {
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 16px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .orc-item-row {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr 1fr auto;
+      gap: 10px;
+      align-items: center;
     }
     .orc-item input, .orc-item select {
       background: #f8fafc;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      padding: 10px;
+      padding: 10px 12px;
       font-size: 13px;
       width: 100%;
       color: var(--dark);
@@ -327,7 +330,7 @@
 
     @media (max-width: 768px) { 
       .orc-form-grid { grid-template-columns: 1fr; } 
-      .orc-item { grid-template-columns: 1fr; gap: 8px; } 
+      .orc-item-row { grid-template-columns: 1fr; gap: 8px; } 
     }
 
     /* ── Impressão de Orçamento Profissional (PDF) ── */
@@ -506,7 +509,7 @@
       <div class="form-group"><label>Nome Completo</label><input type="text" id="cadNome"></div>
       <div class="form-group"><label>Email</label><input type="email" id="cadEmail"></div>
       <div class="form-group"><label>Senha</label><input type="password" id="cadSenha" placeholder="Mínimo 6 caracteres"></div>
-      <button class="btn-primary" id="btnSignup">Cadastrar Grítis</button>
+      <button class="btn-primary" id="btnSignup">Cadastrar Grátis</button>
     </div>
 
     <div class="modal modal-lg" id="modalTermos" style="display:none;">
@@ -585,7 +588,14 @@
               <div class="form-group"><label>Nome do Cliente</label><input id="orcCliNome"></div>
               <div class="form-group"><label>Telefone</label><input id="orcCliTel"></div>
               <div class="form-group"><label>Data de Validade</label><input type="date" id="orcValidDate"></div>
-              <div class="form-group full"><label>Endereço Completo (Rua, Nº, Bairro, CEP, Cidade, Estado)</label><input id="orcCliEnd" placeholder="Ex: Rua A, 100, Centro, 00000-000, São Paulo, SP"></div>
+              
+              <div class="form-group"><label>Rua / Logradouro</label><input id="orcRua" placeholder="Ex: Av. Paulista"></div>
+              <div class="form-group"><label>Número</label><input id="orcNum" placeholder="Ex: 1000"></div>
+              <div class="form-group"><label>Bairro</label><input id="orcBairro" placeholder="Ex: Centro"></div>
+              <div class="form-group"><label>CEP</label><input id="orcCep" placeholder="Ex: 01310-100"></div>
+              <div class="form-group"><label>Cidade</label><input id="orcCidade" placeholder="Ex: São Paulo"></div>
+              <div class="form-group"><label>Estado (UF)</label><input id="orcEstado" placeholder="Ex: SP"></div>
+              <input type="hidden" id="orcCliEnd">
             </div>
             
             <div class="orc-items-header print-only">
@@ -732,8 +742,8 @@
 
     function handleSignup() {
       var n = document.getElementById('cadNome').value.trim();
-      var e = document.getElementById('Email').value.trim();
-      var s = document.getElementById('Senha').value;
+      var e = document.getElementById('cadEmail').value.trim();
+      var s = document.getElementById('cadSenha').value;
       if (!n || !e || !s) { alert('Campos obrigatórios.'); return; }
       auth.createUserWithEmailAndPassword(e, s).then(function(cred) {
         return cred.user.updateProfile({ displayName: n }).then(function() {
@@ -908,13 +918,19 @@
       var aVal = presetAmb || '';
       var dVal = presetDescServ || '';
       
-      div.innerHTML = '<input placeholder="Ex: Sala, Cozinha" class="orc-amb" value="'+aVal+'">' +
-                      descHtml +
-                      '<input placeholder="Detalhes / Observação do serviço" class="orc-desc-serv" value="'+dVal+'">' +
-                      '<input type="number" value="'+qVal+'" min="1" class="orc-qty" style="width:100%; text-align:center;">' +
-                      '<input type="number" class="orc-val" placeholder="R$ Unit" value="'+vVal+'">' +
-                      '<div class="orc-row-total" style="font-weight:800; text-align:right;">R$ 0,00</div>' +
-                      '<button onclick="removeOrcItem('+id+')" style="color:#ef4444;border:none;background:none;cursor:pointer;font-weight:800;font-size:18px;">✕</button>';
+      div.innerHTML = `
+        <div class="orc-item-row">
+          <input placeholder="Ex: Sala, Cozinha" class="orc-amb" value="${aVal}">
+          ${descHtml}
+          <input type="number" value="${qVal}" min="1" class="orc-qty" style="width:100%; text-align:center;">
+          <input type="number" class="orc-val" placeholder="R$ Unit" value="${vVal}">
+          <div class="orc-row-total" style="font-weight:800; text-align:right;">R$ 0,00</div>
+          <button onclick="removeOrcItem(${id})" style="color:#ef4444;border:none;background:none;cursor:pointer;font-weight:800;font-size:18px;">✕</button>
+        </div>
+        <div style="margin-top:10px;">
+          <input placeholder="Bastante espaço para descrever o serviço..." class="orc-desc-serv" value="${dVal}" style="width:100%;">
+        </div>
+      `;
       
       document.getElementById('orcItemsContainer').appendChild(div);
       
@@ -964,12 +980,27 @@
         itemsToSave.push({ amb: a, descServ: ds, desc: desc, qty: q, val: v });
       });
 
+      // Consolidação Detalhada de Endereço
+      var rua = document.getElementById('orcRua').value;
+      var num = document.getElementById('orcNum').value;
+      var bairro = document.getElementById('orcBairro').value;
+      var cep = document.getElementById('orcCep').value;
+      var cid = document.getElementById('orcCidade').value;
+      var est = document.getElementById('orcEstado').value;
+      
+      var fullAddress = [];
+      if(rua) fullAddress.push(rua);
+      if(num) fullAddress.push(`Nº ${num}`);
+      if(bairro) fullAddress.push(bairro);
+      if(cid || est) fullAddress.push(`${cid || ''} - ${est || ''}`.replace(/^ - | - $/g, ''));
+      if(cep) fullAddress.push(`CEP: ${cep}`);
+
       var orcData = { 
         profId: currentUser.uid, 
         clientName: n, 
         clientTel: document.getElementById('orcCliTel').value,
         validDate: document.getElementById('orcValidDate').value,
-        address: document.getElementById('orcCliEnd').value,
+        address: fullAddress.length > 0 ? fullAddress.join(', ') : '',
         obs: document.getElementById('orcObs').value,
         discountRaw: document.getElementById('orcDiscount').value,
         subtotal: document.getElementById('orcSubtotalValue').textContent,
@@ -989,7 +1020,7 @@
         }).catch(function(e){ alert("Erro ao atualizar: "+e.message); });
       } else { 
         db.collection('budgets').add(orcData).then(function() { 
-          alert('Orçamento saved com sucesso!'); 
+          alert('Orçamento salvo com sucesso!'); 
           clearOrcFormState();
           loadHistory('profHistContainer');
         }).catch(function(e){ alert("Erro ao salvar: "+e.message); });
@@ -1003,6 +1034,12 @@
       document.getElementById('btnCancelEditStyle').style.display = "none";
       document.getElementById('orcCliNome').value = "";
       document.getElementById('orcCliTel').value = "";
+      document.getElementById('orcRua').value = "";
+      document.getElementById('orcNum').value = "";
+      document.getElementById('orcBairro').value = "";
+      document.getElementById('orcCep').value = "";
+      document.getElementById('orcCidade').value = "";
+      document.getElementById('orcEstado').value = "";
       document.getElementById('orcCliEnd').value = "";
       document.getElementById('orcObs').value = "";
       document.getElementById('orcDiscount').value = "0";
@@ -1066,7 +1103,27 @@
       document.getElementById('orcCliNome').value = b.clientName || '';
       document.getElementById('orcCliTel').value = b.clientTel || '';
       document.getElementById('orcValidDate').value = b.validDate || '';
-      document.getElementById('orcCliEnd').value = b.address || '';
+      
+      // Tenta quebrar o endereço salvo de volta nos campos
+      if(b.address) {
+        var parts = b.address.split(', ');
+        var ruaNum = parts[0] ? parts[0].split(' Nº ') : [];
+        document.getElementById('orcRua').value = ruaNum[0] || '';
+        document.getElementById('orcNum').value = ruaNum[1] || '';
+        
+        for(var i = 1; i < parts.length; i++) {
+          if(parts[i].includes('CEP:')) {
+            document.getElementById('orcCep').value = parts[i].replace('CEP: ', '') || '';
+          } else if(parts[i].includes('-')) {
+            var cidEst = parts[i].split(' - ');
+            document.getElementById('orcCidade').value = cidEst[0] || '';
+            document.getElementById('orcEstado').value = cidEst[1] || '';
+          } else {
+            document.getElementById('orcBairro').value = parts[i] || '';
+          }
+        }
+      }
+
       document.getElementById('orcObs').value = b.obs || '';
       document.getElementById('orcDiscount').value = b.discountRaw || 0;
       
@@ -1091,7 +1148,10 @@
       document.getElementById('orcCliNome').value = b.clientName || '';
       document.getElementById('orcCliTel').value = b.clientTel || '';
       document.getElementById('orcValidDate').value = b.validDate || '';
-      document.getElementById('orcCliEnd').value = b.address || '';
+      
+      // Preenchimento de endereço
+      if (b.address) document.getElementById('orcRua').value = b.address; 
+      
       document.getElementById('orcObs').value = b.obs || '';
       document.getElementById('orcDiscount').value = b.discountRaw || 0;
       
@@ -1294,7 +1354,7 @@
       db.collection('users').doc(currentUser.uid).get().then(function(doc) { 
         if(doc.exists){ 
           var d=doc.data(); 
-          document.getElementById('pNom').value=d.nome||''; 
+          document.getElementById('Nom').value=d.nome||''; 
           document.getElementById('pTel').value=d.tel||''; 
           document.getElementById('pDoc').value=d.doc||''; 
           document.getElementById('pReg').value=d.reg||''; 
@@ -1336,7 +1396,7 @@
         }
 
         var upd = { 
-          nome: document.getElementById('pNom').value, 
+          nome: document.getElementById('Nom').value, 
           tel: telInput.value, 
           doc: docInput.value, 
           reg: cleanReg, 
