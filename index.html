@@ -1364,5 +1364,79 @@
       };
     }
   </script>
+
+  <!-- INÍCIO DO SISTEMA DE INSTALAÇÃO PWA -->
+  <style>
+    #pwa-install-banner {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 16px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+      z-index: 9999;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      width: 90%;
+      max-width: 400px;
+      border: 2px solid #39FF14;
+    }
+    #btnInstallPwa {
+      background: #39FF14;
+      color: #0f172a;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    #btnInstallPwa:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
+    }
+  </style>
+
+  <div id="pwa-install-banner">
+    <div>
+      <p style="font-weight: 800; margin-bottom: 2px; font-size: 15px;">Instalar Aplicativo</p>
+      <p style="font-size: 12px; color: #94a3b8; line-height: 1.2;">Adicione à tela inicial para acesso rápido.</p>
+    </div>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <button id="btnInstallPwa">Instalar</button>
+      <button onclick="document.getElementById('pwa-install-banner').style.display='none'" style="background:none; border:none; color:#94a3b8; font-size:24px; cursor:pointer; padding:0 5px;">&times;</button>
+    </div>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').catch(function(err) {});
+      });
+    }
+
+    let promptDeInstalacao;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      promptDeInstalacao = e;
+      document.getElementById('pwa-install-banner').style.display = 'flex';
+    });
+
+    document.getElementById('btnInstallPwa').addEventListener('click', async () => {
+      document.getElementById('pwa-install-banner').style.display = 'none';
+      if (promptDeInstalacao) {
+        promptDeInstalacao.prompt();
+        const { outcome } = await promptDeInstalacao.userChoice;
+        promptDeInstalacao = null;
+      }
+    });
+  </script>
+  <!-- FIM DO SISTEMA DE INSTALAÇÃO PWA -->
 </body>
 </html>
