@@ -7,6 +7,8 @@
   
   <title>VoltCalc Pro - A Plataforma do Profissional da Elétrica</title>
 
+  <link rel="manifest" href='data:application/json;charset=utf-8,{"name":"VoltCalc Pro","short_name":"VoltCalc","start_url":"/","display":"standalone","background_color":"#0f172a","theme_color":"#4f46e5","icons":[{"src":"1000488411.webp","sizes":"192x192","type":"image/webp"},{"src":"1000488411.webp","sizes":"512x512","type":"image/webp"}]}'>
+
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="description" content="A ferramenta definitiva para eletricistas: orçamentos profissionais, tabelas de preços de elétrica 2026 completas e gestão técnica de instalações residenciais e industriais.">
   <meta name="keywords" content="orçamento elétrico, eletricista, tabela de preços elétrica 2026, serviços elétricos, NBR 5410, VoltCalc Pro, instalações elétricas, quadro de distribuição, cálculo elétrico">
@@ -257,12 +259,12 @@
     .orc-item-list { border-top: 1px solid #e2e8f0; padding-top: 24px; margin-top: 20px; }
     .orc-item { 
       display: grid; 
-      grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; 
-      gap: 12px; 
+      grid-template-columns: 1.5fr 1.5fr 1fr 1fr 1fr 1fr auto; 
+      gap: 10px; 
       margin-bottom: 16px; 
       align-items: center; 
       background: #ffffff; 
-      padding: 16px; 
+      padding: 12px; 
       border-radius: 12px; 
       border: 1px solid #cbd5e1; 
       box-shadow: 0 2px 4px rgba(0,0,0,0.02);
@@ -271,8 +273,8 @@
       background: #f8fafc;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 14px;
+      padding: 10px;
+      font-size: 13px;
       width: 100%;
       color: var(--dark);
       transition: 0.2s;
@@ -367,13 +369,13 @@
 
       .print-only { display: grid !important; }
       .orc-items-header { 
-        display: grid; grid-template-columns: 4fr 1fr 1fr 1fr; 
+        display: grid; grid-template-columns: 2fr 3fr 1fr 1fr 1fr; 
         font-weight: 800; border-bottom: 2px solid #000; 
         padding-bottom: 6px; margin-bottom: 6px; font-size: 12px; text-transform: uppercase;
       }
       .orc-item-list { border: none !important; margin-top: 0 !important; padding-top: 0 !important; }
       .orc-item { 
-        display: grid; grid-template-columns: 4fr 1fr 1fr 1fr !important; 
+        display: grid; grid-template-columns: 2fr 3fr 1fr 1fr 1fr !important; 
         background: none !important; border: none !important; border-bottom: 1px solid #e2e8f0 !important; 
         padding: 6px 0 !important; box-shadow: none !important; border-radius: 0 !important; gap: 10px;
         page-break-inside: avoid !important; 
@@ -583,7 +585,7 @@
               <div class="form-group"><label>Nome do Cliente</label><input id="orcCliNome"></div>
               <div class="form-group"><label>Telefone</label><input id="orcCliTel"></div>
               <div class="form-group"><label>Data de Validade</label><input type="date" id="orcValidDate"></div>
-              <div class="form-group full"><label>Endereço do Serviço</label><input id="orcCliEnd"></div>
+              <div class="form-group full"><label>Endereço Completo (Rua, Nº, Bairro, CEP, Cidade, Estado)</label><input id="orcCliEnd" placeholder="Ex: Rua A, 100, Centro, 00000-000, São Paulo, SP"></div>
             </div>
             
             <div class="orc-items-header print-only">
@@ -730,8 +732,8 @@
 
     function handleSignup() {
       var n = document.getElementById('cadNome').value.trim();
-      var e = document.getElementById('cadEmail').value.trim();
-      var s = document.getElementById('cadSenha').value;
+      var e = document.getElementById('Email').value.trim();
+      var s = document.getElementById('Senha').value;
       if (!n || !e || !s) { alert('Campos obrigatórios.'); return; }
       auth.createUserWithEmailAndPassword(e, s).then(function(cred) {
         return cred.user.updateProfile({ displayName: n }).then(function() {
@@ -881,7 +883,7 @@
       document.getElementById('tab-precos').innerHTML = h;
     }
 
-    function addOrcItem(isSuggested, presetDesc, presetQty, presetVal, presetAmb) {
+    function addOrcItem(isSuggested, presetDesc, presetQty, presetVal, presetAmb, presetDescServ) {
       var id = Date.now() + Math.floor(Math.random() * 1000);
       var div = document.createElement('div');
       div.className = 'orc-item';
@@ -904,8 +906,16 @@
       var qVal = presetQty || 1;
       var vVal = presetVal || '';
       var aVal = presetAmb || '';
+      var dVal = presetDescServ || '';
       
-      div.innerHTML = '<input placeholder="Ex: Sala, Cozinha" class="orc-amb" value="'+aVal+'">' + descHtml + '<input type="number" value="'+qVal+'" min="1" class="orc-qty" style="width:100%; text-align:center;"><input type="number" class="orc-val" placeholder="R$ Unit" value="'+vVal+'"><div class="orc-row-total" style="font-weight:800; text-align:right;">R$ 0,00</div><button onclick="removeOrcItem('+id+')" style="color:#ef4444;border:none;background:none;cursor:pointer;font-weight:800;font-size:18px;">✕</button>';
+      div.innerHTML = '<input placeholder="Ex: Sala, Cozinha" class="orc-amb" value="'+aVal+'">' +
+                      descHtml +
+                      '<input placeholder="Detalhes / Observação do serviço" class="orc-desc-serv" value="'+dVal+'">' +
+                      '<input type="number" value="'+qVal+'" min="1" class="orc-qty" style="width:100%; text-align:center;">' +
+                      '<input type="number" class="orc-val" placeholder="R$ Unit" value="'+vVal+'">' +
+                      '<div class="orc-row-total" style="font-weight:800; text-align:right;">R$ 0,00</div>' +
+                      '<button onclick="removeOrcItem('+id+')" style="color:#ef4444;border:none;background:none;cursor:pointer;font-weight:800;font-size:18px;">✕</button>';
+      
       document.getElementById('orcItemsContainer').appendChild(div);
       
       if (isSuggested) {
@@ -945,12 +955,13 @@
       var itemsToSave = [];
       document.querySelectorAll('.orc-item').forEach(function(el) {
         var a = el.querySelector('.orc-amb').value;
+        var ds = el.querySelector('.orc-desc-serv').value;
         var q = el.querySelector('.orc-qty').value;
         var v = el.querySelector('.orc-val').value;
         var s = el.querySelector('.orc-sel-suggest');
         var c = el.querySelector('.orc-desc-custom');
         var desc = s && s.selectedIndex >= 0 ? s.options[s.selectedIndex].text : (c ? c.value : '');
-        itemsToSave.push({ amb: a, desc: desc, qty: q, val: v });
+        itemsToSave.push({ amb: a, descServ: ds, desc: desc, qty: q, val: v });
       });
 
       var orcData = { 
@@ -1065,7 +1076,7 @@
         b.items.forEach(function(item) {
           var isNationalPreset = false;
           priceData.forEach(function(c) { c.items.forEach(function(p) { if(item.desc === p.d) isNationalPreset = true; }); });
-          addOrcItem(isNationalPreset, item.desc, item.qty, item.val, item.amb);
+          addOrcItem(isNationalPreset, item.desc, item.qty, item.val, item.amb, item.descServ);
         });
       }
       
@@ -1088,10 +1099,10 @@
       
       if(b.items && b.items.length > 0) {
         b.items.forEach(function(item) {
-          addOrcItem(false, item.desc, item.qty, item.val, item.amb);
+          addOrcItem(false, item.desc, item.qty, item.val, item.amb, item.descServ);
         });
       } else {
-        addOrcItem(false, 'Orçamento Antigo (Detalhes ausentes)', 1, parseFloat(b.total.replace('.','').replace(',','.')), '');
+        addOrcItem(false, 'Orçamento Antigo (Detalhes ausentes)', 1, parseFloat(b.total.replace('.','').replace(',','.')), '', '');
       }
       
       document.querySelector('.tab[data-tab="orc"]').click();
@@ -1118,6 +1129,7 @@
           var t = q * v;
           if(item.amb) text += "📍 *Ambiente:* " + item.amb + "\n";
           text += "▪ " + item.desc + "\n";
+          if(item.descServ) text += "  *Detalhes:* " + item.descServ + "\n";
           text += "  " + q + "x R$ " + parseFloat(v).toLocaleString('pt-BR', {minimumFractionDigits: 2}) + " = *R$ " + t.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + "*\n\n";
         });
       } else {
