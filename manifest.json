@@ -1,6 +1,6 @@
 {
-  "name": "VoltCalc Pro",
-  "short_name": "VoltCalc Pro",
+  "name": "Voltcalcpro Orçamentos",
+  "short_name": "Voltcalcpro",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
