@@ -14,39 +14,21 @@
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         h1 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
         .menu-abas { margin-top: 20px; }
-        .menu-abas div { 
-            background-color: #e9ecef; 
-            padding: 15px; 
-            margin-bottom: 10px; 
-            border-radius: 5px; 
-            border-left: 5px solid #007bff;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+        .menu-abas div { background-color: #e9ecef; padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 5px solid #007bff; cursor: pointer; transition: 0.3s; }
         .menu-abas div:hover { background-color: #d1e7ff; }
-        button { padding: 10px 15px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px; }
         #area-conteudo { margin-top: 20px; padding: 15px; border: 1px dashed #ccc; border-radius: 5px; min-height: 100px; }
+        button { padding: 10px 15px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>Painel de Controle</h1>
-    <p>Área administrativa segura.</p>
-    
     <div class="menu-abas">
-        <div onclick="carregarConteudo('suporte')">
-            <strong>🔍 Suporte a Usuários</strong>
-        </div>
-        <div onclick="carregarConteudo('nbr')">
-            <strong>📊 Gestão NBR 5410</strong>
-        </div>
+        <div onclick="carregarConteudo('suporte')"><strong>🔍 Chamados de Suporte</strong></div>
+        <div onclick="carregarConteudo('nbr')"><strong>📊 Gestão NBR 5410</strong></div>
     </div>
-
-    <div id="area-conteudo">
-        <em>Clique em uma opção acima para carregar o conteúdo.</em>
-    </div>
-
+    <div id="area-conteudo"><em>Selecione uma opção acima.</em></div>
     <button onclick="sair()">Encerrar Sessão</button>
 </div>
 
@@ -60,42 +42,28 @@
         appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
     };
 
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.firestore();
-
-    firebase.auth().onAuthStateChanged((user) => {
-        if (!user) {
-            window.location.href = "/admin/index.html";
-        }
-    });
 
     function carregarConteudo(secao) {
         const area = document.getElementById('area-conteudo');
         if (secao === 'suporte') {
-            area.innerHTML = "<h3>Carregando usuários...</h3>";
-            db.collection("usuarios").get().then((querySnapshot) => {
-                let html = "<h3>Lista de Usuários</h3><ul>";
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    html += `<li><strong>${data.nome || 'Sem nome'}</strong> - ${data.email || 'Sem e-mail'}</li>`;
+            area.innerHTML = "<h3>Buscando chamados...</h3>";
+            db.collection("chamados").get().then((snapshot) => {
+                let html = "<h3>Chamados Abertos</h3><ul>";
+                snapshot.forEach((doc) => {
+                    const d = doc.data();
+                    html += `<li><strong>${d.nome}</strong> (${d.email}): ${d.mensagem}</li>`;
                 });
                 html += "</ul>";
                 area.innerHTML = html;
             });
-        } else if (secao === 'nbr') {
-            area.innerHTML = "<h3>Gestão NBR 5410</h3><p>Área de edição técnica em desenvolvimento.</p>";
+        } else {
+            area.innerHTML = "<h3>Gestão NBR 5410</h3><p>Funcionalidade em desenvolvimento.</p>";
         }
     }
 
-    function sair() {
-        firebase.auth().signOut().then(() => {
-            window.location.href = "/admin/index.html";
-        });
-    }
+    function sair() { firebase.auth().signOut().then(() => window.location.href = "/admin/index.html"); }
 </script>
-
 </body>
 </html>
