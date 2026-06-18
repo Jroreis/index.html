@@ -1504,5 +1504,51 @@
       }
     });
   </script>
+<section id="suporte-section" class="section-padding" style="background: #f8fafc; border-top: 1px solid #e2e8f0; margin-top: 40px;">
+    <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center;">
+        <h2 style="margin-bottom: 20px;">Precisa de ajuda?</h2>
+        <p style="color: var(--text-light); margin-bottom: 24px;">Envie sua dúvida para nossa equipe.</p>
+        
+        <div class="form-group" style="text-align: left;">
+            <input type="text" id="sup-nome" placeholder="Seu Nome">
+        </div>
+        <div class="form-group" style="text-align: left;">
+            <input type="email" id="sup-email" placeholder="Seu E-mail">
+        </div>
+        <div class="form-group" style="text-align: left;">
+            <textarea id="sup-msg" rows="4" placeholder="Descreva sua dúvida"></textarea>
+        </div>
+        <button onclick="enviarSuporte()" class="btn-primary">Enviar Chamado</button>
+    </div>
+</section>
+
+<script>
+    // Função adicionada isoladamente para não interferir nas outras
+    function enviarSuporte() {
+        const nome = document.getElementById('sup-nome').value.trim();
+        const email = document.getElementById('sup-email').value.trim();
+        const mensagem = document.getElementById('sup-msg').value.trim();
+
+        if (nome && email && mensagem) {
+            db.collection("chamados").add({
+                nome: nome,
+                email: email,
+                mensagem: mensagem,
+                data: new Date()
+            })
+            .then(() => {
+                alert("Chamado enviado com sucesso!");
+                document.getElementById('sup-nome').value = '';
+                document.getElementById('sup-email').value = '';
+                document.getElementById('sup-msg').value = '';
+            })
+            .catch((error) => {
+                alert("Erro ao enviar: " + error.message);
+            });
+        } else {
+            alert("Por favor, preencha todos os campos.");
+        }
+    }
+</script>
   </body>
 </html>
