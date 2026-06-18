@@ -5,68 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel da Gerência - VoltCalc Pro</title>
     
-    <!-- Importação do Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
     <style>
-        body { 
-            font-family: sans-serif; 
-            padding: 20px; 
-            background-color: #f4f4f4; 
-            margin: 0;
-        }
-        .container { 
-            max-width: 800px; 
-            margin: 0 auto; 
-            background: white; 
-            padding: 30px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-        }
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f4; margin: 0; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         h1 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
         .menu-abas { margin-top: 20px; }
-        .menu-abas div {
-            background-color: #e9ecef;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border-left: 5px solid #007bff;
-        }
-        button { 
-            padding: 10px 15px; 
-            background-color: #dc3545; 
-            color: white; 
-            border: none; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            margin-top: 20px;
-        }
-        button:hover { background-color: #c82333; }
+        .menu-abas div { background-color: #e9ecef; padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 5px solid #007bff; }
+        button { padding: 10px 15px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>Painel de Controle</h1>
-    <p>Bem-vindo à área administrativa segura do VoltCalc Pro.</p>
+    <p>Área administrativa segura.</p>
     
     <div class="menu-abas">
-        <div>
-            <strong>🔍 Suporte a Usuários</strong><br>
-            <small>Em breve: Área para buscar cadastros e dar suporte.</small>
-        </div>
-        <div>
-            <strong>📊 Gestão NBR 5410</strong><br>
-            <small>Em breve: Área para atualizar preços e normas.</small>
-        </div>
+        <div><strong>🔍 Suporte a Usuários</strong></div>
+        <div><strong>📊 Gestão NBR 5410</strong></div>
     </div>
 
     <button onclick="sair()">Encerrar Sessão</button>
 </div>
 
 <script>
-    // 1. Configuração do Firebase (As mesmas chaves corretas!)
+    // Configuração idêntica à do index.html
     const firebaseConfig = {
         apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
         authDomain: "voltcalc-pro.firebaseapp.com",
@@ -76,18 +42,18 @@
         appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
     };
 
-    // 2. Inicializa o Firebase
-    firebase.initializeApp(firebaseConfig);
+    // Inicialização segura
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
 
-    // 3. Trava de Segurança: Verifica se tem alguém realmente logado
+    // Trava de segurança
     firebase.auth().onAuthStateChanged((user) => {
         if (!user) {
-            // Se não tiver login válido, expulsa de volta pra tela de senha
             window.location.href = "index.html";
         }
     });
 
-    // 4. Função do botão de sair
     function sair() {
         firebase.auth().signOut().then(() => {
             window.location.href = "index.html";
