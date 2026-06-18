@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo - VoltCalc Pro</title>
     
+    <!-- Importação do Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
@@ -68,14 +69,15 @@
 </div>
 
 <script>
-    // 1. Configurações do seu projeto Firebase
+    // 1. Configurações do seu projeto Firebase (AGORA COM AS CHAVES CORRETAS!)
     const firebaseConfig = {
-        apiKey: "AIzaSyCbTPTfMUkuF3VVRg1800x_wEgIAwkAvOQ",
+        apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
         authDomain: "voltcalc-pro.firebaseapp.com",
         projectId: "voltcalc-pro",
-        storageBucket: "voltcalc-pro.appspot.com",
+        storageBucket: "voltcalc-pro.firebasestorage.app",
         messagingSenderId: "411208955318",
-        appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
+        appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17",
+        measurementId: "G-491LK8FWBM"
     };
 
     // 2. Inicializa o Firebase
@@ -93,11 +95,21 @@
 
         firebase.auth().signInWithEmailAndPassword(email, password)
             .then((userCredential) => {
+                // Sucesso! Vai direto para o painel
                 window.location.href = "painel.html"; 
             })
             .catch((error) => {
-                // Aqui está o truque: vamos fazer o erro nu e cru aparecer na tela!
-                alert("O erro exato do Firebase é: " + error.code);
+                let mensagemErro = "Erro ao fazer login.";
+                
+                if(error.code === 'auth/invalid-login-credentials' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                    mensagemErro = "E-mail ou senha incorretos. Verifique os dados e tente novamente.";
+                } else if(error.code === 'auth/invalid-email') {
+                    mensagemErro = "Formato de e-mail inválido.";
+                } else {
+                    mensagemErro = "Erro do servidor: " + error.code;
+                }
+                
+                alert(mensagemErro);
                 console.error(error);
             });
     }
