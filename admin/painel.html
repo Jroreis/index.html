@@ -3,117 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel VoltCalc Pro</title>
+    <title>Painel da Gerência - VoltCalc Pro</title>
     
     <!-- Importação do Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-    <!-- Adicionando o Firestore para o banco de dados -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
     <style>
-        body { font-family: sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
-        
-        /* Estilos das Abas */
-        .abas { display: flex; gap: 10px; margin-bottom: 20px; }
-        .aba-btn { padding: 10px 20px; background-color: #e9ecef; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .aba-btn.ativa { background-color: #007bff; color: white; }
-        
-        /* Estilos do Conteúdo */
-        .secao { display: none; }
-        .secao.ativa { display: block; }
-        
-        .busca-box { display: flex; gap: 10px; margin-bottom: 20px; }
-        .busca-box input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button.sair { background-color: #dc3545; }
-        
-        .resultado-card { background: #f8f9fa; padding: 15px; border-radius: 4px; border: 1px solid #ddd; margin-top: 10px; }
+        body { 
+            font-family: sans-serif; 
+            padding: 20px; 
+            background-color: #f4f4f4; 
+            margin: 0;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        }
+        h1 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+        .menu-abas { margin-top: 20px; }
+        .menu-abas div {
+            background-color: #e9ecef;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 5px solid #007bff;
+        }
+        button { 
+            padding: 10px 15px; 
+            background-color: #dc3545; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin-top: 20px;
+        }
+        button:hover { background-color: #c82333; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <h2>Painel ADM - VoltCalc Pro</h2>
-        <button class="sair" onclick="logout()">Sair</button>
-    </div>
-
-    <!-- Navegação das Abas -->
-    <div class="abas">
-        <button class="aba-btn ativa" onclick="mudarAba('suporte')">Suporte a Usuários</button>
-        <button class="aba-btn" onclick="mudarAba('gestao')">Gestão NBR 5410</button>
-    </div>
-
-    <!-- Seção de Suporte (Ativa por padrão) -->
-    <div id="suporte" class="secao ativa">
-        <h3>Buscar Cadastro de Usuário</h3>
-        <div class="busca-box">
-            <input type="email" id="busca-email" placeholder="Digite o e-mail do usuário cadastrado...">
-            <button onclick="buscarUsuario()">Buscar</button>
+    <h1>Painel de Controle</h1>
+    <p>Bem-vindo à área administrativa segura do VoltCalc Pro.</p>
+    
+    <div class="menu-abas">
+        <div>
+            <strong>🔍 Suporte a Usuários</strong><br>
+            <small>Em breve: Área para buscar cadastros e dar suporte.</small>
         </div>
-        <div id="resultado-busca">
-            <!-- Os dados do usuário aparecerão aqui -->
+        <div>
+            <strong>📊 Gestão NBR 5410</strong><br>
+            <small>Em breve: Área para atualizar preços e normas.</small>
         </div>
     </div>
 
-    <!-- Seção de Gestão de Tabelas -->
-    <div id="gestao" class="secao">
-        <h3>Atualizar Tabelas e Preços</h3>
-        <p>Aqui colocaremos os formulários para você alterar os valores que refletem no aplicativo.</p>
-    </div>
+    <button onclick="sair()">Encerrar Sessão</button>
 </div>
 
 <script>
-    // 1. Configurações do Firebase
+    // 1. Configuração do Firebase (As mesmas chaves corretas!)
     const firebaseConfig = {
-        apiKey: "AIzaSyCbTPTfMUkuF3VVRg1800x_wEgIAwkAvOQ",
+        apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
         authDomain: "voltcalc-pro.firebaseapp.com",
         projectId: "voltcalc-pro",
-        storageBucket: "voltcalc-pro.appspot.com",
+        storageBucket: "voltcalc-pro.firebasestorage.app",
         messagingSenderId: "411208955318",
         appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore(); // Conectando ao Banco de Dados
 
-    // 2. Proteção da Página
+    // 2. Inicializa o Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // 3. Trava de Segurança: Verifica se tem alguém realmente logado
     firebase.auth().onAuthStateChanged((user) => {
         if (!user) {
+            // Se não tiver login válido, expulsa de volta pra tela de senha
             window.location.href = "index.html";
         }
     });
 
-    // 3. Função para Alternar Abas
-    function mudarAba(idSecao) {
-        // Esconde todas as seções e tira a cor ativa dos botões
-        document.querySelectorAll('.secao').forEach(sec => sec.classList.remove('ativa'));
-        document.querySelectorAll('.aba-btn').forEach(btn => btn.classList.remove('ativa'));
-        
-        // Mostra a seção clicada
-        document.getElementById(idSecao).classList.add('ativa');
-        event.currentTarget.classList.add('ativa');
-    }
-
-    // 4. Função Base de Busca (Lógica a ser implementada)
-    function buscarUsuario() {
-        const email = document.getElementById('busca-email').value;
-        const divResultado = document.getElementById('resultado-busca');
-        
-        if(!email) {
-            alert("Por favor, digite um e-mail.");
-            return;
-        }
-
-        divResultado.innerHTML = "<p>Buscando no banco de dados...</p>";
-        
-        // Aqui conectaremos com o Firestore no próximo passo!
-    }
-
-    // 5. Função de Sair
-    function logout() {
+    // 4. Função do botão de sair
+    function sair() {
         firebase.auth().signOut().then(() => {
             window.location.href = "index.html";
         });
