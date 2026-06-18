@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel da Gerência - VoltCalc Pro</title>
     
-    <!-- Importação do Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
     <style>
         body { font-family: sans-serif; padding: 20px; background-color: #f4f4f4; margin: 0; }
@@ -64,6 +64,8 @@
         firebase.initializeApp(firebaseConfig);
     }
 
+    const db = firebase.firestore();
+
     firebase.auth().onAuthStateChanged((user) => {
         if (!user) {
             window.location.href = "/admin/index.html";
@@ -73,9 +75,18 @@
     function carregarConteudo(secao) {
         const area = document.getElementById('area-conteudo');
         if (secao === 'suporte') {
-            area.innerHTML = "<h3>Suporte a Usuários</h3><p>Aqui aparecerá a lista de usuários cadastrados no seu Firebase para você gerenciar.</p>";
+            area.innerHTML = "<h3>Carregando usuários...</h3>";
+            db.collection("usuarios").get().then((querySnapshot) => {
+                let html = "<h3>Lista de Usuários</h3><ul>";
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    html += `<li><strong>${data.nome || 'Sem nome'}</strong> - ${data.email || 'Sem e-mail'}</li>`;
+                });
+                html += "</ul>";
+                area.innerHTML = html;
+            });
         } else if (secao === 'nbr') {
-            area.innerHTML = "<h3>Gestão NBR 5410</h3><p>Aqui você poderá editar os valores e tabelas técnicas que o VoltCalc Pro utiliza.</p>";
+            area.innerHTML = "<h3>Gestão NBR 5410</h3><p>Área de edição técnica em desenvolvimento.</p>";
         }
     }
 
