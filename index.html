@@ -480,7 +480,35 @@
       </div>
     </section>
 
-    <footer style="text-align: center; padding: 32px 24px; color: var(--text-light); font-size: 14px; border-top: 1px solid #e2e8f0; margin-top: 40px; background: rgba(255,255,255,0.85); backdrop-filter: blur(4px);">
+    <section class="section-padding" style="max-width: 1000px; margin: 0 auto; text-align: left; background: rgba(255, 255, 255, 0.95); border-radius: 24px; padding: 48px; box-shadow: var(--shadow); border: 1px solid #f1f5f9; backdrop-filter: blur(10px); margin-bottom: 40px;">
+      <h2 style="color: var(--dark); font-size: 28px; margin-bottom: 20px; font-weight: 800;">A Importância de um Orçamento Elétrico Profissional e Normatizado</h2>
+      <p style="color: var(--text-light); margin-bottom: 16px; font-size: 16px; line-height: 1.8;">Para atuar com excelência no mercado de instalações elétricas, o profissional moderno precisa mais do que apenas conhecimento prático; ele necessita de ferramentas de gestão que transmitam credibilidade. A elaboração de orçamentos técnicos detalhados é a primeira e mais importante etapa para garantir a confiança do cliente e o sucesso do projeto.</p>
+      <p style="color: var(--text-light); margin-bottom: 16px; font-size: 16px; line-height: 1.8;">O <strong>VoltCalc Pro</strong> foi desenvolvido para automatizar cálculos complexos e precificações de serviços, permitindo que eletricistas apresentem propostas justas e perfeitamente alinhadas às práticas do mercado nacional. É fundamental que todo serviço executado, desde a instalação de um simples quadro de distribuição (QDC) até o cálculo avançado de quedas de tensão, dimensionamento de condutores e disjuntores, respeite rigorosamente as normas técnicas vigentes no Brasil, com destaque especial para as diretrizes da <strong>NBR 5410</strong>.</p>
+      <p style="color: var(--text-light); font-size: 16px; line-height: 1.8;">Trabalhar em conformidade com a NBR 5410 não apenas garante a segurança absoluta das instalações de baixa tensão, prevenindo acidentes, curtos-circuitos e perdas energéticas, mas também valoriza a mão de obra técnica. Nossa plataforma apoia ativamente o eletricista que valoriza a técnica apurada, oferecendo um sistema integrado em nuvem onde a precisão técnica e a organização financeira caminham sempre juntas.</p>
+    </section>
+
+    <section id="suporte-section" class="section-padding" style="background: #f8fafc; border-top: 1px solid #e2e8f0; margin-top: 40px;">
+      <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center;">
+          <h2 style="margin-bottom: 20px;">Precisa de ajuda?</h2>
+          <p style="color: var(--text-light); margin-bottom: 24px;">Envie sua dúvida para nossa equipe.</p>
+          
+          <div class="form-group" style="text-align: left;">
+              <input type="text" id="sup-nome" placeholder="Seu Nome">
+          </div>
+          <div class="form-group" style="text-align: left;">
+              <input type="email" id="sup-email" placeholder="Seu E-mail">
+          </div>
+          <div class="form-group" style="text-align: left;">
+              <input type="tel" id="sup-telefone" placeholder="Seu Telefone / WhatsApp">
+          </div>
+          <div class="form-group" style="text-align: left;">
+              <textarea id="sup-msg" rows="4" placeholder="Descreva sua dúvida"></textarea>
+          </div>
+          <button onclick="enviarSuporte()" class="btn-primary">Enviar Chamado</button>
+      </div>
+    </section>
+
+    <footer style="text-align: center; padding: 32px 24px; color: var(--text-light); font-size: 14px; border-top: 1px solid #e2e8f0; background: rgba(255,255,255,0.85); backdrop-filter: blur(4px);">
       <div style="max-width: 500px; margin: 0 auto 24px auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
         <p style="font-weight: 700; color: var(--dark); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
           ☕ Apoie o Projeto VoltCalc Pro
@@ -492,7 +520,8 @@
       </div>
 
       <p>&copy; 2026 VoltCalc Pro. Todos os direitos reservados.</p>
-      <p style="margin-top: 8px;">
+      <p style="margin-top: 12px;">
+        <a href="#suporte-section" style="color: var(--primary); text-decoration: none; font-weight: 600; margin: 0 10px;">Contato / Suporte</a> |
         <a href="#" onclick="openModal('modalTermos')" style="color: var(--primary); text-decoration: none; font-weight: 600; margin: 0 10px;">Termos de Uso</a> |
         <a href="#" onclick="openModal('modalPrivacidade')" style="color: var(--primary); text-decoration: none; font-weight: 600; margin: 0 10px;">Política de Privacidade</a>
       </p>
@@ -518,7 +547,7 @@
       <div class="form-group"><label>Nome Completo</label><input type="text" id="cadNome"></div>
       <div class="form-group"><label>Email</label><input type="email" id="cadEmail"></div>
       <div class="form-group"><label>Senha</label><input type="password" id="cadSenha" placeholder="Mínimo 6 caracteres"></div>
-      <button class="btn-primary" id="btnSignup">Cadastrar Grítis</button>
+      <button class="btn-primary" id="btnSignup">Cadastrar Grátis</button>
     </div>
 
     <div class="modal modal-lg" id="modalTermos" style="display:none;">
@@ -684,12 +713,29 @@
     <div class="tab-content" id="tab-perfil"></div>
   </div>
 
+  <div id="cookieConsent" style="display:none; position:fixed; bottom:0; left:0; width:100%; background:rgba(15,23,42,0.95); color:#fff; padding:16px 24px; z-index:9999; text-align:center; font-size:14px; backdrop-filter:blur(10px); border-top: 1px solid #334155;">
+    Usamos cookies para melhorar sua experiência, personalizar anúncios (Google AdSense) e analisar tráfego. Ao continuar navegando, você concorda com a nossa <a href="#" onclick="openModal('modalPrivacidade')" style="color: var(--neon-green); text-decoration: underline;">Política de Privacidade</a>.
+    <button onclick="aceitarCookies()" style="background:var(--neon-green); color:var(--dark); border:none; padding:8px 16px; border-radius:8px; font-weight:bold; margin-left:16px; cursor:pointer; transition: 0.2s;">Entendi e Aceito</button>
+  </div>
+
   <script>
     var auth, db;
     var loginRole = 'profissional', signupRole = 'profissional';
     var currentUser = null;
     var base64LogoToSave = ""; 
     var globalSavedBudgets = []; 
+
+    // Lógica do Banner de Cookies
+    document.addEventListener('DOMContentLoaded', function() {
+      if(!localStorage.getItem('cookiesAceitos')) {
+        document.getElementById('cookieConsent').style.display = 'block';
+      }
+    });
+
+    function aceitarCookies() {
+      localStorage.setItem('cookiesAceitos', 'true');
+      document.getElementById('cookieConsent').style.display = 'none';
+    }
 
     document.addEventListener('DOMContentLoaded', function() {
       firebase.initializeApp({
@@ -1503,36 +1549,19 @@
         promptDeInstalacao = null;
       }
     });
-  </script>
-<section id="suporte-section" class="section-padding" style="background: #f8fafc; border-top: 1px solid #e2e8f0; margin-top: 40px;">
-    <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center;">
-        <h2 style="margin-bottom: 20px;">Precisa de ajuda?</h2>
-        <p style="color: var(--text-light); margin-bottom: 24px;">Envie sua dúvida para nossa equipe.</p>
-        
-        <div class="form-group" style="text-align: left;">
-            <input type="text" id="sup-nome" placeholder="Seu Nome">
-        </div>
-        <div class="form-group" style="text-align: left;">
-            <input type="email" id="sup-email" placeholder="Seu E-mail">
-        </div>
-        <div class="form-group" style="text-align: left;">
-            <textarea id="sup-msg" rows="4" placeholder="Descreva sua dúvida"></textarea>
-        </div>
-        <button onclick="enviarSuporte()" class="btn-primary">Enviar Chamado</button>
-    </div>
-</section>
 
-<script>
-    // Função adicionada isoladamente para não interferir nas outras
+    // Função de Suporte (Agora com o campo telefone incluso)
     function enviarSuporte() {
         const nome = document.getElementById('sup-nome').value.trim();
         const email = document.getElementById('sup-email').value.trim();
+        const telefone = document.getElementById('sup-telefone').value.trim(); // Telefone extraído
         const mensagem = document.getElementById('sup-msg').value.trim();
 
         if (nome && email && mensagem) {
             db.collection("chamados").add({
                 nome: nome,
                 email: email,
+                telefone: telefone, // Telefone enviado para o Firebase
                 mensagem: mensagem,
                 data: new Date()
             })
@@ -1540,15 +1569,16 @@
                 alert("Chamado enviado com sucesso!");
                 document.getElementById('sup-nome').value = '';
                 document.getElementById('sup-email').value = '';
+                document.getElementById('sup-telefone').value = '';
                 document.getElementById('sup-msg').value = '';
             })
             .catch((error) => {
                 alert("Erro ao enviar: " + error.message);
             });
         } else {
-            alert("Por favor, preencha todos os campos.");
+            alert("Por favor, preencha todos os campos obrigatórios (Nome, E-mail e Mensagem).");
         }
     }
-</script>
-  </body>
+  </script>
+</body>
 </html>
