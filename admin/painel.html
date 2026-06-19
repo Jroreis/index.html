@@ -2,57 +2,68 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Painel Administrativo - VoltCalc Pro</title>
-    <!-- Firebase SDK -->
+    <title>VoltCalc Pro | Painel Administrativo</title>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; background: #f0f2f5; }
+        .sidebar { width: 250px; background: #2c3e50; color: white; height: 100vh; padding: 20px; }
+        .main { flex: 1; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .btn-logout { background: #e74c3c; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; border-radius: 5px; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    </style>
 </head>
 <body>
 
-    <div id="stats-container" style="padding: 20px; font-family: sans-serif;">
-        <h2>Painel Administrativo</h2>
-        <div id="user-count" style="padding: 15px; background: #e0e7ff; border-radius: 8px; margin-bottom: 10px;">
-            Carregando dados...
-        </div>
+<div class="sidebar">
+    <h2>VoltCalc Pro</h2>
+    <hr>
+    <p>Bem-vindo, Admin</p>
+    <button class="btn-logout" onclick="logout()">Sair do Painel</button>
+</div>
+
+<div class="main">
+    <div class="card" id="stats">
+        <h3>Estatísticas Gerais</h3>
+        <p id="total-users">Carregando...</p>
     </div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
-            authDomain: "voltcalc-pro.firebaseapp.com",
-            projectId: "voltcalc-pro",
-            storageBucket: "voltcalc-pro.appspot.com",
-            messagingSenderId: "411208955318",
-            appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
-        };
+    <div class="card">
+        <h3>Chamados Recentes</h3>
+        <table id="chamados-table">
+            <thead><tr><th>Nome</th><th>Endereço</th><th>Ação</th></tr></thead>
+            <tbody><!-- Dados aparecerão aqui --></tbody>
+        </table>
+    </div>
+</div>
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+<script>
+    const firebaseConfig = { /* SEU CONFIG AQUI */ };
+    firebase.initializeApp(firebaseConfig);
 
-        // 1. Proteção: Redireciona se não estiver logado
-        firebase.auth().onAuthStateChanged((user) => {
-            if (!user) {
-                window.location.href = "login.html";
-            } else {
-                carregarEstatisticas();
-            }
+    // Proteção de Acesso
+    firebase.auth().onAuthStateChanged(user => { if (!user) window.location.href = "login.html"; });
+
+    // Logout
+    function logout() { firebase.auth().signOut().then(() => window.location.href = "login.html"); }
+
+    // Carregar Dados
+    const db = firebase.firestore();
+    
+    // Contar Usuários
+    db.collection('users').get().then(s => document.getElementById('total-users').innerText = "Total de Usuários: " + s.size);
+
+    // Listar Chamados
+    db.collection('chamados').get().then(snapshot => {
+        const tbody = document.querySelector('#chamados-table tbody');
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            tbody.innerHTML += `<tr><td>${data.clientName || 'N/A'}</td><td>${data.address || 'N/A'}</td><td><button>Ver</button></td></tr>`;
         });
-
-        // 2. Função para buscar os dados
-        function carregarEstatisticas() {
-            firebase.firestore().collection('users').get()
-                .then((snapshot) => {
-                    const total = snapshot.size;
-                    document.getElementById('user-count').innerHTML = 
-                        `<h3>Total de Usuários Cadastrados: <strong>${total}</strong></h3>`;
-                })
-                .catch((error) => {
-                    document.getElementById('user-count').innerHTML = 
-                        `<h3 style="color:red;">Erro ao carregar: ${error.message}</h3>`;
-                });
-        }
-    </script>
+    });
+</script>
 </body>
 </html>
