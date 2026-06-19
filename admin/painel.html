@@ -6,6 +6,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: sans-serif; margin: 0; display: flex; background: #f0f2f5; }
         .sidebar { width: 250px; background: #2c3e50; color: white; height: 100vh; padding: 20px; }
@@ -31,6 +32,7 @@
     <div class="card">
         <h3>Estatísticas Gerais</h3>
         <p id="total-users">Buscando dados...</p>
+        <canvas id="userChart" style="max-height: 200px;"></canvas>
     </div>
 
     <div class="card">
@@ -76,19 +78,15 @@
 
     const db = firebase.firestore();
 
-    function filterTable(tableId, inputId) {
-        const input = document.getElementById(inputId);
-        const filter = input.value.toUpperCase();
-        const table = document.getElementById(tableId);
-        const tr = table.getElementsByTagName("tr");
-        for (let i = 1; i < tr.length; i++) {
-            const td = tr[i].getElementsByTagName("td")[0];
-            if (td) {
-                const txtValue = td.textContent || td.innerText;
-                tr[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
-            }
+    // Gráfico de Usuários
+    const ctx = document.getElementById('userChart').getContext('2d');
+    const userChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['7 dias atrás', '6 dias', '5 dias', '4 dias', '3 dias', 'Ontem', 'Hoje'],
+            datasets: [{ label: 'Novos Usuários', data: [0, 0, 0, 0, 0, 0, 0], backgroundColor: '#4285f4' }]
         }
-    }
+    });
 
     db.collection('users').onSnapshot(snapshot => {
         document.getElementById('total-users').innerText = "Total de Usuários Cadastrados: " + snapshot.size;
@@ -99,6 +97,19 @@
             userTbody.innerHTML += `<tr><td>${data.nome || 'N/A'}</td><td>${data.email || 'N/A'}</td><td>${data.role || 'N/A'}</td></tr>`;
         });
     });
+
+    function filterTable(tableId, inputId) {
+        const input = document.getElementById(inputId);
+        const filter = input.value.toUpperCase();
+        const table = document.getElementById(tableId);
+        const tr = table.getElementsByTagName("tr");
+        for (let i = 1; i < tr.length; i++) {
+            const td = tr[i].getElementsByTagName("td")[0];
+            if (td) {
+                tr[i].style.display = (td.textContent || td.innerText).toUpperCase().indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+    }
 
     const chamadosTbody = document.querySelector('#chamados-table tbody');
     db.collection('chamados').onSnapshot(snapshot => {
@@ -113,22 +124,13 @@
             const btnVer = document.createElement('button');
             btnVer.innerText = "Ver";
             btnVer.onclick = () => {
-                let acaoHtml = "";
-                if (data.telefone && data.telefone.trim() !== "") {
-                    const telFormatado = data.telefone.replace(/\D/g, '');
-                    const whatsappLink = `https://wa.me/55${telFormatado}?text=Olá ${data.nome || ''}, vi seu chamado no VoltCalc Pro sobre: ${data.mensagem || ''}`;
-                    acaoHtml = `<a href="${whatsappLink}" target="_blank" style="display:block; background:#25d366; color:white; padding:10px; text-align:center; border-radius:5px; text-decoration:none;">Chamar no WhatsApp</a>`;
-                } else {
-                    acaoHtml = `<p style="color:orange; font-size: 0.9em;">Este usuário não cadastrou um número de WhatsApp.</p>`;
-                }
+                let acaoHtml = (data.telefone && data.telefone.trim() !== "") ? `<a href="https://wa.me/55${data.telefone.replace(/\D/g, '')}?text=Olá ${data.nome || ''}, vi seu chamado no VoltCalc Pro sobre: ${data.mensagem || ''}" target="_blank" style="display:block; background:#25d366; color:white; padding:10px; text-align:center; border-radius:5px; text-decoration:none;">Chamar no WhatsApp</a>` : `<p style="color:orange; font-size: 0.9em;">Sem WhatsApp.</p>`;
                 document.getElementById('modal-body').innerHTML = `<strong>Nome:</strong> ${data.nome || 'N/A'}<br><strong>Email:</strong> ${data.email || 'N/A'}<br><strong>Telefone:</strong> ${data.telefone || 'Não informado'}<br><strong>Mensagem:</strong> ${data.mensagem || 'N/A'}<br><br>${acaoHtml}`;
                 document.getElementById('detalhesModal').style.display = 'block';
             };
             const btnStatus = document.createElement('button');
             btnStatus.innerText = status === 'Pendente' ? "Concluir" : "Reabrir";
-            btnStatus.onclick = () => {
-                db.collection('chamados').doc(docId).update({ status: status === 'Pendente' ? 'Concluído' : 'Pendente' });
-            };
+            btnStatus.onclick = () => { db.collection('chamados').doc(docId).update({ status: status === 'Pendente' ? 'Concluído' : 'Pendente' }); };
             btnCell.appendChild(btnVer);
             btnCell.appendChild(btnStatus);
             row.appendChild(btnCell);
