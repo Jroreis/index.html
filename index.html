@@ -46,7 +46,7 @@
       --secondary: #f59e0b;
       --neon-green: #39FF14;
       
-      /* Novas variáveis Dark Tech */
+      /* Visual Dark Tech Profissional */
       --bg-color: #020617;
       --card-bg: #0f172a;
       --border-color: #1e293b;
@@ -73,55 +73,22 @@
 
     /* ── Camada de Fundo (Marca d'água) ── */
     .bg-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-image: url('1000488411.webp');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      opacity: 0.02;
-      z-index: -1;
-      pointer-events: none;
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background-image: url('1000488411.webp'); background-size: cover; background-position: center; background-repeat: no-repeat;
+      opacity: 0.02; z-index: -1; pointer-events: none;
     }
 
     /* ── Header Ajustado ── */
     .header {
-      background: rgba(15, 23, 42, 0.95);
-      backdrop-filter: blur(12px);
-      padding: 14px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
+      background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); padding: 14px 24px;
+      display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000;
       border-bottom: 1px solid var(--border-color);
     }
-    .logo { 
-      font-size: 24px; 
-      font-weight: 800; 
-      color: var(--neon-green); 
-      text-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
-      text-decoration: none; 
-      display: flex; 
-      align-items: center; 
-      gap: 12px; 
-    }
-    .logo img { 
-      height: 36px; 
-      width: 36px; 
-      object-fit: contain; 
-      border-radius: 6px;
-    }
+    .logo { font-size: 24px; font-weight: 800; color: var(--neon-green); text-shadow: 0 0 10px rgba(57, 255, 20, 0.4); text-decoration: none; display: flex; align-items: center; gap: 12px; }
+    .logo img { height: 36px; width: 36px; object-fit: contain; border-radius: 6px; }
     .logo span { color: var(--text); font-weight: 400; text-shadow: none; }
     .header-btns { display: flex; gap: 12px; }
-    .btn-header {
-      padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s;
-      border: 2px solid var(--neon-green); color: var(--neon-green); background: transparent;
-    }
+    .btn-header { padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; border: 2px solid var(--neon-green); color: var(--neon-green); background: transparent; }
     .btn-header.filled { background: var(--neon-green); color: #020617; font-weight: 700; border-color: var(--neon-green); }
     .btn-header:hover { transform: translateY(-1px); box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
 
@@ -132,14 +99,11 @@
     .hero p { font-size: clamp(18px, 4vw, 22px); max-width: 800px; margin: 0 auto 40px; color: var(--text-light); }
     .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
     
-    .btn-hero {
-      padding: 18px 36px; border-radius: 14px; font-weight: 700; font-size: 18px; cursor: pointer; transition: 0.3s; border: none; display: flex; align-items: center; gap: 10px;
-    }
+    .btn-hero { padding: 18px 36px; border-radius: 14px; font-weight: 700; font-size: 18px; cursor: pointer; transition: 0.3s; border: none; display: flex; align-items: center; gap: 10px; }
     .btn-hero.primary { background: var(--primary); color: #fff; box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); }
     .btn-hero.secondary { background: transparent; color: var(--text); border: 2px solid var(--border-color); }
     .btn-hero:hover { transform: translateY(-3px); scale: 1.02; }
 
-    /* Seção do Vídeo Institucional da Plataforma */
     .video-container { max-width: 850px; margin: 0 auto 40px; padding: 0 24px; }
     .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 20px; box-shadow: var(--shadow-lg); border: 2px solid var(--border-color); background: var(--card-bg); }
     .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
@@ -151,8 +115,6 @@
 
     .section-padding { padding: 60px 24px; }
     .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; max-width: 1200px; margin: 0 auto; }
-    
-    /* Adaptação Dark Tech nos Cards da Landing Page */
     .feature-card { background: var(--card-bg); padding: 48px; border-radius: 24px; box-shadow: var(--shadow); border: 1px solid var(--border-color); transition: 0.3s; }
     .feature-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
     .feature-icon { width: 64px; height: 64px; background: rgba(79, 70, 229, 0.1); color: var(--primary); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 32px; border: 1px solid rgba(79, 70, 229, 0.2); }
@@ -168,25 +130,8 @@
     
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: var(--text); }
-    
-    /* Inputs Dark Tech */
-    .form-group input, .form-group select, .form-group textarea { 
-      width: 100%; 
-      padding: 14px 16px; 
-      border-radius: 10px; 
-      border: 1px solid var(--border-color); 
-      background: var(--input-bg);
-      font-family: inherit; 
-      font-size: 15px; 
-      color: var(--text);
-      transition: all 0.2s ease; 
-    }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { 
-      outline: none; 
-      border-color: var(--neon-green); 
-      background: var(--card-bg);
-      box-shadow: 0 0 0 4px rgba(57, 255, 20, 0.1); 
-    }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px 16px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--input-bg); font-family: inherit; font-size: 15px; color: var(--text); transition: all 0.2s ease; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--neon-green); background: var(--card-bg); box-shadow: 0 0 0 4px rgba(57, 255, 20, 0.1); }
     
     .btn-primary { width: 100%; padding: 16px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.2s; }
     .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
@@ -197,84 +142,52 @@
     .legal-text h3 { margin: 20px 0 10px; font-size: 18px; color: var(--text); }
     .legal-text p { margin-bottom: 12px; font-size: 14px; color: var(--text-light); line-height: 1.6; }
 
-    /* ── App Screen Layout ── */
-    .app-screen { display: none; max-width: 1200px; margin: 0 auto; padding: 40px 24px; animation: fadeIn 0.4s ease-out; }
+    /* ── App Screen Layout (SIDEBAR DASHBOARD) ── */
+    .app-screen { display: none; max-width: 1400px; margin: 0 auto; padding: 30px 24px; animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .flex-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+    
+    .dashboard-layout { display: flex; gap: 30px; align-items: flex-start; margin-top: 10px; }
+
+    .dashboard-sidebar {
+      width: 280px; background: var(--card-bg); border: 1px solid var(--border-color);
+      border-radius: 20px; padding: 24px; display: flex; flex-direction: column;
+      position: sticky; top: 90px; height: calc(100vh - 120px);
+    }
+    .sidebar-user { margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
     
     .editable-panel-title {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--text);
-      border: 1px dashed transparent;
-      background: transparent;
-      padding: 4px 8px;
-      border-radius: 8px;
-      font-family: inherit;
-      width: auto;
-      max-width: 500px;
-      transition: all 0.2s;
+      font-size: 20px; font-weight: 800; color: var(--neon-green); border: 1px dashed transparent;
+      background: transparent; padding: 4px 8px; border-radius: 8px; font-family: inherit; width: 100%; transition: all 0.2s;
     }
-    .editable-panel-title:hover {
-      border-color: var(--primary);
-      background: rgba(79, 70, 229, 0.1);
-      cursor: pointer;
-    }
-    .editable-panel-title:focus {
-      outline: none;
-      border-style: solid;
-      border-color: var(--neon-green);
-      background: var(--card-bg);
-      box-shadow: 0 0 0 3px rgba(57, 255, 20, 0.2);
-    }
+    .editable-panel-title:hover { border-color: var(--primary); background: rgba(79, 70, 229, 0.1); cursor: pointer; }
+    .editable-panel-title:focus { outline: none; border-style: solid; border-color: var(--neon-green); background: var(--card-bg); box-shadow: 0 0 0 3px rgba(57, 255, 20, 0.2); }
 
-    .tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--border-color); margin-bottom: 32px; overflow-x: auto; padding-bottom: 2px; }
-    .tab { padding: 12px 24px; font-weight: 600; cursor: pointer; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--text-light); white-space: nowrap; font-size: 15px; transition: 0.2s; border-radius: 10px 10px 0 0; }
-    .tab.active { color: var(--neon-green); border-bottom-color: var(--neon-green); background: rgba(57, 255, 20, 0.05); }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    .logout-btn { background: rgba(220, 38, 38, 0.1); color: #ef4444; border: 1px solid rgba(220, 38, 38, 0.3); padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 700; transition: 0.2s; }
+    .tabs { display: flex; flex-direction: column; gap: 8px; margin-bottom: auto; }
+    .tab { padding: 16px; font-weight: 600; cursor: pointer; background: transparent; border: none; color: var(--text-light); text-align: left; font-size: 15px; transition: 0.2s; border-radius: 12px; }
+    .tab:hover { background: rgba(255, 255, 255, 0.05); color: var(--text); }
+    .tab.active { background: var(--neon-green); color: var(--bg-color); }
+    
+    .logout-btn { background: rgba(220, 38, 38, 0.1); color: #ef4444; border: 1px solid rgba(220, 38, 38, 0.3); padding: 14px; border-radius: 12px; cursor: pointer; font-weight: 700; transition: 0.2s; width: 100%; margin-top: 20px; }
     .logout-btn:hover { background: rgba(220, 38, 38, 0.2); }
 
-    /* ── Profile & Cards Dark Tech ── */
+    .dashboard-main { flex: 1; min-width: 0; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── Profile & Cards ── */
     .card { background: var(--card-bg); border-radius: 20px; padding: 32px; box-shadow: var(--shadow); border: 1px solid var(--border-color); margin-bottom: 24px; }
     .card h3 { font-size: 20px; font-weight: 700; margin-bottom: 24px; color: var(--text); display: flex; align-items: center; gap: 10px; }
     .profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
     .profile-grid .full { grid-column: 1 / -1; }
 
-    /* ── Orçamento System Dark Tech ── */
+    /* ── Orçamento System ── */
     .orc-form-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
     .orc-item-list { border-top: 1px solid var(--border-color); padding-top: 24px; margin-top: 20px; }
     
-    .orc-item {
-      background: var(--bg-color);
-      padding: 16px;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      margin-bottom: 16px;
-    }
-    .orc-item-row {
-      display: grid;
-      grid-template-columns: 1fr 2fr 1fr 1fr auto;
-      gap: 10px;
-      align-items: center;
-    }
-    .orc-item input, .orc-item select {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 13px;
-      width: 100%;
-      color: var(--text);
-      transition: 0.2s;
-    }
-    .orc-item input:focus, .orc-item select:focus {
-      border-color: var(--neon-green);
-      background: var(--input-bg);
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(57, 255, 20, 0.1);
-    }
+    .orc-item { background: var(--bg-color); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 16px; }
+    .orc-item-row { display: grid; grid-template-columns: 1fr 2fr 1fr 1fr auto; gap: 10px; align-items: center; }
+    .orc-item input, .orc-item select { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; font-size: 13px; width: 100%; color: var(--text); transition: 0.2s; }
+    .orc-item input:focus, .orc-item select:focus { border-color: var(--neon-green); background: var(--input-bg); outline: none; box-shadow: 0 0 0 3px rgba(57, 255, 20, 0.1); }
     
     .btn-add-item { background: rgba(79, 70, 229, 0.1); color: #818cf8; border: 1px dashed rgba(79, 70, 229, 0.4); padding: 14px; border-radius: 10px; width: 100%; font-weight: 700; cursor: pointer; margin-top: 16px; transition: 0.2s; font-size: 15px; }
     .btn-add-item:hover { background: rgba(79, 70, 229, 0.2); }
@@ -285,7 +198,7 @@
     .btn-secondary-action { width: 100%; padding: 16px; background: transparent; border: 2px solid var(--border-color); color: var(--text); border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 12px; transition: 0.2s; }
     .btn-secondary-action:hover { background: rgba(255, 255, 255, 0.05); border-color: #475569; }
 
-    /* ── Tabela de Preços e Histórico Dark Tech ── */
+    /* ── Tabela de Preços e Histórico ── */
     .ptable-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow); background: var(--card-bg); }
     .ptable { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 700px; }
     .ptable th { background: rgba(79, 70, 229, 0.1); color: #818cf8; padding: 16px; text-align: left; font-weight: 700; border-bottom: 1px solid var(--border-color); }
@@ -293,18 +206,15 @@
     .cat-row { background: var(--bg-color) !important; color: #fff; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
     .mn { color: #10b981; font-weight: 600; } .mx { color: #f43f5e; font-weight: 600; } .md { color: #818cf8; font-weight: 800; }
 
-    .btn-action-icon {
-      background: transparent; border: 1px solid var(--border-color); color: var(--text); border-radius: 8px; padding: 8px 12px; 
-      cursor: pointer; margin-right: 6px; font-size: 16px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center;
-    }
+    .btn-action-icon { background: transparent; border: 1px solid var(--border-color); color: var(--text); border-radius: 8px; padding: 8px 12px; cursor: pointer; margin-right: 6px; font-size: 16px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; }
     .btn-action-icon:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.05); }
 
-    .btn-pix-donation {
-      background: #10b981; color: #020617; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 14px; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; margin-top: 8px;
-    }
+    .btn-pix-donation { background: #10b981; color: #020617; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 14px; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; }
     .btn-pix-donation:hover { background: #059669; transform: translateY(-1px); }
 
-    @media (max-width: 768px) { 
+    @media (max-width: 992px) { 
+      .dashboard-layout { flex-direction: column; }
+      .dashboard-sidebar { width: 100%; height: auto; position: relative; top: 0; }
       .orc-form-grid { grid-template-columns: 1fr; } 
       .orc-item-row { grid-template-columns: 1fr; gap: 8px; } 
     }
@@ -315,81 +225,42 @@
     @media print {
       @page { margin: 0.8cm; size: A4 portrait; }
       body { background: #fff !important; color: #000 !important; font-size: 11px; line-height: 1.3; }
-      .bg-overlay { display: none !important; }
-      .ads-container, .adsbygoogle, .video-container { display: none !important; }
-      .header, .tabs, .logout-btn, .btn-add-item, .btn-primary, .btn-secondary-action, .orc-item button, #authBtns, footer { display: none !important; }
-      .flex-header, .card > h3 { display: none !important; }
+      .bg-overlay, .ads-container, .adsbygoogle, .video-container { display: none !important; }
+      .header, .dashboard-sidebar, .btn-add-item, .btn-primary, .btn-secondary-action, .orc-item button, #authBtns, footer { display: none !important; }
+      .card > h3 { display: none !important; }
+      
+      .dashboard-layout { display: block !important; margin: 0 !important; }
+      .dashboard-main { padding: 0 !important; }
       .app-screen { padding: 0; margin: 0; display: block !important; }
+      
       .tab-content { display: none !important; }
       .tab-content.active { display: block !important; }
       .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; background: #fff !important; }
       .orc-form-grid { display: block !important; }
       
-      .profile-grid { 
-        display: flex !important; 
-        flex-wrap: wrap !important;
-        gap: 10px !important; 
-        border: none !important;
-        border-bottom: 2px solid #000 !important; 
-        padding: 0 0 10px 0 !important; 
-        margin-bottom: 15px !important; 
-      }
+      .profile-grid { display: flex !important; flex-wrap: wrap !important; gap: 10px !important; border: none !important; border-bottom: 2px solid #000 !important; padding: 0 0 10px 0 !important; margin-bottom: 15px !important; }
       .form-group { margin-bottom: 3px !important; flex: 1 1 45% !important; }
       .form-group.full { flex: 1 1 100% !important; }
       .form-group label { color: #475569 !important; font-size: 10px !important; margin-bottom: 2px !important; text-transform: uppercase; font-weight: 700 !important; }
       
-      .form-group input, .form-group textarea, .form-group select, .orc-item input, .orc-item select { 
-        background: transparent !important; border: none !important; padding: 0 0 2px 0 !important; 
-        font-size: 12px !important; color: #000 !important; font-weight: 600 !important; 
-        border-radius: 0 !important; box-shadow: none !important; height: auto !important; outline: none !important;
-        -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; background-image: none !important;
-      }
+      .form-group input, .form-group textarea, .form-group select, .orc-item input, .orc-item select { background: transparent !important; border: none !important; padding: 0 0 2px 0 !important; font-size: 12px !important; color: #000 !important; font-weight: 600 !important; border-radius: 0 !important; box-shadow: none !important; height: auto !important; outline: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; background-image: none !important; }
       .form-group select::-ms-expand, .orc-item select::-ms-expand { display: none !important; }
 
       .print-only { display: grid !important; }
-      .orc-items-header { 
-        display: grid; grid-template-columns: 2fr 3fr 1fr 1fr 1fr; 
-        font-weight: 800; border-bottom: 2px solid #000; 
-        padding-bottom: 4px; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; color: #000 !important;
-      }
+      .orc-items-header { display: grid; grid-template-columns: 2fr 3fr 1fr 1fr 1fr; font-weight: 800; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; color: #000 !important; }
       .orc-item-list { border: none !important; margin-top: 0 !important; padding-top: 0 !important; }
       
-      .orc-item { 
-        background: none !important; 
-        border: none !important; 
-        border-bottom: 1px solid #e2e8f0 !important; 
-        padding: 4px 0 !important; 
-        box-shadow: none !important; 
-        border-radius: 0 !important; 
-        margin-bottom: 8px !important;
-        page-break-inside: avoid !important; 
-      }
-      .orc-item-row {
-        display: grid; grid-template-columns: 2fr 3fr 1fr 1fr !important;
-        gap: 8px !important;
-      }
+      .orc-item { background: none !important; border: none !important; border-bottom: 1px solid #e2e8f0 !important; padding: 4px 0 !important; box-shadow: none !important; border-radius: 0 !important; margin-bottom: 8px !important; page-break-inside: avoid !important; }
+      .orc-item-row { display: grid; grid-template-columns: 2fr 3fr 1fr 1fr !important; gap: 8px !important; }
       
       .summary-box { border: none !important; background: none !important; width: 35%; margin-left: auto; margin-top: 10px; padding: 0 !important; }
       .summary-row { margin-bottom: 4px !important; font-size: 12px !important; color: #000 !important; }
       .summary-row.total { color: #000 !important; border-top: 2px solid #000 !important; padding-top: 6px !important; font-size: 14px !important;}
       .print-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
 
-      /* Ajustando as tabelas e elementos escuros para impressão branca e preta */
       .ptable, .ptable th, .ptable td, .cat-row { background: #fff !important; color: #000 !important; border-color: #000 !important; }
 
-      body::after {
-        content: "Documento gerado e validado por VoltCalc Pro - A Plataforma do Profissional da Elétrica | www.voltcalcpro.com";
-        position: fixed;
-        bottom: 0px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        font-size: 9px;
-        color: #94a3b8;
-        border-top: 1px solid #cbd5e1;
-        padding-top: 6px;
-        font-weight: 600;
-      }
+      body::after { content: "Documento gerado e validado por VoltCalc Pro - A Plataforma do Profissional da Elétrica | www.voltcalcpro.com"; position: fixed; bottom: 0px; left: 0; width: 100%; text-align: center; font-size: 9px; color: #94a3b8; border-top: 1px solid #cbd5e1; padding-top: 6px; font-weight: 600; }
     }
     .print-header { display: none; }
   </style>
@@ -579,152 +450,158 @@
       </div>
     </div>
 
-    <div class="flex-header">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span style="font-size: 28px; font-weight: 800; color: var(--text);">Painel do</span>
-        <input type="text" id="profNameTitleInput" class="editable-panel-title" title="Clique para editar seu nome diretamente por aqui">
-      </div>
-      <button class="logout-btn" onclick="auth.signOut()">Encerrar Sessão</button>
-    </div>
-    
-    <nav class="tabs">
-      <div class="tab active" data-tab="orc">📋 Novo Orçamento</div>
-      <div class="tab" data-tab="precos">💰 Tabela de Preços</div>
-      <div class="tab" data-tab="dimens">📐 Dimensionamentos (NBR 5410)</div>
-      <div class="tab" data-tab="hist-prof">📚 Histórico</div>
-      <div class="tab" data-tab="perfil">👤 Perfil e Empresa</div>
-    </nav>
-
-    <div class="tab-content active" id="tab-orc">
-      <article class="card">
-        <h3 id="orcFormHeaderTitle">📄 Gerador de Novo Orçamento</h3>
-        <input type="hidden" id="currentEditingBudgetId" value="">
+    <div class="dashboard-layout">
+      
+      <aside class="dashboard-sidebar">
+        <div class="sidebar-user">
+          <span style="font-size: 13px; color: var(--text-light); text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Painel de Gestão</span>
+          <input type="text" id="profNameTitleInput" class="editable-panel-title" title="Clique para editar seu nome diretamente por aqui" style="margin-top: 5px;">
+        </div>
         
-        <div class="orc-form-grid">
-          <div>
-            <div class="profile-grid">
-              <div class="form-group"><label>Nome do Cliente</label><input id="orcCliNome"></div>
-              <div class="form-group"><label>Telefone</label><input id="orcCliTel"></div>
-              <div class="form-group"><label>Data de Validade</label><input type="date" id="orcValidDate"></div>
-              
-              <div class="form-group"><label>Rua / Logradouro</label><input id="orcRua" placeholder="Ex: Av. Paulista"></div>
-              <div class="form-group"><label>Número</label><input id="orcNum" placeholder="Ex: 1000"></div>
-              <div class="form-group"><label>Bairro</label><input id="orcBairro" placeholder="Ex: Centro"></div>
-              <div class="form-group"><label>CEP</label><input id="orcCep" placeholder="Ex: 01310-100"></div>
-              <div class="form-group"><label>Cidade</label><input id="orcCidade" placeholder="Ex: São Paulo"></div>
-              <div class="form-group"><label>Estado (UF)</label><input id="orcEstado" placeholder="Ex: SP"></div>
-              <input type="hidden" id="orcCliEnd">
-            </div>
-            
-            <div class="orc-items-header print-only">
-              <span>Ambiente</span>
-              <span>Descrição do Serviço</span>
-              <span style="text-align:center;">Qtd</span>
-              <span>V. Unitário</span>
-              <span style="text-align:right;">Subtotal</span>
-            </div>
+        <nav class="tabs">
+          <button class="tab active" data-tab="orc">📋 Novo Orçamento</button>
+          <button class="tab" data-tab="precos">💰 Tabela de Preços</button>
+          <button class="tab" data-tab="dimens">📐 Dimensionamentos (NBR 5410)</button>
+          <button class="tab" data-tab="hist-prof">📚 Histórico</button>
+          <button class="tab" data-tab="perfil">👤 Perfil e Empresa</button>
+        </nav>
 
-            <div class="orc-item-list" id="orcItemsContainer"></div>
+        <button class="logout-btn" onclick="auth.signOut()">Encerrar Sessão</button>
+      </aside>
+
+      <main class="dashboard-main">
+        <div class="tab-content active" id="tab-orc">
+          <article class="card">
+            <h3 id="orcFormHeaderTitle">📄 Gerador de Novo Orçamento</h3>
+            <input type="hidden" id="currentEditingBudgetId" value="">
             
-            <button class="btn-add-item" id="btnAddOrcItem">+ Adicionar Serviço da Tabela Nacional</button>
-            <button class="btn-add-item" style="background:transparent; color:var(--text-light); border-color: var(--border-color);" id="btnAddCustomItem">+ Adicionar Serviço Personalizado</button>
-            
-            <div class="form-group" style="margin-top: 24px;">
-              <label>Observações / Condições de Pagamento</label>
-              <textarea id="orcObs" rows="3" placeholder="Ex: 50% de entrada e 50% na conclusão da entrega técnica. Garantia de 1 ano sobre a mão de obra."></textarea>
-            </div>
-          </div>
-          
-          <div>
-            <div class="card" style="position: sticky; top: 100px;">
-              <h4>Resumo Financeiro</h4>
-              <div style="margin: 20px 0 10px 0;">
-                <div class="form-group">
-                  <label>Desconto (%)</label>
-                  <input type="number" id="orcDiscount" value="0" min="0" max="100">
+            <div class="orc-form-grid">
+              <div>
+                <div class="profile-grid">
+                  <div class="form-group"><label>Nome do Cliente</label><input id="orcCliNome"></div>
+                  <div class="form-group"><label>Telefone</label><input id="orcCliTel"></div>
+                  <div class="form-group"><label>Data de Validade</label><input type="date" id="orcValidDate"></div>
+                  
+                  <div class="form-group"><label>Rua / Logradouro</label><input id="orcRua" placeholder="Ex: Av. Paulista"></div>
+                  <div class="form-group"><label>Número</label><input id="orcNum" placeholder="Ex: 1000"></div>
+                  <div class="form-group"><label>Bairro</label><input id="orcBairro" placeholder="Ex: Centro"></div>
+                  <div class="form-group"><label>CEP</label><input id="orcCep" placeholder="Ex: 01310-100"></div>
+                  <div class="form-group"><label>Cidade</label><input id="orcCidade" placeholder="Ex: São Paulo"></div>
+                  <div class="form-group"><label>Estado (UF)</label><input id="orcEstado" placeholder="Ex: SP"></div>
+                  <input type="hidden" id="orcCliEnd">
+                </div>
+                
+                <div class="orc-items-header print-only">
+                  <span>Ambiente</span>
+                  <span>Descrição do Serviço</span>
+                  <span style="text-align:center;">Qtd</span>
+                  <span>V. Unitário</span>
+                  <span style="text-align:right;">Subtotal</span>
+                </div>
+
+                <div class="orc-item-list" id="orcItemsContainer"></div>
+                
+                <button class="btn-add-item" id="btnAddOrcItem">+ Adicionar Serviço da Tabela Nacional</button>
+                <button class="btn-add-item" style="background:transparent; color:var(--text-light); border-color: var(--border-color);" id="btnAddCustomItem">+ Adicionar Serviço Personalizado</button>
+                
+                <div class="form-group" style="margin-top: 24px;">
+                  <label>Observações / Condições de Pagamento</label>
+                  <textarea id="orcObs" rows="3" placeholder="Ex: 50% de entrada e 50% na conclusão da entrega técnica. Garantia de 1 ano sobre a mão de obra."></textarea>
                 </div>
               </div>
-              <div class="summary-box">
-                <div class="summary-row"><span>Subtotal:</span><span>R$ <span id="orcSubtotalValue">0,00</span></span></div>
-                <div class="summary-row"><span>Desconto:</span><span>R$ <span id="orcDiscountValue">0,00</span></span></div>
-                <div class="summary-row total"><span>Total:</span><span>R$ <span id="orcTotalValue">0,00</span></span></div>
+              
+              <div>
+                <div class="card" style="position: sticky; top: 100px;">
+                  <h4>Resumo Financeiro</h4>
+                  <div style="margin: 20px 0 10px 0;">
+                    <div class="form-group">
+                      <label>Desconto (%)</label>
+                      <input type="number" id="orcDiscount" value="0" min="0" max="100">
+                    </div>
+                  </div>
+                  <div class="summary-box">
+                    <div class="summary-row"><span>Subtotal:</span><span>R$ <span id="orcSubtotalValue">0,00</span></span></div>
+                    <div class="summary-row"><span>Desconto:</span><span>R$ <span id="orcDiscountValue">0,00</span></span></div>
+                    <div class="summary-row total"><span>Total:</span><span>R$ <span id="orcTotalValue">0,00</span></span></div>
+                  </div>
+                  <button class="btn-primary" id="btnSaveOrc">Salvar no Histórico</button>
+                  <button class="btn-secondary-action" id="btnCancelEditStyle" style="display:none; background:transparent; color:#ef4444; border-color:#ef4444;" onclick="clearOrcFormState()">Cancelar Edição</button>
+                  <button class="btn-secondary-action" onclick="window.print()">🖨️ Imprimir / Gerar PDF</button>
+                </div>
               </div>
-              <button class="btn-primary" id="btnSaveOrc">Salvar no Histórico</button>
-              <button class="btn-secondary-action" id="btnCancelEditStyle" style="display:none; background:transparent; color:#ef4444; border-color:#ef4444;" onclick="clearOrcFormState()">Cancelar Edição</button>
-              <button class="btn-secondary-action" onclick="window.print()">🖨️ Imprimir / Gerar PDF</button>
+            </div>
+          </article>
+
+          <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border-color); margin-top: 40px;">
+            <div style="max-width: 500px; margin: 0 auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
+              <p style="font-weight: 700; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                ☕ Apoie o Projeto VoltCalc Pro
+              </p>
+              <p style="font-size: 12px; color: var(--text-light);">Gostou da ferramenta? Contribua com qualquer valor para ajudar a manter o servidor ativo!</p>
+              <button onclick="copiarChavePix()" class="btn-pix-donation">
+                📋 Copiar Chave PIX
+              </button>
+            </div>
+          </footer>
+        </div>
+
+        <div class="tab-content" id="tab-precos"></div>
+
+        <div class="tab-content" id="tab-dimens">
+          <div class="card">
+            <h3>📐 Tabela de Dimensionamentos (NBR 5410)</h3>
+            <p style="color:var(--text-light); margin-bottom: 20px;">Referência técnica para condutores de cobre (Isolação PVC 70°C - Método de Instalação B1 - 2 condutores carregados). Consulte a norma completa para cálculos exatos.</p>
+            
+            <div class="ptable-wrap">
+              <table class="ptable">
+                <thead>
+                  <tr>
+                    <th>Seção (Bitola)</th>
+                    <th>Corrente Máx. (Iz)</th>
+                    <th>Disjuntor Recomendado</th>
+                    <th>Aplicação Típica</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>1,5 mm²</td><td class="mn">17,5 A</td><td class="md">10 A ou 16 A</td><td>Iluminação geral</td></tr>
+                  <tr><td>2,5 mm²</td><td class="mn">24 A</td><td class="md">20 A</td><td>Tomadas de Uso Geral (TUGs)</td></tr>
+                  <tr><td>4,0 mm²</td><td class="mn">32 A</td><td class="md">25 A ou 32 A</td><td>Chuveiros médios, Ar-condicionado, TUEs</td></tr>
+                  <tr><td>6,0 mm²</td><td class="mn">41 A</td><td class="md">40 A</td><td>Chuveiros potentes, Fornos elétricos</td></tr>
+                  <tr><td>10,0 mm²</td><td class="mn">57 A</td><td class="md">50 A</td><td>Padrão de entrada residencial (pequeno porte)</td></tr>
+                  <tr><td>16,0 mm²</td><td class="mn">76 A</td><td class="md">63 A ou 70 A</td><td>Quadros de distribuição (QDC principal)</td></tr>
+                  <tr><td>25,0 mm²</td><td class="mn">101 A</td><td class="md">80 A ou 100 A</td><td>Entradas de energia de maior capacidade</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="margin-top: 24px; padding: 16px; border-left: 4px solid var(--secondary); background: rgba(245, 158, 11, 0.05); border-radius: 8px;">
+              <strong style="color: var(--secondary);">⚠️ Nota Técnica Importante:</strong> 
+              <p style="color: var(--text-light); font-size: 14px; margin-top: 8px;">Os valores acima são puramente orientativos para situações ideais e correntes nominais embutidas em alvenaria. Em projetos reais e elaboração de orçamentos precisos, o profissional de elétrica deve aplicar os Fatores de Correção de Agrupamento (FCA), Fatores de Correção de Temperatura (FCT) e calcular a queda de tensão admissível rigorosamente em conformidade com as exigências da norma técnica <strong>ABNT NBR 5410</strong> vigente.</p>
             </div>
           </div>
         </div>
-      </article>
 
-      <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border-color); margin-top: 40px;">
-        <div style="max-width: 500px; margin: 0 auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
-          <p style="font-weight: 700; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-            ☕ Apoie o Projeto VoltCalc Pro
-          </p>
-          <p style="font-size: 12px; color: var(--text-light);">Gostou da ferramenta? Contribua com qualquer valor para ajudar a manter o servidor ativo!</p>
-          <button onclick="copiarChavePix()" class="btn-pix-donation">
-            📋 Copiar Chave PIX
-          </button>
+        <div class="tab-content" id="tab-hist-prof">
+          <h3>📚 Histórico de Orçamentos</h3>
+          <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, altere dados estruturais, reimprima, envie via WhatsApp ou exclua registros indesejados.</p>
+          <div id="profHistContainer"></div>
+
+          <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border-color); margin-top: 40px;">
+            <div style="max-width: 500px; margin: 0 auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
+              <p style="font-weight: 700; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                ☕ Apoie o Projeto VoltCalc Pro
+              </p>
+              <p style="font-size: 12px; color: var(--text-light);">Gostou da ferramenta? Contribua com qualquer valor para ajudar a manter o servidor ativo!</p>
+              <button onclick="copiarChavePix()" class="btn-pix-donation">
+                📋 Copiar Chave PIX
+              </button>
+            </div>
+          </footer>
         </div>
-      </footer>
+
+        <div class="tab-content" id="tab-perfil"></div>
+      </main>
     </div>
-
-    <div class="tab-content" id="tab-precos"></div>
-
-    <div class="tab-content" id="tab-dimens">
-      <div class="card">
-        <h3>📐 Tabela de Dimensionamentos (NBR 5410)</h3>
-        <p style="color:var(--text-light); margin-bottom: 20px;">Referência técnica para condutores de cobre (Isolação PVC 70°C - Método de Instalação B1 - 2 condutores carregados). Consulte a norma completa para cálculos exatos.</p>
-        
-        <div class="ptable-wrap">
-          <table class="ptable">
-            <thead>
-              <tr>
-                <th>Seção (Bitola)</th>
-                <th>Corrente Máx. (Iz)</th>
-                <th>Disjuntor Recomendado</th>
-                <th>Aplicação Típica</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>1,5 mm²</td><td class="mn">17,5 A</td><td class="md">10 A ou 16 A</td><td>Iluminação geral</td></tr>
-              <tr><td>2,5 mm²</td><td class="mn">24 A</td><td class="md">20 A</td><td>Tomadas de Uso Geral (TUGs)</td></tr>
-              <tr><td>4,0 mm²</td><td class="mn">32 A</td><td class="md">25 A ou 32 A</td><td>Chuveiros médios, Ar-condicionado, TUEs</td></tr>
-              <tr><td>6,0 mm²</td><td class="mn">41 A</td><td class="md">40 A</td><td>Chuveiros potentes, Fornos elétricos</td></tr>
-              <tr><td>10,0 mm²</td><td class="mn">57 A</td><td class="md">50 A</td><td>Padrão de entrada residencial (pequeno porte)</td></tr>
-              <tr><td>16,0 mm²</td><td class="mn">76 A</td><td class="md">63 A ou 70 A</td><td>Quadros de distribuição (QDC principal)</td></tr>
-              <tr><td>25,0 mm²</td><td class="mn">101 A</td><td class="md">80 A ou 100 A</td><td>Entradas de energia de maior capacidade</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div style="margin-top: 24px; padding: 16px; border-left: 4px solid var(--secondary); background: rgba(245, 158, 11, 0.05); border-radius: 8px;">
-          <strong style="color: var(--secondary);">⚠️ Nota Técnica Importante:</strong> 
-          <p style="color: var(--text-light); font-size: 14px; margin-top: 8px;">Os valores acima são puramente orientativos para situações ideais e correntes nominais embutidas em alvenaria. Em projetos reais e elaboração de orçamentos precisos, o profissional de elétrica deve aplicar os Fatores de Correção de Agrupamento (FCA), Fatores de Correção de Temperatura (FCT) e calcular a queda de tensão admissível rigorosamente em conformidade com as exigências da norma técnica <strong>ABNT NBR 5410</strong> vigente.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="tab-content" id="tab-hist-prof">
-      <h3>📚 Histórico de Orçamentos</h3>
-      <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, altere dados estruturais, reimprima, envie via WhatsApp ou exclua registros indesejados.</p>
-      <div id="profHistContainer"></div>
-
-      <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border-color); margin-top: 40px;">
-        <div style="max-width: 500px; margin: 0 auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
-          <p style="font-weight: 700; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-            ☕ Apoie o Projeto VoltCalc Pro
-          </p>
-          <p style="font-size: 12px; color: var(--text-light);">Gostou da ferramenta? Contribua com qualquer valor para ajudar a manter o servidor ativo!</p>
-          <button onclick="copiarChavePix()" class="btn-pix-donation">
-            📋 Copiar Chave PIX
-          </button>
-        </div>
-      </footer>
-    </div>
-
-    <div class="tab-content" id="tab-perfil"></div>
   </div>
 
   <div id="cookieConsent" style="display:none; position:fixed; bottom:0; left:0; width:100%; background:rgba(2, 6, 23, 0.95); color:#fff; padding:16px 24px; z-index:9999; text-align:center; font-size:14px; backdrop-filter:blur(10px); border-top: 1px solid var(--border-color);">
@@ -1149,7 +1026,7 @@
           h += '<button class="btn-action-icon" onclick="actionEditOrc('+index+')" title="Editar Orçamento">✏️</button>';
           h += '<button class="btn-action-icon" onclick="actionReprint('+index+')" title="Re-imprimir / Gerar PDF">🖨️</button>';
           h += '<button class="btn-action-icon" onclick="actionShareWpp('+index+')" title="Enviar via WhatsApp">📱</button>';
-          h += '<button class="btn-action-icon" onclick="actionDelete(\''+d.id+'\')" title="Excluir Orçamento" style="color: #f43f5e;">🗑️</button>';
+          h += '<button class="btn-action-icon" onclick="actionDelete(\''+d.id+'\')" title="Excluir Orçamento" style="color: #dc2626;">🗑️</button>';
           h += '</td></tr>'; 
         });
         container.innerHTML = h + '</tbody></table></div>';
@@ -1479,4 +1356,99 @@
 
         db.collection('users').doc(currentUser.uid).set(upd, { merge: true }).then(function(){
           alert('Perfil estruturado e atualizado com sucesso!');
-          document.getElementById('profNameTitleInput').
+          document.getElementById('profNameTitleInput').value = upd.nome;
+          document.getElementById('printProfName').textContent = upd.nome;
+          document.getElementById('printProfDoc').textContent = upd.doc ? 'Doc: ' + upd.doc : '';
+          document.getElementById('printProfPix').textContent = upd.pix ? 'PIX para pgto: ' + upd.pix : '';
+          document.getElementById('printProfTel').textContent = upd.tel ? 'Contato: ' + upd.tel : '';
+          if(upd.logoBase64) {
+            document.getElementById('printLogoImage').src = upd.logoBase64;
+            document.getElementById('printLogoContainer').style.display = 'block';
+          }
+        }).catch(function(e){ alert("Erro ao salvar perfil: "+e.message); }); 
+      };
+    }
+  </script>
+
+  <style>
+    #pwa-install-banner {
+      display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(10px); color: white; padding: 16px 24px;
+      border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); z-index: 9999;
+      align-items: center; justify-content: space-between; gap: 16px; width: 90%; max-width: 400px; border: 2px solid var(--neon-green);
+    }
+    #btnInstallPwa { background: var(--neon-green); color: #020617; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+    #btnInstallPwa:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
+  </style>
+
+  <div id="pwa-install-banner">
+    <div>
+      <p style="font-weight: 800; margin-bottom: 2px; font-size: 15px;">Instalar Aplicativo</p>
+      <p style="font-size: 12px; color: var(--text-light); line-height: 1.2;">Adicione à tela inicial para acesso rápido.</p>
+    </div>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <button id="btnInstallPwa">Instalar</button>
+      <button onclick="document.getElementById('pwa-install-banner').style.display='none'" style="background:none; border:none; color:var(--text-light); font-size:24px; cursor:pointer; padding:0 5px;">&times;</button>
+    </div>
+  </div>
+
+  <a href="https://wa.me/5519989142713" target="_blank" style="position: fixed; bottom: 25px; right: 25px; background-color: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 9999; font-size: 30px; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+      <svg viewBox="0 0 24 24" width="35" height="35" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.372-.025-.521-.075-.148-.67-1.611-.916-2.206-.242-.579-.487-.501-.67-.51-.172-.008-.369-.01-.567-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.955c-.003 5.444-4.437 9.88-9.875 9.88z"/>
+      </svg>
+  </a>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').catch(function(err) {});
+      });
+    }
+
+    let promptDeInstalacao;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      promptDeInstalacao = e;
+      document.getElementById('pwa-install-banner').style.display = 'flex';
+    });
+
+    document.getElementById('btnInstallPwa').addEventListener('click', async () => {
+      document.getElementById('pwa-install-banner').style.display = 'none';
+      if (promptDeInstalacao) {
+        promptDeInstalacao.prompt();
+        const { outcome } = await promptDeInstalacao.userChoice;
+        promptDeInstalacao = null;
+      }
+    });
+
+    function enviarSuporte() {
+        const nome = document.getElementById('sup-nome').value.trim();
+        const email = document.getElementById('sup-email').value.trim();
+        const telefone = document.getElementById('sup-telefone').value.trim();
+        const mensagem = document.getElementById('sup-msg').value.trim();
+
+        if (nome && email && mensagem) {
+            db.collection("chamados").add({
+                nome: nome,
+                email: email,
+                telefone: telefone,
+                mensagem: mensagem,
+                data: new Date()
+            })
+            .then(() => {
+                alert("Chamado enviado com sucesso!");
+                document.getElementById('sup-nome').value = '';
+                document.getElementById('sup-email').value = '';
+                document.getElementById('sup-telefone').value = '';
+                document.getElementById('sup-msg').value = '';
+            })
+            .catch((error) => {
+                alert("Erro ao enviar: " + error.message);
+            });
+        } else {
+            alert("Por favor, preencha todos os campos obrigatórios (Nome, E-mail e Mensagem).");
+        }
+    }
+  </script>
+</body>
+</html>
