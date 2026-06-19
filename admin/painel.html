@@ -1,18 +1,22 @@
+<!-- Local onde o número aparecerá -->
 <div id="user-count" style="padding: 20px; background: #e0e7ff; border-radius: 8px; margin-bottom: 20px;">
-    Carregando...
+    Buscando dados...
 </div>
 
 <script>
-    // Aguarda o Firebase estar pronto
-    firebase.firestore().collection('users').get()
-        .then((snapshot) => {
-            const count = snapshot.size;
-            document.getElementById('user-count').innerHTML = 
-                `<h3>Total de Usuários Cadastrados: <strong>${count}</strong></h3>`;
-        })
-        .catch((error) => {
-            console.error("Erro:", error);
-            document.getElementById('user-count').innerHTML = 
-                `<h3 style="color:red;">Erro ao carregar dados.</h3>`;
-        });
+    // Verifica se o Firebase já está inicializado
+    if (firebase.apps.length > 0) {
+        firebase.firestore().collection('users').get()
+            .then((snapshot) => {
+                const count = snapshot.size;
+                document.getElementById('user-count').innerHTML = 
+                    `<h3>Total de Usuários Cadastrados: <strong>${count}</strong></h3>`;
+            })
+            .catch((error) => {
+                document.getElementById('user-count').innerHTML = 
+                    `<h3 style="color:red;">Erro: ${error.code}</h3>`;
+            });
+    } else {
+        document.getElementById('user-count').innerHTML = "Firebase não inicializado.";
+    }
 </script>
