@@ -521,9 +521,9 @@
 
       <p>&copy; 2026 VoltCalc Pro. Todos os direitos reservados.</p>
       <p style="margin-top: 12px;">
-        <a href="#suporte-section" style="color: var(--primary); text-decoration: none; font-weight: 600; margin: 0 10px;">Contato / Suporte</a> |
-        <a href="#" onclick="openModal('modalTermos')" style="color: var(--primary); text-decoration: none; font-weight: 600; margin: 0 10px;">Termos de Uso</a> |
-        <a href="#" onclick="openModal('modalPrivacidade')" style="color: var(--primary); text-decoration: none; font-weight: 600; margin: 0 10px;">Política de Privacidade</a>
+        <a href="sobre.html" style="color: var(--primary); text-decoration: none; font-weight: 600; margin: 0 10px;">Sobre Nós</a> |
+        <a href="termos.html" style="color: var(--primary); text-decoration: none; font-weight: 600; margin: 0 10px;">Termos de Uso</a> |
+        <a href="privacidade.html" style="color: var(--primary); text-decoration: none; font-weight: 600; margin: 0 10px;">Política de Privacidade</a>
       </p>
     </footer>
   </main>
@@ -714,7 +714,7 @@
   </div>
 
   <div id="cookieConsent" style="display:none; position:fixed; bottom:0; left:0; width:100%; background:rgba(15,23,42,0.95); color:#fff; padding:16px 24px; z-index:9999; text-align:center; font-size:14px; backdrop-filter:blur(10px); border-top: 1px solid #334155;">
-    Usamos cookies para melhorar sua experiência, personalizar anúncios (Google AdSense) e analisar tráfego. Ao continuar navegando, você concorda com a nossa <a href="#" onclick="openModal('modalPrivacidade')" style="color: var(--neon-green); text-decoration: underline;">Política de Privacidade</a>.
+    Usamos cookies para melhorar sua experiência, personalizar anúncios (Google AdSense) e analisar tráfego. Ao continuar navegando, você concorda com a nossa <a href="privacidade.html" style="color: var(--neon-green); text-decoration: underline;">Política de Privacidade</a>.
     <button onclick="aceitarCookies()" style="background:var(--neon-green); color:var(--dark); border:none; padding:8px 16px; border-radius:8px; font-weight:bold; margin-left:16px; cursor:pointer; transition: 0.2s;">Entendi e Aceito</button>
   </div>
 
@@ -1550,18 +1550,17 @@
       }
     });
 
-    // Função de Suporte (Agora com o campo telefone incluso)
     function enviarSuporte() {
         const nome = document.getElementById('sup-nome').value.trim();
         const email = document.getElementById('sup-email').value.trim();
-        const telefone = document.getElementById('sup-telefone').value.trim(); // Telefone extraído
+        const telefone = document.getElementById('sup-telefone').value.trim();
         const mensagem = document.getElementById('sup-msg').value.trim();
 
         if (nome && email && mensagem) {
             db.collection("chamados").add({
                 nome: nome,
                 email: email,
-                telefone: telefone, // Telefone enviado para o Firebase
+                telefone: telefone,
                 mensagem: mensagem,
                 data: new Date()
             })
