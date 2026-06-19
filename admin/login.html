@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Login Administrativo - VoltCalc Pro</title>
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <style>
         body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f4f4f4; }
         .login-card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 300px; text-align: center; }
@@ -31,12 +31,33 @@
     };
 
     firebase.initializeApp(firebaseConfig);
+    
+    // Inicialização do banco de dados (Adicionado)
+    const db = firebase.firestore();
 
     function loginGoogle() {
         const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithPopup(provider).then(() => {
-            // Redireciona para o painel.html na mesma pasta
-            window.location.href = "painel.html";
+        firebase.auth().signInWithPopup(provider).then((result) => {
+            const user = result.user;
+            const userRef = db.collection('users').doc(user.uid);
+            
+            // Verifica se o usuário já existe no banco
+            userRef.get().then((doc) => {
+                if (!doc.exists) {
+                    // É um usuário novo: salva os dados dele junto com a data de hoje
+                    userRef.set({
+                        nome: user.displayName || 'Sem Nome',
+                        email: user.email,
+                        role: 'cliente',
+                        dataCriacao: new Date().toISOString()
+                    }).then(() => {
+                        window.location.href = "painel.html";
+                    });
+                } else {
+                    // O usuário já existe: apenas redireciona (preservando o fluxo original)
+                    window.location.href = "painel.html";
+                }
+            });
         }).catch((error) => {
             alert("Erro ao logar: " + error.message);
         });
