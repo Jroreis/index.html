@@ -1,45 +1,13 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <title>Login Administrativo - VoltCalc Pro</title>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f4f4f4; }
-        .login-card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 300px; text-align: center; }
-        button { width: 100%; padding: 10px; margin-top: 10px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
-        .btn-google { background: #4285f4; color: white; }
-    </style>
-</head>
-<body>
-
-<div class="login-card">
-    <h2>Acesso Administrativo</h2>
-    <button class="btn-google" onclick="loginGoogle()">Entrar com Google</button>
+<!-- Adicione isto onde você quiser que o número apareça -->
+<div id="user-count" style="padding: 20px; background: #e0e7ff; border-radius: 8px; margin-bottom: 20px;">
+    Carregando total de usuários...
 </div>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
-        authDomain: "voltcalc-pro.firebaseapp.com",
-        projectId: "voltcalc-pro",
-        storageBucket: "voltcalc-pro.appspot.com",
-        messagingSenderId: "411208955318",
-        appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-
-    function loginGoogle() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithPopup(provider).then(() => {
-            window.location.href = "painel.html";
-        }).catch((error) => {
-            alert("Erro ao logar: " + error.message);
-        });
-    }
+    // Este código deve estar após a inicialização do firebase no seu painel.html
+    firebase.firestore().collection('users').get().then((snap) => {
+        const count = snap.size;
+        document.getElementById('user-count').innerHTML = 
+            `<h3>Total de Usuários Cadastrados: <strong>${count}</strong></h3>`;
+    });
 </script>
-</body>
-</html>
