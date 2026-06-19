@@ -9,13 +9,13 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      --bg: #0f172a;
+      --bg: #020617;
       --sidebar: #1e293b;
       --accent: #4f46e5;
       --neon: #39FF14;
       --text: #f8fafc;
     }
-    body { font-family: 'Inter', sans-serif; margin: 0; display: flex; background: #020617; color: var(--text); height: 100vh; }
+    body { font-family: 'Inter', sans-serif; margin: 0; display: flex; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
     
     .sidebar { width: 280px; background: var(--sidebar); padding: 25px; display: flex; flex-direction: column; border-right: 1px solid #334155; }
     .sidebar h2 { color: var(--neon); font-size: 24px; margin-bottom: 30px; letter-spacing: -1px; }
@@ -25,10 +25,10 @@
     
     .main { flex: 1; padding: 40px; overflow-y: auto; }
     .page-section { display: none; }
-    .page-section.active { display: block; animation: fadeIn 0.5s; }
+    .page-section.active { display: block; animation: fadeIn 0.4s; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    .card { background: #1e293b; padding: 30px; border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); border: 1px solid #334155; }
+    .card { background: #1e293b; padding: 30px; border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); border: 1px solid #334155; margin-bottom: 20px; }
     h3 { margin-top: 0; color: var(--neon); border-left: 4px solid var(--neon); padding-left: 15px; }
     
     table { width: 100%; border-collapse: separate; border-spacing: 0 10px; margin-top: 20px; }
@@ -36,9 +36,10 @@
     td { background: #0f172a; padding: 15px; border-top: 1px solid #334155; border-bottom: 1px solid #334155; }
     
     .btn-logout { background: #991b1b; color: white; border: none; padding: 15px; width: 100%; cursor: pointer; border-radius: 12px; margin-top: auto; font-weight: bold; }
-    
     .chart-controls button { background: #334155; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; margin-right: 5px; }
-    .chart-controls button:hover { background: var(--accent); }
+    
+    .modal { display: none; position: fixed; z-index: 10; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
+    .modal-content { background: #1e293b; margin: 10% auto; padding: 30px; width: 80%; max-width: 500px; border-radius: 20px; color: white; }
   </style>
 </head>
 <body>
@@ -58,22 +59,20 @@
     <section id="section-estatisticas" class="page-section active">
         <div class="card">
             <h3>Estatísticas Gerais</h3>
-            <p id="total-users" style="font-size: 1.2em; font-weight: bold;">Buscando dados...</p>
+            <p id="total-users" style="font-size: 1.2em; font-weight: bold;">Carregando...</p>
             <div class="chart-controls">
                 <button onclick="changeChartType('bar')">Barras</button>
                 <button onclick="changeChartType('line')">Linhas</button>
                 <button onclick="changeChartType('pie')">Pizza</button>
             </div>
-            <div style="height: 300px; margin-top: 20px;">
-                <canvas id="userChart"></canvas>
-            </div>
+            <div style="height: 300px; margin-top: 20px;"><canvas id="userChart"></canvas></div>
         </div>
     </section>
 
     <section id="section-chamados" class="page-section">
         <div class="card">
             <h3>Chamados Recentes</h3>
-            <input type="text" id="search-chamados" onkeyup="filterTable('chamados-table', 'search-chamados')" placeholder="Buscar..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white;">
+            <input type="text" id="search-chamados" onkeyup="filterTable('chamados-table', 'search-chamados')" placeholder="Buscar por Nome, Mensagem ou Status..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white;">
             <table id="chamados-table">
                 <thead><tr><th>Nome</th><th>Mensagem</th><th>Status</th><th>Ação</th></tr></thead>
                 <tbody></tbody>
@@ -84,7 +83,7 @@
     <section id="section-usuarios" class="page-section">
         <div class="card">
             <h3>Lista de Usuários</h3>
-            <input type="text" id="search-users" onkeyup="filterTable('users-table', 'search-users')" placeholder="Buscar..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white;">
+            <input type="text" id="search-users" onkeyup="filterTable('users-table', 'search-users')" placeholder="Buscar por Nome ou E-mail..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white;">
             <table id="users-table">
                 <thead><tr><th>Nome</th><th>Email</th><th>Role</th></tr></thead>
                 <tbody></tbody>
@@ -93,13 +92,20 @@
     </section>
 </div>
 
+<div id="detalhesModal" class="modal">
+    <div class="modal-content">
+        <h3>Detalhes do Chamado</h3>
+        <p id="modal-body"></p>
+        <button onclick="document.getElementById('detalhesModal').style.display='none'" style="padding: 10px 20px; cursor:pointer;">Fechar</button>
+    </div>
+</div>
+
 <script>
     function showSection(id) {
         document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    // A Lógica Firebase/Chart permanece intacta conforme sua versão original
     const firebaseConfig = {
         apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
         authDomain: "voltcalc-pro.firebaseapp.com",
@@ -131,18 +137,35 @@
         tbody.innerHTML = "";
         snapshot.forEach(doc => {
             const d = doc.data();
-            tbody.innerHTML += `<tr><td>${d.nome}</td><td>${d.email}</td><td>${d.role}</td></tr>`;
+            tbody.innerHTML += `<tr><td>${d.nome||'N/A'}</td><td>${d.email||'N/A'}</td><td>${d.role||'N/A'}</td></tr>`;
             if(d.role=='cliente') cC++; else if(d.role=='admin') cA++; else cO++;
         });
         userChart.data.datasets[0].data = [cC, cA, cO];
         userChart.update();
     });
 
+    db.collection('chamados').onSnapshot(snapshot => {
+        const tbody = document.querySelector('#chamados-table tbody');
+        tbody.innerHTML = snapshot.empty ? "<tr><td colspan='4' style='text-align:center;'>Nenhum chamado encontrado.</td></tr>" : "";
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${d.nome||'N/A'}</td><td>${d.mensagem||'N/A'}</td><td>${d.status||'Pendente'}</td><td><button onclick="ver('${d.nome}','${d.mensagem}','${d.telefone}')">Ver</button></td>`;
+            tbody.appendChild(row);
+        });
+    });
+
+    function ver(nome, msg, tel) {
+        const wpp = tel ? `<a href="https://wa.me/55${tel.replace(/\D/g,'')}" target="_blank" style="color:var(--neon);">Chamar no WhatsApp</a>` : "Sem WhatsApp";
+        document.getElementById('modal-body').innerHTML = `<strong>Nome:</strong> ${nome}<br><strong>Msg:</strong> ${msg}<br><br>${wpp}`;
+        document.getElementById('detalhesModal').style.display = 'block';
+    }
+
     function filterTable(id, inputId) {
-        const filter = document.getElementById(inputId).value.toUpperCase();
+        const filter = document.getElementById(inputId).value.toUpperCase().trim();
         const tr = document.getElementById(id).getElementsByTagName("tr");
         for (let i = 1; i < tr.length; i++) {
-            tr[i].style.display = (tr[i].innerText.toUpperCase().indexOf(filter) > -1) ? "" : "none";
+            tr[i].style.display = (tr[i].textContent.toUpperCase().indexOf(filter) > -1) ? "" : "none";
         }
     }
     
