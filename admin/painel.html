@@ -1,13 +1,18 @@
-<!-- Adicione isto onde você quiser que o número apareça -->
 <div id="user-count" style="padding: 20px; background: #e0e7ff; border-radius: 8px; margin-bottom: 20px;">
-    Carregando total de usuários...
+    Carregando...
 </div>
 
 <script>
-    // Este código deve estar após a inicialização do firebase no seu painel.html
-    firebase.firestore().collection('users').get().then((snap) => {
-        const count = snap.size;
-        document.getElementById('user-count').innerHTML = 
-            `<h3>Total de Usuários Cadastrados: <strong>${count}</strong></h3>`;
-    });
+    // Aguarda o Firebase estar pronto
+    firebase.firestore().collection('users').get()
+        .then((snapshot) => {
+            const count = snapshot.size;
+            document.getElementById('user-count').innerHTML = 
+                `<h3>Total de Usuários Cadastrados: <strong>${count}</strong></h3>`;
+        })
+        .catch((error) => {
+            console.error("Erro:", error);
+            document.getElementById('user-count').innerHTML = 
+                `<h3 style="color:red;">Erro ao carregar dados.</h3>`;
+        });
 </script>
