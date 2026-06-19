@@ -14,7 +14,6 @@
         .btn-logout { background: #e74c3c; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; border-radius: 5px; margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        /* Estilo do Modal */
         .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
         .modal-content { background: white; margin: 15% auto; padding: 20px; width: 80%; max-width: 500px; border-radius: 8px; }
     </style>
@@ -37,7 +36,7 @@
     <div class="card">
         <h3>Chamados Recentes</h3>
         <table id="chamados-table">
-            <thead><tr><th>Nome</th><th>Mensagem</th><th>Ação</th></tr></thead>
+            <thead><tr><th>Nome</th><th>Mensagem</th><th>Status</th><th>Ação</th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
@@ -51,7 +50,6 @@
     </div>
 </div>
 
-<!-- Janela do Modal -->
 <div id="detalhesModal" class="modal">
     <div class="modal-content">
         <h3>Detalhes do Chamado</h3>
@@ -71,12 +69,8 @@
     };
 
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-
-    firebase.auth().onAuthStateChanged((user) => {
-        if (!user) { window.location.href = "login.html"; }
-    });
-
-    function logout() { firebase.auth().signOut().then(() => { window.location.href = "login.html"; }); }
+    firebase.auth().onAuthStateChanged((user) => { if (!user) window.location.href = "login.html"; });
+    function logout() { firebase.auth().signOut().then(() => window.location.href = "login.html"); }
 
     const db = firebase.firestore();
 
@@ -95,16 +89,18 @@
         chamadosTbody.innerHTML = "";
         snapshot.forEach(doc => {
             const data = doc.data();
+            const docId = doc.id;
+            const status = data.status || 'Pendente';
+            
             const row = document.createElement('tr');
-            row.innerHTML = `<td>${data.nome || 'N/A'}</td><td>${data.mensagem || 'N/A'}</td>`;
+            row.innerHTML = `<td>${data.nome || 'N/A'}</td><td>${data.mensagem || 'N/A'}</td><td><strong>${status}</strong></td>`;
             
             const btnCell = document.createElement('td');
-            const btn = document.createElement('button');
-            btn.innerText = "Ver";
-            btn.onclick = () => {
+            
+            const btnVer = document.createElement('button');
+            btnVer.innerText = "Ver";
+            btnVer.onclick = () => {
                 let acaoHtml = "";
-                
-                // Lógica inteligente do WhatsApp
                 if (data.telefone && data.telefone.trim() !== "") {
                     const telFormatado = data.telefone.replace(/\D/g, '');
                     const whatsappLink = `https://wa.me/55${telFormatado}?text=Olá ${data.nome || ''}, vi seu chamado no VoltCalc Pro sobre: ${data.mensagem || ''}`;
@@ -112,17 +108,18 @@
                 } else {
                     acaoHtml = `<p style="color:orange; font-size: 0.9em;">Este usuário não cadastrou um número de WhatsApp.</p>`;
                 }
-
-                document.getElementById('modal-body').innerHTML = `
-                    <strong>Nome:</strong> ${data.nome || 'N/A'}<br>
-                    <strong>Email:</strong> ${data.email || 'N/A'}<br>
-                    <strong>Telefone:</strong> ${data.telefone || 'Não informado'}<br>
-                    <strong>Mensagem:</strong> ${data.mensagem || 'N/A'}<br><br>
-                    ${acaoHtml}
-                `;
+                document.getElementById('modal-body').innerHTML = `<strong>Nome:</strong> ${data.nome || 'N/A'}<br><strong>Email:</strong> ${data.email || 'N/A'}<br><strong>Telefone:</strong> ${data.telefone || 'Não informado'}<br><strong>Mensagem:</strong> ${data.mensagem || 'N/A'}<br><br>${acaoHtml}`;
                 document.getElementById('detalhesModal').style.display = 'block';
             };
-            btnCell.appendChild(btn);
+
+            const btnStatus = document.createElement('button');
+            btnStatus.innerText = status === 'Pendente' ? "Concluir" : "Reabrir";
+            btnStatus.onclick = () => {
+                db.collection('chamados').doc(docId).update({ status: status === 'Pendente' ? 'Concluído' : 'Pendente' });
+            };
+            
+            btnCell.appendChild(btnVer);
+            btnCell.appendChild(btnStatus);
             row.appendChild(btnCell);
             chamadosTbody.appendChild(row);
         });
