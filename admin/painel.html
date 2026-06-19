@@ -35,6 +35,7 @@
 
     <div class="card">
         <h3>Chamados Recentes</h3>
+        <input type="text" id="search-chamados" placeholder="Buscar chamado por nome..." onkeyup="filterTable('chamados-table', 'search-chamados')" style="width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box;">
         <table id="chamados-table">
             <thead><tr><th>Nome</th><th>Mensagem</th><th>Status</th><th>Ação</th></tr></thead>
             <tbody></tbody>
@@ -43,6 +44,7 @@
 
     <div class="card">
         <h3>Lista de Usuários</h3>
+        <input type="text" id="search-users" placeholder="Buscar usuário por nome..." onkeyup="filterTable('users-table', 'search-users')" style="width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box;">
         <table id="users-table">
             <thead><tr><th>Nome</th><th>Email</th><th>Role</th></tr></thead>
             <tbody></tbody>
@@ -74,6 +76,20 @@
 
     const db = firebase.firestore();
 
+    function filterTable(tableId, inputId) {
+        const input = document.getElementById(inputId);
+        const filter = input.value.toUpperCase();
+        const table = document.getElementById(tableId);
+        const tr = table.getElementsByTagName("tr");
+        for (let i = 1; i < tr.length; i++) {
+            const td = tr[i].getElementsByTagName("td")[0];
+            if (td) {
+                const txtValue = td.textContent || td.innerText;
+                tr[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+    }
+
     db.collection('users').onSnapshot(snapshot => {
         document.getElementById('total-users').innerText = "Total de Usuários Cadastrados: " + snapshot.size;
         const userTbody = document.querySelector('#users-table tbody');
@@ -91,12 +107,9 @@
             const data = doc.data();
             const docId = doc.id;
             const status = data.status || 'Pendente';
-            
             const row = document.createElement('tr');
             row.innerHTML = `<td>${data.nome || 'N/A'}</td><td>${data.mensagem || 'N/A'}</td><td><strong>${status}</strong></td>`;
-            
             const btnCell = document.createElement('td');
-            
             const btnVer = document.createElement('button');
             btnVer.innerText = "Ver";
             btnVer.onclick = () => {
@@ -111,13 +124,11 @@
                 document.getElementById('modal-body').innerHTML = `<strong>Nome:</strong> ${data.nome || 'N/A'}<br><strong>Email:</strong> ${data.email || 'N/A'}<br><strong>Telefone:</strong> ${data.telefone || 'Não informado'}<br><strong>Mensagem:</strong> ${data.mensagem || 'N/A'}<br><br>${acaoHtml}`;
                 document.getElementById('detalhesModal').style.display = 'block';
             };
-
             const btnStatus = document.createElement('button');
             btnStatus.innerText = status === 'Pendente' ? "Concluir" : "Reabrir";
             btnStatus.onclick = () => {
                 db.collection('chamados').doc(docId).update({ status: status === 'Pendente' ? 'Concluído' : 'Pendente' });
             };
-            
             btnCell.appendChild(btnVer);
             btnCell.appendChild(btnStatus);
             row.appendChild(btnCell);
