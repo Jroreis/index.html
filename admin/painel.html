@@ -1,11 +1,35 @@
-<!-- Local onde o número aparecerá -->
-<div id="user-count" style="padding: 20px; background: #e0e7ff; border-radius: 8px; margin-bottom: 20px;">
-    Buscando dados...
-</div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Administrativo - VoltCalc Pro</title>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+</head>
+<body>
 
-<script>
-    // Verifica se o Firebase já está inicializado
-    if (firebase.apps.length > 0) {
+    <div id="user-count" style="padding: 20px; background: #e0e7ff; border-radius: 8px; margin-bottom: 20px;">
+        Buscando dados...
+    </div>
+
+    <script>
+        // CONFIGURAÇÃO DO SEU PROJETO
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
+            authDomain: "voltcalc-pro.firebaseapp.com",
+            projectId: "voltcalc-pro",
+            storageBucket: "voltcalc-pro.appspot.com",
+            messagingSenderId: "411208955318",
+            appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
+        };
+
+        // Inicializa o Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        // Busca os dados
         firebase.firestore().collection('users').get()
             .then((snapshot) => {
                 const count = snapshot.size;
@@ -14,9 +38,8 @@
             })
             .catch((error) => {
                 document.getElementById('user-count').innerHTML = 
-                    `<h3 style="color:red;">Erro: ${error.code}</h3>`;
+                    `<h3 style="color:red;">Erro: ${error.message}</h3>`;
             });
-    } else {
-        document.getElementById('user-count').innerHTML = "Firebase não inicializado.";
-    }
-</script>
+    </script>
+</body>
+</html>
