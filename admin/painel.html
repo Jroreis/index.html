@@ -32,6 +32,11 @@
     <div class="card">
         <h3>Estatísticas Gerais</h3>
         <p id="total-users">Buscando dados...</p>
+        <div style="margin-bottom: 10px;">
+            <button onclick="changeChartType('bar')">Gráfico de Barras</button>
+            <button onclick="changeChartType('line')">Gráfico de Linhas</button>
+            <button onclick="changeChartType('pie')">Gráfico de Pizza</button>
+        </div>
         <canvas id="userChart" style="max-height: 200px;"></canvas>
     </div>
 
@@ -78,15 +83,25 @@
 
     const db = firebase.firestore();
 
-    // Gráfico de Usuários
+    // Configuração do Gráfico
     const ctx = document.getElementById('userChart').getContext('2d');
-    const userChart = new Chart(ctx, {
+    let userChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: ['7 dias atrás', '6 dias', '5 dias', '4 dias', '3 dias', 'Ontem', 'Hoje'],
             datasets: [{ label: 'Novos Usuários', data: [0, 0, 0, 0, 0, 0, 0], backgroundColor: '#4285f4' }]
         }
     });
+
+    // Função para mudar o tipo do gráfico
+    function changeChartType(type) {
+        userChart.destroy();
+        userChart = new Chart(ctx, {
+            type: type,
+            data: userChart.data,
+            options: { responsive: true }
+        });
+    }
 
     db.collection('users').onSnapshot(snapshot => {
         document.getElementById('total-users').innerText = "Total de Usuários Cadastrados: " + snapshot.size;
