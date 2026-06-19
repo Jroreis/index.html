@@ -51,6 +51,7 @@
     </div>
 </div>
 
+<!-- Janela do Modal -->
 <div id="detalhesModal" class="modal">
     <div class="modal-content">
         <h3>Detalhes do Chamado</h3>
@@ -101,15 +102,23 @@
             const btn = document.createElement('button');
             btn.innerText = "Ver";
             btn.onclick = () => {
-                const whatsappLink = `https://wa.me/55?text=Olá ${data.nome || ''}, vi seu chamado no VoltCalc Pro sobre: ${data.mensagem || ''}`;
+                let acaoHtml = "";
                 
+                // Lógica inteligente do WhatsApp
+                if (data.telefone && data.telefone.trim() !== "") {
+                    const telFormatado = data.telefone.replace(/\D/g, '');
+                    const whatsappLink = `https://wa.me/55${telFormatado}?text=Olá ${data.nome || ''}, vi seu chamado no VoltCalc Pro sobre: ${data.mensagem || ''}`;
+                    acaoHtml = `<a href="${whatsappLink}" target="_blank" style="display:block; background:#25d366; color:white; padding:10px; text-align:center; border-radius:5px; text-decoration:none;">Chamar no WhatsApp</a>`;
+                } else {
+                    acaoHtml = `<p style="color:orange; font-size: 0.9em;">Este usuário não cadastrou um número de WhatsApp.</p>`;
+                }
+
                 document.getElementById('modal-body').innerHTML = `
                     <strong>Nome:</strong> ${data.nome || 'N/A'}<br>
                     <strong>Email:</strong> ${data.email || 'N/A'}<br>
+                    <strong>Telefone:</strong> ${data.telefone || 'Não informado'}<br>
                     <strong>Mensagem:</strong> ${data.mensagem || 'N/A'}<br><br>
-                    <a href="${whatsappLink}" target="_blank" style="display:block; background:#25d366; color:white; padding:10px; text-align:center; border-radius:5px; text-decoration:none;">
-                        Chamar no WhatsApp
-                    </a>
+                    ${acaoHtml}
                 `;
                 document.getElementById('detalhesModal').style.display = 'block';
             };
