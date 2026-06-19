@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Painel Administrativo - VoltCalc Pro</title>
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
-    <div id="user-count" style="padding: 20px; background: #e0e7ff; border-radius: 8px; margin-bottom: 20px;">
-        Buscando dados...
+    <div id="stats-container" style="padding: 20px; font-family: sans-serif;">
+        <h2>Painel Administrativo</h2>
+        <div id="user-count" style="padding: 15px; background: #e0e7ff; border-radius: 8px; margin-bottom: 10px;">
+            Carregando dados...
+        </div>
     </div>
 
     <script>
-        // CONFIGURAÇÃO DO SEU PROJETO
         const firebaseConfig = {
             apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
             authDomain: "voltcalc-pro.firebaseapp.com",
@@ -24,22 +27,32 @@
             appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
         };
 
-        // Inicializa o Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
 
-        // Busca os dados
-        firebase.firestore().collection('users').get()
-            .then((snapshot) => {
-                const count = snapshot.size;
-                document.getElementById('user-count').innerHTML = 
-                    `<h3>Total de Usuários Cadastrados: <strong>${count}</strong></h3>`;
-            })
-            .catch((error) => {
-                document.getElementById('user-count').innerHTML = 
-                    `<h3 style="color:red;">Erro: ${error.message}</h3>`;
-            });
+        // 1. Proteção: Redireciona se não estiver logado
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = "login.html";
+            } else {
+                carregarEstatisticas();
+            }
+        });
+
+        // 2. Função para buscar os dados
+        function carregarEstatisticas() {
+            firebase.firestore().collection('users').get()
+                .then((snapshot) => {
+                    const total = snapshot.size;
+                    document.getElementById('user-count').innerHTML = 
+                        `<h3>Total de Usuários Cadastrados: <strong>${total}</strong></h3>`;
+                })
+                .catch((error) => {
+                    document.getElementById('user-count').innerHTML = 
+                        `<h3 style="color:red;">Erro ao carregar: ${error.message}</h3>`;
+                });
+        }
     </script>
 </body>
 </html>
