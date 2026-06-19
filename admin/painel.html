@@ -14,6 +14,9 @@
         .btn-logout { background: #e74c3c; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; border-radius: 5px; margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        /* Estilo do Modal */
+        .modal { display: none; position: fixed; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 15% auto; padding: 20px; width: 80%; max-width: 500px; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -34,18 +37,26 @@
     <div class="card">
         <h3>Chamados Recentes</h3>
         <table id="chamados-table">
-            <thead><tr><th>Nome</th><th>Mensagem</th></tr></thead>
+            <thead><tr><th>Nome</th><th>Mensagem</th><th>Ação</th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
 
-    <!-- Nova Tabela de Usuários -->
     <div class="card">
         <h3>Lista de Usuários</h3>
         <table id="users-table">
             <thead><tr><th>Nome</th><th>Email</th><th>Role</th></tr></thead>
             <tbody></tbody>
         </table>
+    </div>
+</div>
+
+<!-- Janela do Modal -->
+<div id="detalhesModal" class="modal">
+    <div class="modal-content">
+        <h3>Detalhes do Chamado</h3>
+        <p id="modal-body"></p>
+        <button onclick="document.getElementById('detalhesModal').style.display='none'">Fechar</button>
     </div>
 </div>
 
@@ -69,10 +80,8 @@
 
     const db = firebase.firestore();
 
-    // Carregar usuários para estatística e tabela
     db.collection('users').onSnapshot(snapshot => {
         document.getElementById('total-users').innerText = "Total de Usuários Cadastrados: " + snapshot.size;
-        
         const userTbody = document.querySelector('#users-table tbody');
         userTbody.innerHTML = "";
         snapshot.forEach(doc => {
@@ -81,13 +90,28 @@
         });
     });
 
-    // Carregar Chamados
     const chamadosTbody = document.querySelector('#chamados-table tbody');
     db.collection('chamados').onSnapshot(snapshot => {
         chamadosTbody.innerHTML = "";
         snapshot.forEach(doc => {
             const data = doc.data();
-            chamadosTbody.innerHTML += `<tr><td>${data.nome || 'N/A'}</td><td>${data.mensagem || 'N/A'}</td></tr>`;
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${data.nome || 'N/A'}</td><td>${data.mensagem || 'N/A'}</td>`;
+            
+            const btnCell = document.createElement('td');
+            const btn = document.createElement('button');
+            btn.innerText = "Ver";
+            btn.onclick = () => {
+                document.getElementById('modal-body').innerHTML = `
+                    <strong>Nome:</strong> ${data.nome || 'N/A'}<br>
+                    <strong>Email:</strong> ${data.email || 'N/A'}<br>
+                    <strong>Mensagem:</strong> ${data.mensagem || 'N/A'}
+                `;
+                document.getElementById('detalhesModal').style.display = 'block';
+            };
+            btnCell.appendChild(btn);
+            row.appendChild(btnCell);
+            chamadosTbody.appendChild(row);
         });
     });
 </script>
