@@ -2,34 +2,22 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel da Gerência - VoltCalc Pro</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
+    <title>Login Administrativo - VoltCalc Pro</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f4; margin: 0; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
-        .menu-abas { margin-top: 20px; }
-        .menu-abas div { background-color: #e9ecef; padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 5px solid #007bff; cursor: pointer; transition: 0.3s; }
-        .menu-abas div:hover { background-color: #d1e7ff; }
-        #area-conteudo { margin-top: 20px; padding: 15px; border: 1px dashed #ccc; border-radius: 5px; min-height: 100px; }
-        button { padding: 10px 15px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px; }
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f4f4f4; }
+        .login-card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 300px; text-align: center; }
+        button { width: 100%; padding: 10px; margin-top: 10px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
+        .btn-google { background: #4285f4; color: white; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Painel de Controle</h1>
-    <div class="menu-abas">
-        <div onclick="carregarConteudo('suporte')"><strong>🔍 Chamados de Suporte</strong></div>
-        <div onclick="carregarConteudo('nbr')"><strong>📊 Gestão NBR 5410</strong></div>
-    </div>
-    <div id="area-conteudo"><em>Selecione uma opção acima.</em></div>
-    <button onclick="sair()">Encerrar Sessão</button>
+<div class="login-card">
+    <h2>Acesso Administrativo</h2>
+    <button class="btn-google" onclick="loginGoogle()">Entrar com Google</button>
 </div>
 
 <script>
@@ -37,33 +25,21 @@
         apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
         authDomain: "voltcalc-pro.firebaseapp.com",
         projectId: "voltcalc-pro",
-        storageBucket: "voltcalc-pro.firebasestorage.app",
+        storageBucket: "voltcalc-pro.appspot.com",
         messagingSenderId: "411208955318",
         appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
     };
 
-    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-    const db = firebase.firestore();
+    firebase.initializeApp(firebaseConfig);
 
-    function carregarConteudo(secao) {
-        const area = document.getElementById('area-conteudo');
-        if (secao === 'suporte') {
-            area.innerHTML = "<h3>Buscando chamados...</h3>";
-            db.collection("chamados").get().then((snapshot) => {
-                let html = "<h3>Chamados Abertos</h3><ul>";
-                snapshot.forEach((doc) => {
-                    const d = doc.data();
-                    html += `<li><strong>${d.nome}</strong> (${d.email}): ${d.mensagem}</li>`;
-                });
-                html += "</ul>";
-                area.innerHTML = html;
-            });
-        } else {
-            area.innerHTML = "<h3>Gestão NBR 5410</h3><p>Funcionalidade em desenvolvimento.</p>";
-        }
+    function loginGoogle() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        firebase.auth().signInWithPopup(provider).then(() => {
+            window.location.href = "painel.html";
+        }).catch((error) => {
+            alert("Erro ao logar: " + error.message);
+        });
     }
-
-    function sair() { firebase.auth().signOut().then(() => window.location.href = "/admin/index.html"); }
 </script>
 </body>
 </html>
