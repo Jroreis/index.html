@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Painel Administrativo - VoltCalc Pro</title>
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -22,12 +21,12 @@
 <div class="sidebar">
     <h2>VoltCalc Pro</h2>
     <hr>
-    <p>Bem-vindo, <strong>MILIONÁRIO</strong></p>
+    <p>Bem-vindo, <strong>MILIONÁRIO JEFFERSON</strong></p>
     <button class="btn-logout" onclick="logout()">Sair do Painel</button>
 </div>
 
 <div class="main">
-    <div class="card" id="stats">
+    <div class="card">
         <h3>Estatísticas Gerais</h3>
         <p id="total-users">Buscando dados...</p>
     </div>
@@ -53,25 +52,28 @@
 
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 
+    firebase.auth().onAuthStateChanged((user) => {
+        if (!user) { window.location.href = "login.html"; }
+    });
+
     function logout() {
         firebase.auth().signOut().then(() => { window.location.href = "login.html"; });
     }
 
     const db = firebase.firestore();
 
-    // Contador de Usuários
+    // Carregar Usuários
     db.collection('users').get().then(snap => {
         document.getElementById('total-users').innerText = "Total de Usuários Cadastrados: " + snap.size;
-    }).catch(err => {
-        document.getElementById('total-users').innerText = "Erro ao carregar usuários.";
     });
 
-    // Chamados
-    db.collection('chamados').get().then(snapshot => {
-        const tbody = document.querySelector('#chamados-table tbody');
+    // Carregar Chamados com atualização em tempo real
+    const tbody = document.querySelector('#chamados-table tbody');
+    db.collection('chamados').onSnapshot(snapshot => {
+        tbody.innerHTML = ""; // Limpa a tabela antes de atualizar
         snapshot.forEach(doc => {
             const data = doc.data();
-            tbody.innerHTML += `<tr><td>${data.clientName || 'N/A'}</td><td>${data.address || 'N/A'}</td><td>Ver</td></tr>`;
+            tbody.innerHTML += `<tr><td>${data.clientName || 'N/A'}</td><td>${data.address || 'N/A'}</td><td><button>Ver</button></td></tr>`;
         });
     });
 </script>
