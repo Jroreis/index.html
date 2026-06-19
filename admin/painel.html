@@ -12,7 +12,7 @@
         .main { flex: 1; padding: 20px; }
         .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .btn-logout { background: #e74c3c; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; border-radius: 5px; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
     </style>
 </head>
@@ -34,7 +34,16 @@
     <div class="card">
         <h3>Chamados Recentes</h3>
         <table id="chamados-table">
-            <thead><tr><th>Nome</th><th>Mensagem</th><th>Ação</th></tr></thead>
+            <thead><tr><th>Nome</th><th>Mensagem</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Nova Tabela de Usuários -->
+    <div class="card">
+        <h3>Lista de Usuários</h3>
+        <table id="users-table">
+            <thead><tr><th>Nome</th><th>Email</th><th>Role</th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
@@ -56,25 +65,29 @@
         if (!user) { window.location.href = "login.html"; }
     });
 
-    function logout() {
-        firebase.auth().signOut().then(() => { window.location.href = "login.html"; });
-    }
+    function logout() { firebase.auth().signOut().then(() => { window.location.href = "login.html"; }); }
 
     const db = firebase.firestore();
 
-    // Carregar Usuários
-    db.collection('users').get().then(snap => {
-        document.getElementById('total-users').innerText = "Total de Usuários Cadastrados: " + snap.size;
-    });
-
-    // Carregar Chamados com os nomes de campos corretos (nome e mensagem)
-    const tbody = document.querySelector('#chamados-table tbody');
-    db.collection('chamados').onSnapshot(snapshot => {
-        tbody.innerHTML = ""; 
+    // Carregar usuários para estatística e tabela
+    db.collection('users').onSnapshot(snapshot => {
+        document.getElementById('total-users').innerText = "Total de Usuários Cadastrados: " + snapshot.size;
+        
+        const userTbody = document.querySelector('#users-table tbody');
+        userTbody.innerHTML = "";
         snapshot.forEach(doc => {
             const data = doc.data();
-            // Agora buscando pelos campos 'nome' e 'mensagem' da foto 1000489960.jpg
-            tbody.innerHTML += `<tr><td>${data.nome || 'N/A'}</td><td>${data.mensagem || 'N/A'}</td><td><button>Ver</button></td></tr>`;
+            userTbody.innerHTML += `<tr><td>${data.nome || 'N/A'}</td><td>${data.email || 'N/A'}</td><td>${data.role || 'N/A'}</td></tr>`;
+        });
+    });
+
+    // Carregar Chamados
+    const chamadosTbody = document.querySelector('#chamados-table tbody');
+    db.collection('chamados').onSnapshot(snapshot => {
+        chamadosTbody.innerHTML = "";
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            chamadosTbody.innerHTML += `<tr><td>${data.nome || 'N/A'}</td><td>${data.mensagem || 'N/A'}</td></tr>`;
         });
     });
 </script>
