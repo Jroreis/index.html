@@ -5,54 +5,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VoltCalc Pro - Dashboard Admin</title>
   
-  <!-- Cache Control -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   
-  <!-- Scripts Preservados -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
-    /* Reset e Cores Base Inspiradas na Imagem */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     :root {
-        --bg-color: #1a1b2f; /* Fundo escuro azulado da imagem */
-        --card-bg: #162447; /* Fundo dos gráficos */
+        --bg-color: #1a1b2f; 
+        --card-bg: #162447; 
         --border-color: #1f4068;
         --text-main: #ffffff;
         --text-muted: #9ba4b5;
-        --accent-neon: #e43f5a; /* Rosa/Vermelho da imagem */
-        --gradient-banner: linear-gradient(90deg, #ff9a44 0%, #fc6076 100%); /* Laranja pro Rosa */
+        --accent-neon: #e43f5a; 
+        --gradient-banner: linear-gradient(90deg, #ff9a44 0%, #fc6076 100%);
     }
 
+    /* TRAVA DA TELA: O body não rola mais */
     body { 
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         background-color: var(--bg-color); 
         color: var(--text-main); 
         display: flex; 
-        min-height: 100vh;
-        overflow-x: hidden;
+        height: 100vh; /* Fixa na altura da tela */
+        overflow: hidden; /* Esconde rolagem global */
     }
 
     /* ---------------- SIDEBAR ---------------- */
     .sidebar {
         width: 260px;
+        height: 100vh; /* Altura total */
         background: #111827;
         padding: 30px 20px;
         display: flex;
         flex-direction: column;
         border-right: 1px solid var(--border-color);
         flex-shrink: 0;
+        overflow-y: auto;
     }
 
     @media (max-width: 768px) {
-        body { flex-direction: column; }
-        .sidebar { width: 100%; padding: 20px; border-right: none; border-bottom: 1px solid var(--border-color); }
+        body { flex-direction: column; overflow: auto; }
+        .sidebar { width: 100%; height: auto; padding: 20px; border-right: none; border-bottom: 1px solid var(--border-color); }
+        .main-content { height: auto !important; overflow-y: visible !important; }
     }
 
     .logo { font-size: 22px; font-weight: bold; color: #39FF14; margin-bottom: 30px; letter-spacing: 1px; }
@@ -65,11 +66,9 @@
         transition: all 0.3s ease; cursor: pointer; border: 1px solid transparent;
     }
     
-    /* Aba Ativa e Hover */
     .nav-links a:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-main); }
     .nav-links a.active-nav { background: var(--card-bg); color: var(--text-main); border-color: var(--border-color); border-left: 4px solid var(--accent-neon); }
 
-    /* Botão Sair Arrumado */
     .logout-btn { 
         margin-top: auto; padding: 14px; border: 1px solid rgba(228, 63, 90, 0.4);
         color: #ff4b5c; background: rgba(228, 63, 90, 0.1);
@@ -79,16 +78,22 @@
     .logout-btn:hover { background: rgba(228, 63, 90, 0.2); }
 
     /* ---------------- MAIN CONTENT & ABAS ---------------- */
-    .main-content { flex: 1; padding: 30px; width: 100%; display: flex; flex-direction: column; }
+    .main-content { 
+        flex: 1; 
+        height: 100vh; /* Altura total */
+        overflow-y: auto; /* Rolagem apenas aqui dentro */
+        padding: 30px; 
+        display: flex; 
+        flex-direction: column; 
+    }
     
-    /* Lógica de ocultar abas inativas */
     .tab-content { display: none; flex-direction: column; gap: 20px; }
-    .tab-content.active { display: flex; } /* Só mostra a que tem a classe active */
+    .tab-content.active { display: flex; }
 
     .header-title { margin-bottom: 20px; }
     .header-title h1 { font-size: 28px; font-weight: normal; letter-spacing: -0.5px; }
 
-    /* ---------------- GRID DE GRÁFICOS (Estilo da Imagem) ---------------- */
+    /* ---------------- GRID DE GRÁFICOS ---------------- */
     .dashboard-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -104,12 +109,17 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        min-height: 250px;
     }
     .chart-card h3 { width: 100%; text-align: center; font-size: 14px; color: var(--text-main); background: #1f2937; padding: 8px 0; margin-top: -20px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); }
 
-    /* Banner Inferior (As métricas laranja/rosa da imagem) */
+    /* CAIXA PARA TRAVAR OS GRÁFICOS (Resolve o bug do esticamento) */
+    .chart-container {
+        position: relative;
+        height: 220px;
+        width: 100%;
+    }
+
+    /* Banner Inferior */
     .metrics-banner {
         background: var(--gradient-banner);
         border-radius: 6px;
@@ -131,18 +141,15 @@
 <aside class="sidebar">
     <div class="logo">VoltCalc Pro</div>
     <ul class="nav-links">
-        <!-- Adicionado onclick para trocar as abas -->
         <li><a onclick="mudarAba('tab-estatisticas', this)" class="active-nav">📊 Painel Geral</a></li>
         <li><a onclick="mudarAba('tab-chamados', this)">✉️ Chamados</a></li>
         <li><a onclick="mudarAba('tab-usuarios', this)">👥 Usuários</a></li>
     </ul>
-    <!-- Botão Sair com a função corrigida -->
     <div class="logout-btn" onclick="fazerLogout()">Sair do Sistema</div>
 </aside>
 
 <main class="main-content">
     
-    <!-- ABA 1: ESTATÍSTICAS (Ativa por padrão) -->
     <div id="tab-estatisticas" class="tab-content active">
         <div class="header-title">
             <h1>Painel de Atendimento e Estatísticas</h1>
@@ -151,15 +158,21 @@
         <div class="dashboard-grid">
             <div class="chart-card">
                 <h3>Volume de Usuários por Mês</h3>
-                <canvas id="barChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="barChart"></canvas>
+                </div>
             </div>
             <div class="chart-card">
                 <h3>Satisfação do Cliente</h3>
-                <canvas id="pieChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="pieChart"></canvas>
+                </div>
             </div>
             <div class="chart-card">
                 <h3>Crescimento de Assinaturas</h3>
-                <canvas id="lineChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="lineChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -179,7 +192,6 @@
         </div>
     </div>
 
-    <!-- ABA 2: CHAMADOS -->
     <div id="tab-chamados" class="tab-content">
         <div class="header-title">
             <h1>Gerenciamento de Chamados</h1>
@@ -189,7 +201,6 @@
         </div>
     </div>
 
-    <!-- ABA 3: USUÁRIOS -->
     <div id="tab-usuarios" class="tab-content">
         <div class="header-title">
             <h1>Gestão de Usuários</h1>
@@ -202,53 +213,43 @@
 </main>
 
 <script>
-    // --- LÓGICA DE TROCAR ABAS (Resolve o problema do "Aperto e não muda") ---
     function mudarAba(abaId, elementoClicado) {
-        // 1. Esconde todas as abas
         const abas = document.querySelectorAll('.tab-content');
         abas.forEach(aba => aba.classList.remove('active'));
 
-        // 2. Remove o destaque de todos os botões do menu
         const botoes = document.querySelectorAll('.nav-links a');
         botoes.forEach(botao => botao.classList.remove('active-nav'));
 
-        // 3. Mostra a aba que foi clicada e destaca o botão
         document.getElementById(abaId).classList.add('active');
         elementoClicado.classList.add('active-nav');
     }
 
-    // --- LÓGICA DE LOGOUT (Resolve o problema do botão sair) ---
     function fazerLogout() {
         try {
-            // Tenta chamar o Firebase. Se não estiver configurado, avisa no console.
             firebase.auth().signOut().then(() => {
-                window.location.href = "/login.html"; // Redireciona após sair
+                window.location.href = "/login.html"; 
             }).catch((error) => {
                 console.error("Erro ao sair:", error);
                 alert("Erro ao sair. Verifique sua conexão.");
             });
         } catch (e) {
-            console.warn("Firebase Auth não inicializado neste HTML. Redirecionamento simulado.");
-            window.location.href = "/login.html"; // Fallback se o firebase não carregar a tempo
+            console.warn("Firebase Auth não inicializado. Fallback ativado.");
+            window.location.href = "/login.html"; 
         }
     }
 
-    // --- INICIALIZAÇÃO DOS GRÁFICOS (Estilo da Imagem) ---
-    // Usamos setTimeout apenas para garantir que o HTML carregou antes de injetar os gráficos
     setTimeout(() => {
         Chart.defaults.color = '#9ba4b5';
         
-        // Gráfico de Barras
         new Chart(document.getElementById('barChart').getContext('2d'), {
             type: 'bar',
             data: {
                 labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai'],
                 datasets: [{ label: 'Cadastros', data: [12, 19, 3, 5, 55], backgroundColor: '#e43f5a' }]
             },
-            options: { responsive: true, scales: { y: { grid: { color: '#1f4068' } }, x: { grid: { color: '#1f4068' } } } }
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: '#1f4068' } }, x: { grid: { color: '#1f4068' } } } }
         });
 
-        // Gráfico de Pizza (Donut)
         new Chart(document.getElementById('pieChart').getContext('2d'), {
             type: 'doughnut',
             data: {
@@ -258,14 +259,13 @@
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // Gráfico de Linhas
         new Chart(document.getElementById('lineChart').getContext('2d'), {
             type: 'line',
             data: {
                 labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai'],
                 datasets: [{ label: 'Assinaturas', data: [5, 10, 8, 25, 50], borderColor: '#ff9a44', tension: 0.4 }]
             },
-            options: { responsive: true, scales: { y: { grid: { color: '#1f4068' } }, x: { grid: { color: '#1f4068' } } } }
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: '#1f4068' } }, x: { grid: { color: '#1f4068' } } } }
         });
     }, 500);
 </script>
