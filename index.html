@@ -7,6 +7,11 @@
   
   <title>VoltCalc Pro - A Plataforma do Profissional da Elétrica</title>
 
+  <!-- META TAGS ANTI-CACHE (Camada 1) -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
   <link rel="manifest" href="manifest.json">
 
   <meta name="robots" content="index, follow, max-image-preview:large">
@@ -564,9 +569,11 @@
 
         <div class="tab-content" id="tab-precos"></div>
 
+        <!-- ── NOVO NÚCLEO: PLANILHA TÉCNICA INTERATIVA NBR 5410 ── -->
         <div class="tab-content" id="tab-dimens">
           <div class="card">
             
+            <!-- Cabeçalho visível estritamente na impressão do PDF da planilha -->
             <div class="dimens-print-header">
               <h2 style="font-size: 18px; font-weight: 800; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 12px;">📐 MEMÓRIA DE CÁLCULO DE DIMENSIONAMENTO - NBR 5410</h2>
               <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px; font-size: 12px; margin-bottom: 16px;">
@@ -577,6 +584,7 @@
               </div>
             </div>
 
+            <!-- Apresentação na tela do navegador -->
             <div class="print-hidden" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
               <div>
                 <h3 style="font-size: 22px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px;">📐 Planilha de Dimensionamento (ABNT NBR 5410)</h3>
@@ -588,6 +596,7 @@
               </div>
             </div>
 
+            <!-- Dados do projeto para preencher o cabeçalho de impressão -->
             <div class="print-hidden" style="background: var(--bg-color); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 24px;">
               <div class="profile-grid" style="grid-template-columns: 2fr 1fr;">
                 <div class="form-group" style="margin: 0;"><label>Identificação da Obra / Setor</label><input type="text" id="dimInputObra" placeholder="Ex: Residência Família Souza - Pavimento Superior" oninput="document.getElementById('dimPrintObra').textContent = this.value || 'Estudo de Instalação Elétrica'"></div>
@@ -613,7 +622,8 @@
                   </tr>
                 </thead>
                 <tbody id="dimensTbody">
-                  </tbody>
+                  <!-- Linhas dinâmicas gerenciadas pelo JS -->
+                </tbody>
               </table>
             </div>
 
@@ -627,6 +637,8 @@
 
           </div>
         </div>
+        <!-- ── FIM DO NÚCLEO NBR 5410 ── -->
+
         <div class="tab-content" id="tab-hist-prof">
           <h3>📚 Histórico de Orçamentos</h3>
           <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, altere dados estruturais, reimprima, envie via WhatsApp ou exclua registros indesejados.</p>
@@ -1619,7 +1631,25 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js').catch(function(err) {});
+        navigator.serviceWorker.register('/sw.js').then(function(registration) {
+          
+          // CAMADA 2: Força o navegador a checar se tem versão nova na Vercel
+          registration.update(); 
+
+          // CAMADA 3: Escuta o gatilho. Achou código novo? Dá um F5 invisível no usuário.
+          registration.onupdatefound = () => {
+            const installingWorker = registration.installing;
+            installingWorker.onstatechange = () => {
+              if (installingWorker.state === 'installed') {
+                if (navigator.serviceWorker.controller) {
+                  console.log("Nova versão detectada. Atualizando...");
+                  window.location.reload();
+                }
+              }
+            };
+          };
+
+        }).catch(function(err) { console.log('SW Falhou:', err); });
       });
     }
 
