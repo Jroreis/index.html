@@ -212,6 +212,14 @@
     .btn-pix-donation { background: #10b981; color: #020617; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 14px; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; }
     .btn-pix-donation:hover { background: #059669; transform: translateY(-1px); }
 
+    /* ── ESTILOS DA PLANILHA DE DIMENSIONAMENTO ── */
+    .dimens-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 850px; }
+    .dimens-table th { background: rgba(79, 70, 229, 0.15); color: #a5b4fc; padding: 14px 10px; text-align: center; font-weight: 700; border-bottom: 1px solid var(--border-color); }
+    .dimens-table td { padding: 10px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); vertical-align: middle; text-align: center; }
+    .dimens-table input, .dimens-table select { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; font-size: 13px; color: var(--text); width: 100%; text-align: center; transition: 0.2s; }
+    .dimens-table input:focus, .dimens-table select:focus { border-color: var(--neon-green); outline: none; }
+    .dimens-print-header { display: none; }
+
     @media (max-width: 992px) { 
       .dashboard-layout { flex-direction: column; }
       .dashboard-sidebar { width: 100%; height: auto; position: relative; top: 0; }
@@ -219,7 +227,7 @@
       .orc-item-row { grid-template-columns: 1fr; gap: 8px; } 
     }
 
-    /* ── Impressão Técnica e Compacta de Orçamento Profissional (PDF) ── */
+    /* ── Impressão Técnica Blindada (Orçamento ou Planilha NBR 5410) ── */
     .print-only { display: none; }
     
     @media print {
@@ -227,12 +235,13 @@
       body { background: #fff !important; color: #000 !important; font-size: 11px; line-height: 1.3; }
       .bg-overlay, .ads-container, .adsbygoogle, .video-container { display: none !important; }
       .header, .dashboard-sidebar, .btn-add-item, .btn-primary, .btn-secondary-action, .orc-item button, #authBtns, footer { display: none !important; }
-      .card > h3 { display: none !important; }
+      .card > h3, .print-hidden { display: none !important; }
       
       .dashboard-layout { display: block !important; margin: 0 !important; }
       .dashboard-main { padding: 0 !important; }
       .app-screen { padding: 0; margin: 0; display: block !important; }
       
+      /* O Segredo: Imprime estritamente a aba que estiver ativa na tela! */
       .tab-content { display: none !important; }
       .tab-content.active { display: block !important; }
       .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; background: #fff !important; }
@@ -257,6 +266,14 @@
       .summary-row { margin-bottom: 4px !important; font-size: 12px !important; color: #000 !important; }
       .summary-row.total { color: #000 !important; border-top: 2px solid #000 !important; padding-top: 6px !important; font-size: 14px !important;}
       .print-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
+
+      /* Blindagem da Planilha de Dimensionamento para PDF */
+      .dimens-print-header { display: block !important; margin-bottom: 20px; }
+      .dimens-table { width: 100% !important; border-collapse: collapse !important; font-size: 10px !important; }
+      .dimens-table th { background: #f1f5f9 !important; color: #000 !important; font-weight: bold !important; border: 1px solid #475569 !important; padding: 6px 4px !important; text-align: center !important; }
+      .dimens-table td { border: 1px solid #475569 !important; padding: 5px 4px !important; text-align: center !important; color: #000 !important; background: #fff !important; }
+      .dimens-table input, .dimens-table select { border: none !important; background: transparent !important; color: #000 !important; font-size: 10px !important; width: 100% !important; text-align: center !important; font-weight: 600 !important; padding: 0 !important; }
+      .dimens-table td:first-child input { text-align: left !important; font-weight: bold !important; }
 
       .ptable, .ptable th, .ptable td, .cat-row { background: #fff !important; color: #000 !important; border-color: #000 !important; }
 
@@ -549,38 +566,67 @@
 
         <div class="tab-content" id="tab-dimens">
           <div class="card">
-            <h3>📐 Tabela de Dimensionamentos (NBR 5410)</h3>
-            <p style="color:var(--text-light); margin-bottom: 20px;">Referência técnica para condutores de cobre (Isolação PVC 70°C - Método de Instalação B1 - 2 condutores carregados). Consulte a norma completa para cálculos exatos.</p>
             
+            <div class="dimens-print-header">
+              <h2 style="font-size: 18px; font-weight: 800; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 12px;">📐 MEMÓRIA DE CÁLCULO DE DIMENSIONAMENTO - NBR 5410</h2>
+              <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px; font-size: 12px; margin-bottom: 16px;">
+                <div><strong>OBRA / CLIENTE:</strong> <span id="dimPrintObra">Estudo de Instalação Elétrica</span></div>
+                <div><strong>DATA:</strong> <span id="dimPrintData"></span></div>
+                <div><strong>RESPONSÁVEL TÉCNICO:</strong> <span id="dimPrintProf"></span></div>
+                <div><strong>MÉTODO DE REFERÊNCIA:</strong> B1 (Embutido em Alvenaria - PVC 70°C)</div>
+              </div>
+            </div>
+
+            <div class="print-hidden" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+              <div>
+                <h3 style="font-size: 22px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px;">📐 Planilha de Dimensionamento (ABNT NBR 5410)</h3>
+                <p style="color: var(--text-light); font-size: 14px; margin-top: 4px;">Altere a carga, tensão e distância. O sistema calcula a Corrente de Projeto ($I_b$), Seção mínima em Cobre, Disjuntor de proteção e Queda admissível.</p>
+              </div>
+              <div style="display: flex; gap: 12px;">
+                <button class="btn-header filled" onclick="addDimensRow('', 1200, 127, 15)">+ Novo Circuito</button>
+                <button class="btn-header" onclick="prepararImpressaoDimens()" style="color: var(--text); border-color: var(--border-color);">🖨️ Imprimir Planilha</button>
+              </div>
+            </div>
+
+            <div class="print-hidden" style="background: var(--bg-color); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 24px;">
+              <div class="profile-grid" style="grid-template-columns: 2fr 1fr;">
+                <div class="form-group" style="margin: 0;"><label>Identificação da Obra / Setor</label><input type="text" id="dimInputObra" placeholder="Ex: Residência Família Souza - Pavimento Superior" oninput="document.getElementById('dimPrintObra').textContent = this.value || 'Estudo de Instalação Elétrica'"></div>
+                <div class="form-group" style="margin: 0;"><label>Data do Estudo</label><input type="date" id="dimInputData" oninput="formatarDataDim(this.value)"></div>
+              </div>
+            </div>
+
             <div class="ptable-wrap">
-              <table class="ptable">
+              <table class="dimens-table">
                 <thead>
                   <tr>
-                    <th>Seção (Bitola)</th>
-                    <th>Corrente Máx. (Iz)</th>
-                    <th>Disjuntor Recomendado</th>
-                    <th>Aplicação Típica</th>
+                    <th style="min-width: 190px; text-align: left;">Circuito / Destino</th>
+                    <th style="width: 105px;">Carga (W)</th>
+                    <th style="width: 130px;">Tensão (V)</th>
+                    <th style="width: 110px;">F. Potência</th>
+                    <th style="width: 85px;">Dist. (m)</th>
+                    <th style="width: 95px; color: var(--secondary);">Corrente ($I_b$)</th>
+                    <th style="width: 100px; color: var(--neon-green);">Bitola Mín.</th>
+                    <th style="width: 95px; color: #818cf8;">Disjuntor</th>
+                    <th style="width: 85px;">Queda %</th>
+                    <th style="width: 115px;">Diagnóstico</th>
+                    <th class="print-hidden" style="width: 40px;"></th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr><td>1,5 mm²</td><td class="mn">17,5 A</td><td class="md">10 A ou 16 A</td><td>Iluminação geral</td></tr>
-                  <tr><td>2,5 mm²</td><td class="mn">24 A</td><td class="md">20 A</td><td>Tomadas de Uso Geral (TUGs)</td></tr>
-                  <tr><td>4,0 mm²</td><td class="mn">32 A</td><td class="md">25 A ou 32 A</td><td>Chuveiros médios, Ar-condicionado, TUEs</td></tr>
-                  <tr><td>6,0 mm²</td><td class="mn">41 A</td><td class="md">40 A</td><td>Chuveiros potentes, Fornos elétricos</td></tr>
-                  <tr><td>10,0 mm²</td><td class="mn">57 A</td><td class="md">50 A</td><td>Padrão de entrada residencial (pequeno porte)</td></tr>
-                  <tr><td>16,0 mm²</td><td class="mn">76 A</td><td class="md">63 A ou 70 A</td><td>Quadros de distribuição (QDC principal)</td></tr>
-                  <tr><td>25,0 mm²</td><td class="mn">101 A</td><td class="md">80 A ou 100 A</td><td>Entradas de energia de maior capacidade</td></tr>
-                </tbody>
+                <tbody id="dimensTbody">
+                  </tbody>
               </table>
             </div>
 
-            <div style="margin-top: 24px; padding: 16px; border-left: 4px solid var(--secondary); background: rgba(245, 158, 11, 0.05); border-radius: 8px;">
-              <strong style="color: var(--secondary);">⚠️ Nota Técnica Importante:</strong> 
-              <p style="color: var(--text-light); font-size: 14px; margin-top: 8px;">Os valores acima são puramente orientativos para situações ideais e correntes nominais embutidas em alvenaria. Em projetos reais e elaboração de orçamentos precisos, o profissional de elétrica deve aplicar os Fatores de Correção de Agrupamento (FCA), Fatores de Correção de Temperatura (FCT) e calcular a queda de tensão admissível rigorosamente em conformidade com as exigências da norma técnica <strong>ABNT NBR 5410</strong> vigente.</p>
+            <div class="print-hidden" style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+              <button class="btn-add-item" style="width: auto; padding: 14px 28px; margin: 0;" onclick="addDimensRow('', 1000, 127, 10)">+ Inserir Linha em Branco na Planilha</button>
+              <div style="font-size: 12px; color: var(--text-light); text-align: right;">
+                *Queda de Tensão máxima configurada: <strong>4.0%</strong> (Padrão NBR 5410).<br>
+                *Capacidade de condução ($I_z$) baseada em condutores de Cobre, Isolação PVC 70°C, Método B1.
+              </div>
             </div>
+
           </div>
         </div>
-
         <div class="tab-content" id="tab-hist-prof">
           <h3>📚 Histórico de Orçamentos</h3>
           <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, altere dados estruturais, reimprima, envie via WhatsApp ou exclua registros indesejados.</p>
@@ -616,7 +662,6 @@
     var base64LogoToSave = ""; 
     var globalSavedBudgets = []; 
 
-    // Lógica do Banner de Cookies
     document.addEventListener('DOMContentLoaded', function() {
       if(!localStorage.getItem('cookiesAceitos')) {
         document.getElementById('cookieConsent').style.display = 'block';
@@ -766,6 +811,15 @@
       renderPrecosTable();
       renderProfileForm('tab-perfil');
       loadHistory('profHistContainer');
+
+      // Preenche a planilha de dimensionamento com 4 circuitos base na primeira abertura
+      var tbodyDim = document.getElementById('dimensTbody');
+      if(tbodyDim && tbodyDim.children.length === 0) {
+        addDimensRow('Iluminação Geral (Salas e Quartos)', 500, 127, 12);
+        addDimensRow('TUGs Cozinha / Copa (Tomadas de Força)', 1900, 127, 16);
+        addDimensRow('Chuveiro Elétrico Suíte Master', 5500, 220, 18);
+        addDimensRow('Ar Condicionado Split Suíte (12.000 BTU)', 1100, 220, 22);
+      }
     }
 
     function setupTabs() {
@@ -1367,6 +1421,170 @@
           }
         }).catch(function(e){ alert("Erro ao salvar perfil: "+e.message); }); 
       };
+    }
+
+    /* ── LÓGICA DA PLANILHA TÉCNICA DE DIMENSIONAMENTO ── */
+    function addDimensRow(nomePreset = '', wPreset = 1200, vPreset = 127, distPreset = 15) {
+      var tbody = document.getElementById('dimensTbody');
+      if(!tbody) return;
+      var id = Date.now() + Math.floor(Math.random() * 1000);
+      var tr = document.createElement('tr');
+      tr.id = 'dimrow-' + id;
+      
+      tr.innerHTML = `
+        <td><input type="text" class="dim-nome" placeholder="Ex: TUG Cozinha" value="${nomePreset}" style="text-align: left; font-weight: 600;"></td>
+        <td><input type="number" class="dim-w" value="${wPreset}" min="0" step="100"></td>
+        <td>
+          <select class="dim-v">
+            <option value="127" ${vPreset==127?'selected':''}>127V (F+N)</option>
+            <option value="220" ${vPreset==220?'selected':''}>220V (F+N / F+F)</option>
+            <option value="380" ${vPreset==380?'selected':''}>380V (Trifásico)</option>
+          </select>
+        </td>
+        <td>
+          <select class="dim-fp">
+            <option value="1.0">1.00 (Resistivo)</option>
+            <option value="0.95" selected>0.95 (Misto Padrão)</option>
+            <option value="0.85">0.85 (Motores/Indutivo)</option>
+          </select>
+        </td>
+        <td><input type="number" class="dim-dist" value="${distPreset}" min="1"></td>
+        <td class="dim-res-ib" style="font-weight: 700;">0.00 A</td>
+        <td class="dim-res-bitola" style="font-weight: 900; color: var(--neon-green);">--</td>
+        <td class="dim-res-disj" style="font-weight: 700;">--</td>
+        <td class="dim-res-queda" style="font-weight: 600;">0.0%</td>
+        <td class="dim-res-status">--</td>
+        <td class="print-hidden"><button onclick="removeDimensRow(${id})" style="color: #ef4444; background: none; border: none; cursor: pointer; font-size: 16px; font-weight: bold;">✕</button></td>
+      `;
+      
+      tbody.appendChild(tr);
+      tr.querySelectorAll('input, select').forEach(function(el) { el.addEventListener('input', calcularPlanilhaDimens); });
+      calcularPlanilhaDimens();
+    }
+
+    function removeDimensRow(id) { 
+      var el = document.getElementById('dimrow-' + id);
+      if(el) { el.remove(); calcularPlanilhaDimens(); }
+    }
+
+    function calcularPlanilhaDimens() {
+      var rows = document.querySelectorAll('#dimensTbody tr');
+      rows.forEach(function(row) {
+        var w = parseFloat(row.querySelector('.dim-w').value) || 0;
+        var v = parseFloat(row.querySelector('.dim-v').value) || 127;
+        var fp = parseFloat(row.querySelector('.dim-fp').value) || 0.95;
+        var dist = parseFloat(row.querySelector('.dim-dist').value) || 1;
+
+        if(w === 0) {
+          row.querySelector('.dim-res-ib').textContent = '0.00 A';
+          row.querySelector('.dim-res-bitola').textContent = '--';
+          row.querySelector('.dim-res-disj').textContent = '--';
+          row.querySelector('.dim-res-queda').textContent = '0.0%';
+          row.querySelector('.dim-res-status').textContent = '--';
+          return;
+        }
+
+        // 1. Cálculo da Corrente de Projeto (Ib)
+        var ib = 0;
+        var k_queda = 2; // Fator para circuitos monofásicos e bifásicos
+        if (v === 380) {
+          ib = w / (1.732 * v * fp);
+          k_queda = 1.732; // Fator raiz de 3 para trifásico equilibrado
+        } else {
+          ib = w / (v * fp);
+        }
+
+        // 2. Tabela de Capacidade de Condução (Iz) - PVC 70°C, Método B1 (Cobre)
+        var normTable = [
+          { s: 1.5, iz: 17.5 },
+          { s: 2.5, iz: 24.0 },
+          { s: 4.0, iz: 32.0 },
+          { s: 6.0, iz: 41.0 },
+          { s: 10.0, iz: 57.0 },
+          { s: 16.0, iz: 76.0 },
+          { s: 25.0, iz: 101.0 },
+          { s: 35.0, iz: 125.0 },
+          { s: 50.0, iz: 151.0 },
+          { s: 70.0, iz: 192.0 }
+        ];
+
+        var chosen = normTable[normTable.length - 1];
+        for (var i = 0; i < normTable.length; i++) {
+          if (normTable[i].iz >= ib) { chosen = normTable[i]; break; }
+        }
+
+        // Trava Normativa Mínima (Iluminação: 1.5mm² | Força/Tomadas: 2.5mm²)
+        var nomeCirc = row.querySelector('.dim-nome').value.toLowerCase();
+        var minNorma = 2.5; 
+        if (nomeCirc.includes('ilum') || nomeCirc.includes('luz') || nomeCirc.includes('spot') || nomeCirc.includes('led')) {
+          minNorma = 1.5;
+        }
+        if (chosen.s < minNorma) {
+          chosen = normTable.find(function(x) { return x.s >= minNorma; }) || chosen;
+        }
+
+        // 3. Verificação de Queda de Tensão (Resistividade do Cobre a 70°C = 0.0219)
+        var dV_volts = (k_queda * 0.0219 * dist * ib) / chosen.s;
+        var dV_perc = (dV_volts / v) * 100;
+
+        var statusText = "OK (Norma)";
+        var statusColor = "#10b981";
+
+        // Iteração automática: Se a queda passar de 4%, sobe a bitola até estabilizar
+        while (dV_perc > 4.0 && chosen.s < 70.0) {
+          var nextIdx = normTable.findIndex(function(x) { return x.s > chosen.s; });
+          if (nextIdx !== -1) {
+            chosen = normTable[nextIdx];
+            dV_volts = (k_queda * 0.0219 * dist * ib) / chosen.s;
+            dV_perc = (dV_volts / v) * 100;
+            statusText = "Bitola ↑ (Queda)";
+            statusColor = "#f59e0b";
+          } else { break; }
+        }
+
+        if (dV_perc > 4.0) { statusText = "⚠️ Queda > 4%"; statusColor = "#ef4444"; }
+
+        // 4. Coordenação do Disjuntor DIN (Ib <= In <= Iz) com margem de segurança de 10%
+        var disjComerciais = [6, 10, 16, 20, 25, 32, 40, 50, 63, 70, 80, 100, 125, 160];
+        var djMin = ib * 1.1; 
+        var disjEscolhido = disjComerciais.find(function(dj) { return dj >= djMin && dj <= chosen.iz; });
+        if (!disjEscolhido) {
+          disjEscolhido = disjComerciais.find(function(dj) { return dj >= ib; }) || "Especial";
+        }
+
+        // Aplicação dos resultados na interface
+        row.querySelector('.dim-res-ib').textContent = ib.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' A';
+        row.querySelector('.dim-res-bitola').textContent = chosen.s.toLocaleString('pt-BR') + ' mm²';
+        row.querySelector('.dim-res-disj').textContent = disjEscolhido + ' A';
+        
+        var tdQueda = row.querySelector('.dim-res-queda');
+        tdQueda.textContent = dV_perc.toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1}) + '%';
+        tdQueda.style.color = dV_perc > 4.0 ? '#ef4444' : 'inherit';
+
+        var tdStatus = row.querySelector('.dim-res-status');
+        tdStatus.textContent = statusText;
+        tdStatus.style.color = statusColor;
+        tdStatus.style.fontWeight = "700";
+      });
+    }
+
+    function formatarDataDim(val) {
+      if(!val) return;
+      var p = val.split('-');
+      document.getElementById('dimPrintData').textContent = p[2] + '/' + p[1] + '/' + p[0];
+    }
+
+    function prepararImpressaoDimens() {
+      var profName = document.getElementById('profNameTitleInput').value || document.getElementById('printProfName').textContent || 'Engenheiro / Eletricista Responsável';
+      document.getElementById('dimPrintProf').textContent = profName;
+      
+      var inputData = document.getElementById('dimInputData');
+      if(!inputData.value) {
+        var hoje = new Date().toISOString().split('T')[0];
+        inputData.value = hoje;
+        formatarDataDim(hoje);
+      }
+      window.print();
     }
   </script>
 
