@@ -15,16 +15,14 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-    // IMPORTANTE: Substitua os valores abaixo pelas chaves reais do seu projeto Firebase!
     const firebaseConfig = {
-      apiKey: "SUA_API_KEY_AQUI",
-      authDomain: "SEU_PROJETO.firebaseapp.com",
-      projectId: "SEU_PROJETO_ID",
-      storageBucket: "SEU_PROJETO.appspot.com",
-      messagingSenderId: "SEU_SENDER_ID",
-      appId: "SEU_APP_ID"
+        apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
+        authDomain: "voltcalc-pro.firebaseapp.com",
+        projectId: "voltcalc-pro",
+        storageBucket: "voltcalc-pro.appspot.com",
+        messagingSenderId: "411208955318",
+        appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
     };
-    
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
@@ -43,6 +41,7 @@
         --gradient-banner: linear-gradient(90deg, #ff9a44 0%, #fc6076 100%);
     }
 
+    /* TRAVA DE TELA GLOBAL */
     body { 
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         background-color: var(--bg-color); 
@@ -67,14 +66,13 @@
 
     @media (max-width: 768px) {
         body { flex-direction: column; overflow: auto; }
-        /* overflow: visible garante que nada fique cortado no celular, incluindo o botão sair */
         .sidebar { width: 100%; height: auto; padding: 20px; border-right: none; border-bottom: 1px solid var(--border-color); overflow: visible; }
         .main-content { height: auto !important; overflow-y: visible !important; }
-        .logout-btn { margin-top: 20px !important; }
     }
 
     .logo { font-size: 22px; font-weight: bold; color: #39FF14; margin-bottom: 30px; letter-spacing: 1px; }
     
+    /* INFORMAÇÕES DO ADMIN DEVOLVIDAS */
     .user-greet { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
     .user-greet small { color: var(--text-muted); font-size: 11px; text-transform: uppercase; }
     .user-greet h2 { margin: 5px 0; font-size: 16px; color: #fff; }
@@ -91,6 +89,7 @@
     .nav-links a:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-main); }
     .nav-links a.active-nav { background: var(--card-bg); color: var(--text-main); border-color: var(--border-color); border-left: 4px solid var(--accent-neon); }
 
+    /* BOTÃO DE DESLOGAR */
     .logout-btn { 
         margin-top: 20px; padding: 14px; border: 1px solid rgba(228, 63, 90, 0.4);
         color: #ff4b5c; background: rgba(228, 63, 90, 0.1);
@@ -125,7 +124,6 @@
     .data-table td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
     
     .badge-green { color: #39FF14; background: rgba(57, 255, 20, 0.1); padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-    .badge-orange { color: #ff9a44; background: rgba(255, 154, 68, 0.1); padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -197,8 +195,8 @@
         <div class="header-title">
             <h1>Gerenciamento de Chamados</h1>
         </div>
-        <div class="chart-card" style="padding: 30px; text-align: center;">
-            <p style="color: var(--text-muted);">Nenhum chamado pendente no momento.</p>
+        <div class="chart-card" style="padding: 40px; text-align: center; width: 100%;">
+            <p style="color: var(--text-muted);">Nenhum chamado de suporte aberto no momento.</p>
         </div>
     </div>
 
@@ -206,7 +204,7 @@
         <div class="header-title">
             <h1>Gestão de Usuários</h1>
         </div>
-        <div class="chart-card" style="padding: 0;">
+        <div class="chart-card" style="padding: 0; width: 100%;">
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
@@ -214,13 +212,13 @@
                             <th>Nome do Usuário</th>
                             <th>Email</th>
                             <th>Status</th>
-                            <th>Plano Atual</th>
-                            <th>Último Login</th>
+                            <th>Perfil</th>
+                            <th>Data de Cadastro</th>
                         </tr>
                     </thead>
                     <tbody id="tabela-usuarios-body">
                         <tr>
-                            <td colspan="5" style="text-align: center; padding: 30px;">Carregando usuários reais...</td>
+                            <td colspan="5" style="text-align: center; padding: 30px;">Carregando base de usuários do Firebase...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -231,6 +229,7 @@
 </main>
 
 <script>
+    // 1. TROCA DE ABAS
     function mudarAba(abaId, elementoClicado) {
         const abas = document.querySelectorAll('.tab-content');
         abas.forEach(aba => aba.classList.remove('active'));
@@ -242,50 +241,54 @@
         elementoClicado.classList.add('active-nav');
     }
 
+    // 2. LOGOUT
     function fazerLogout() {
-        try {
-            firebase.auth().signOut().then(() => {
-                window.location.href = "/login.html"; 
-            }).catch((error) => {
-                console.error("Erro ao sair:", error);
-                alert("Erro ao sair. Verifique sua conexão.");
-            });
-        } catch (e) {
-            console.warn("Firebase Auth não inicializado.");
-            window.location.href = "/login.html"; 
-        }
+        firebase.auth().signOut().then(() => {
+            window.location.href = "login.html"; 
+        }).catch((error) => {
+            alert("Erro ao deslogar: " + error.message);
+        });
     }
 
+    // 3. BUSCA DE USUÁRIOS APONTADA PARA A PASTA "users"
     async function carregarUsuariosReais() {
         const tbody = document.getElementById('tabela-usuarios-body');
-        
+        const db = firebase.firestore();
+
         try {
-            const db = firebase.firestore();
-            const snapshot = await db.collection('usuarios').get(); 
+            // MUDANÇA CRÍTICA AQUI: apontado para 'users'
+            const snapshot = await db.collection('users').get(); 
             
             tbody.innerHTML = ''; 
 
             if (snapshot.empty) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhum usuário encontrado no banco de dados.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Nenhum usuário cadastrado no banco de dados ainda.</td></tr>';
                 return;
             }
 
             snapshot.forEach(doc => {
                 const user = doc.data();
                 
+                // Formata a data de ISO para DD/MM/AAAA
+                let dataFormatada = 'Recente';
+                if(user.dataCriacao) {
+                    let d = new Date(user.dataCriacao);
+                    dataFormatada = d.toLocaleDateString('pt-BR');
+                }
+                
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${user.nome || 'Usuário Sem Nome'}</td>
-                    <td>${user.email || 'Sem Email'}</td>
+                    <td><strong>${user.nome || 'Sem Nome'}</strong></td>
+                    <td>${user.email || 'Sem e-mail'}</td>
                     <td><span class="badge-green">Ativo</span></td>
-                    <td>${user.plano || 'Grátis'}</td>
-                    <td>${user.ultimoLogin || 'Acesso Recente'}</td>
+                    <td style="text-transform: capitalize;">${user.role || 'Cliente'}</td>
+                    <td>${dataFormatada}</td>
                 `;
                 tbody.appendChild(tr);
             });
         } catch (error) {
-            console.error("Erro ao buscar usuários no Firebase: ", error);
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #ff4b5c;">Erro de conexão. Você esqueceu de colocar as chaves do seu Firebase no bloco firebaseConfig no início do arquivo HTML.</td></tr>';
+            console.error("Erro Firestore:", error);
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #ff4b5c; padding: 20px;">Erro ao ler o banco: ${error.message}</td></tr>`;
         }
     }
 
@@ -293,6 +296,7 @@
         carregarUsuariosReais();
     };
 
+    // 4. GRÁFICOS INTOCADOS
     setTimeout(() => {
         Chart.defaults.color = '#9ba4b5';
         
