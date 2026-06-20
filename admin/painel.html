@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VoltCalc Pro - Dashboard Admin</title>
   
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -23,311 +19,165 @@
         messagingSenderId: "411208955318",
         appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
     };
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
   </script>
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --bg-color: #1a1b2f; --card-bg: #162447; --border-color: #1f4068; --accent-neon: #39FF14; }
+    body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: #fff; display: flex; height: 100vh; overflow: hidden; }
     
-    :root {
-        --bg-color: #1a1b2f; 
-        --card-bg: #162447; 
-        --border-color: #1f4068;
-        --text-main: #ffffff;
-        --text-muted: #9ba4b5;
-        --accent-neon: #e43f5a; 
-        --gradient-banner: linear-gradient(90deg, #ff9a44 0%, #fc6076 100%);
-    }
-
-    /* TRAVA DE TELA GLOBAL */
-    body { 
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-        background-color: var(--bg-color); 
-        color: var(--text-main); 
-        display: flex; 
-        height: 100vh; 
-        overflow: hidden; 
-    }
-
-    /* ---------------- SIDEBAR ---------------- */
-    .sidebar {
-        width: 260px;
-        height: 100vh; 
-        background: #111827;
-        padding: 30px 20px;
-        display: flex;
-        flex-direction: column;
-        border-right: 1px solid var(--border-color);
-        flex-shrink: 0;
-        overflow-y: auto;
-    }
-
-    @media (max-width: 768px) {
-        body { flex-direction: column; overflow: auto; }
-        .sidebar { width: 100%; height: auto; padding: 20px; border-right: none; border-bottom: 1px solid var(--border-color); overflow: visible; }
-        .main-content { height: auto !important; overflow-y: visible !important; }
-    }
-
-    .logo { font-size: 22px; font-weight: bold; color: #39FF14; margin-bottom: 30px; letter-spacing: 1px; }
+    .sidebar { width: 260px; background: #111827; padding: 30px 20px; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); flex-shrink: 0; }
+    .logo { font-size: 24px; font-weight: 800; color: var(--accent-neon); margin-bottom: 30px; letter-spacing: 1px; }
     
-    /* INFORMAÇÕES DO ADMIN DEVOLVIDAS */
     .user-greet { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .user-greet small { color: var(--text-muted); font-size: 11px; text-transform: uppercase; }
-    .user-greet h2 { margin: 5px 0; font-size: 16px; color: #fff; }
-    .admin-email { color: #39FF14; font-size: 12px; font-weight: bold; word-break: break-all; }
-
+    .user-greet small { color: #9ba4b5; font-size: 11px; text-transform: uppercase; }
+    .user-greet h2 { margin: 5px 0; font-size: 16px; color: #fff; text-transform: uppercase; }
+    
     .nav-links { list-style: none; flex-grow: 1; }
-    .nav-links li { margin-bottom: 10px; }
-    .nav-links a { 
-        display: block; padding: 12px 16px; border-radius: 8px; 
-        color: var(--text-muted); text-decoration: none; font-weight: 500;
-        transition: all 0.3s ease; cursor: pointer; border: 1px solid transparent;
-    }
+    .nav-links a { display: block; padding: 12px; color: #9ba4b5; text-decoration: none; cursor: pointer; border-radius: 8px; margin-bottom: 10px; }
+    .nav-links a.active-nav { background: var(--card-bg); border-left: 4px solid #e43f5a; color: #fff; }
+    .logout-btn { padding: 12px; border: 1px solid #ff4b5c; color: #ff4b5c; border-radius: 8px; cursor: pointer; text-align: center; }
+
+    .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+    .tab-content { display: none; } .tab-content.active { display: block; }
     
-    .nav-links a:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-main); }
-    .nav-links a.active-nav { background: var(--card-bg); color: var(--text-main); border-color: var(--border-color); border-left: 4px solid var(--accent-neon); }
-
-    /* BOTÃO DE DESLOGAR */
-    .logout-btn { 
-        margin-top: 20px; padding: 14px; border: 1px solid rgba(228, 63, 90, 0.4);
-        color: #ff4b5c; background: rgba(228, 63, 90, 0.1);
-        border-radius: 8px; cursor: pointer; text-align: center; font-weight: bold;
-        transition: 0.3s;
-    }
-    .logout-btn:hover { background: rgba(228, 63, 90, 0.2); }
-
-    /* ---------------- MAIN CONTENT & ABAS ---------------- */
-    .main-content { flex: 1; height: 100vh; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; }
-    .tab-content { display: none; flex-direction: column; gap: 20px; }
-    .tab-content.active { display: flex; }
-    .header-title { margin-bottom: 20px; }
-    .header-title h1 { font-size: 28px; font-weight: normal; letter-spacing: -0.5px; }
-
-    /* ---------------- GRID DE GRÁFICOS ---------------- */
-    .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px; }
-    .chart-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; }
-    .chart-card h3 { width: 100%; text-align: center; font-size: 14px; color: var(--text-main); background: #1f2937; padding: 8px 0; margin-top: -20px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); }
-    .chart-container { position: relative; height: 220px; width: 100%; }
-
-    /* Banner Inferior */
-    .metrics-banner { background: var(--gradient-banner); border-radius: 6px; padding: 20px; display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 15px; }
-    .metric-item { text-align: center; }
-    .metric-item span { display: block; font-size: 14px; font-weight: bold; text-transform: uppercase; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
-    .metric-value { background: #fff; color: #333; padding: 10px 20px; font-size: 24px; font-weight: bold; border-radius: 4px; margin-top: 5px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-
-    /* ---------------- TABELAS ---------------- */
-    .data-table-container { width: 100%; overflow-x: auto; margin-top: -20px; }
-    .data-table { width: 100%; border-collapse: collapse; text-align: left; }
-    .data-table th { padding: 15px; background: #1f2937; border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-size: 14px; font-weight: 600; }
-    .data-table td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; }
+    .chart-card { background: var(--card-bg); padding: 25px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color); }
+    table { width: 100%; border-collapse: collapse; color: #fff; }
+    th { text-align: left; padding: 12px; border-bottom: 1px solid var(--border-color); color: #9ba4b5; }
+    td { padding: 12px; border-bottom: 1px solid #1f4068; }
     
-    .badge-green { color: #39FF14; background: rgba(57, 255, 20, 0.1); padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+    .btn-acao { padding: 6px 10px; border-radius: 4px; border: none; cursor: pointer; font-size: 12px; font-weight: bold; }
+    .btn-resolver { background: #39FF14; color: #000; }
+    .btn-apagar { background: #ff4b5c; color: #fff; margin-left: 5px; }
+
+    /* MODAL */
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+    .modal-content { background: #162447; margin: 10% auto; padding: 25px; width: 400px; border-radius: 8px; }
   </style>
 </head>
 <body>
 
 <aside class="sidebar">
     <div class="logo">VoltCalc Pro</div>
-    
     <div class="user-greet">
         <small>Bem-vindo,</small>
         <h2>MILIONÁRIO JEFFERSON</h2>
-        <div class="admin-email">jroreis4582@gmail.com</div>
-        <small style="color: #9ba4b5; display: block; margin-top: 4px;">Administrador</small>
     </div>
-
     <ul class="nav-links">
         <li><a onclick="mudarAba('tab-estatisticas', this)" class="active-nav">📊 Painel Geral</a></li>
         <li><a onclick="mudarAba('tab-chamados', this)">✉️ Chamados</a></li>
         <li><a onclick="mudarAba('tab-usuarios', this)">👥 Usuários</a></li>
     </ul>
-    
-    <div class="logout-btn" onclick="fazerLogout()">Sair do Sistema</div>
+    <div class="logout-btn" onclick="firebase.auth().signOut().then(() => location.href='login.html')">Sair</div>
 </aside>
 
 <main class="main-content">
-    
     <div id="tab-estatisticas" class="tab-content active">
-        <div class="header-title">
-            <h1>Estatísticas do App</h1>
-        </div>
-
-        <div class="dashboard-grid">
-            <div class="chart-card">
-                <h3>Acessos de Usuários na Semana</h3>
-                <div class="chart-container">
-                    <canvas id="barChart"></canvas>
-                </div>
-            </div>
-            <div class="chart-card">
-                <h3>Status da Base de Usuários</h3>
-                <div class="chart-container">
-                    <canvas id="pieChart"></canvas>
-                </div>
-            </div>
-            <div class="chart-card">
-                <h3>Crescimento de Cadastros</h3>
-                <div class="chart-container">
-                    <canvas id="lineChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <div class="metrics-banner">
-            <div class="metric-item">
-                <span>Total de Usuários</span>
-                <div class="metric-value">50</div>
-            </div>
-            <div class="metric-item">
-                <span>Orçamentos (Mês)</span>
-                <div class="metric-value">312</div>
-            </div>
-            <div class="metric-item">
-                <span>Receita Projetada</span>
-                <div class="metric-value">R$ 995,00</div>
-            </div>
+        <h1>Painel Geral</h1>
+        <div class="chart-card">
+            <h3>Usuários: <span id="total-users">0</span></h3>
+            <canvas id="barChart" height="80"></canvas>
         </div>
     </div>
 
     <div id="tab-chamados" class="tab-content">
-        <div class="header-title">
-            <h1>Gerenciamento de Chamados</h1>
-        </div>
-        <div class="chart-card" style="padding: 40px; text-align: center; width: 100%;">
-            <p style="color: var(--text-muted);">Nenhum chamado de suporte aberto no momento.</p>
+        <h1>Gerenciamento de Chamados</h1>
+        <div class="chart-card">
+            <table>
+                <thead><tr><th>Email</th><th>Problema</th><th>Status</th><th>Ações</th></tr></thead>
+                <tbody id="tabela-chamados-body"></tbody>
+            </table>
         </div>
     </div>
 
     <div id="tab-usuarios" class="tab-content">
-        <div class="header-title">
-            <h1>Gestão de Usuários</h1>
-        </div>
-        <div class="chart-card" style="padding: 0; width: 100%;">
-            <div class="data-table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Nome do Usuário</th>
-                            <th>Email</th>
-                            <th>Status</th>
-                            <th>Perfil</th>
-                            <th>Data de Cadastro</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-usuarios-body">
-                        <tr>
-                            <td colspan="5" style="text-align: center; padding: 30px;">Carregando base de usuários do Firebase...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <h1>Gestão de Usuários</h1>
+        <div class="chart-card">
+            <table>
+                <thead><tr><th>Nome</th><th>Email</th></tr></thead>
+                <tbody id="tabela-usuarios-body"></tbody>
+            </table>
         </div>
     </div>
-
 </main>
 
+<div id="modal-reply" class="modal">
+    <div class="modal-content">
+        <h3>Responder E-mail</h3>
+        <p id="modal-email" style="color: #9ba4b5; margin: 10px 0;"></p>
+        <textarea id="reply-text" style="width:100%; height:80px; margin-bottom:10px;"></textarea>
+        <button class="btn-resolver" onclick="enviarResposta()">Enviar</button>
+        <button class="btn-apagar" onclick="document.getElementById('modal-reply').style.display='none'">Cancelar</button>
+    </div>
+</div>
+
 <script>
-    // 1. TROCA DE ABAS
-    function mudarAba(abaId, elementoClicado) {
-        const abas = document.querySelectorAll('.tab-content');
-        abas.forEach(aba => aba.classList.remove('active'));
+    const db = firebase.firestore();
 
-        const botoes = document.querySelectorAll('.nav-links a');
-        botoes.forEach(botao => botao.classList.remove('active-nav'));
-
-        document.getElementById(abaId).classList.add('active');
-        elementoClicado.classList.add('active-nav');
+    function mudarAba(id, el) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active-nav'));
+        document.getElementById(id).classList.add('active');
+        el.classList.add('active-nav');
     }
 
-    // 2. LOGOUT
-    function fazerLogout() {
-        firebase.auth().signOut().then(() => {
-            window.location.href = "login.html"; 
-        }).catch((error) => {
-            alert("Erro ao deslogar: " + error.message);
-        });
-    }
-
-    // 3. BUSCA DE USUÁRIOS APONTADA PARA A PASTA "users"
-    async function carregarUsuariosReais() {
+    // CARREGAR USUÁRIOS
+    db.collection('users').get().then(snap => {
+        document.getElementById('total-users').innerText = snap.size;
         const tbody = document.getElementById('tabela-usuarios-body');
-        const db = firebase.firestore();
+        tbody.innerHTML = '';
+        snap.forEach(doc => {
+            const u = doc.data();
+            tbody.innerHTML += `<tr><td>${u.nome || 'Sem Nome'}</td><td>${u.email}</td></tr>`;
+        });
+    });
 
-        try {
-            // MUDANÇA CRÍTICA AQUI: apontado para 'users'
-            const snapshot = await db.collection('users').get(); 
-            
-            tbody.innerHTML = ''; 
-
-            if (snapshot.empty) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Nenhum usuário cadastrado no banco de dados ainda.</td></tr>';
-                return;
-            }
-
-            snapshot.forEach(doc => {
-                const user = doc.data();
-                
-                // Formata a data de ISO para DD/MM/AAAA
-                let dataFormatada = 'Recente';
-                if(user.dataCriacao) {
-                    let d = new Date(user.dataCriacao);
-                    dataFormatada = d.toLocaleDateString('pt-BR');
-                }
-                
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${user.nome || 'Sem Nome'}</strong></td>
-                    <td>${user.email || 'Sem e-mail'}</td>
-                    <td><span class="badge-green">Ativo</span></td>
-                    <td style="text-transform: capitalize;">${user.role || 'Cliente'}</td>
-                    <td>${dataFormatada}</td>
-                `;
-                tbody.appendChild(tr);
+    // CARREGAR CHAMADOS
+    function carregarChamados() {
+        const tbody = document.getElementById('tabela-chamados-body');
+        db.collection('chamados').get().then(snap => {
+            tbody.innerHTML = '';
+            snap.forEach(doc => {
+                const c = doc.data();
+                tbody.innerHTML += `<tr>
+                    <td onclick="abrirModal('${c.email}')" style="cursor:pointer; color:cyan;">${c.email}</td>
+                    <td>${c.problema}</td>
+                    <td>${c.status || 'Pendente'}</td>
+                    <td>
+                        <button class="btn-acao btn-resolver" onclick="atualizarStatus('${doc.id}', 'Resolvido')">Resolver</button>
+                        <button class="btn-acao btn-apagar" onclick="apagarChamado('${doc.id}')">Apagar</button>
+                    </td>
+                </tr>`;
             });
-        } catch (error) {
-            console.error("Erro Firestore:", error);
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #ff4b5c; padding: 20px;">Erro ao ler o banco: ${error.message}</td></tr>`;
-        }
+        });
     }
 
-    window.onload = function() {
-        carregarUsuariosReais();
-    };
+    function abrirModal(email) {
+        document.getElementById('modal-email').innerText = email;
+        document.getElementById('modal-reply').style.display = 'block';
+    }
 
-    // 4. GRÁFICOS INTOCADOS
-    setTimeout(() => {
-        Chart.defaults.color = '#9ba4b5';
-        
-        new Chart(document.getElementById('barChart').getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
-                datasets: [{ label: 'Acessos Diários', data: [15, 22, 18, 25, 30, 10, 5], backgroundColor: '#e43f5a' }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: '#1f4068' } }, x: { grid: { color: '#1f4068' } } } }
-        });
+    function enviarResposta() {
+        alert("Resposta enviada para o banco! Para disparar e-mail real, configure uma Cloud Function.");
+        document.getElementById('modal-reply').style.display = 'none';
+    }
 
-        new Chart(document.getElementById('pieChart').getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: ['Usuários Ativos', 'Inativos', 'Novos (Pendentes)'],
-                datasets: [{ data: [35, 10, 5], backgroundColor: ['#39FF14', '#1f4068', '#ff9a44'], borderWidth: 0 }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
+    function atualizarStatus(id, status) {
+        db.collection('chamados').doc(id).update({status: status}).then(() => carregarChamados());
+    }
 
-        new Chart(document.getElementById('lineChart').getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-                datasets: [{ label: 'Total de Usuários', data: [5, 12, 20, 35, 45, 50], borderColor: '#ff9a44', tension: 0.4 }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: '#1f4068' } }, x: { grid: { color: '#1f4068' } } } }
-        });
-    }, 500);
+    function apagarChamado(id) {
+        if(confirm("Tem certeza?")) db.collection('chamados').doc(id).delete().then(() => carregarChamados());
+    }
+
+    carregarChamados();
+    
+    // GRÁFICO
+    new Chart(document.getElementById('barChart'), { 
+        type: 'bar', 
+        data: { labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'], datasets: [{ label: 'Acessos', data: [10, 15, 8, 22, 18], backgroundColor: '#e43f5a' }] } 
+    });
 </script>
-
 </body>
 </html>
