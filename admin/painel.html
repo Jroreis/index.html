@@ -102,7 +102,7 @@
     .metric-item span { display: block; font-size: 14px; font-weight: bold; text-transform: uppercase; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
     .metric-value { background: #fff; color: #333; padding: 10px 20px; font-size: 24px; font-weight: bold; border-radius: 4px; margin-top: 5px; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 
-    /* ---------------- TABELAS (NOVO PARA APARECER OS USUÁRIOS) ---------------- */
+    /* ---------------- TABELAS ---------------- */
     .data-table-container { width: 100%; overflow-x: auto; margin-top: -20px; }
     .data-table { width: 100%; border-collapse: collapse; text-align: left; }
     .data-table th { padding: 15px; background: #1f2937; border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-size: 14px; font-weight: 600; }
@@ -182,7 +182,7 @@
         </div>
     </div>
 
-    <!-- ABA 2: CHAMADOS (Agora com dados visíveis) -->
+    <!-- ABA 2: CHAMADOS (Manti os dados como molde por enquanto) -->
     <div id="tab-chamados" class="tab-content">
         <div class="header-title">
             <h1>Gerenciamento de Chamados</h1>
@@ -205,7 +205,7 @@
         </div>
     </div>
 
-    <!-- ABA 3: USUÁRIOS (Agora com a tabela visível) -->
+    <!-- ABA 3: USUÁRIOS (Agora com o ID na tabela para carregar pelo JS) -->
     <div id="tab-usuarios" class="tab-content">
         <div class="header-title">
             <h1>Gestão de Usuários</h1>
@@ -222,27 +222,9 @@
                             <th>Último Login</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="tabela-usuarios-body">
                         <tr>
-                            <td>Carlos Almeida</td>
-                            <td>carlos.eletrica@gmail.com</td>
-                            <td><span class="badge-green">Ativo</span></td>
-                            <td>Pro (Anual)</td>
-                            <td>Hoje, 09:30</td>
-                        </tr>
-                        <tr>
-                            <td>Marcos Silva</td>
-                            <td>marcos@empresa.com.br</td>
-                            <td><span class="badge-green">Ativo</span></td>
-                            <td>Grátis</td>
-                            <td>Ontem, 14:15</td>
-                        </tr>
-                        <tr>
-                            <td>Felipe Instalações</td>
-                            <td>felipe.tec@hotmail.com</td>
-                            <td><span class="badge-orange">Inativo</span></td>
-                            <td>Grátis</td>
-                            <td>Há 5 dias</td>
+                            <td colspan="5" style="text-align: center; padding: 30px;">Carregando usuários reais...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -253,6 +235,7 @@
 </main>
 
 <script>
+    // 1. LÓGICA DAS ABAS
     function mudarAba(abaId, elementoClicado) {
         const abas = document.querySelectorAll('.tab-content');
         abas.forEach(aba => aba.classList.remove('active'));
@@ -264,6 +247,7 @@
         elementoClicado.classList.add('active-nav');
     }
 
+    // 2. LÓGICA DE LOGOUT
     function fazerLogout() {
         try {
             firebase.auth().signOut().then(() => {
@@ -278,7 +262,50 @@
         }
     }
 
-    // Gráficos atualizados com informações reais e "Usuários"
+    // 3. NOVA LÓGICA: BUSCAR USUÁRIOS REAIS NO FIREBASE
+    async function carregarUsuariosReais() {
+        const tbody = document.getElementById('tabela-usuarios-body');
+        
+        try {
+            // Verifica se o Firebase Firestore está instanciado no sistema
+            const db = firebase.firestore();
+            
+            // Aqui ele procura a coleção 'usuarios' (se a sua chamar 'users', altere aqui)
+            const snapshot = await db.collection('usuarios').get(); 
+            
+            tbody.innerHTML = ''; // Limpa a mensagem "Carregando usuários reais..."
+
+            if (snapshot.empty) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhum usuário encontrado no banco de dados.</td></tr>';
+                return;
+            }
+
+            snapshot.forEach(doc => {
+                const user = doc.data();
+                
+                // Constrói a linha da tabela exatamente com o nosso visual CSS
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${user.nome || 'Usuário Sem Nome'}</td>
+                    <td>${user.email || 'Sem Email'}</td>
+                    <td><span class="badge-green">Ativo</span></td>
+                    <td>${user.plano || 'Grátis'}</td>
+                    <td>${user.ultimoLogin || 'Acesso Recente'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (error) {
+            console.error("Erro ao buscar usuários no Firebase: ", error);
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #ff4b5c;">Aguardando conexão com o Banco de Dados (Firestore)... Certifique-se que o Firebase está inicializado.</td></tr>';
+        }
+    }
+
+    // Executa a busca assim que a tela abre
+    window.onload = function() {
+        carregarUsuariosReais();
+    };
+
+    // 4. GRÁFICOS (Mantidos intactos)
     setTimeout(() => {
         Chart.defaults.color = '#9ba4b5';
         
