@@ -1,5 +1,5 @@
-// Mude este número sempre que fizer um deploy importante (v1, v2, v3...)
-const CACHE_NAME = 'voltcalc-v1'; 
+// ATENÇÃO: Incrementado para v2 para disparar a atualização automática no seu próximo deploy
+const CACHE_NAME = 'voltcalc-v2'; 
 const ASSETS = ['/', '/index.html', '/21310.png', '/manifest.json'];
 
 self.addEventListener('install', (e) => {
