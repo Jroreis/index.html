@@ -19,7 +19,7 @@
         messagingSenderId: "411208955318",
         appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
     };
-    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
   </script>
   
   <style>
@@ -27,33 +27,21 @@
     :root { --bg-color: #1a1b2f; --card-bg: #162447; --border-color: #1f4068; --accent-neon: #39FF14; }
     body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: #fff; display: flex; height: 100vh; overflow: hidden; }
     
-    .sidebar { width: 260px; background: #111827; padding: 30px 20px; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); flex-shrink: 0; }
-    .logo { font-size: 24px; font-weight: 800; color: var(--accent-neon); margin-bottom: 30px; letter-spacing: 1px; }
-    
-    .user-greet { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .user-greet small { color: #9ba4b5; font-size: 11px; text-transform: uppercase; }
-    .user-greet h2 { margin: 5px 0; font-size: 16px; color: #fff; text-transform: uppercase; }
-    
+    /* SIDEBAR CORRIGIDA: flex-column com margin-top: auto para o botão fixar no fundo */
+    .sidebar { width: 260px; background: #111827; padding: 30px 20px; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); flex-shrink: 0; height: 100vh; }
+    .logo { font-size: 24px; font-weight: 800; color: var(--accent-neon); margin-bottom: 20px; letter-spacing: 1px; }
+    .user-greet { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .user-greet h2 { font-size: 14px; text-transform: uppercase; color: #fff; }
     .nav-links { list-style: none; flex-grow: 1; }
-    .nav-links a { display: block; padding: 12px; color: #9ba4b5; text-decoration: none; cursor: pointer; border-radius: 8px; margin-bottom: 10px; }
+    .nav-links a { display: block; padding: 12px; color: #9ba4b5; cursor: pointer; border-radius: 8px; margin-bottom: 10px; font-weight: 500; }
     .nav-links a.active-nav { background: var(--card-bg); border-left: 4px solid #e43f5a; color: #fff; }
-    .logout-btn { padding: 12px; border: 1px solid #ff4b5c; color: #ff4b5c; border-radius: 8px; cursor: pointer; text-align: center; }
+    
+    /* BOTÃO LOGOUT FIXO NA BASE */
+    .logout-btn { padding: 12px; border: 1px solid #ff4b5c; color: #ff4b5c; border-radius: 8px; cursor: pointer; text-align: center; margin-top: auto; font-weight: bold; }
 
     .main-content { flex: 1; padding: 30px; overflow-y: auto; }
     .tab-content { display: none; } .tab-content.active { display: block; }
-    
     .chart-card { background: var(--card-bg); padding: 25px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color); }
-    table { width: 100%; border-collapse: collapse; color: #fff; }
-    th { text-align: left; padding: 12px; border-bottom: 1px solid var(--border-color); color: #9ba4b5; }
-    td { padding: 12px; border-bottom: 1px solid #1f4068; }
-    
-    .btn-acao { padding: 6px 10px; border-radius: 4px; border: none; cursor: pointer; font-size: 12px; font-weight: bold; }
-    .btn-resolver { background: #39FF14; color: #000; }
-    .btn-apagar { background: #ff4b5c; color: #fff; margin-left: 5px; }
-
-    /* MODAL */
-    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-    .modal-content { background: #162447; margin: 10% auto; padding: 25px; width: 400px; border-radius: 8px; }
   </style>
 </head>
 <body>
@@ -63,29 +51,30 @@
     <div class="user-greet">
         <small>Bem-vindo,</small>
         <h2>MILIONÁRIO JEFFERSON</h2>
+        <div style="color: #39FF14; font-size: 11px;">jroreis4582@gmail.com</div>
     </div>
     <ul class="nav-links">
         <li><a onclick="mudarAba('tab-estatisticas', this)" class="active-nav">📊 Painel Geral</a></li>
         <li><a onclick="mudarAba('tab-chamados', this)">✉️ Chamados</a></li>
         <li><a onclick="mudarAba('tab-usuarios', this)">👥 Usuários</a></li>
     </ul>
-    <div class="logout-btn" onclick="firebase.auth().signOut().then(() => location.href='login.html')">Sair</div>
+    <div class="logout-btn" onclick="firebase.auth().signOut().then(() => location.href='login.html')">Sair do Sistema</div>
 </aside>
 
 <main class="main-content">
     <div id="tab-estatisticas" class="tab-content active">
         <h1>Painel Geral</h1>
         <div class="chart-card">
-            <h3>Usuários: <span id="total-users">0</span></h3>
-            <canvas id="barChart" height="80"></canvas>
+            <h3>Visão Geral de Acessos</h3>
+            <canvas id="mainChart" height="80"></canvas>
         </div>
     </div>
 
     <div id="tab-chamados" class="tab-content">
-        <h1>Gerenciamento de Chamados</h1>
+        <h1>Chamados</h1>
         <div class="chart-card">
-            <table>
-                <thead><tr><th>Email</th><th>Problema</th><th>Status</th><th>Ações</th></tr></thead>
+            <table id="tabela-chamados">
+                <thead><tr><th>Email</th><th>Problema</th><th>Status</th></tr></thead>
                 <tbody id="tabela-chamados-body"></tbody>
             </table>
         </div>
@@ -102,19 +91,7 @@
     </div>
 </main>
 
-<div id="modal-reply" class="modal">
-    <div class="modal-content">
-        <h3>Responder E-mail</h3>
-        <p id="modal-email" style="color: #9ba4b5; margin: 10px 0;"></p>
-        <textarea id="reply-text" style="width:100%; height:80px; margin-bottom:10px;"></textarea>
-        <button class="btn-resolver" onclick="enviarResposta()">Enviar</button>
-        <button class="btn-apagar" onclick="document.getElementById('modal-reply').style.display='none'">Cancelar</button>
-    </div>
-</div>
-
 <script>
-    const db = firebase.firestore();
-
     function mudarAba(id, el) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active-nav'));
@@ -122,9 +99,25 @@
         el.classList.add('active-nav');
     }
 
-    // CARREGAR USUÁRIOS
+    // GRÁFICOS MAIS DETALHADOS
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+            datasets: [
+                { label: 'Acessos App', data: [12, 19, 3, 25, 32, 10, 8], borderColor: '#39FF14', tension: 0.4 },
+                { label: 'Orçamentos Criados', data: [8, 11, 5, 18, 22, 6, 2], borderColor: '#e43f5a', tension: 0.4 }
+            ]
+        },
+        options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } } }
+    });
+
+    // CARREGAR DADOS REAIS
+    const db = firebase.firestore();
+    
+    // Usuários
     db.collection('users').get().then(snap => {
-        document.getElementById('total-users').innerText = snap.size;
         const tbody = document.getElementById('tabela-usuarios-body');
         tbody.innerHTML = '';
         snap.forEach(doc => {
@@ -133,50 +126,14 @@
         });
     });
 
-    // CARREGAR CHAMADOS
-    function carregarChamados() {
+    // Chamados
+    db.collection('chamados').get().then(snap => {
         const tbody = document.getElementById('tabela-chamados-body');
-        db.collection('chamados').get().then(snap => {
-            tbody.innerHTML = '';
-            snap.forEach(doc => {
-                const c = doc.data();
-                tbody.innerHTML += `<tr>
-                    <td onclick="abrirModal('${c.email}')" style="cursor:pointer; color:cyan;">${c.email}</td>
-                    <td>${c.problema}</td>
-                    <td>${c.status || 'Pendente'}</td>
-                    <td>
-                        <button class="btn-acao btn-resolver" onclick="atualizarStatus('${doc.id}', 'Resolvido')">Resolver</button>
-                        <button class="btn-acao btn-apagar" onclick="apagarChamado('${doc.id}')">Apagar</button>
-                    </td>
-                </tr>`;
-            });
+        tbody.innerHTML = '';
+        snap.forEach(doc => {
+            const c = doc.data();
+            tbody.innerHTML += `<tr><td>${c.email}</td><td>${c.problema}</td><td>${c.status || 'Pendente'}</td></tr>`;
         });
-    }
-
-    function abrirModal(email) {
-        document.getElementById('modal-email').innerText = email;
-        document.getElementById('modal-reply').style.display = 'block';
-    }
-
-    function enviarResposta() {
-        alert("Resposta enviada para o banco! Para disparar e-mail real, configure uma Cloud Function.");
-        document.getElementById('modal-reply').style.display = 'none';
-    }
-
-    function atualizarStatus(id, status) {
-        db.collection('chamados').doc(id).update({status: status}).then(() => carregarChamados());
-    }
-
-    function apagarChamado(id) {
-        if(confirm("Tem certeza?")) db.collection('chamados').doc(id).delete().then(() => carregarChamados());
-    }
-
-    carregarChamados();
-    
-    // GRÁFICO
-    new Chart(document.getElementById('barChart'), { 
-        type: 'bar', 
-        data: { labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'], datasets: [{ label: 'Acessos', data: [10, 15, 8, 22, 18], backgroundColor: '#e43f5a' }] } 
     });
 </script>
 </body>
