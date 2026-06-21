@@ -2,9 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VoltCalc Pro - Dashboard Admin</title>
-  
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -23,34 +21,23 @@
   </script>
   
   <style>
+    /* Estilos preservados */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root { --bg-color: #1a1b2f; --card-bg: #162447; --border-color: #1f4068; --accent-neon: #39FF14; }
     body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: #fff; display: flex; height: 100vh; overflow: hidden; }
-    
-    .sidebar { width: 260px; background: #111827; padding: 30px 20px; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); flex-shrink: 0; }
-    .logo { font-size: 24px; font-weight: 800; color: var(--accent-neon); margin-bottom: 30px; letter-spacing: 1px; }
-    .user-greet { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .user-greet h2 { margin: 5px 0; font-size: 16px; text-transform: uppercase; color: #fff; }
-    .nav-links { list-style: none; flex-grow: 1; }
-    .nav-links a { display: block; padding: 12px; color: #9ba4b5; text-decoration: none; cursor: pointer; border-radius: 8px; margin-bottom: 10px; }
-    .nav-links a.active-nav { background: var(--card-bg); border-left: 4px solid #e43f5a; color: #fff; }
-    .logout-btn { padding: 12px; border: 1px solid #ff4b5c; color: #ff4b5c; border-radius: 8px; cursor: pointer; text-align: center; margin-top: auto; }
-
+    .sidebar { width: 260px; background: #111827; padding: 30px 20px; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); }
+    .logo { font-size: 24px; font-weight: 800; color: var(--accent-neon); margin-bottom: 30px; }
+    .user-greet { margin-bottom: 30px; }
+    .nav-links a { display: block; padding: 12px; color: #9ba4b5; cursor: pointer; border-radius: 8px; margin-bottom: 10px; }
+    .nav-links a.active-nav { background: var(--card-bg); color: #fff; border-left: 4px solid #e43f5a; }
+    .logout-btn { padding: 12px; border: 1px solid #ff4b5c; color: #ff4b5c; text-align: center; cursor: pointer; border-radius: 8px; margin-top: auto; }
     .main-content { flex: 1; padding: 30px; overflow-y: auto; }
     .tab-content { display: none; } .tab-content.active { display: block; }
     .chart-card { background: var(--card-bg); padding: 25px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color); }
-    
     table { width: 100%; border-collapse: collapse; }
-    th { text-align: left; color: #9ba4b5; padding: 12px; border-bottom: 1px solid var(--border-color); }
-    td { padding: 12px; border-bottom: 1px solid #1f4068; }
-    
-    .btn-acao { padding: 6px 10px; border-radius: 4px; border: none; cursor: pointer; font-size: 12px; font-weight: bold; margin-right: 5px; }
-    .btn-resolver { background: #39FF14; color: #000; }
-    .btn-apagar { background: #ff4b5c; color: #fff; }
-    
-    /* MODAL */
+    th, td { padding: 12px; border-bottom: 1px solid #1f4068; text-align: left; }
     .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-    .modal-content { background: #162447; margin: 10% auto; padding: 25px; width: 400px; border-radius: 8px; border: 1px solid var(--border-color); }
+    .modal-content { background: #162447; margin: 10% auto; padding: 25px; width: 400px; border-radius: 8px; }
   </style>
 </head>
 <body>
@@ -58,12 +45,11 @@
 <aside class="sidebar">
     <div class="logo">VoltCalc Pro</div>
     <div class="user-greet">
-        <small>Bem-vindo,</small>
         <h2>MILIONÁRIO JEFFERSON</h2>
         <div style="color: #39FF14; font-size: 11px;">jroreis4582@gmail.com</div>
     </div>
     <ul class="nav-links">
-        <li><a onclick="mudarAba('tab-estatisticas', this)" class="active-nav">📊 Painel Geral</a></li>
+        <li><a onclick="mudarAba('tab-estatisticas', this)" class="active-nav">📊 Painel</a></li>
         <li><a onclick="mudarAba('tab-chamados', this)">✉️ Chamados</a></li>
         <li><a onclick="mudarAba('tab-usuarios', this)">👥 Usuários</a></li>
     </ul>
@@ -73,23 +59,17 @@
 <main class="main-content">
     <div id="tab-estatisticas" class="tab-content active">
         <h1>Painel Geral</h1>
-        <div class="dashboard-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div class="chart-card">
-                <h3>Tendência de Acessos</h3>
-                <canvas id="lineChart" height="150"></canvas>
-            </div>
-            <div class="chart-card">
-                <h3>Status do Sistema</h3>
-                <canvas id="polarChart" height="150"></canvas>
-            </div>
+        <div class="chart-card">
+            <h3>Usuários Ativos: <span id="total-users">0</span></h3>
+            <canvas id="barChart" height="50"></canvas>
         </div>
     </div>
 
     <div id="tab-chamados" class="tab-content">
-        <h1>Chamados de Suporte</h1>
+        <h1>Chamados</h1>
         <div class="chart-card">
             <table>
-                <thead><tr><th>Email</th><th>Problema</th><th>Status</th><th>Ações</th></tr></thead>
+                <thead><tr><th>Email</th><th>Problema</th><th>Ações</th></tr></thead>
                 <tbody id="tabela-chamados-body"></tbody>
             </table>
         </div>
@@ -108,11 +88,11 @@
 
 <div id="modal-reply" class="modal">
     <div class="modal-content">
-        <h3>Responder E-mail</h3>
+        <h3>Responder Chamado</h3>
         <p id="modal-email" style="color: #9ba4b5; margin: 10px 0;"></p>
-        <textarea id="reply-text" placeholder="Digite sua resposta..." style="width:100%; height:80px; margin-bottom:10px;"></textarea>
-        <button class="btn-resolver" onclick="enviarResposta()">Enviar</button>
-        <button class="btn-apagar" onclick="fecharModal()">Cancelar</button>
+        <textarea id="reply-text" placeholder="Escreva a resposta aqui..." style="width:100%; height:80px;"></textarea>
+        <button style="background:#39FF14; border:none; padding:10px; width:100%; margin-top:10px; cursor:pointer;" onclick="enviarResposta()">Enviar Resposta no Site</button>
+        <button style="background:transparent; border:none; color:#fff; width:100%; margin-top:10px; cursor:pointer;" onclick="fecharModal()">Fechar</button>
     </div>
 </div>
 
@@ -126,49 +106,67 @@
         el.classList.add('active-nav');
     }
 
-    // CARREGAR USUÁRIOS
-    db.collection('users').get().then(snap => {
-        const tbody = document.getElementById('tabela-usuarios-body');
-        tbody.innerHTML = '';
-        snap.forEach(doc => {
-            const u = doc.data();
-            // Correção do undefined:
-            tbody.innerHTML += `<tr><td>${u.nome || 'Sem Nome'}</td><td>${u.email || 'Sem E-mail'}</td></tr>`;
-        });
-    });
-
-    // CARREGAR CHAMADOS
-    function carregarChamados() {
-        const tbody = document.getElementById('tabela-chamados-body');
-        db.collection('chamados').get().then(snap => {
-            tbody.innerHTML = '';
-            snap.forEach(doc => {
-                const c = doc.data();
-                tbody.innerHTML += `<tr>
-                    <td onclick="abrirModal('${c.email}')" style="cursor:pointer; color:#39FF14;">${c.email}</td>
-                    <td>${c.problema}</td>
-                    <td>${c.status || 'Pendente'}</td>
-                    <td>
-                        <button class="btn-acao btn-resolver" onclick="atualizarChamado('${doc.id}', 'Resolvido')">Resolver</button>
-                        <button class="btn-acao btn-apagar" onclick="apagarChamado('${doc.id}')">Apagar</button>
-                    </td>
-                </tr>`;
+    // CARREGAR COM CHECAGEM DE SEGURANÇA (Se a tabela não existir, não dá erro)
+    function carregarDados() {
+        // Carregar Usuários
+        if(document.getElementById('tabela-usuarios-body')) {
+            db.collection('users').get().then(snap => {
+                document.getElementById('total-users').innerText = snap.size;
+                const tbody = document.getElementById('tabela-usuarios-body');
+                tbody.innerHTML = '';
+                snap.forEach(doc => {
+                    const u = doc.data();
+                    tbody.innerHTML += `<tr><td>${u.nome || 'Sem Nome'}</td><td>${u.email}</td></tr>`;
+                });
             });
+        }
+
+        // Carregar Chamados
+        if(document.getElementById('tabela-chamados-body')) {
+            db.collection('chamados').get().then(snap => {
+                const tbody = document.getElementById('tabela-chamados-body');
+                tbody.innerHTML = '';
+                snap.forEach(doc => {
+                    const c = doc.data();
+                    tbody.innerHTML += `<tr>
+                        <td onclick="abrirModal('${c.email}', '${doc.id}')" style="color:cyan; cursor:pointer;">${c.email}</td>
+                        <td>${c.problema}</td>
+                        <td><button onclick="db.collection('chamados').doc('${doc.id}').delete().then(carregarDados)">Apagar</button></td>
+                    </tr>`;
+                });
+            });
+        }
+    }
+
+    function abrirModal(email, docId) {
+        document.getElementById('modal-email').innerText = "Para: " + email;
+        document.getElementById('modal-reply').dataset.id = docId;
+        document.getElementById('modal-reply').style.display = 'block';
+    }
+
+    function enviarResposta() {
+        const docId = document.getElementById('modal-reply').dataset.id;
+        const resposta = document.getElementById('reply-text').value;
+        
+        // AQUI ESTÁ A MÁGICA: Em vez de e-mail, salvamos no banco na sub-coleção 'mensagens'
+        db.collection('chamados').doc(docId).collection('mensagens').add({
+            texto: resposta,
+            data: new Date(),
+            remetente: 'admin'
+        }).then(() => {
+            alert("Resposta enviada para o painel do usuário!");
+            fecharModal();
         });
     }
 
-    function abrirModal(email) { document.getElementById('modal-email').innerText = email; document.getElementById('modal-reply').style.display = 'block'; }
     function fecharModal() { document.getElementById('modal-reply').style.display = 'none'; }
-    function enviarResposta() { alert("Resposta enviada para " + document.getElementById('modal-email').innerText); fecharModal(); }
-    
-    function atualizarChamado(id, status) { db.collection('chamados').doc(id).update({status}).then(() => carregarChamados()); }
-    function apagarChamado(id) { if(confirm('Excluir?')) db.collection('chamados').doc(id).delete().then(() => carregarChamados()); }
 
-    carregarChamados();
+    window.onload = carregarDados;
 
-    // GRÁFICOS
-    new Chart(document.getElementById('lineChart'), { type: 'line', data: { labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'], datasets: [{ label: 'Acessos', data: [10, 20, 15, 30, 25], borderColor: '#39FF14' }, { label: 'Orçamentos', data: [5, 8, 4, 12, 10], borderColor: '#e43f5a' }] } });
-    new Chart(document.getElementById('polarChart'), { type: 'polarArea', data: { labels: ['Pendentes', 'Resolvidos', 'Em Andamento'], datasets: [{ data: [10, 20, 5], backgroundColor: ['#ff4b5c', '#39FF14', '#f1c40f'] }] } });
+    new Chart(document.getElementById('barChart'), { 
+        type: 'bar', 
+        data: { labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'], datasets: [{ label: 'Acessos', data: [12, 19, 3, 5, 20], backgroundColor: '#39FF14' }] } 
+    });
 </script>
 </body>
 </html>
