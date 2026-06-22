@@ -7,7 +7,6 @@
   
   <title>VoltCalc Pro - A Plataforma do Profissional da Elétrica</title>
 
-  <!-- META TAGS ANTI-CACHE (Camada 1) -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -246,7 +245,6 @@
       .dashboard-main { padding: 0 !important; }
       .app-screen { padding: 0; margin: 0; display: block !important; }
       
-      /* O Segredo: Imprime estritamente a aba que estiver ativa na tela! */
       .tab-content { display: none !important; }
       .tab-content.active { display: block !important; }
       .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; background: #fff !important; }
@@ -272,7 +270,6 @@
       .summary-row.total { color: #000 !important; border-top: 2px solid #000 !important; padding-top: 6px !important; font-size: 14px !important;}
       .print-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
 
-      /* Blindagem da Planilha de Dimensionamento para PDF */
       .dimens-print-header { display: block !important; margin-bottom: 20px; }
       .dimens-table { width: 100% !important; border-collapse: collapse !important; font-size: 10px !important; }
       .dimens-table th { background: #f1f5f9 !important; color: #000 !important; font-weight: bold !important; border: 1px solid #475569 !important; padding: 6px 4px !important; text-align: center !important; }
@@ -299,6 +296,16 @@
     <div class="header-btns" id="authBtns">
       <button class="btn-header" onclick="openModal('modalLogin')">Entrar</button>
       <button class="btn-header filled" onclick="openModal('modalCadastro')">Cadastrar Agora</button>
+    </div>
+
+    <div class="header-btns" id="userTopNav" style="display: none; align-items: center; gap: 12px;">
+      <button class="btn-header" onclick="abrirModalNotificacoes()" style="position: relative; padding: 10px 16px;" title="Ver Respostas do Suporte">
+        🔔 Suporte
+        <span id="badgeNotif" style="position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; font-size: 11px; font-weight: 800; border-radius: 50%; padding: 2px 6px; display: none;">0</span>
+      </button>
+      <button class="btn-header filled" onclick="abrirPerfilTopo()" title="Acessar Perfil e Empresa">
+        👤 Perfil e Empresa
+      </button>
     </div>
   </header>
 
@@ -422,6 +429,16 @@
       <button class="btn-primary" id="btnSignup">Cadastrar Grátis</button>
     </div>
 
+    <div class="modal modal-lg" id="modalNotificacoes" style="display:none;">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <h2 style="margin-bottom: 24px; font-weight: 800; display:flex; align-items:center; gap:10px;">
+        🔔 Retorno do Suporte Técnico
+      </h2>
+      <div id="notifListBody" style="max-height: 400px; overflow-y: auto; padding-right: 8px;">
+        <p style="color: var(--text-light); font-size: 14px;">Buscando chamados associados ao seu e-mail...</p>
+      </div>
+    </div>
+
     <div class="modal modal-lg" id="modalTermos" style="display:none;">
       <button class="modal-close" onclick="closeModal()">&times;</button>
       <h2 style="font-weight: 800; border-bottom: 2px solid var(--border-color); padding-bottom: 16px; margin-bottom: 16px;">Termos de Uso</h2>
@@ -482,11 +499,9 @@
         
         <nav class="tabs">
           <button class="tab active" data-tab="orc">📋 Novo Orçamento</button>
-          <button class="tab" data-tab="precos">💰 Tabela de Preços</button>
-          <button class="tab" data-tab="dimens">📐 Dimensionamentos (NBR 5410)</button>
+          <button class="tab" data-tab="eng">⚡ Eletricista / Engenheiro</button>
           <button class="tab" data-tab="hist-prof">📚 Histórico</button>
-          <button class="tab" data-tab="perfil">👤 Perfil e Empresa</button>
-        </nav>
+          </nav>
 
         <button class="logout-btn" onclick="auth.signOut()">Encerrar Sessão</button>
       </aside>
@@ -567,77 +582,72 @@
           </footer>
         </div>
 
-        <div class="tab-content" id="tab-precos"></div>
+        <div class="tab-content" id="tab-eng">
+          
+          <div id="tab-precos" style="margin-bottom: 40px;"></div>
 
-        <!-- ── NOVO NÚCLEO: PLANILHA TÉCNICA INTERATIVA NBR 5410 ── -->
-        <div class="tab-content" id="tab-dimens">
-          <div class="card">
-            
-            <!-- Cabeçalho visível estritamente na impressão do PDF da planilha -->
-            <div class="dimens-print-header">
-              <h2 style="font-size: 18px; font-weight: 800; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 12px;">📐 MEMÓRIA DE CÁLCULO DE DIMENSIONAMENTO - NBR 5410</h2>
-              <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px; font-size: 12px; margin-bottom: 16px;">
-                <div><strong>OBRA / CLIENTE:</strong> <span id="dimPrintObra">Estudo de Instalação Elétrica</span></div>
-                <div><strong>DATA:</strong> <span id="dimPrintData"></span></div>
-                <div><strong>RESPONSÁVEL TÉCNICO:</strong> <span id="dimPrintProf"></span></div>
-                <div><strong>MÉTODO DE REFERÊNCIA:</strong> B1 (Embutido em Alvenaria - PVC 70°C)</div>
+          <div id="tab-dimens">
+            <div class="card">
+              <div class="dimens-print-header">
+                <h2 style="font-size: 18px; font-weight: 800; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 12px;">📐 MEMÓRIA DE CÁLCULO DE DIMENSIONAMENTO - NBR 5410</h2>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px; font-size: 12px; margin-bottom: 16px;">
+                  <div><strong>OBRA / CLIENTE:</strong> <span id="dimPrintObra">Estudo de Instalação Elétrica</span></div>
+                  <div><strong>DATA:</strong> <span id="dimPrintData"></span></div>
+                  <div><strong>RESPONSÁVEL TÉCNICO:</strong> <span id="dimPrintProf"></span></div>
+                  <div><strong>MÉTODO DE REFERÊNCIA:</strong> B1 (Embutido em Alvenaria - PVC 70°C)</div>
+                </div>
               </div>
-            </div>
 
-            <!-- Apresentação na tela do navegador -->
-            <div class="print-hidden" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
-              <div>
-                <h3 style="font-size: 22px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px;">📐 Planilha de Dimensionamento (ABNT NBR 5410)</h3>
-                <p style="color: var(--text-light); font-size: 14px; margin-top: 4px;">Altere a carga, tensão e distância. O sistema calcula a Corrente de Projeto ($I_b$), Seção mínima em Cobre, Disjuntor de proteção e Queda admissível.</p>
+              <div class="print-hidden" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+                <div>
+                  <h3 style="font-size: 22px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px;">📐 Planilha de Dimensionamento (ABNT NBR 5410)</h3>
+                  <p style="color: var(--text-light); font-size: 14px; margin-top: 4px;">Altere a carga, tensão e distância. O sistema calcula a Corrente de Projeto ($I_b$), Seção mínima em Cobre, Disjuntor de proteção e Queda admissível.</p>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                  <button class="btn-header filled" onclick="addDimensRow('', 1200, 127, 15)">+ Novo Circuito</button>
+                  <button class="btn-header" onclick="prepararImpressaoDimens()" style="color: var(--text); border-color: var(--border-color);">🖨️ Imprimir Planilha</button>
+                </div>
               </div>
-              <div style="display: flex; gap: 12px;">
-                <button class="btn-header filled" onclick="addDimensRow('', 1200, 127, 15)">+ Novo Circuito</button>
-                <button class="btn-header" onclick="prepararImpressaoDimens()" style="color: var(--text); border-color: var(--border-color);">🖨️ Imprimir Planilha</button>
+
+              <div class="print-hidden" style="background: var(--bg-color); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 24px;">
+                <div class="profile-grid" style="grid-template-columns: 2fr 1fr;">
+                  <div class="form-group" style="margin: 0;"><label>Identificação da Obra / Setor</label><input type="text" id="dimInputObra" placeholder="Ex: Residência Família Souza - Pavimento Superior" oninput="document.getElementById('dimPrintObra').textContent = this.value || 'Estudo de Instalação Elétrica'"></div>
+                  <div class="form-group" style="margin: 0;"><label>Data do Estudo</label><input type="date" id="dimInputData" oninput="formatarDataDim(this.value)"></div>
+                </div>
               </div>
-            </div>
 
-            <!-- Dados do projeto para preencher o cabeçalho de impressão -->
-            <div class="print-hidden" style="background: var(--bg-color); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 24px;">
-              <div class="profile-grid" style="grid-template-columns: 2fr 1fr;">
-                <div class="form-group" style="margin: 0;"><label>Identificação da Obra / Setor</label><input type="text" id="dimInputObra" placeholder="Ex: Residência Família Souza - Pavimento Superior" oninput="document.getElementById('dimPrintObra').textContent = this.value || 'Estudo de Instalação Elétrica'"></div>
-                <div class="form-group" style="margin: 0;"><label>Data do Estudo</label><input type="date" id="dimInputData" oninput="formatarDataDim(this.value)"></div>
+              <div class="ptable-wrap">
+                <table class="dimens-table">
+                  <thead>
+                    <tr>
+                      <th style="min-width: 190px; text-align: left;">Circuito / Destino</th>
+                      <th style="width: 105px;">Carga (W)</th>
+                      <th style="width: 130px;">Tensão (V)</th>
+                      <th style="width: 110px;">F. Potência</th>
+                      <th style="width: 85px;">Dist. (m)</th>
+                      <th style="width: 95px; color: var(--secondary);">Corrente ($I_b$)</th>
+                      <th style="width: 100px; color: var(--neon-green);">Bitola Mín.</th>
+                      <th style="width: 95px; color: #818cf8;">Disjuntor</th>
+                      <th style="width: 85px;">Queda %</th>
+                      <th style="width: 115px;">Diagnóstico</th>
+                      <th class="print-hidden" style="width: 40px;"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="dimensTbody"></tbody>
+                </table>
               </div>
-            </div>
 
-            <div class="ptable-wrap">
-              <table class="dimens-table">
-                <thead>
-                  <tr>
-                    <th style="min-width: 190px; text-align: left;">Circuito / Destino</th>
-                    <th style="width: 105px;">Carga (W)</th>
-                    <th style="width: 130px;">Tensão (V)</th>
-                    <th style="width: 110px;">F. Potência</th>
-                    <th style="width: 85px;">Dist. (m)</th>
-                    <th style="width: 95px; color: var(--secondary);">Corrente ($I_b$)</th>
-                    <th style="width: 100px; color: var(--neon-green);">Bitola Mín.</th>
-                    <th style="width: 95px; color: #818cf8;">Disjuntor</th>
-                    <th style="width: 85px;">Queda %</th>
-                    <th style="width: 115px;">Diagnóstico</th>
-                    <th class="print-hidden" style="width: 40px;"></th>
-                  </tr>
-                </thead>
-                <tbody id="dimensTbody">
-                  <!-- Linhas dinâmicas gerenciadas pelo JS -->
-                </tbody>
-              </table>
-            </div>
-
-            <div class="print-hidden" style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-              <button class="btn-add-item" style="width: auto; padding: 14px 28px; margin: 0;" onclick="addDimensRow('', 1000, 127, 10)">+ Inserir Linha em Branco na Planilha</button>
-              <div style="font-size: 12px; color: var(--text-light); text-align: right;">
-                *Queda de Tensão máxima configurada: <strong>4.0%</strong> (Padrão NBR 5410).<br>
-                *Capacidade de condução ($I_z$) baseada em condutores de Cobre, Isolação PVC 70°C, Método B1.
+              <div class="print-hidden" style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                <button class="btn-add-item" style="width: auto; padding: 14px 28px; margin: 0;" onclick="addDimensRow('', 1000, 127, 10)">+ Inserir Linha em Branco na Planilha</button>
+                <div style="font-size: 12px; color: var(--text-light); text-align: right;">
+                  *Queda de Tensão máxima configurada: <strong>4.0%</strong> (Padrão NBR 5410).<br>
+                  *Capacidade de condução ($I_z$) baseada em condutores de Cobre, Isolação PVC 70°C, Método B1.
+                </div>
               </div>
-            </div>
 
+            </div>
           </div>
         </div>
-        <!-- ── FIM DO NÚCLEO NBR 5410 ── -->
 
         <div class="tab-content" id="tab-hist-prof">
           <h3>📚 Histórico de Orçamentos</h3>
@@ -787,9 +797,7 @@
         console.error("Erro Firebase Auth:", err);
         
         if(err.code === "auth/popup-blocked") {
-          alert('O bloqueador de pop-ups do seu navegador impediu a abertura da janela. Por favor, autorize a abertura de pop-ups para este site.');
-        } else if(err.code === "auth/unauthorized-domain") {
-          alert('Este domínio não está autorizado no Console do Firebase. Adicione "voltcalcpro.com" nas configurações de Autenticação.');
+          alert('O bloqueador de pop-ups do seu navegador impediu a abertura da janela.');
         } else {
           alert('Erro na conexão com o Google: ' + err.message);
         }
@@ -813,18 +821,21 @@
       document.getElementById('landingPage').style.display = 'block';
       document.getElementById('profScreen').style.display = 'none';
       document.getElementById('authBtns').style.display = 'flex';
+      document.getElementById('userTopNav').style.display = 'none';
     }
 
     function showApp(role, name) {
       document.getElementById('landingPage').style.display = 'none';
       document.getElementById('authBtns').style.display = 'none';
       document.getElementById('profScreen').style.display = 'block';
+      document.getElementById('userTopNav').style.display = 'flex'; // Exibe Sino e Perfil no topo
       document.getElementById('profNameTitleInput').value = name;
+      
       renderPrecosTable();
       renderProfileForm('tab-perfil');
       loadHistory('profHistContainer');
+      escutarNotificacoesSuporte(); // Ativa escuta de respostas do suporte
 
-      // Preenche a planilha de dimensionamento com 4 circuitos base na primeira abertura
       var tbodyDim = document.getElementById('dimensTbody');
       if(tbodyDim && tbodyDim.children.length === 0) {
         addDimensRow('Iluminação Geral (Salas e Quartos)', 500, 127, 12);
@@ -832,6 +843,69 @@
         addDimensRow('Chuveiro Elétrico Suíte Master', 5500, 220, 18);
         addDimensRow('Ar Condicionado Split Suíte (12.000 BTU)', 1100, 220, 22);
       }
+    }
+
+    // ── GATILHOS DA BARRA SUPERIOR ──
+    function abrirPerfilTopo() {
+      document.querySelectorAll('#profScreen .tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('#profScreen .tab').forEach(t => t.classList.remove('active'));
+      const aba = document.getElementById('tab-perfil');
+      if(aba) { aba.classList.add('active'); aba.scrollIntoView({behavior: 'smooth'}); }
+    }
+
+    function abrirModalNotificacoes() {
+      openModal('modalNotificacoes');
+    }
+
+    // ── CONEXÃO COM AS RESPOSTAS DO ADMIN ──
+    function escutarNotificacoesSuporte() {
+      if(!currentUser || !currentUser.email) return;
+      const notifBody = document.getElementById('notifListBody');
+      const badge = document.getElementById('badgeNotif');
+
+      db.collection('chamados').where('email', '==', currentUser.email).onSnapshot(function(snap) {
+        let totalRespostas = 0;
+        let html = '';
+
+        if(snap.empty) {
+          if(notifBody) notifBody.innerHTML = '<p style="color:var(--text-light); font-size:14px;">Você ainda não abriu nenhum chamado de suporte.</p>';
+          if(badge) badge.style.display = 'none';
+          return;
+        }
+
+        snap.forEach(function(doc) {
+          const c = doc.data();
+          const cId = doc.id;
+
+          html += `<div style="background:var(--bg-color); border:1px solid var(--border-color); padding:16px; border-radius:12px; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-light); margin-bottom:8px; font-weight:600;">
+              <span>Chamado: "${c.mensagem ? c.mensagem.substring(0, 35) + '...' : 'Sem Assunto'}"</span>
+              <span style="color:${c.status === 'Resolvido' ? 'var(--neon-green)' : '#f59e0b'};">${c.status || 'Em Análise'}</span>
+            </div>`;
+
+          db.collection('chamados').doc(cId).collection('mensagens').orderBy('data', 'asc').get().then(function(msgSnap) {
+            if(msgSnap.empty) {
+              html += `<p style="font-size:13px; color:var(--text-light); font-style:italic;">Equipe técnica analisando sua solicitação...</p>`;
+            } else {
+              msgSnap.forEach(function(mDoc) {
+                const m = mDoc.data();
+                totalRespostas++;
+                html += `<div style="background:var(--card-bg); border-left:3px solid var(--neon-green); padding:10px 12px; margin-top:8px; border-radius:6px;">
+                  <span style="font-size:11px; color:var(--neon-green); font-weight:700;">Resposta do Suporte:</span>
+                  <p style="font-size:14px; color:#fff; margin-top:4px;">${m.texto}</p>
+                </div>`;
+              });
+            }
+            html += `</div>`;
+            if(notifBody) notifBody.innerHTML = html;
+            if(totalRespostas > 0) {
+              if(badge) { badge.textContent = totalRespostas; badge.style.display = 'inline-block'; }
+            } else {
+              if(badge) badge.style.display = 'none';
+            }
+          });
+        });
+      });
     }
 
     function setupTabs() {
@@ -1496,17 +1570,15 @@
           return;
         }
 
-        // 1. Cálculo da Corrente de Projeto (Ib)
         var ib = 0;
-        var k_queda = 2; // Fator para circuitos monofásicos e bifásicos
+        var k_queda = 2; 
         if (v === 380) {
           ib = w / (1.732 * v * fp);
-          k_queda = 1.732; // Fator raiz de 3 para trifásico equilibrado
+          k_queda = 1.732; 
         } else {
           ib = w / (v * fp);
         }
 
-        // 2. Tabela de Capacidade de Condução (Iz) - PVC 70°C, Método B1 (Cobre)
         var normTable = [
           { s: 1.5, iz: 17.5 },
           { s: 2.5, iz: 24.0 },
@@ -1525,7 +1597,6 @@
           if (normTable[i].iz >= ib) { chosen = normTable[i]; break; }
         }
 
-        // Trava Normativa Mínima (Iluminação: 1.5mm² | Força/Tomadas: 2.5mm²)
         var nomeCirc = row.querySelector('.dim-nome').value.toLowerCase();
         var minNorma = 2.5; 
         if (nomeCirc.includes('ilum') || nomeCirc.includes('luz') || nomeCirc.includes('spot') || nomeCirc.includes('led')) {
@@ -1535,14 +1606,12 @@
           chosen = normTable.find(function(x) { return x.s >= minNorma; }) || chosen;
         }
 
-        // 3. Verificação de Queda de Tensão (Resistividade do Cobre a 70°C = 0.0219)
         var dV_volts = (k_queda * 0.0219 * dist * ib) / chosen.s;
         var dV_perc = (dV_volts / v) * 100;
 
         var statusText = "OK (Norma)";
         var statusColor = "#10b981";
 
-        // Iteração automática: Se a queda passar de 4%, sobe a bitola até estabilizar
         while (dV_perc > 4.0 && chosen.s < 70.0) {
           var nextIdx = normTable.findIndex(function(x) { return x.s > chosen.s; });
           if (nextIdx !== -1) {
@@ -1556,7 +1625,6 @@
 
         if (dV_perc > 4.0) { statusText = "⚠️ Queda > 4%"; statusColor = "#ef4444"; }
 
-        // 4. Coordenação do Disjuntor DIN (Ib <= In <= Iz) com margem de segurança de 10%
         var disjComerciais = [6, 10, 16, 20, 25, 32, 40, 50, 63, 70, 80, 100, 125, 160];
         var djMin = ib * 1.1; 
         var disjEscolhido = disjComerciais.find(function(dj) { return dj >= djMin && dj <= chosen.iz; });
@@ -1564,7 +1632,6 @@
           disjEscolhido = disjComerciais.find(function(dj) { return dj >= ib; }) || "Especial";
         }
 
-        // Aplicação dos resultados na interface
         row.querySelector('.dim-res-ib').textContent = ib.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' A';
         row.querySelector('.dim-res-bitola').textContent = chosen.s.toLocaleString('pt-BR') + ' mm²';
         row.querySelector('.dim-res-disj').textContent = disjEscolhido + ' A';
@@ -1632,23 +1699,15 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('/sw.js').then(function(registration) {
-          
-          // CAMADA 2: Força o navegador a checar se tem versão nova na Vercel
           registration.update(); 
-
-          // CAMADA 3: Escuta o gatilho. Achou código novo? Dá um F5 invisível no usuário.
           registration.onupdatefound = () => {
             const installingWorker = registration.installing;
             installingWorker.onstatechange = () => {
-              if (installingWorker.state === 'installed') {
-                if (navigator.serviceWorker.controller) {
-                  console.log("Nova versão detectada. Atualizando...");
-                  window.location.reload();
-                }
+              if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                window.location.reload();
               }
             };
           };
-
         }).catch(function(err) { console.log('SW Falhou:', err); });
       });
     }
@@ -1681,18 +1740,15 @@
                 email: email,
                 telefone: telefone,
                 mensagem: mensagem,
+                status: "Pendente",
                 data: new Date()
-            })
-            .then(() => {
-                alert("Chamado enviado com sucesso!");
+            }).then(() => {
+                alert("Chamado disparado para a central! Acompanhe as respostas pelo sino no topo.");
                 document.getElementById('sup-nome').value = '';
                 document.getElementById('sup-email').value = '';
                 document.getElementById('sup-telefone').value = '';
                 document.getElementById('sup-msg').value = '';
-            })
-            .catch((error) => {
-                alert("Erro ao enviar: " + error.message);
-            });
+            }).catch(error => alert("Erro ao enviar: " + error.message));
         } else {
             alert("Por favor, preencha todos os campos obrigatórios (Nome, E-mail e Mensagem).");
         }
