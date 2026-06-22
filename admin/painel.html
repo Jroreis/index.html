@@ -176,7 +176,7 @@
                         <td onclick="abrirModal('${c.email}', '${doc.id}')" style="color:#39FF14; font-weight:bold; cursor:pointer; text-decoration:underline;">
                             ${c.email} 💬
                         </td>
-                        <td>${c.problema || 'Sem descrição'}</td>
+                        <td>${c.nensagem || 'Sem descrição'}</td>
                         <td>
                             <select class="status-select" style="border-color: ${corBorda};" onchange="atualizarStatusChamado('${doc.id}', this.value)">
                                 <option value="Pendente" ${statusAtual === 'Pendente' ? 'selected' : ''}>🔴 Pendente</option>
