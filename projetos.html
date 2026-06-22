@@ -2,29 +2,48 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VoltCalc Pro - Editor de Projetos</title>
     <script src="https://unpkg.com/konva@9.3.1/konva.min.js"></script>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #1a1b2f; font-family: 'Segoe UI', sans-serif; }
+        body, html { 
+            margin: 0; padding: 0; height: 100%; overflow: hidden; 
+            background: #1a1b2f; font-family: 'Segoe UI', Tahoma, sans-serif; 
+        }
         
         .cad-container { display: flex; height: 100vh; }
         
-        .toolbar { width: 220px; background: #111827; padding: 20px; border-right: 1px solid #1f4068; color: #fff; }
-        .toolbar h3 { color: #39FF14; margin-bottom: 20px; }
-        .toolbar button { width: 100%; padding: 12px; margin-bottom: 10px; background: #162447; border: 1px solid #1f4068; color: #fff; cursor: pointer; border-radius: 5px; }
-        .toolbar button:hover { background: #39FF14; color: #000; font-weight: bold; }
+        /* BARRA LATERAL ESQUERDA - FERRAMENTAS */
+        .toolbar { 
+            width: 220px; background: #111827; padding: 20px; 
+            border-right: 1px solid #1f4068; color: #fff; z-index: 10;
+        }
+        .toolbar h3 { color: #39FF14; margin-bottom: 20px; text-transform: uppercase; font-size: 14px;}
+        .toolbar button { 
+            width: 100%; padding: 12px; margin-bottom: 10px; 
+            background: #162447; border: 1px solid #1f4068; color: #fff; 
+            cursor: pointer; border-radius: 5px; font-weight: bold; transition: 0.3s;
+        }
+        .toolbar button:hover { background: #39FF14; color: #000; }
         
-        #container-canvas { flex: 1; background: #fff; position: relative; }
+        /* ÁREA DE DESENHO */
+        #container-canvas { flex: 1; background: #ffffff; position: relative; }
         
-        .sidebar-calculo { width: 300px; background: #111827; padding: 20px; border-left: 1px solid #1f4068; color: #fff; }
-        .sidebar-calculo h3 { color: #e43f5a; }
+        /* BARRA LATERAL DIREITA - CÁLCULOS */
+        .sidebar-calculo { 
+            width: 300px; background: #111827; padding: 20px; 
+            border-left: 1px solid #1f4068; color: #fff; z-index: 10;
+        }
+        .sidebar-calculo h3 { color: #e43f5a; text-transform: uppercase; font-size: 14px; margin-bottom: 20px; }
+        #resultado-calculo p { color: #9ba4b5; font-size: 14px; }
+        #resultado-calculo strong { color: #fff; }
     </style>
 </head>
 <body>
 
 <div class="cad-container">
     <div class="toolbar">
-        <h3>Componentes</h3>
+        <h3>Componentes NBR 5410</h3>
         <button onclick="adicionarElemento('tomada')">➕ Tomada</button>
         <button onclick="adicionarElemento('lampada')">💡 Lâmpada</button>
         <button onclick="adicionarElemento('disjuntor')">⚡ Disjuntor</button>
@@ -35,42 +54,133 @@
     <div class="sidebar-calculo">
         <h3>Dimensionamento</h3>
         <div id="resultado-calculo">
-            <p>Selecione um componente para ver dados...</p>
+            <p>Selecione um componente no projeto para inspecionar os dados...</p>
         </div>
     </div>
 </div>
 
 <script>
-    // Inicializa o Canvas
-    const width = document.getElementById('container-canvas').offsetWidth;
+    // 1. INICIALIZAÇÃO DO MOTOR GRÁFICO (CANVAS)
+    const container = document.getElementById('container-canvas');
+    const width = container.offsetWidth;
     const height = window.innerHeight;
+    
     const stage = new Konva.Stage({ container: 'container-canvas', width: width, height: height });
     const layer = new Konva.Layer();
     stage.add(layer);
 
+    // 2. VARIÁVEIS DE CONTROLE DO SISTEMA
+    let selected = null; // Armazena o componente selecionado para ligação
+
+    // Função utilitária para pegar o centro exato do componente
+    function getCenter(node) {
+        if (node.getClassName() === 'Circle') {
+            return { x: node.x(), y: node.y() };
+        }
+        return { x: node.x() + node.width() / 2, y: node.y() + node.height() / 2 };
+    }
+
+    // 3. FUNÇÃO PRINCIPAL: ADICIONAR E CONECTAR COMPONENTES
     function adicionarElemento(tipo) {
         let shape;
         
+        // Posição inicial levemente randomizada para não sobrepor um em cima do outro
+        let startX = 50 + Math.random() * 50; 
+        let startY = 50 + Math.random() * 50;
+        
         if (tipo === 'tomada') {
-            shape = new Konva.Rect({ x: 50, y: 50, width: 40, height: 40, fill: '#3498db', draggable: true, stroke: 'black' });
+            shape = new Konva.Rect({ x: startX, y: startY, width: 40, height: 40, fill: '#3498db', draggable: true, stroke: 'black', strokeWidth: 1 });
         } else if (tipo === 'lampada') {
-            shape = new Konva.Circle({ x: 100, y: 100, radius: 20, fill: '#f1c40f', draggable: true, stroke: 'black' });
+            shape = new Konva.Circle({ x: startX + 20, y: startY + 20, radius: 20, fill: '#f1c40f', draggable: true, stroke: 'black', strokeWidth: 1 });
         } else if (tipo === 'disjuntor') {
-            shape = new Konva.Rect({ x: 150, y: 50, width: 60, height: 30, fill: '#e74c3c', draggable: true, stroke: 'black' });
+            shape = new Konva.Rect({ x: startX, y: startY, width: 60, height: 30, fill: '#e74c3c', draggable: true, stroke: 'black', strokeWidth: 1 });
         }
+
+        shape.linesAttached = []; // Histórico de fios ligados a este componente
+
+        // Dinâmica do Fio: Acompanhar o objeto ao ser arrastado
+        shape.on('dragmove', () => {
+            shape.linesAttached.forEach(line => {
+                const points = line.points();
+                const center = getCenter(shape);
+                
+                if (line.source === shape) {
+                    points[0] = center.x;
+                    points[1] = center.y;
+                } else {
+                    points[2] = center.x;
+                    points[3] = center.y;
+                }
+                line.points(points);
+            });
+        });
+
+        // Dinâmica de Seleção e Criação de Fiação
+        shape.on('click', (e) => {
+            e.cancelBubble = true; // Impede que o clique afete o fundo
+            
+            if (!selected) {
+                // Passo 1: Seleciona o primeiro componente
+                selected = shape;
+                shape.stroke('#39FF14'); // Borda neon verde
+                shape.strokeWidth(3);
+            } else if (selected !== shape) {
+                // Passo 2: Clica no segundo componente e traça o fio
+                const center1 = getCenter(selected);
+                const center2 = getCenter(shape);
+
+                const line = new Konva.Line({
+                    points: [center1.x, center1.y, center2.x, center2.y],
+                    stroke: '#2c3e50', // Cor do cabo
+                    strokeWidth: 3,
+                    dash: [10, 5], // Estilo tracejado (eletroduto)
+                    tension: 0
+                });
+                
+                // Grava a conexão matemática
+                line.source = selected;
+                line.target = shape;
+                selected.linesAttached.push(line);
+                shape.linesAttached.push(line);
+                
+                layer.add(line);
+                line.moveToBottom(); // Joga o fio para trás do componente
+                
+                // Reseta a seleção visual
+                selected.stroke('black');
+                selected.strokeWidth(1);
+                selected = null;
+            }
+            layer.draw();
+
+            // Atualiza Painel de Dimensionamento
+            document.getElementById('resultado-calculo').innerHTML = `
+                <p><strong>Circuito:</strong> ${tipo.toUpperCase()}</p>
+                <p><strong>Carga Unitária:</strong> 100W</p>
+                <p><strong>Tensão:</strong> 220V</p>
+                <button style="background: #39FF14; color: #000; border: none; padding: 10px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 15px;">Dimensionar Bitola</button>
+            `;
+        });
 
         layer.add(shape);
         layer.draw();
-        
-        // Exemplo de interação: ao clicar, mostra dados no painel
-        shape.on('click', () => {
-            document.getElementById('resultado-calculo').innerHTML = `
-                <p><strong>Tipo:</strong> ${tipo.toUpperCase()}</p>
-                <p><strong>Carga estimada:</strong> 100W</p>
-                <button onclick="alert('Calculando queda de tensão...')">Calcular Queda</button>
-            `;
-        });
     }
+    
+    // 4. CANCELAR SELEÇÃO (Clicar no fundo branco reseta a ferramenta de fiação)
+    stage.on('click', (e) => {
+        if (e.target === stage && selected) {
+            selected.stroke('black');
+            selected.strokeWidth(1);
+            selected = null;
+            layer.draw();
+        }
+    });
+
+    // Responsividade da tela
+    window.addEventListener('resize', () => {
+        stage.width(container.offsetWidth);
+        stage.height(window.innerHeight);
+    });
 </script>
 
 </body>
