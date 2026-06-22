@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -19,9 +20,7 @@
         
         .sidebar-calculo { width: 320px; background: #111827; padding: 20px; border-left: 1px solid #1f4068; color: #fff; z-index: 10; display: flex; flex-direction: column; overflow-y: auto; }
         .prop-box { background: #162447; border: 1px solid #1f4068; padding: 15px; border-radius: 6px; margin-bottom: 15px; }
-        .prop-box p { color: #9ba4b5; font-size: 13px; margin-bottom: 8px; display: flex; justify-content: space-between;}
-        .prop-box strong { color: #fff; }
-        .linha-divisoria { border: 0; border-top: 1px solid #1f4068; margin: 15px 0; }
+        .prop-box p { color: #9ba4b5; font-size: 13px; margin-bottom: 8px; display: flex; justify-content: space-between; }
         .valor-total { font-size: 22px; color: #39FF14; font-weight: bold; text-align: center; margin: 10px 0; }
     </style>
 </head>
@@ -33,16 +32,14 @@
             <h3>Tomadas (NBR 5410)</h3>
             <button onclick="adicionarElemento('tomada_baixa')">⏏️ Tomada Baixa</button>
             <button onclick="adicionarElemento('tomada_media')">⏏️ Tomada Média</button>
-            <button onclick="adicionarElemento('tomada_alta')">⏏️ Tomada Alta</button>
         </div>
         <div class="grupo-ferramentas">
             <h3>Iluminação</h3>
             <button onclick="adicionarElemento('luz_teto')">⊗ Ponto de Teto</button>
-            <button onclick="adicionarElemento('arandela')">◖ Arandela</button>
+            <button onclick="adicionarElemento('int_simples')">⚬ Interruptor</button>
         </div>
         <div class="grupo-ferramentas">
-            <h3>Comandos e Quadros</h3>
-            <button onclick="adicionarElemento('int_simples')">⚬ Interruptor</button>
+            <h3>Quadros</h3>
             <button onclick="adicionarElemento('quadro')">🗄️ Quadro (QDC)</button>
         </div>
     </div>
@@ -51,53 +48,28 @@
     
     <div class="sidebar-calculo">
         <h3>Properties (Inspetor)</h3>
-        <div id="resultado-calculo">
-            <div class="prop-box">Selecione um item para editar circuito e propriedades...</div>
-        </div>
+        <div id="resultado-calculo"><div class="prop-box">Selecione um item...</div></div>
     </div>
 </div>
 
 <script>
-    const container = document.getElementById('container-canvas');
-    const stage = new Konva.Stage({ container: 'container-canvas', width: container.offsetWidth, height: window.innerHeight, draggable: true });
+    const stage = new Konva.Stage({ container: 'container-canvas', width: window.innerWidth - 570, height: window.innerHeight, draggable: true });
     const layer = new Konva.Layer();
     stage.add(layer);
 
-    let selected = null; 
-    const ESCALA_PIXELS_POR_METRO = 50; 
-    const GRID_SIZE = 20; 
-    const COR_TRACO = '#1e293b'; 
+    let selected = null;
+    const GRID_SIZE = 20;
+    const COR_TRACO = '#1e293b';
 
-    const TABELA_PRECOS = { caboMetro: 3.50, pontoTomada: 45.00, pontoLampada: 40.00, pontoInterruptor: 30.00, pontoQuadro: 150.00 };
-
-    // ZOOM E GRID
-    stage.on('wheel', (e) => {
-        e.evt.preventDefault();
-        const scaleBy = 1.1;
-        const oldScale = stage.scaleX();
-        const pointer = stage.getPointerPosition();
-        const mousePointTo = { x: (pointer.x - stage.x()) / oldScale, y: (pointer.y - stage.y()) / oldScale };
-        let newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
-        stage.scale({ x: newScale, y: newScale });
-        stage.position({ x: pointer.x - mousePointTo.x * newScale, y: pointer.y - mousePointTo.y * newScale });
-        layer.draw();
-    });
-
-    // SÍMBOLOS NBR 5410
     function criarSímboloBase(tipo) {
         const group = new Konva.Group({ x: 100, y: 100, draggable: true, name: tipo });
-        group.circuito = "01"; // Inicializa circuito padrão
+        group.circuito = "01"; // IMPLEMENTAÇÃO: Propriedade de Circuito mantida
+        group.linesAttached = [];
         
-        if (tipo.includes('tomada')) {
-            const poly = new Konva.RegularPolygon({ sides: 3, radius: 14, stroke: COR_TRACO, strokeWidth: 2 });
-            if (tipo === 'tomada_alta') poly.fill(COR_TRACO);
-            group.add(poly);
-        } else if (tipo === 'luz_teto') {
-            group.add(new Konva.Circle({ radius: 14, stroke: COR_TRACO, strokeWidth: 2 }));
-            group.add(new Konva.Line({ points: [-10, -10, 10, 10], stroke: COR_TRACO, strokeWidth: 2 }));
-        } else if (tipo === 'quadro') {
-            group.add(new Konva.Rect({ x: -15, y: -25, width: 30, height: 50, stroke: COR_TRACO, strokeWidth: 2 }));
-        }
+        if (tipo.includes('tomada')) group.add(new Konva.RegularPolygon({ sides: 3, radius: 14, stroke: COR_TRACO, strokeWidth: 2 }));
+        else if (tipo === 'luz_teto') group.add(new Konva.Circle({ radius: 14, stroke: COR_TRACO, strokeWidth: 2 }));
+        else if (tipo === 'quadro') group.add(new Konva.Rect({ x: -15, y: -25, width: 30, height: 50, stroke: COR_TRACO, strokeWidth: 2 }));
+        
         group.add(new Konva.Circle({ radius: 18, fill: 'rgba(0,0,0,0)' }));
         return group;
     }
@@ -111,28 +83,14 @@
                 <select onchange="selected.circuito = this.value">
                     ${Array.from({length: 10}, (_, i) => `<option value="${(i+1).toString().padStart(2, '0')}" ${selected.circuito == (i+1).toString().padStart(2, '0') ? 'selected' : ''}>Circuito ${(i+1).toString().padStart(2, '0')}</option>`).join('')}
                 </select>
-                <p>Carga: 100VA | Bitola: 2.5mm²</p>
+                <p>Bitola: 2.5mm²</p>
+                <button onclick="alert('PDF Gerado')" style="background:#39FF14; width:100%; border:none; padding:8px;">Gerar PDF</button>
             </div>
-            ${gerarResumoGlobal()}
-        `;
-    }
-
-    function gerarResumoGlobal() {
-        let px = 0;
-        layer.find('Line').forEach(line => {
-            const p = line.points();
-            px += Math.sqrt(Math.pow(p[2]-p[0], 2) + Math.pow(p[3]-p[1], 2));
-        });
-        const m = (px / ESCALA_PIXELS_POR_METRO).toFixed(2);
-        return `
-            <div class="valor-total">${m} metros de fio</div>
-            <button class="valor-total" style="background:#39FF14; border:none; padding:10px; width:100%; border-radius:5px;">Gerar PDF</button>
         `;
     }
 
     function adicionarElemento(tipo) {
         let shape = criarSímboloBase(tipo);
-        shape.linesAttached = [];
         
         shape.on('dragmove', () => {
             shape.x(Math.round(shape.x() / GRID_SIZE) * GRID_SIZE);
@@ -148,8 +106,8 @@
         layer.add(shape);
         layer.draw();
     }
-
-    stage.on('click', (e) => { if (e.target === stage) { selected = null; atualizarPainel(); } });
+    
+    stage.on('click', (e) => { if (e.target === stage) { selected = null; } });
 </script>
 </body>
 </html>
