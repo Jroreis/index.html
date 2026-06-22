@@ -14,209 +14,225 @@
         
         /* BARRA LATERAL ESQUERDA - FERRAMENTAS */
         .toolbar { 
-            width: 220px; background: #111827; padding: 20px; 
+            width: 250px; background: #111827; padding: 20px; 
             border-right: 1px solid #1f4068; color: #fff; z-index: 10;
+            overflow-y: auto;
         }
-        .toolbar h3 { color: #39FF14; margin-bottom: 20px; text-transform: uppercase; font-size: 14px;}
+        .toolbar h3 { color: #39FF14; margin-bottom: 15px; text-transform: uppercase; font-size: 13px;}
+        .grupo-ferramentas { margin-bottom: 20px; }
         .toolbar button { 
-            width: 100%; padding: 12px; margin-bottom: 10px; 
+            width: 100%; padding: 10px; margin-bottom: 8px; 
             background: #162447; border: 1px solid #1f4068; color: #fff; 
-            cursor: pointer; border-radius: 5px; font-weight: bold; transition: 0.3s;
-            text-align: left;
+            cursor: pointer; border-radius: 4px; font-size: 13px; text-align: left; transition: 0.2s;
         }
-        .toolbar button:hover { background: #39FF14; color: #000; }
+        .toolbar button:hover { background: #39FF14; color: #000; font-weight: bold; }
         
-        /* ÁREA DE DESENHO - ESTILO AUTOCAD GRID */
+        /* ÁREA DE DESENHO - GRID CAD */
         #container-canvas { 
             flex: 1; 
-            background-color: #ffffff;
+            background-color: #f0f0f0;
             background-image: 
-                linear-gradient(#e5e7eb 1px, transparent 1px),
-                linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
-            background-size: 25px 25px; /* Tamanho do Grid */
+                linear-gradient(#ccc 1px, transparent 1px),
+                linear-gradient(90deg, #ccc 1px, transparent 1px);
+            background-size: 20px 20px; /* Grade de 20px */
+            background-position: 0 0;
             position: relative; 
+            cursor: grab;
         }
+        #container-canvas:active { cursor: grabbing; }
         
-        /* BARRA LATERAL DIREITA - CÁLCULOS */
+        /* BARRA LATERAL DIREITA - CÁLCULOS E PROPRIEDADES */
         .sidebar-calculo { 
-            width: 300px; background: #111827; padding: 20px; 
+            width: 320px; background: #111827; padding: 20px; 
             border-left: 1px solid #1f4068; color: #fff; z-index: 10;
             display: flex; flex-direction: column; overflow-y: auto;
         }
-        .sidebar-calculo h3 { color: #e43f5a; text-transform: uppercase; font-size: 14px; margin-bottom: 20px; }
-        #resultado-calculo p { color: #9ba4b5; font-size: 14px; margin-bottom: 5px; }
-        #resultado-calculo strong { color: #fff; }
+        .sidebar-calculo h3 { color: #e43f5a; text-transform: uppercase; font-size: 13px; margin-bottom: 15px; }
+        .prop-box { background: #162447; border: 1px solid #1f4068; padding: 15px; border-radius: 6px; margin-bottom: 15px; }
+        .prop-box p { color: #9ba4b5; font-size: 13px; margin-bottom: 8px; display: flex; justify-content: space-between;}
+        .prop-box strong { color: #fff; }
         .linha-divisoria { border: 0; border-top: 1px solid #1f4068; margin: 15px 0; }
-        .valor-total { font-size: 24px; color: #39FF14; font-weight: bold; text-align: center; margin: 15px 0; }
+        .valor-total { font-size: 22px; color: #39FF14; font-weight: bold; text-align: center; margin: 10px 0; }
     </style>
 </head>
 <body>
 
 <div class="cad-container">
     <div class="toolbar">
-        <h3>Símbolos NBR 5410</h3>
-        <button onclick="adicionarElemento('tomada')">⏏️ Tomada</button>
-        <button onclick="adicionarElemento('lampada')">⊗ Ponto de Luz</button>
-        <button onclick="adicionarElemento('interruptor')">⚬ Interruptor</button>
-        <button onclick="adicionarElemento('quadro')">🗄️ Quadro (QDC)</button>
+        <div class="grupo-ferramentas">
+            <h3>Tomadas (NBR 5410)</h3>
+            <button onclick="adicionarElemento('tomada_baixa')">⏏️ Tomada Baixa (30cm)</button>
+            <button onclick="adicionarElemento('tomada_media')">⏏️ Tomada Média (1,30m)</button>
+            <button onclick="adicionarElemento('tomada_alta')">⏏️ Tomada Alta (2,00m)</button>
+        </div>
+        <div class="grupo-ferramentas">
+            <h3>Iluminação</h3>
+            <button onclick="adicionarElemento('luz_teto')">⊗ Ponto de Teto</button>
+            <button onclick="adicionarElemento('arandela')">◖ Arandela (Parede)</button>
+        </div>
+        <div class="grupo-ferramentas">
+            <h3>Comandos e Quadros</h3>
+            <button onclick="adicionarElemento('int_simples')">⚬ Interruptor Simples</button>
+            <button onclick="adicionarElemento('int_paralelo')">⚬ Interruptor Paralelo</button>
+            <button onclick="adicionarElemento('quadro')">🗄️ Quadro de Dist. (QDC)</button>
+        </div>
     </div>
     
     <div id="container-canvas"></div>
     
     <div class="sidebar-calculo">
-        <h3>Propriedades</h3>
+        <h3>Properties (Inspetor)</h3>
         <div id="resultado-calculo">
-            <p>Selecione um componente para inspecionar...</p>
+            <div class="prop-box">Selecione um componente para editar atributos NBR...</div>
         </div>
     </div>
 </div>
 
 <script>
     const container = document.getElementById('container-canvas');
-    const width = container.offsetWidth;
-    const height = window.innerHeight;
-    
-    const stage = new Konva.Stage({ container: 'container-canvas', width: width, height: height });
+    const stage = new Konva.Stage({ container: 'container-canvas', width: container.offsetWidth, height: window.innerHeight, draggable: true }); // Draggable = PAN
     const layer = new Konva.Layer();
     stage.add(layer);
 
     let selected = null; 
     const ESCALA_PIXELS_POR_METRO = 50; 
-    const COR_TRACO = '#1e293b'; // Cor padrão do desenho técnico (Azul/Preto bem escuro)
+    const GRID_SIZE = 20; // Snap to grid
+    const COR_TRACO = '#1e293b'; 
 
     const TABELA_PRECOS = {
-        caboMetro: 3.50,       
-        pontoTomada: 45.00,    
-        pontoLampada: 40.00,   
-        pontoInterruptor: 30.00, 
-        pontoQuadro: 150.00  
+        caboMetro: 3.50, pontoTomada: 45.00, pontoLampada: 40.00, pontoInterruptor: 30.00, pontoQuadro: 150.00  
     };
 
     // ==========================================
-    // CONSTRUTORES DE SÍMBOLOS VETORIAIS (AUTOCAD STYLE)
+    // SISTEMA DE ZOOM (Scroll do Mouse)
     // ==========================================
-    function criarTomada(x, y) {
-        const group = new Konva.Group({ x, y, draggable: true, name: 'tomada' });
-        // Triângulo
-        group.add(new Konva.RegularPolygon({ sides: 3, radius: 16, stroke: COR_TRACO, strokeWidth: 2, fill: 'transparent' }));
-        // Área de clique invisível
-        group.add(new Konva.Circle({ radius: 18, fill: 'rgba(0,0,0,0)' }));
-        return group;
-    }
+    const scaleBy = 1.1;
+    stage.on('wheel', (e) => {
+        e.evt.preventDefault();
+        const oldScale = stage.scaleX();
+        const pointer = stage.getPointerPosition();
+        const mousePointTo = { x: (pointer.x - stage.x()) / oldScale, y: (pointer.y - stage.y()) / oldScale };
+        let newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
+        stage.scale({ x: newScale, y: newScale });
+        const newPos = { x: pointer.x - mousePointTo.x * newScale, y: pointer.y - mousePointTo.y * newScale };
+        stage.position(newPos);
+        atualizarGridVisual();
+    });
 
-    function criarLampada(x, y) {
-        const group = new Konva.Group({ x, y, draggable: true, name: 'lampada' });
-        group.add(new Konva.Circle({ radius: 16, stroke: COR_TRACO, strokeWidth: 2 }));
-        group.add(new Konva.Line({ points: [-11, -11, 11, 11], stroke: COR_TRACO, strokeWidth: 2 }));
-        group.add(new Konva.Line({ points: [11, -11, -11, 11], stroke: COR_TRACO, strokeWidth: 2 }));
-        group.add(new Konva.Circle({ radius: 18, fill: 'rgba(0,0,0,0)' }));
-        return group;
+    function atualizarGridVisual() {
+        container.style.backgroundPosition = `${stage.x()}px ${stage.y()}px`;
+        container.style.backgroundSize = `${GRID_SIZE * stage.scaleX()}px ${GRID_SIZE * stage.scaleY()}px`;
     }
-
-    function criarInterruptor(x, y) {
-        const group = new Konva.Group({ x, y, draggable: true, name: 'interruptor' });
-        group.add(new Konva.Circle({ radius: 8, stroke: COR_TRACO, strokeWidth: 2, fill: 'transparent' }));
-        group.add(new Konva.Circle({ radius: 12, fill: 'rgba(0,0,0,0)' }));
-        return group;
-    }
-
-    function criarQuadro(x, y) {
-        const group = new Konva.Group({ x, y, draggable: true, name: 'quadro' });
-        group.add(new Konva.Rect({ x: -15, y: -25, width: 30, height: 50, stroke: COR_TRACO, strokeWidth: 2, fill: 'transparent' }));
-        group.add(new Konva.Line({ points: [-15, 0, 15, 0], stroke: COR_TRACO, strokeWidth: 2 })); // Divisória do QDC
-        group.add(new Konva.Rect({ x: -15, y: -25, width: 30, height: 50, fill: 'rgba(0,0,0,0)' }));
-        return group;
-    }
-
-    // Função para alterar a cor quando selecionado
-    function alternarSelecaoVisual(grupo, isSelected) {
-        const cor = isSelected ? '#39FF14' : COR_TRACO;
-        const espessura = isSelected ? 3 : 2;
-        grupo.getChildren().forEach(filho => {
-            if (filho.fill() !== 'rgba(0,0,0,0)') { // Ignora a área de clique
-                if (filho.stroke()) {
-                    filho.stroke(cor);
-                    filho.strokeWidth(espessura);
-                }
-            }
-        });
-        layer.draw();
-    }
-
-    // Matemática
-    function calcularDistanciaPixels(x1, y1, x2, y2) { return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)); }
+    stage.on('dragmove', atualizarGridVisual);
 
     // ==========================================
-    // LÓGICA FINANCEIRA E RESUMO
+    // SÍMBOLOS NBR 5410 (Geometria Dinâmica)
     // ==========================================
+    function criarSímboloBase(x, y, tipo) {
+        const group = new Konva.Group({ x, y, draggable: true, name: tipo });
+        
+        if (tipo.includes('tomada')) {
+            const poly = new Konva.RegularPolygon({ sides: 3, radius: 14, stroke: COR_TRACO, strokeWidth: 2 });
+            if (tipo === 'tomada_media') poly.fillLinearGradientStartPoint({ x: -14, y: 0 });
+            if (tipo === 'tomada_media') poly.fillLinearGradientEndPoint({ x: 14, y: 0 });
+            if (tipo === 'tomada_media') poly.fillLinearGradientColorStops([0, COR_TRACO, 0.5, COR_TRACO, 0.5, 'transparent', 1, 'transparent']);
+            if (tipo === 'tomada_alta') poly.fill(COR_TRACO);
+            group.add(poly);
+        } 
+        else if (tipo === 'luz_teto') {
+            group.add(new Konva.Circle({ radius: 14, stroke: COR_TRACO, strokeWidth: 2 }));
+            group.add(new Konva.Line({ points: [-10, -10, 10, 10], stroke: COR_TRACO, strokeWidth: 2 }));
+            group.add(new Konva.Line({ points: [10, -10, -10, 10], stroke: COR_TRACO, strokeWidth: 2 }));
+        }
+        else if (tipo === 'arandela') {
+            group.add(new Konva.Arc({ innerRadius: 0, outerRadius: 14, angle: 180, rotation: 180, stroke: COR_TRACO, strokeWidth: 2, fill: 'transparent' }));
+            group.add(new Konva.Line({ points: [-14, 0, 14, 0], stroke: COR_TRACO, strokeWidth: 2 }));
+        }
+        else if (tipo.includes('int')) {
+            group.add(new Konva.Circle({ radius: 8, stroke: COR_TRACO, strokeWidth: 2, fill: tipo === 'int_paralelo' ? COR_TRACO : 'transparent' }));
+        }
+        else if (tipo === 'quadro') {
+            group.add(new Konva.Rect({ x: -15, y: -25, width: 30, height: 50, stroke: COR_TRACO, strokeWidth: 2, fill: 'transparent' }));
+            group.add(new Konva.Line({ points: [-15, 0, 15, 0], stroke: COR_TRACO, strokeWidth: 2 })); 
+            group.add(new Konva.Rect({ x: -15, y: 0, width: 30, height: 25, fill: COR_TRACO })); // Meio pintado
+        }
+
+        group.add(new Konva.Circle({ radius: 18, fill: 'rgba(0,0,0,0)' })); // Área de clique
+        return group;
+    }
+
+    // ==========================================
+    // INSPETOR E CÁLCULO
+    // ==========================================
+    function obterAtributosNBR(tipo) {
+        if(tipo.includes('tomada')) return { desc: 'TUG - Tomada Uso Geral', bitola: '2,5 mm²', carga: '100 VA', preco: TABELA_PRECOS.pontoTomada };
+        if(tipo.includes('luz') || tipo === 'arandela') return { desc: 'Ponto de Iluminação', bitola: '1,5 mm²', carga: '100 VA', preco: TABELA_PRECOS.pontoLampada };
+        if(tipo.includes('int')) return { desc: 'Comando Iluminação', bitola: '1,5 mm²', carga: '-', preco: TABELA_PRECOS.pontoInterruptor };
+        if(tipo === 'quadro') return { desc: 'Quadro de Distribuição', bitola: 'Dimensionar Geral', carga: 'Total', preco: TABELA_PRECOS.pontoQuadro };
+    }
+
     function gerarResumoProjeto() {
-        let pixelsTotal = 0;
-        let pTomada = 0, pLampada = 0, pInterruptor = 0, pQuadro = 0;
+        let px = 0, ptT = 0, ptL = 0, ptI = 0, ptQ = 0;
 
-        layer.children.forEach(node => {
-            if (node.name() === 'tomada') pTomada++;
-            if (node.name() === 'lampada') pLampada++;
-            if (node.name() === 'interruptor') pInterruptor++;
-            if (node.name() === 'quadro') pQuadro++;
+        layer.children.forEach(n => {
+            let t = n.name();
+            if(t) {
+                if(t.includes('tomada')) ptT++;
+                if(t.includes('luz') || t === 'arandela') ptL++;
+                if(t.includes('int')) ptI++;
+                if(t === 'quadro') ptQ++;
+            }
         });
 
         layer.find('Line').forEach(line => {
-            const p = line.points();
-            pixelsTotal += calcularDistanciaPixels(p[0], p[1], p[2], p[3]);
+            const p = line.points(); px += Math.sqrt(Math.pow(p[2]-p[0], 2) + Math.pow(p[3]-p[1], 2));
         });
 
-        const metrosTotal = (pixelsTotal / ESCALA_PIXELS_POR_METRO);
-        
-        const totalRs = (metrosTotal * TABELA_PRECOS.caboMetro) + 
-                        (pTomada * TABELA_PRECOS.pontoTomada) + 
-                        (pLampada * TABELA_PRECOS.pontoLampada) + 
-                        (pInterruptor * TABELA_PRECOS.pontoInterruptor) + 
-                        (pQuadro * TABELA_PRECOS.pontoQuadro);
+        const m = px / ESCALA_PIXELS_POR_METRO;
+        const totalRs = (m * TABELA_PRECOS.caboMetro) + (ptT * TABELA_PRECOS.pontoTomada) + (ptL * TABELA_PRECOS.pontoLampada) + (ptI * TABELA_PRECOS.pontoInterruptor) + (ptQ * TABELA_PRECOS.pontoQuadro);
 
         return `
-            <hr class="linha-divisoria">
-            <p><strong>Resumo Global:</strong></p>
-            <p>Tomadas: <span style="color:#fff">${pTomada}</span></p>
-            <p>Iluminação/Interruptores: <span style="color:#fff">${pLampada + pInterruptor}</span></p>
-            <p>Quadros (QDC): <span style="color:#fff">${pQuadro}</span></p>
-            <p>Eletrodutos: <span style="color:#e43f5a">${metrosTotal.toFixed(2)} m</span></p>
-            
-            <div class="valor-total">
-                ${totalRs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            <div class="prop-box" style="margin-top:10px;">
+                <p><strong>RESUMO DO PROJETO</strong></p>
+                <p>Tomadas: <strong>${ptT}</strong></p>
+                <p>Iluminação/Comandos: <strong>${ptL + ptI}</strong></p>
+                <p>Eletrodutos: <strong>${m.toFixed(2)} m</strong></p>
+                <div class="valor-total">${totalRs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                <button style="background: #39FF14; color: #000; border: none; padding: 10px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer;">Gerar PDF</button>
             </div>
-
-            <button style="background: #39FF14; color: #000; border: none; padding: 10px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer;">Gerar Planta em PDF</button>
         `;
     }
 
-    function atualizarPainelVazio() {
-        document.getElementById('resultado-calculo').innerHTML = `<p>Planta livre...</p>${gerarResumoProjeto()}`;
+    function atualizarPainelVazio() { document.getElementById('resultado-calculo').innerHTML = gerarResumoProjeto(); }
+
+    function alternarSelecaoVisual(grupo, isSelected) {
+        grupo.getChildren().forEach(f => {
+            if (f.fill() !== 'rgba(0,0,0,0)' && f.stroke()) { f.stroke(isSelected ? '#39FF14' : COR_TRACO); f.strokeWidth(isSelected ? 3 : 2); }
+        }); layer.draw();
     }
 
     // ==========================================
-    // MOTOR DE DESENHO (DRAG AND DROP E CONEXÃO)
+    // MOTOR DE DESENHO
     // ==========================================
     function adicionarElemento(tipo) {
-        let shape;
-        let startX = 100 + Math.random() * 50; 
-        let startY = 100 + Math.random() * 50;
+        // Corrige a posição para adicionar na área visível da tela atual (caso tenha dado pan)
+        let scale = stage.scaleX();
+        let startX = (-stage.x() + 100) / scale; 
+        let startY = (-stage.y() + 100) / scale;
         
-        if (tipo === 'tomada') shape = criarTomada(startX, startY);
-        if (tipo === 'lampada') shape = criarLampada(startX, startY);
-        if (tipo === 'interruptor') shape = criarInterruptor(startX, startY);
-        if (tipo === 'quadro') shape = criarQuadro(startX, startY);
-
+        let shape = criarSímboloBase(startX, startY, tipo);
         shape.linesAttached = []; 
 
         shape.on('dragmove', () => {
+            // SNAP TO GRID (TRAVAMENTO)
+            shape.x(Math.round(shape.x() / GRID_SIZE) * GRID_SIZE);
+            shape.y(Math.round(shape.y() / GRID_SIZE) * GRID_SIZE);
+
             shape.linesAttached.forEach(line => {
-                const points = line.points();
-                if (line.source === shape) {
-                    points[0] = shape.x(); points[1] = shape.y();
-                } else {
-                    points[2] = shape.x(); points[3] = shape.y();
-                }
-                line.points(points);
+                const pts = line.points();
+                if (line.source === shape) { pts[0] = shape.x(); pts[1] = shape.y(); } 
+                else { pts[2] = shape.x(); pts[3] = shape.y(); }
+                line.points(pts);
             });
             if(selected === shape) shape.fire('click'); 
         });
@@ -224,52 +240,45 @@
         shape.on('click', (e) => {
             e.cancelBubble = true; 
             if (!selected) {
-                selected = shape;
-                alternarSelecaoVisual(shape, true);
+                selected = shape; alternarSelecaoVisual(shape, true);
             } else if (selected !== shape) {
                 const line = new Konva.Line({
                     points: [selected.x(), selected.y(), shape.x(), shape.y()],
-                    stroke: '#e43f5a', strokeWidth: 2, dash: [8, 4], tension: 0 // Eletroduto avermelhado técnico
+                    stroke: '#e43f5a', strokeWidth: 2, dash: [8, 4], tension: 0
                 });
-                line.source = selected;
-                line.target = shape;
-                selected.linesAttached.push(line);
-                shape.linesAttached.push(line);
-                layer.add(line);
-                line.moveToBottom(); 
+                line.source = selected; line.target = shape;
+                selected.linesAttached.push(line); shape.linesAttached.push(line);
+                layer.add(line); line.moveToBottom(); 
                 
-                alternarSelecaoVisual(selected, false);
-                selected = null;
+                alternarSelecaoVisual(selected, false); selected = null;
             }
             layer.draw();
 
+            const att = obterAtributosNBR(tipo);
             document.getElementById('resultado-calculo').innerHTML = `
-                <p><strong>Atributos:</strong> ${tipo.toUpperCase()}</p>
-                <p><strong>Configuração NBR:</strong> Padrão</p>
-                <button style="background: #1f4068; color: #fff; border: 1px solid #39FF14; padding: 8px; width: 100%; border-radius: 4px; cursor: pointer; margin-top: 10px;">Propriedades do Ponto</button>
+                <div class="prop-box">
+                    <p style="color:#39FF14; font-weight:bold; font-size: 14px;">Propriedades NBR 5410</p>
+                    <p>Descrição: <strong>${att.desc}</strong></p>
+                    <p>Carga Estimada: <strong>${att.carga}</strong></p>
+                    <p>Bitola Mínima: <strong style="color:#e43f5a">${att.bitola}</strong></p>
+                    <p>Custo Ponto: <strong>R$ ${att.preco.toFixed(2)}</strong></p>
+                </div>
                 ${gerarResumoProjeto()}
             `;
         });
 
-        layer.add(shape);
-        layer.draw();
-        atualizarPainelVazio();
+        layer.add(shape); layer.draw(); atualizarPainelVazio();
     }
     
     stage.on('click', (e) => {
         if (e.target === stage) {
-            if (selected) {
-                alternarSelecaoVisual(selected, false);
-                selected = null;
-            }
+            if (selected) { alternarSelecaoVisual(selected, false); selected = null; layer.draw(); }
             atualizarPainelVazio();
         }
     });
 
-    window.addEventListener('resize', () => {
-        stage.width(container.offsetWidth);
-        stage.height(window.innerHeight);
-    });
+    window.addEventListener('resize', () => { stage.width(container.offsetWidth); stage.height(window.innerHeight); });
+    atualizarPainelVazio();
 </script>
 
 </body>
