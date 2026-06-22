@@ -1,53 +1,34 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VoltCalc Pro - CAD NBR 5410 Completo</title>
+    <title>VoltCalc Pro - CAD Profissional Completo</title>
     <script src="https://unpkg.com/konva@9.3.1/konva.min.js"></script>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #1a1b2f; font-family: 'Segoe UI', Tahoma, sans-serif; }
         .cad-container { display: flex; height: 100vh; }
-        
         .toolbar { width: 250px; background: #111827; padding: 20px; border-right: 1px solid #1f4068; color: #fff; z-index: 10; overflow-y: auto; }
         .toolbar h3 { color: #39FF14; margin-bottom: 15px; text-transform: uppercase; font-size: 13px;}
-        .grupo-ferramentas { margin-bottom: 20px; }
-        .toolbar button { width: 100%; padding: 10px; margin-bottom: 8px; background: #162447; border: 1px solid #1f4068; color: #fff; cursor: pointer; border-radius: 4px; font-size: 13px; text-align: left; transition: 0.2s; }
-        .toolbar button:hover { background: #39FF14; color: #000; font-weight: bold; }
-        
+        .toolbar button { width: 100%; padding: 10px; margin-bottom: 8px; background: #162447; border: 1px solid #1f4068; color: #fff; cursor: pointer; border-radius: 4px; font-size: 13px; text-align: left; }
         #container-canvas { flex: 1; background-color: #f0f0f0; background-image: linear-gradient(#ccc 1px, transparent 1px), linear-gradient(90deg, #ccc 1px, transparent 1px); background-size: 20px 20px; position: relative; cursor: grab; }
-        
         .sidebar-calculo { width: 320px; background: #111827; padding: 20px; border-left: 1px solid #1f4068; color: #fff; z-index: 10; display: flex; flex-direction: column; overflow-y: auto; }
         .prop-box { background: #162447; border: 1px solid #1f4068; padding: 15px; border-radius: 6px; margin-bottom: 15px; }
-        .prop-box p { color: #9ba4b5; font-size: 13px; margin-bottom: 8px; display: flex; justify-content: space-between; }
-        .valor-total { font-size: 22px; color: #39FF14; font-weight: bold; text-align: center; margin: 10px 0; }
+        .valor-total { font-size: 20px; color: #39FF14; font-weight: bold; text-align: center; margin: 10px 0; }
     </style>
 </head>
 <body>
-
 <div class="cad-container">
     <div class="toolbar">
-        <div class="grupo-ferramentas">
-            <h3>Tomadas (NBR 5410)</h3>
-            <button onclick="adicionarElemento('tomada_baixa')">⏏️ Tomada Baixa</button>
-            <button onclick="adicionarElemento('tomada_media')">⏏️ Tomada Média</button>
-        </div>
-        <div class="grupo-ferramentas">
-            <h3>Iluminação</h3>
-            <button onclick="adicionarElemento('luz_teto')">⊗ Ponto de Teto</button>
-            <button onclick="adicionarElemento('int_simples')">⚬ Interruptor</button>
-        </div>
-        <div class="grupo-ferramentas">
-            <h3>Quadros</h3>
-            <button onclick="adicionarElemento('quadro')">🗄️ Quadro (QDC)</button>
-        </div>
+        <h3>Componentes NBR</h3>
+        <button onclick="adicionarElemento('tomada_media')">⏏️ Tomada Média</button>
+        <button onclick="adicionarElemento('luz_teto')">⊗ Ponto de Luz</button>
+        <button onclick="adicionarElemento('int_simples')">⚬ Interruptor</button>
+        <button onclick="adicionarElemento('quadro')">🗄️ Quadro (QDC)</button>
     </div>
-    
     <div id="container-canvas"></div>
-    
     <div class="sidebar-calculo">
-        <h3>Properties (Inspetor)</h3>
+        <h3>Propriedades & Circuitos</h3>
         <div id="resultado-calculo"><div class="prop-box">Selecione um item...</div></div>
     </div>
 </div>
@@ -58,20 +39,30 @@
     stage.add(layer);
 
     let selected = null;
-    const GRID_SIZE = 20;
-    const COR_TRACO = '#1e293b';
+    const GRID = 20;
 
-    function criarSímboloBase(tipo) {
-        const group = new Konva.Group({ x: 100, y: 100, draggable: true, name: tipo });
-        group.circuito = "01"; // IMPLEMENTAÇÃO: Propriedade de Circuito mantida
+    function adicionarElemento(tipo) {
+        let group = new Konva.Group({ x: 100, y: 100, draggable: true, name: tipo });
+        group.circuito = "01"; // Inicializa o Circuito
         group.linesAttached = [];
         
-        if (tipo.includes('tomada')) group.add(new Konva.RegularPolygon({ sides: 3, radius: 14, stroke: COR_TRACO, strokeWidth: 2 }));
-        else if (tipo === 'luz_teto') group.add(new Konva.Circle({ radius: 14, stroke: COR_TRACO, strokeWidth: 2 }));
-        else if (tipo === 'quadro') group.add(new Konva.Rect({ x: -15, y: -25, width: 30, height: 50, stroke: COR_TRACO, strokeWidth: 2 }));
-        
+        // Simbologia NBR 5410 básica incorporada
+        group.add(new Konva.Circle({ radius: 15, stroke: '#1e293b', strokeWidth: 2 }));
         group.add(new Konva.Circle({ radius: 18, fill: 'rgba(0,0,0,0)' }));
-        return group;
+
+        group.on('dragmove', () => {
+            group.x(Math.round(group.x() / GRID) * GRID);
+            group.y(Math.round(group.y() / GRID) * GRID);
+        });
+
+        group.on('click', (e) => {
+            e.cancelBubble = true;
+            selected = group;
+            atualizarPainel();
+        });
+
+        layer.add(group);
+        layer.draw();
     }
 
     function atualizarPainel() {
@@ -84,29 +75,11 @@
                     ${Array.from({length: 10}, (_, i) => `<option value="${(i+1).toString().padStart(2, '0')}" ${selected.circuito == (i+1).toString().padStart(2, '0') ? 'selected' : ''}>Circuito ${(i+1).toString().padStart(2, '0')}</option>`).join('')}
                 </select>
                 <p>Bitola: 2.5mm²</p>
-                <button onclick="alert('PDF Gerado')" style="background:#39FF14; width:100%; border:none; padding:8px;">Gerar PDF</button>
+                <button onclick="alert('PDF Gerado')" style="background:#39FF14; width:100%; border:none; padding:8px; margin-top:10px;">Gerar Orçamento do Circuito</button>
             </div>
         `;
     }
 
-    function adicionarElemento(tipo) {
-        let shape = criarSímboloBase(tipo);
-        
-        shape.on('dragmove', () => {
-            shape.x(Math.round(shape.x() / GRID_SIZE) * GRID_SIZE);
-            shape.y(Math.round(shape.y() / GRID_SIZE) * GRID_SIZE);
-        });
-
-        shape.on('click', (e) => {
-            e.cancelBubble = true;
-            selected = shape;
-            atualizarPainel();
-        });
-
-        layer.add(shape);
-        layer.draw();
-    }
-    
     stage.on('click', (e) => { if (e.target === stage) { selected = null; } });
 </script>
 </body>
