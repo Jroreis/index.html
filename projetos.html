@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VoltCalc Pro - Editor de Projetos</title>
+    <title>VoltCalc Pro - Editor CAD NBR 5410</title>
     <script src="https://unpkg.com/konva@9.3.1/konva.min.js"></script>
     <style>
         body, html { 
@@ -12,6 +12,7 @@
         }
         .cad-container { display: flex; height: 100vh; }
         
+        /* BARRA LATERAL ESQUERDA - FERRAMENTAS */
         .toolbar { 
             width: 220px; background: #111827; padding: 20px; 
             border-right: 1px solid #1f4068; color: #fff; z-index: 10;
@@ -21,11 +22,22 @@
             width: 100%; padding: 12px; margin-bottom: 10px; 
             background: #162447; border: 1px solid #1f4068; color: #fff; 
             cursor: pointer; border-radius: 5px; font-weight: bold; transition: 0.3s;
+            text-align: left;
         }
         .toolbar button:hover { background: #39FF14; color: #000; }
         
-        #container-canvas { flex: 1; background: #ffffff; position: relative; }
+        /* ÁREA DE DESENHO - ESTILO AUTOCAD GRID */
+        #container-canvas { 
+            flex: 1; 
+            background-color: #ffffff;
+            background-image: 
+                linear-gradient(#e5e7eb 1px, transparent 1px),
+                linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+            background-size: 25px 25px; /* Tamanho do Grid */
+            position: relative; 
+        }
         
+        /* BARRA LATERAL DIREITA - CÁLCULOS */
         .sidebar-calculo { 
             width: 300px; background: #111827; padding: 20px; 
             border-left: 1px solid #1f4068; color: #fff; z-index: 10;
@@ -42,18 +54,19 @@
 
 <div class="cad-container">
     <div class="toolbar">
-        <h3>Componentes NBR 5410</h3>
-        <button onclick="adicionarElemento('tomada')">➕ Tomada</button>
-        <button onclick="adicionarElemento('lampada')">💡 Lâmpada</button>
-        <button onclick="adicionarElemento('disjuntor')">⚡ Disjuntor</button>
+        <h3>Símbolos NBR 5410</h3>
+        <button onclick="adicionarElemento('tomada')">⏏️ Tomada</button>
+        <button onclick="adicionarElemento('lampada')">⊗ Ponto de Luz</button>
+        <button onclick="adicionarElemento('interruptor')">⚬ Interruptor</button>
+        <button onclick="adicionarElemento('quadro')">🗄️ Quadro (QDC)</button>
     </div>
     
     <div id="container-canvas"></div>
     
     <div class="sidebar-calculo">
-        <h3>Dimensionamento e Orçamento</h3>
+        <h3>Propriedades</h3>
         <div id="resultado-calculo">
-            <p>Selecione um componente no projeto para inspecionar os dados...</p>
+            <p>Selecione um componente para inspecionar...</p>
         </div>
     </div>
 </div>
@@ -69,109 +82,139 @@
 
     let selected = null; 
     const ESCALA_PIXELS_POR_METRO = 50; 
+    const COR_TRACO = '#1e293b'; // Cor padrão do desenho técnico (Azul/Preto bem escuro)
 
-    // TABELA DE PREÇOS MÉDIA NACIONAL 2026 (Você pode alterar estes valores depois)
     const TABELA_PRECOS = {
-        caboMetro: 3.50,       // Preço do metro do cabo + eletroduto
-        pontoTomada: 45.00,    // Preço para instalar uma tomada
-        pontoLampada: 40.00,   // Preço para instalar uma luminária
-        pontoDisjuntor: 65.00  // Preço para instalar um disjuntor no QDC
+        caboMetro: 3.50,       
+        pontoTomada: 45.00,    
+        pontoLampada: 40.00,   
+        pontoInterruptor: 30.00, 
+        pontoQuadro: 150.00  
     };
 
-    function getCenter(node) {
-        if (node.getClassName() === 'Circle') {
-            return { x: node.x(), y: node.y() };
-        }
-        return { x: node.x() + node.width() / 2, y: node.y() + node.height() / 2 };
+    // ==========================================
+    // CONSTRUTORES DE SÍMBOLOS VETORIAIS (AUTOCAD STYLE)
+    // ==========================================
+    function criarTomada(x, y) {
+        const group = new Konva.Group({ x, y, draggable: true, name: 'tomada' });
+        // Triângulo
+        group.add(new Konva.RegularPolygon({ sides: 3, radius: 16, stroke: COR_TRACO, strokeWidth: 2, fill: 'transparent' }));
+        // Área de clique invisível
+        group.add(new Konva.Circle({ radius: 18, fill: 'rgba(0,0,0,0)' }));
+        return group;
     }
 
-    function calcularDistanciaPixels(x1, y1, x2, y2) {
-        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    function criarLampada(x, y) {
+        const group = new Konva.Group({ x, y, draggable: true, name: 'lampada' });
+        group.add(new Konva.Circle({ radius: 16, stroke: COR_TRACO, strokeWidth: 2 }));
+        group.add(new Konva.Line({ points: [-11, -11, 11, 11], stroke: COR_TRACO, strokeWidth: 2 }));
+        group.add(new Konva.Line({ points: [11, -11, -11, 11], stroke: COR_TRACO, strokeWidth: 2 }));
+        group.add(new Konva.Circle({ radius: 18, fill: 'rgba(0,0,0,0)' }));
+        return group;
     }
 
-    // Função de Inteligência e Finanças
-    function gerarResumoProjeto() {
-        let pixelsTotal = 0;
-        
-        // Contadores específicos
-        let qtdTomadas = 0;
-        let qtdLampadas = 0;
-        let qtdDisjuntores = 0;
+    function criarInterruptor(x, y) {
+        const group = new Konva.Group({ x, y, draggable: true, name: 'interruptor' });
+        group.add(new Konva.Circle({ radius: 8, stroke: COR_TRACO, strokeWidth: 2, fill: 'transparent' }));
+        group.add(new Konva.Circle({ radius: 12, fill: 'rgba(0,0,0,0)' }));
+        return group;
+    }
 
-        layer.children.forEach(node => {
-            if (node.getClassName() !== 'Line') {
-                if (node.name() === 'tomada') qtdTomadas++;
-                else if (node.name() === 'lampada') qtdLampadas++;
-                else if (node.name() === 'disjuntor') qtdDisjuntores++;
+    function criarQuadro(x, y) {
+        const group = new Konva.Group({ x, y, draggable: true, name: 'quadro' });
+        group.add(new Konva.Rect({ x: -15, y: -25, width: 30, height: 50, stroke: COR_TRACO, strokeWidth: 2, fill: 'transparent' }));
+        group.add(new Konva.Line({ points: [-15, 0, 15, 0], stroke: COR_TRACO, strokeWidth: 2 })); // Divisória do QDC
+        group.add(new Konva.Rect({ x: -15, y: -25, width: 30, height: 50, fill: 'rgba(0,0,0,0)' }));
+        return group;
+    }
+
+    // Função para alterar a cor quando selecionado
+    function alternarSelecaoVisual(grupo, isSelected) {
+        const cor = isSelected ? '#39FF14' : COR_TRACO;
+        const espessura = isSelected ? 3 : 2;
+        grupo.getChildren().forEach(filho => {
+            if (filho.fill() !== 'rgba(0,0,0,0)') { // Ignora a área de clique
+                if (filho.stroke()) {
+                    filho.stroke(cor);
+                    filho.strokeWidth(espessura);
+                }
             }
         });
+        layer.draw();
+    }
 
-        const qtdComponentes = qtdTomadas + qtdLampadas + qtdDisjuntores;
-        
-        const linhas = layer.find('Line');
-        linhas.forEach(line => {
+    // Matemática
+    function calcularDistanciaPixels(x1, y1, x2, y2) { return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)); }
+
+    // ==========================================
+    // LÓGICA FINANCEIRA E RESUMO
+    // ==========================================
+    function gerarResumoProjeto() {
+        let pixelsTotal = 0;
+        let pTomada = 0, pLampada = 0, pInterruptor = 0, pQuadro = 0;
+
+        layer.children.forEach(node => {
+            if (node.name() === 'tomada') pTomada++;
+            if (node.name() === 'lampada') pLampada++;
+            if (node.name() === 'interruptor') pInterruptor++;
+            if (node.name() === 'quadro') pQuadro++;
+        });
+
+        layer.find('Line').forEach(line => {
             const p = line.points();
             pixelsTotal += calcularDistanciaPixels(p[0], p[1], p[2], p[3]);
         });
 
         const metrosTotal = (pixelsTotal / ESCALA_PIXELS_POR_METRO);
         
-        // CÁLCULO DO VALOR TOTAL (Mão de Obra + Material Estimado)
-        const valorCabos = metrosTotal * TABELA_PRECOS.caboMetro;
-        const valorTomadas = qtdTomadas * TABELA_PRECOS.pontoTomada;
-        const valorLampadas = qtdLampadas * TABELA_PRECOS.pontoLampada;
-        const valorDisjuntores = qtdDisjuntores * TABELA_PRECOS.pontoDisjuntor;
-        
-        const valorTotalOrçamento = valorCabos + valorTomadas + valorLampadas + valorDisjuntores;
+        const totalRs = (metrosTotal * TABELA_PRECOS.caboMetro) + 
+                        (pTomada * TABELA_PRECOS.pontoTomada) + 
+                        (pLampada * TABELA_PRECOS.pontoLampada) + 
+                        (pInterruptor * TABELA_PRECOS.pontoInterruptor) + 
+                        (pQuadro * TABELA_PRECOS.pontoQuadro);
 
         return `
             <hr class="linha-divisoria">
-            <p><strong>Resumo Global do Projeto:</strong></p>
-            <p>Peças Instaladas: <span style="color:#39FF14">${qtdComponentes} un</span></p>
-            <p>Infraestrutura (Fios/Tubos): <span style="color:#e43f5a">${metrosTotal.toFixed(2)} m</span></p>
+            <p><strong>Resumo Global:</strong></p>
+            <p>Tomadas: <span style="color:#fff">${pTomada}</span></p>
+            <p>Iluminação/Interruptores: <span style="color:#fff">${pLampada + pInterruptor}</span></p>
+            <p>Quadros (QDC): <span style="color:#fff">${pQuadro}</span></p>
+            <p>Eletrodutos: <span style="color:#e43f5a">${metrosTotal.toFixed(2)} m</span></p>
             
             <div class="valor-total">
-                ${valorTotalOrçamento.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                ${totalRs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
             </div>
 
-            <button style="background: #39FF14; color: #000; border: none; padding: 10px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px;">Gerar PDF Profissional</button>
+            <button style="background: #39FF14; color: #000; border: none; padding: 10px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer;">Gerar Planta em PDF</button>
         `;
     }
 
     function atualizarPainelVazio() {
-        document.getElementById('resultado-calculo').innerHTML = `
-            <p>Projeto em andamento...</p>
-            ${gerarResumoProjeto()}
-        `;
+        document.getElementById('resultado-calculo').innerHTML = `<p>Planta livre...</p>${gerarResumoProjeto()}`;
     }
 
+    // ==========================================
+    // MOTOR DE DESENHO (DRAG AND DROP E CONEXÃO)
+    // ==========================================
     function adicionarElemento(tipo) {
         let shape;
-        let startX = 50 + Math.random() * 50; 
-        let startY = 50 + Math.random() * 50;
+        let startX = 100 + Math.random() * 50; 
+        let startY = 100 + Math.random() * 50;
         
-        // Adicionei o .name(tipo) para o sistema saber o que cobrar
-        if (tipo === 'tomada') {
-            shape = new Konva.Rect({ x: startX, y: startY, width: 40, height: 40, fill: '#3498db', draggable: true, stroke: 'black', strokeWidth: 1 });
-            shape.name('tomada');
-        } else if (tipo === 'lampada') {
-            shape = new Konva.Circle({ x: startX + 20, y: startY + 20, radius: 20, fill: '#f1c40f', draggable: true, stroke: 'black', strokeWidth: 1 });
-            shape.name('lampada');
-        } else if (tipo === 'disjuntor') {
-            shape = new Konva.Rect({ x: startX, y: startY, width: 60, height: 30, fill: '#e74c3c', draggable: true, stroke: 'black', strokeWidth: 1 });
-            shape.name('disjuntor');
-        }
+        if (tipo === 'tomada') shape = criarTomada(startX, startY);
+        if (tipo === 'lampada') shape = criarLampada(startX, startY);
+        if (tipo === 'interruptor') shape = criarInterruptor(startX, startY);
+        if (tipo === 'quadro') shape = criarQuadro(startX, startY);
 
         shape.linesAttached = []; 
 
         shape.on('dragmove', () => {
             shape.linesAttached.forEach(line => {
                 const points = line.points();
-                const center = getCenter(shape);
                 if (line.source === shape) {
-                    points[0] = center.x; points[1] = center.y;
+                    points[0] = shape.x(); points[1] = shape.y();
                 } else {
-                    points[2] = center.x; points[3] = center.y;
+                    points[2] = shape.x(); points[3] = shape.y();
                 }
                 line.points(points);
             });
@@ -182,14 +225,11 @@
             e.cancelBubble = true; 
             if (!selected) {
                 selected = shape;
-                shape.stroke('#39FF14'); 
-                shape.strokeWidth(3);
+                alternarSelecaoVisual(shape, true);
             } else if (selected !== shape) {
-                const center1 = getCenter(selected);
-                const center2 = getCenter(shape);
                 const line = new Konva.Line({
-                    points: [center1.x, center1.y, center2.x, center2.y],
-                    stroke: '#2c3e50', strokeWidth: 3, dash: [10, 5], tension: 0
+                    points: [selected.x(), selected.y(), shape.x(), shape.y()],
+                    stroke: '#e43f5a', strokeWidth: 2, dash: [8, 4], tension: 0 // Eletroduto avermelhado técnico
                 });
                 line.source = selected;
                 line.target = shape;
@@ -197,16 +237,16 @@
                 shape.linesAttached.push(line);
                 layer.add(line);
                 line.moveToBottom(); 
-                selected.stroke('black');
-                selected.strokeWidth(1);
+                
+                alternarSelecaoVisual(selected, false);
                 selected = null;
             }
             layer.draw();
 
             document.getElementById('resultado-calculo').innerHTML = `
-                <p><strong>Circuito:</strong> ${tipo.toUpperCase()}</p>
-                <p><strong>Carga Padrão:</strong> ${tipo === 'tomada' ? '100W' : tipo === 'lampada' ? '60W' : 'Geral'}</p>
-                <button style="background: #e43f5a; color: #fff; border: none; padding: 8px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px;">Dimensionar Bitola NBR 5410</button>
+                <p><strong>Atributos:</strong> ${tipo.toUpperCase()}</p>
+                <p><strong>Configuração NBR:</strong> Padrão</p>
+                <button style="background: #1f4068; color: #fff; border: 1px solid #39FF14; padding: 8px; width: 100%; border-radius: 4px; cursor: pointer; margin-top: 10px;">Propriedades do Ponto</button>
                 ${gerarResumoProjeto()}
             `;
         });
@@ -219,10 +259,8 @@
     stage.on('click', (e) => {
         if (e.target === stage) {
             if (selected) {
-                selected.stroke('black');
-                selected.strokeWidth(1);
+                alternarSelecaoVisual(selected, false);
                 selected = null;
-                layer.draw();
             }
             atualizarPainelVazio();
         }
