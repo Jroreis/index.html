@@ -10,10 +10,8 @@
             margin: 0; padding: 0; height: 100%; overflow: hidden; 
             background: #1a1b2f; font-family: 'Segoe UI', Tahoma, sans-serif; 
         }
-        
         .cad-container { display: flex; height: 100vh; }
         
-        /* BARRA LATERAL ESQUERDA - FERRAMENTAS */
         .toolbar { 
             width: 220px; background: #111827; padding: 20px; 
             border-right: 1px solid #1f4068; color: #fff; z-index: 10;
@@ -26,19 +24,18 @@
         }
         .toolbar button:hover { background: #39FF14; color: #000; }
         
-        /* ÁREA DE DESENHO */
         #container-canvas { flex: 1; background: #ffffff; position: relative; }
         
-        /* BARRA LATERAL DIREITA - CÁLCULOS */
         .sidebar-calculo { 
             width: 300px; background: #111827; padding: 20px; 
             border-left: 1px solid #1f4068; color: #fff; z-index: 10;
-            display: flex; flex-direction: column;
+            display: flex; flex-direction: column; overflow-y: auto;
         }
         .sidebar-calculo h3 { color: #e43f5a; text-transform: uppercase; font-size: 14px; margin-bottom: 20px; }
         #resultado-calculo p { color: #9ba4b5; font-size: 14px; margin-bottom: 5px; }
         #resultado-calculo strong { color: #fff; }
         .linha-divisoria { border: 0; border-top: 1px solid #1f4068; margin: 15px 0; }
+        .valor-total { font-size: 24px; color: #39FF14; font-weight: bold; text-align: center; margin: 15px 0; }
     </style>
 </head>
 <body>
@@ -54,7 +51,7 @@
     <div id="container-canvas"></div>
     
     <div class="sidebar-calculo">
-        <h3>Dimensionamento</h3>
+        <h3>Dimensionamento e Orçamento</h3>
         <div id="resultado-calculo">
             <p>Selecione um componente no projeto para inspecionar os dados...</p>
         </div>
@@ -62,7 +59,6 @@
 </div>
 
 <script>
-    // 1. INICIALIZAÇÃO DO MOTOR GRÁFICO (CANVAS)
     const container = document.getElementById('container-canvas');
     const width = container.offsetWidth;
     const height = window.innerHeight;
@@ -71,11 +67,17 @@
     const layer = new Konva.Layer();
     stage.add(layer);
 
-    // 2. VARIÁVEIS DE CONTROLE E ESCALA
     let selected = null; 
-    const ESCALA_PIXELS_POR_METRO = 50; // Define que 50 pixels = 1 metro na vida real
+    const ESCALA_PIXELS_POR_METRO = 50; 
 
-    // Utilitário: Pega o centro exato do componente
+    // TABELA DE PREÇOS MÉDIA NACIONAL 2026 (Você pode alterar estes valores depois)
+    const TABELA_PRECOS = {
+        caboMetro: 3.50,       // Preço do metro do cabo + eletroduto
+        pontoTomada: 45.00,    // Preço para instalar uma tomada
+        pontoLampada: 40.00,   // Preço para instalar uma luminária
+        pontoDisjuntor: 65.00  // Preço para instalar um disjuntor no QDC
+    };
+
     function getCenter(node) {
         if (node.getClassName() === 'Circle') {
             return { x: node.x(), y: node.y() };
@@ -83,15 +85,28 @@
         return { x: node.x() + node.width() / 2, y: node.y() + node.height() / 2 };
     }
 
-    // Utilitário: Fórmula matemática de distância entre dois pontos
     function calcularDistanciaPixels(x1, y1, x2, y2) {
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 
-    // Função de Inteligência: Calcula o total de cabos do projeto inteiro
+    // Função de Inteligência e Finanças
     function gerarResumoProjeto() {
         let pixelsTotal = 0;
-        let qtdComponentes = layer.children.length - layer.find('Line').length;
+        
+        // Contadores específicos
+        let qtdTomadas = 0;
+        let qtdLampadas = 0;
+        let qtdDisjuntores = 0;
+
+        layer.children.forEach(node => {
+            if (node.getClassName() !== 'Line') {
+                if (node.name() === 'tomada') qtdTomadas++;
+                else if (node.name() === 'lampada') qtdLampadas++;
+                else if (node.name() === 'disjuntor') qtdDisjuntores++;
+            }
+        });
+
+        const qtdComponentes = qtdTomadas + qtdLampadas + qtdDisjuntores;
         
         const linhas = layer.find('Line');
         linhas.forEach(line => {
@@ -99,18 +114,30 @@
             pixelsTotal += calcularDistanciaPixels(p[0], p[1], p[2], p[3]);
         });
 
-        const metrosTotal = (pixelsTotal / ESCALA_PIXELS_POR_METRO).toFixed(2);
+        const metrosTotal = (pixelsTotal / ESCALA_PIXELS_POR_METRO);
         
+        // CÁLCULO DO VALOR TOTAL (Mão de Obra + Material Estimado)
+        const valorCabos = metrosTotal * TABELA_PRECOS.caboMetro;
+        const valorTomadas = qtdTomadas * TABELA_PRECOS.pontoTomada;
+        const valorLampadas = qtdLampadas * TABELA_PRECOS.pontoLampada;
+        const valorDisjuntores = qtdDisjuntores * TABELA_PRECOS.pontoDisjuntor;
+        
+        const valorTotalOrçamento = valorCabos + valorTomadas + valorLampadas + valorDisjuntores;
+
         return `
             <hr class="linha-divisoria">
-            <p><strong>Resumo Global:</strong></p>
-            <p>Peças no projeto: <span style="color:#39FF14">${qtdComponentes}</span></p>
-            <p>Eletroduto/Fiação: <span style="color:#e43f5a">${metrosTotal} m</span></p>
-            <button style="background: #39FF14; color: #000; border: none; padding: 10px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 15px;">Calcular Preço Total (R$)</button>
+            <p><strong>Resumo Global do Projeto:</strong></p>
+            <p>Peças Instaladas: <span style="color:#39FF14">${qtdComponentes} un</span></p>
+            <p>Infraestrutura (Fios/Tubos): <span style="color:#e43f5a">${metrosTotal.toFixed(2)} m</span></p>
+            
+            <div class="valor-total">
+                ${valorTotalOrçamento.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            </div>
+
+            <button style="background: #39FF14; color: #000; border: none; padding: 10px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px;">Gerar PDF Profissional</button>
         `;
     }
 
-    // Atualiza o painel apenas com o resumo quando clica no fundo
     function atualizarPainelVazio() {
         document.getElementById('resultado-calculo').innerHTML = `
             <p>Projeto em andamento...</p>
@@ -118,29 +145,29 @@
         `;
     }
 
-    // 3. FUNÇÃO PRINCIPAL: ADICIONAR E CONECTAR COMPONENTES
     function adicionarElemento(tipo) {
         let shape;
-        
         let startX = 50 + Math.random() * 50; 
         let startY = 50 + Math.random() * 50;
         
+        // Adicionei o .name(tipo) para o sistema saber o que cobrar
         if (tipo === 'tomada') {
             shape = new Konva.Rect({ x: startX, y: startY, width: 40, height: 40, fill: '#3498db', draggable: true, stroke: 'black', strokeWidth: 1 });
+            shape.name('tomada');
         } else if (tipo === 'lampada') {
             shape = new Konva.Circle({ x: startX + 20, y: startY + 20, radius: 20, fill: '#f1c40f', draggable: true, stroke: 'black', strokeWidth: 1 });
+            shape.name('lampada');
         } else if (tipo === 'disjuntor') {
             shape = new Konva.Rect({ x: startX, y: startY, width: 60, height: 30, fill: '#e74c3c', draggable: true, stroke: 'black', strokeWidth: 1 });
+            shape.name('disjuntor');
         }
 
         shape.linesAttached = []; 
 
-        // Dinâmica do Fio: Acompanhar o objeto ao ser arrastado
         shape.on('dragmove', () => {
             shape.linesAttached.forEach(line => {
                 const points = line.points();
                 const center = getCenter(shape);
-                
                 if (line.source === shape) {
                     points[0] = center.x; points[1] = center.y;
                 } else {
@@ -148,14 +175,11 @@
                 }
                 line.points(points);
             });
-            // Atualiza a metragem em tempo real enquanto arrasta
             if(selected === shape) shape.fire('click'); 
         });
 
-        // Dinâmica de Seleção e Criação de Fiação
         shape.on('click', (e) => {
             e.cancelBubble = true; 
-            
             if (!selected) {
                 selected = shape;
                 shape.stroke('#39FF14'); 
@@ -163,32 +187,26 @@
             } else if (selected !== shape) {
                 const center1 = getCenter(selected);
                 const center2 = getCenter(shape);
-
                 const line = new Konva.Line({
                     points: [center1.x, center1.y, center2.x, center2.y],
                     stroke: '#2c3e50', strokeWidth: 3, dash: [10, 5], tension: 0
                 });
-                
                 line.source = selected;
                 line.target = shape;
                 selected.linesAttached.push(line);
                 shape.linesAttached.push(line);
-                
                 layer.add(line);
                 line.moveToBottom(); 
-                
                 selected.stroke('black');
                 selected.strokeWidth(1);
                 selected = null;
             }
             layer.draw();
 
-            // Preservado: Atualiza Painel de Dimensionamento do item + Resumo
             document.getElementById('resultado-calculo').innerHTML = `
                 <p><strong>Circuito:</strong> ${tipo.toUpperCase()}</p>
-                <p><strong>Carga Unitária:</strong> 100W</p>
-                <p><strong>Tensão:</strong> 220V</p>
-                <button style="background: #e43f5a; color: #fff; border: none; padding: 8px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px;">Dimensionar Bitola</button>
+                <p><strong>Carga Padrão:</strong> ${tipo === 'tomada' ? '100W' : tipo === 'lampada' ? '60W' : 'Geral'}</p>
+                <button style="background: #e43f5a; color: #fff; border: none; padding: 8px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px;">Dimensionar Bitola NBR 5410</button>
                 ${gerarResumoProjeto()}
             `;
         });
@@ -198,7 +216,6 @@
         atualizarPainelVazio();
     }
     
-    // 4. CANCELAR SELEÇÃO (Clicar no fundo branco)
     stage.on('click', (e) => {
         if (e.target === stage) {
             if (selected) {
@@ -211,7 +228,6 @@
         }
     });
 
-    // Responsividade da tela
     window.addEventListener('resize', () => {
         stage.width(container.offsetWidth);
         stage.height(window.innerHeight);
