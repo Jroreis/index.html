@@ -33,10 +33,12 @@
         .sidebar-calculo { 
             width: 300px; background: #111827; padding: 20px; 
             border-left: 1px solid #1f4068; color: #fff; z-index: 10;
+            display: flex; flex-direction: column;
         }
         .sidebar-calculo h3 { color: #e43f5a; text-transform: uppercase; font-size: 14px; margin-bottom: 20px; }
-        #resultado-calculo p { color: #9ba4b5; font-size: 14px; }
+        #resultado-calculo p { color: #9ba4b5; font-size: 14px; margin-bottom: 5px; }
         #resultado-calculo strong { color: #fff; }
+        .linha-divisoria { border: 0; border-top: 1px solid #1f4068; margin: 15px 0; }
     </style>
 </head>
 <body>
@@ -69,10 +71,11 @@
     const layer = new Konva.Layer();
     stage.add(layer);
 
-    // 2. VARIÁVEIS DE CONTROLE DO SISTEMA
-    let selected = null; // Armazena o componente selecionado para ligação
+    // 2. VARIÁVEIS DE CONTROLE E ESCALA
+    let selected = null; 
+    const ESCALA_PIXELS_POR_METRO = 50; // Define que 50 pixels = 1 metro na vida real
 
-    // Função utilitária para pegar o centro exato do componente
+    // Utilitário: Pega o centro exato do componente
     function getCenter(node) {
         if (node.getClassName() === 'Circle') {
             return { x: node.x(), y: node.y() };
@@ -80,11 +83,45 @@
         return { x: node.x() + node.width() / 2, y: node.y() + node.height() / 2 };
     }
 
+    // Utilitário: Fórmula matemática de distância entre dois pontos
+    function calcularDistanciaPixels(x1, y1, x2, y2) {
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    }
+
+    // Função de Inteligência: Calcula o total de cabos do projeto inteiro
+    function gerarResumoProjeto() {
+        let pixelsTotal = 0;
+        let qtdComponentes = layer.children.length - layer.find('Line').length;
+        
+        const linhas = layer.find('Line');
+        linhas.forEach(line => {
+            const p = line.points();
+            pixelsTotal += calcularDistanciaPixels(p[0], p[1], p[2], p[3]);
+        });
+
+        const metrosTotal = (pixelsTotal / ESCALA_PIXELS_POR_METRO).toFixed(2);
+        
+        return `
+            <hr class="linha-divisoria">
+            <p><strong>Resumo Global:</strong></p>
+            <p>Peças no projeto: <span style="color:#39FF14">${qtdComponentes}</span></p>
+            <p>Eletroduto/Fiação: <span style="color:#e43f5a">${metrosTotal} m</span></p>
+            <button style="background: #39FF14; color: #000; border: none; padding: 10px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 15px;">Calcular Preço Total (R$)</button>
+        `;
+    }
+
+    // Atualiza o painel apenas com o resumo quando clica no fundo
+    function atualizarPainelVazio() {
+        document.getElementById('resultado-calculo').innerHTML = `
+            <p>Projeto em andamento...</p>
+            ${gerarResumoProjeto()}
+        `;
+    }
+
     // 3. FUNÇÃO PRINCIPAL: ADICIONAR E CONECTAR COMPONENTES
     function adicionarElemento(tipo) {
         let shape;
         
-        // Posição inicial levemente randomizada para não sobrepor um em cima do outro
         let startX = 50 + Math.random() * 50; 
         let startY = 50 + Math.random() * 50;
         
@@ -96,7 +133,7 @@
             shape = new Konva.Rect({ x: startX, y: startY, width: 60, height: 30, fill: '#e74c3c', draggable: true, stroke: 'black', strokeWidth: 1 });
         }
 
-        shape.linesAttached = []; // Histórico de fios ligados a este componente
+        shape.linesAttached = []; 
 
         // Dinâmica do Fio: Acompanhar o objeto ao ser arrastado
         shape.on('dragmove', () => {
@@ -105,74 +142,72 @@
                 const center = getCenter(shape);
                 
                 if (line.source === shape) {
-                    points[0] = center.x;
-                    points[1] = center.y;
+                    points[0] = center.x; points[1] = center.y;
                 } else {
-                    points[2] = center.x;
-                    points[3] = center.y;
+                    points[2] = center.x; points[3] = center.y;
                 }
                 line.points(points);
             });
+            // Atualiza a metragem em tempo real enquanto arrasta
+            if(selected === shape) shape.fire('click'); 
         });
 
         // Dinâmica de Seleção e Criação de Fiação
         shape.on('click', (e) => {
-            e.cancelBubble = true; // Impede que o clique afete o fundo
+            e.cancelBubble = true; 
             
             if (!selected) {
-                // Passo 1: Seleciona o primeiro componente
                 selected = shape;
-                shape.stroke('#39FF14'); // Borda neon verde
+                shape.stroke('#39FF14'); 
                 shape.strokeWidth(3);
             } else if (selected !== shape) {
-                // Passo 2: Clica no segundo componente e traça o fio
                 const center1 = getCenter(selected);
                 const center2 = getCenter(shape);
 
                 const line = new Konva.Line({
                     points: [center1.x, center1.y, center2.x, center2.y],
-                    stroke: '#2c3e50', // Cor do cabo
-                    strokeWidth: 3,
-                    dash: [10, 5], // Estilo tracejado (eletroduto)
-                    tension: 0
+                    stroke: '#2c3e50', strokeWidth: 3, dash: [10, 5], tension: 0
                 });
                 
-                // Grava a conexão matemática
                 line.source = selected;
                 line.target = shape;
                 selected.linesAttached.push(line);
                 shape.linesAttached.push(line);
                 
                 layer.add(line);
-                line.moveToBottom(); // Joga o fio para trás do componente
+                line.moveToBottom(); 
                 
-                // Reseta a seleção visual
                 selected.stroke('black');
                 selected.strokeWidth(1);
                 selected = null;
             }
             layer.draw();
 
-            // Atualiza Painel de Dimensionamento
+            // Preservado: Atualiza Painel de Dimensionamento do item + Resumo
             document.getElementById('resultado-calculo').innerHTML = `
                 <p><strong>Circuito:</strong> ${tipo.toUpperCase()}</p>
                 <p><strong>Carga Unitária:</strong> 100W</p>
                 <p><strong>Tensão:</strong> 220V</p>
-                <button style="background: #39FF14; color: #000; border: none; padding: 10px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 15px;">Dimensionar Bitola</button>
+                <button style="background: #e43f5a; color: #fff; border: none; padding: 8px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px;">Dimensionar Bitola</button>
+                ${gerarResumoProjeto()}
             `;
         });
 
         layer.add(shape);
         layer.draw();
+        atualizarPainelVazio();
     }
     
-    // 4. CANCELAR SELEÇÃO (Clicar no fundo branco reseta a ferramenta de fiação)
+    // 4. CANCELAR SELEÇÃO (Clicar no fundo branco)
     stage.on('click', (e) => {
-        if (e.target === stage && selected) {
-            selected.stroke('black');
-            selected.strokeWidth(1);
-            selected = null;
-            layer.draw();
+        if (e.target === stage) {
+            if (selected) {
+                selected.stroke('black');
+                selected.strokeWidth(1);
+                selected = null;
+                layer.draw();
+            }
+            atualizarPainelVazio();
         }
     });
 
