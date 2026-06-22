@@ -1,3 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>VoltCalc Pro - Editor de Projetos</title>
+    <script src="https://unpkg.com/konva@9.3.1/konva.min.js"></script>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #1a1b2f; font-family: 'Segoe UI', sans-serif; }
+        
+        .cad-container { display: flex; height: 100vh; }
+        
+        .toolbar { width: 220px; background: #111827; padding: 20px; border-right: 1px solid #1f4068; color: #fff; }
+        .toolbar h3 { color: #39FF14; margin-bottom: 20px; }
+        .toolbar button { width: 100%; padding: 12px; margin-bottom: 10px; background: #162447; border: 1px solid #1f4068; color: #fff; cursor: pointer; border-radius: 5px; }
+        .toolbar button:hover { background: #39FF14; color: #000; font-weight: bold; }
+        
+        #container-canvas { flex: 1; background: #fff; position: relative; }
+        
+        .sidebar-calculo { width: 300px; background: #111827; padding: 20px; border-left: 1px solid #1f4068; color: #fff; }
+        .sidebar-calculo h3 { color: #e43f5a; }
+    </style>
+</head>
+<body>
+
 <div class="cad-container">
     <div class="toolbar">
         <h3>Componentes</h3>
@@ -6,13 +30,48 @@
         <button onclick="adicionarElemento('disjuntor')">⚡ Disjuntor</button>
     </div>
     
-    <div id="container-canvas" style="background: #fff; flex: 1;">
-        </div>
+    <div id="container-canvas"></div>
     
     <div class="sidebar-calculo">
-        <h3>Dimensionamento Automático</h3>
+        <h3>Dimensionamento</h3>
         <div id="resultado-calculo">
-            <p>Selecione um circuito para calcular...</p>
+            <p>Selecione um componente para ver dados...</p>
         </div>
     </div>
 </div>
+
+<script>
+    // Inicializa o Canvas
+    const width = document.getElementById('container-canvas').offsetWidth;
+    const height = window.innerHeight;
+    const stage = new Konva.Stage({ container: 'container-canvas', width: width, height: height });
+    const layer = new Konva.Layer();
+    stage.add(layer);
+
+    function adicionarElemento(tipo) {
+        let shape;
+        
+        if (tipo === 'tomada') {
+            shape = new Konva.Rect({ x: 50, y: 50, width: 40, height: 40, fill: '#3498db', draggable: true, stroke: 'black' });
+        } else if (tipo === 'lampada') {
+            shape = new Konva.Circle({ x: 100, y: 100, radius: 20, fill: '#f1c40f', draggable: true, stroke: 'black' });
+        } else if (tipo === 'disjuntor') {
+            shape = new Konva.Rect({ x: 150, y: 50, width: 60, height: 30, fill: '#e74c3c', draggable: true, stroke: 'black' });
+        }
+
+        layer.add(shape);
+        layer.draw();
+        
+        // Exemplo de interação: ao clicar, mostra dados no painel
+        shape.on('click', () => {
+            document.getElementById('resultado-calculo').innerHTML = `
+                <p><strong>Tipo:</strong> ${tipo.toUpperCase()}</p>
+                <p><strong>Carga estimada:</strong> 100W</p>
+                <button onclick="alert('Calculando queda de tensão...')">Calcular Queda</button>
+            `;
+        });
+    }
+</script>
+
+</body>
+</html>
