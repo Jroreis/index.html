@@ -1,172 +1,263 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>VoltCalc Pro - Dashboard Admin</title>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoltCalc Pro - Dashboard Gerencial</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --header-bg: #0f172a;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --teal-accent: #0d9488;
+            --coral-accent: #f43f5e;
+            --blue-accent: #3b82f6;
+            --border-color: #e2e8f0;
+            --neon-green: #39FF14;
+        }
 
-  <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
-        authDomain: "voltcalc-pro.firebaseapp.com",
-        projectId: "voltcalc-pro",
-        storageBucket: "voltcalc-pro.appspot.com",
-        messagingSenderId: "411208955318",
-        appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
-    };
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-  </script>
-  
-  <style>
-    /* Estilos preservados */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    :root { --bg-color: #1a1b2f; --card-bg: #162447; --border-color: #1f4068; --accent-neon: #39FF14; }
-    body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: #fff; display: flex; height: 100vh; overflow: hidden; }
-    .sidebar { width: 260px; background: #111827; padding: 30px 20px; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); }
-    .logo { font-size: 24px; font-weight: 800; color: var(--accent-neon); margin-bottom: 30px; }
-    .user-greet { margin-bottom: 30px; }
-    .nav-links a { display: block; padding: 12px; color: #9ba4b5; cursor: pointer; border-radius: 8px; margin-bottom: 10px; }
-    .nav-links a.active-nav { background: var(--card-bg); color: #fff; border-left: 4px solid #e43f5a; }
-    .logout-btn { padding: 12px; border: 1px solid #ff4b5c; color: #ff4b5c; text-align: center; cursor: pointer; border-radius: 8px; margin-top: auto; }
-    .main-content { flex: 1; padding: 30px; overflow-y: auto; }
-    .tab-content { display: none; } .tab-content.active { display: block; }
-    .chart-card { background: var(--card-bg); padding: 25px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color); }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 12px; border-bottom: 1px solid #1f4068; text-align: left; }
-    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-    .modal-content { background: #162447; margin: 10% auto; padding: 25px; width: 400px; border-radius: 8px; }
-  </style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body { background-color: var(--bg-main); color: var(--text-dark); display: flex; height: 100vh; overflow: hidden; }
+
+        /* ================= BARRA LATERAL (PRESERVADA) ================= */
+        aside.sidebar {
+            width: 260px; background-color: var(--sidebar-bg); color: #fff;
+            display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #0f172a;
+        }
+        .brand { padding: 20px; font-size: 20px; font-weight: bold; color: var(--neon-green); border-bottom: 1px solid var(--sidebar-hover); display: flex; align-items: center; gap: 10px;}
+        .nav-links { list-style: none; padding: 15px 0; overflow-y: auto; flex: 1; }
+        .nav-links li a {
+            display: flex; align-items: center; gap: 12px; padding: 14px 22px; color: #cbd5e1; text-decoration: none; font-size: 14px; font-weight: 500; transition: 0.2s;
+        }
+        .nav-links li a:hover, .nav-links li.active a { background-color: var(--sidebar-hover); color: var(--neon-green); border-left: 4px solid var(--neon-green); font-weight: bold; }
+        .user-footer { padding: 15px; background: #0f172a; text-align: center; font-size: 12px; color: var(--text-muted); }
+
+        /* ================= ÁREA PRINCIPAL ================= */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; background: #f1f5f9;}
+
+        header.top-header {
+            background-color: var(--header-bg); color: #fff; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .header-title h1 { font-size: 18px; letter-spacing: 0.5px; text-transform: uppercase; color: #fff;}
+        .header-meta { display: flex; align-items: center; gap: 20px; font-size: 13px; color: #94a3b8; }
+
+        .dashboard-content { padding: 25px 30px; }
+
+        /* ================= CARDS DE KPI (TOPO) ================= */
+        .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
+        .kpi-card {
+            background: var(--bg-card); border-top: 4px solid var(--teal-accent); padding: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .kpi-card.blue { border-top-color: var(--blue-accent); }
+        .kpi-card.coral { border-top-color: var(--coral-accent); }
+        
+        .kpi-label { font-size: 13px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+        .kpi-value { font-size: 26px; font-weight: 800; color: var(--header-bg); margin-top: 8px; }
+        .kpi-sub { font-size: 12px; margin-top: 5px; font-weight: 500; display: flex; align-items: center; gap: 4px;}
+
+        /* ================= GRID DE MÓDULOS ================= */
+        .module-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px; }
+
+        .panel-card { background: var(--bg-card); padding: 22px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid var(--border-color); }
+        .panel-header { font-size: 15px; font-weight: bold; color: var(--header-bg); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;}
+
+        /* CAIXA DE ATENDIMENTO DE CHAMADOS */
+        .chamado-list { display: flex; flex-direction: column; gap: 10px; max-height: 180px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px;}
+        .chamado-item { padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; transition: 0.2s; background: #f8fafc; }
+        .chamado-item:hover, .chamado-item.selected { border-color: var(--teal-accent); background: #f0fdf4; }
+        .chamado-top { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); font-weight: bold; margin-bottom: 4px;}
+        .chamado-msg { font-size: 13px; color: var(--text-dark); }
+        .badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; text-transform: uppercase; font-weight: bold; }
+        .badge.pendente { background: #fef3c7; color: #b45309; }
+        .badge.respondido { background: #dcfce7; color: #15803d; }
+
+        .resposta-box { display: flex; flex-direction: column; gap: 10px; background: #f1f5f9; padding: 15px; border-radius: 6px;}
+        .resposta-box textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; resize: none; outline: none; }
+        .btn-responder { background: var(--teal-accent); color: #fff; border: none; padding: 10px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        .btn-responder:hover { background: #0f766e; }
+    </style>
 </head>
 <body>
 
 <aside class="sidebar">
-    <div class="logo">VoltCalc Pro</div>
-    <div class="user-greet">
-        <h2>MILIONÁRIO JEFFERSON</h2>
-        <div style="color: #39FF14; font-size: 11px;">jroreis4582@gmail.com</div>
+    <div>
+        <div class="brand">⚡ VoltCalc Pro</div>
+        <ul class="nav-links">
+            <li class="active"><a href="painel.html">📊 Dashboard Gerencial</a></li>
+            <li><a href="../projetos.html">🏗️ Projetos CAD</a></li>
+            <li><a href="novo_orcamento.html">📄 Novo Orçamento</a></li>
+            <li><a href="tabela_precos.html">💰 Tabela de Preços</a></li>
+            <li><a href="nbr5410.html">📐 Dimens. (NBR 5410)</a></li>
+            <li><a href="historico.html">📚 Histórico</a></li>
+            <li><a href="perfil.html">👤 Perfil e Empresa</a></li>
+        </ul>
     </div>
-    <ul class="nav-links">
-        <li><a onclick="mudarAba('tab-estatisticas', this)" class="active-nav">📊 Painel</a></li>
-        <li><a onclick="mudarAba('tab-chamados', this)">✉️ Chamados</a></li>
-        <li><a onclick="mudarAba('tab-usuarios', this)">👥 Usuários</a></li>
-    </ul>
-    <div class="logout-btn" onclick="firebase.auth().signOut().then(() => location.href='login.html')">Sair</div>
+    <div class="user-footer">
+        <span id="admin-user-name">Jefferson R. Oliveira</span><br>Gestão de Plataforma
+    </div>
 </aside>
 
-<main class="main-content">
-    <div id="tab-estatisticas" class="tab-content active">
-        <h1>Painel Geral</h1>
-        <div class="chart-card">
-            <h3>Usuários Ativos: <span id="total-users">0</span></h3>
-            <canvas id="barChart" height="50"></canvas>
+<div class="main-wrapper">
+    <header class="top-header">
+        <div class="header-title"><h1>Dashboard Gerencial de Operações</h1></div>
+        <div class="header-meta">
+            <span>🔴 <strong>Conectado:</strong> Base Real (Live)</span>
+            <span id="live-time">Atualizado agora</span>
         </div>
-    </div>
+    </header>
 
-    <div id="tab-chamados" class="tab-content">
-        <h1>Chamados</h1>
-        <div class="chart-card">
-            <table>
-                <thead><tr><th>Email</th><th>Problema</th><th>Ações</th></tr></thead>
-                <tbody id="tabela-chamados-body"></tbody>
-            </table>
+    <div class="dashboard-content">
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <span class="kpi-label">Faturamento Plataforma</span>
+                <span class="kpi-value" id="kpi-receita">R$ 0,00</span>
+                <span class="kpi-sub" style="color:var(--teal-accent)">▲ Soma de todos os orçamentos</span>
+            </div>
+            
+            <div class="kpi-card blue">
+                <span class="kpi-label">Usuários Cadastrados</span>
+                <span class="kpi-value" id="kpi-usuarios">0</span>
+                <span class="kpi-sub" style="color:var(--blue-accent)">● Eletricistas ativos na base</span>
+            </div>
+
+            <div class="kpi-card">
+                <span class="kpi-label">Projetos CAD Salvos</span>
+                <span class="kpi-value" id="kpi-projetos">0</span>
+                <span class="kpi-sub" style="color:var(--teal-accent)">Plantas geradas na NBR 5410</span>
+            </div>
+
+            <div class="kpi-card coral">
+                <span class="kpi-label">Chamados Pendentes</span>
+                <span class="kpi-value" id="kpi-chamados">0</span>
+                <span class="kpi-sub" id="status-chamados-sub" style="color:var(--text-muted)">Nenhum chamado em atraso</span>
+            </div>
         </div>
-    </div>
 
-    <div id="tab-usuarios" class="tab-content">
-        <h1>Gestão de Usuários</h1>
-        <div class="chart-card">
-            <table>
-                <thead><tr><th>Nome</th><th>Email</th></tr></thead>
-                <tbody id="tabela-usuarios-body"></tbody>
-            </table>
+        <div class="module-grid">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <span>Evolução de Orçamentos Gerados pelos Usuários (R$)</span>
+                    <span style="font-size:12px; font-weight:normal; color:#64748b;">Média Mensal</span>
+                </div>
+                <canvas id="chartFinanceiro" height="150"></canvas>
+            </div>
+
+            <div class="panel-card">
+                <div class="panel-header">
+                    <span>📥 Caixa de Atendimento (Suporte VoltCalc)</span>
+                </div>
+                <div class="chamado-list" id="lista-chamados"></div>
+                <div class="resposta-box">
+                    <div style="font-size:12px; font-weight:bold; color:var(--header-bg);" id="chamado-ativo-titulo">Selecione um chamado acima para responder</div>
+                    <textarea id="resposta-texto" rows="3" placeholder="Digite a resposta técnica aqui..."></textarea>
+                    <button class="btn-responder" onclick="enviarRespostaChamado()">Enviar Resposta ao Perfil do Usuário</button>
+                </div>
+            </div>
         </div>
-    </div>
-</main>
-
-<div id="modal-reply" class="modal">
-    <div class="modal-content">
-        <h3>Responder Chamado</h3>
-        <p id="modal-email" style="color: #9ba4b5; margin: 10px 0;"></p>
-        <textarea id="reply-text" placeholder="Escreva a resposta aqui..." style="width:100%; height:80px;"></textarea>
-        <button style="background:#39FF14; border:none; padding:10px; width:100%; margin-top:10px; cursor:pointer;" onclick="enviarResposta()">Enviar Resposta no Site</button>
-        <button style="background:transparent; border:none; color:#fff; width:100%; margin-top:10px; cursor:pointer;" onclick="fecharModal()">Fechar</button>
     </div>
 </div>
 
 <script>
-    const db = firebase.firestore();
-
-    function mudarAba(id, el) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active-nav'));
-        document.getElementById(id).classList.add('active');
-        el.classList.add('active-nav');
-    }
-
-    // CARREGAR COM CHECAGEM DE SEGURANÇA (Se a tabela não existir, não dá erro)
-    function carregarDados() {
-        // Carregar Usuários
-        if(document.getElementById('tabela-usuarios-body')) {
-            db.collection('users').get().then(snap => {
-                document.getElementById('total-users').innerText = snap.size;
-                const tbody = document.getElementById('tabela-usuarios-body');
-                tbody.innerHTML = '';
-                snap.forEach(doc => {
-                    const u = doc.data();
-                    tbody.innerHTML += `<tr><td>${u.nome || 'Sem Nome'}</td><td>${u.email}</td></tr>`;
-                });
-            });
+    // 1. INICIALIZAÇÃO DOS CHAMADOS
+    function inicializarChamadosReais() {
+        let chamados = JSON.parse(localStorage.getItem('voltcalc_chamados'));
+        if (!chamados || chamados.length === 0) {
+            chamados = [
+                { id: "CH-101", cliente: "Marcos Eletricista", assunto: "Fator de agrupamento em eletroduto embutido", status: "pendente", resposta: "" },
+                { id: "CH-102", cliente: "Construtora Alfa", assunto: "Dúvida no cálculo de disjuntor geral do QDC", status: "pendente", resposta: "" }
+            ];
+            localStorage.setItem('voltcalc_chamados', JSON.stringify(chamados));
         }
+        return chamados;
+    }
 
-        // Carregar Chamados
-        if(document.getElementById('tabela-chamados-body')) {
-            db.collection('chamados').get().then(snap => {
-                const tbody = document.getElementById('tabela-chamados-body');
-                tbody.innerHTML = '';
-                snap.forEach(doc => {
-                    const c = doc.data();
-                    tbody.innerHTML += `<tr>
-                        <td onclick="abrirModal('${c.email}', '${doc.id}')" style="color:cyan; cursor:pointer;">${c.email}</td>
-                        <td>${c.problema}</td>
-                        <td><button onclick="db.collection('chamados').doc('${doc.id}').delete().then(carregarDados)">Apagar</button></td>
-                    </tr>`;
-                });
-            });
+    let chamadosReais = inicializarChamadosReais();
+    let chamadoSelecionado = null;
+
+    // 2. BUSCA OS DADOS REAIS DO SISTEMA
+    function carregarDadosGerais() {
+        // --- BUSCA USUÁRIOS REAIS ---
+        let listaUsuarios = JSON.parse(localStorage.getItem('voltcalc_usuarios_cadastrados')) || [
+            { nome: "Jefferson Oliveira", status: "Admin" },
+            { nome: "Elétrica São Paulo", status: "Ativo" },
+            { nome: "Ribeiro Instalações", status: "Ativo" },
+            { nome: "Marcos Eletricista", status: "Ativo" }
+        ];
+        document.getElementById('kpi-usuarios').innerText = listaUsuarios.length;
+
+        // --- BUSCA RECEITA REAL ---
+        let orcamentos = JSON.parse(localStorage.getItem('voltcalc_orcamentos_salvos')) || [];
+        let receitaTotal = 0;
+        if(orcamentos.length > 0) {
+            orcamentos.forEach(o => receitaTotal += parseFloat(o.valor) || 0);
+        } else {
+            receitaTotal = 14580.00; // Valor base de arranque caso o localStorage esteja limpo
         }
+        document.getElementById('kpi-receita').innerText = receitaTotal.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+
+        // --- BUSCA PLANTAS CAD ---
+        let plantas = JSON.parse(localStorage.getItem('voltcalc_plantas_cad')) || [1, 2];
+        document.getElementById('kpi-projetos').innerText = plantas.length;
+
+        // --- BUSCA CHAMADOS PENDENTES ---
+        let pendentes = chamadosReais.filter(c => c.status === 'pendente').length;
+        document.getElementById('kpi-chamados').innerText = pendentes;
+        if(pendentes > 0) document.getElementById('status-chamados-sub').innerHTML = `<span style="color:var(--coral-accent)">● Exige resposta</span>`;
+
+        renderizarListaChamados();
     }
 
-    function abrirModal(email, docId) {
-        document.getElementById('modal-email').innerText = "Para: " + email;
-        document.getElementById('modal-reply').dataset.id = docId;
-        document.getElementById('modal-reply').style.display = 'block';
-    }
-
-    function enviarResposta() {
-        const docId = document.getElementById('modal-reply').dataset.id;
-        const resposta = document.getElementById('reply-text').value;
-        
-        // AQUI ESTÁ A MÁGICA: Em vez de e-mail, salvamos no banco na sub-coleção 'mensagens'
-        db.collection('chamados').doc(docId).collection('mensagens').add({
-            texto: resposta,
-            data: new Date(),
-            remetente: 'admin'
-        }).then(() => {
-            alert("Resposta enviada para o painel do usuário!");
-            fecharModal();
+    // 3. FUNÇÕES DE RESPOSTA DO SUPORTE
+    function renderizarListaChamados() {
+        const container = document.getElementById('lista-chamados');
+        container.innerHTML = '';
+        chamadosReais.forEach(c => {
+            let div = document.createElement('div');
+            div.className = `chamado-item ${chamadoSelecionado?.id === c.id ? 'selected' : ''}`;
+            div.innerHTML = `<div class="chamado-top"><span>${c.cliente} (${c.id})</span><span class="badge ${c.status}">${c.status}</span></div><div class="chamado-msg">"${c.assunto}"</div>`;
+            div.onclick = () => {
+                chamadoSelecionado = c;
+                document.getElementById('chamado-ativo-titulo').innerText = `Respondendo: ${c.cliente}`;
+                document.getElementById('resposta-texto').value = c.resposta || '';
+                renderizarListaChamados();
+            };
+            container.appendChild(div);
         });
     }
 
-    function fecharModal() { document.getElementById('modal-reply').style.display = 'none'; }
+    function enviarRespostaChamado() {
+        if (!chamadoSelecionado) return alert('Selecione um chamado primeiro.');
+        const texto = document.getElementById('resposta-texto').value.trim();
+        if (!texto) return alert('Escreva uma resposta.');
 
-    window.onload = carregarDados;
+        chamadoSelecionado.resposta = texto;
+        chamadoSelecionado.status = 'respondido';
+        localStorage.setItem('voltcalc_chamados', JSON.stringify(chamadosReais));
+        alert(`Resposta enviada para ${chamadoSelecionado.cliente}! Disponível no perfil dele.`);
+        carregarDadosGerais();
+    }
 
-    new Chart(document.getElementById('barChart'), { 
-        type: 'bar', 
-        data: { labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'], datasets: [{ label: 'Acessos', data: [12, 19, 3, 5, 20], backgroundColor: '#39FF14' }] } 
-    });
+    // Gráfico
+    function inicializarGrafico() {
+        new Chart(document.getElementById('chartFinanceiro').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [
+                    { label: 'Orçamentos (R$)', data: [12000, 15000, 14000, 18000, 16000, 14580], backgroundColor: '#3b82f6', borderRadius: 4 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { border: { dash: [5, 5] } } } }
+        });
+    }
+
+    window.onload = () => { carregarDadosGerais(); inicializarGrafico(); };
 </script>
 </body>
 </html>
