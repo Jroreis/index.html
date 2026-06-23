@@ -122,7 +122,6 @@
     .feature-card h3 { font-size: 22px; margin-bottom: 16px; color: var(--text); font-weight: 700; }
     .feature-card p { color: var(--text-light); font-size: 16px; }
 
-    /* ── Modais ── */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(2, 6, 23, 0.85); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px); }
     .modal-overlay.open { display: flex; }
     .modal { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 24px; padding: 40px; max-width: 480px; width: 100%; position: relative; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; color: var(--text); }
@@ -162,10 +161,13 @@
     .editable-panel-title:hover { border-color: var(--primary); background: rgba(79, 70, 229, 0.1); cursor: pointer; }
     .editable-panel-title:focus { outline: none; border-style: solid; border-color: var(--neon-green); background: var(--card-bg); box-shadow: 0 0 0 3px rgba(57, 255, 20, 0.2); }
 
-    .tabs { display: flex; flex-direction: column; gap: 8px; margin-bottom: auto; }
-    .tab { padding: 16px; font-weight: 600; cursor: pointer; background: transparent; border: none; color: var(--text-light); text-align: left; font-size: 15px; transition: 0.2s; border-radius: 12px; }
-    .tab:hover { background: rgba(255, 255, 255, 0.05); color: var(--text); }
-    .tab.active { background: var(--neon-green); color: var(--bg-color); }
+    /* =================================================================================== */
+    /* ── ALTERAÇÃO 4: ABAS LATERAIS MINIMALISTAS (APENAS NOMES, SEM ESTICAR) ── */
+    /* =================================================================================== */
+    .tabs { display: flex; flex-direction: column; gap: 14px; margin-bottom: auto; align-items: flex-start; }
+    .tab { padding: 6px 0; font-weight: 600; cursor: pointer; background: transparent !important; border: none; color: var(--text-light); text-align: left; font-size: 15px; transition: 0.2s; width: auto; display: inline-block; }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--neon-green) !important; font-weight: 800; border-bottom: 2px solid var(--neon-green); border-radius: 0; }
     
     .logout-btn { background: rgba(220, 38, 38, 0.1); color: #ef4444; border: 1px solid rgba(220, 38, 38, 0.3); padding: 14px; border-radius: 12px; cursor: pointer; font-weight: 700; transition: 0.2s; width: 100%; margin-top: 20px; }
     .logout-btn:hover { background: rgba(220, 38, 38, 0.2); }
@@ -216,15 +218,6 @@
     .dimens-table input:focus, .dimens-table select:focus { border-color: var(--neon-green); outline: none; }
     .dimens-print-header { display: none; }
 
-    /* =================================================================================== */
-    /* ── ADIÇÃO PADRÃO: BOTÕES UNIFORMES DE RECOLHER/ABRIR E SEÇÕES COLAPSÁVEIS ── */
-    /* =================================================================================== */
-    .header-com-toggle { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
-    .btn-toggle-padrao { background: #0f172a; color: var(--neon-green); border: 1px solid #334155; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; min-width: 120px; transition: all 0.2s; }
-    .btn-toggle-padrao:hover { background: #1e293b; border-color: var(--neon-green); box-shadow: 0 0 10px rgba(57, 255, 20, 0.2); }
-    .conteudo-colapsavel { transition: max-height 0.3s ease-out; overflow: visible; }
-    .conteudo-colapsavel.recolhido { display: none !important; }
-
     @media (max-width: 992px) { 
       .dashboard-layout { flex-direction: column; }
       .dashboard-sidebar { width: 100%; height: auto; position: relative; top: 0; }
@@ -239,7 +232,7 @@
       body { background: #fff !important; color: #000 !important; font-size: 11px; line-height: 1.3; }
       .bg-overlay, .ads-container, .adsbygoogle, .video-container { display: none !important; }
       .header, .dashboard-sidebar, .btn-add-item, .btn-primary, .btn-secondary-action, .orc-item button, #authBtns, footer { display: none !important; }
-      .card > h3, .print-hidden, .btn-toggle-padrao { display: none !important; } /* Esconde o botão no papel */
+      .card > h3, .print-hidden { display: none !important; }
       
       .dashboard-layout { display: block !important; margin: 0 !important; }
       .dashboard-main { padding: 0 !important; }
@@ -250,16 +243,19 @@
       .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; background: #fff !important; }
       .orc-form-grid { display: block !important; }
       
-      /* REGRA TÉCNICA DE BLINDAGEM: Força as abas a se expandirem na impressão mesmo se recolhidas na tela */
-      .conteudo-colapsavel.recolhido { display: block !important; }
+      /* =================================================================================== */
+      /* ── CIRURGIA 2: OCULTA A TABELA DE PREÇOS QUANDO ESTIVER IMPRIMINDO DIMENSIONAMENTO ── */
+      /* =================================================================================== */
+      body.imprimindo-dimens #tab-precos { display: none !important; }
 
       .profile-grid { display: flex !important; flex-wrap: wrap !important; gap: 10px !important; border: none !important; border-bottom: 2px solid #000 !important; padding: 0 0 10px 0 !important; margin-bottom: 15px !important; }
       .form-group { margin-bottom: 3px !important; flex: 1 1 45% !important; }
       .form-group.full { flex: 1 1 100% !important; }
       .form-group label { color: #475569 !important; font-size: 10px !important; margin-bottom: 2px !important; text-transform: uppercase; font-weight: 700 !important; }
       
-      .form-group input, .form-group textarea, .form-group select, .orc-item input, .orc-item select { background: transparent !important; border: none !important; padding: 0 0 2px 0 !important; font-size: 12px !important; color: #000 !important; font-weight: 600 !important; border-radius: 0 !important; box-shadow: none !important; height: auto !important; outline: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; background-image: none !important; }
-      .form-group select::-ms-expand, .orc-item select::-ms-expand { display: none !important; }
+      /* CIRURGIA 2 (Setas de Seleção): Adicionado appearance: none !important e background: transparent para matar as setas */
+      .form-group input, .form-group textarea, .form-group select, .orc-item input, .orc-item select, .dimens-table select { background: transparent !important; border: none !important; padding: 0 0 2px 0 !important; font-size: 12px !important; color: #000 !important; font-weight: 600 !important; border-radius: 0 !important; box-shadow: none !important; height: auto !important; outline: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; background-image: none !important; }
+      .form-group select::-ms-expand, .orc-item select::-ms-expand, .dimens-table select::-ms-expand { display: none !important; }
 
       .print-only { display: grid !important; }
       .orc-items-header { display: grid; grid-template-columns: 2fr 3fr 1fr 1fr 1fr; font-weight: 800; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; color: #000 !important; }
@@ -277,7 +273,7 @@
       .dimens-table { width: 100% !important; border-collapse: collapse !important; font-size: 10px !important; }
       .dimens-table th { background: #f1f5f9 !important; color: #000 !important; font-weight: bold !important; border: 1px solid #475569 !important; padding: 6px 4px !important; text-align: center !important; }
       .dimens-table td { border: 1px solid #475569 !important; padding: 5px 4px !important; text-align: center !important; color: #000 !important; background: #fff !important; }
-      .dimens-table input, .dimens-table select { border: none !important; background: transparent !important; color: #000 !important; font-size: 10px !important; width: 100% !important; text-align: center !important; font-weight: 600 !important; padding: 0 !important; }
+      .dimens-table input, .dimens-table select { border: none !important; background: transparent !important; color: #000 !important; font-size: 10px !important; width: 100% !important; text-align: center !important; font-weight: 600 !important; padding: 0 !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; background-image: none !important; }
       .dimens-table td:first-child input { text-align: left !important; font-weight: bold !important; }
 
       .ptable, .ptable th, .ptable td, .cat-row { background: #fff !important; color: #000 !important; border-color: #000 !important; }
@@ -302,12 +298,15 @@
     </div>
 
     <div class="header-btns" id="userTopNav" style="display: none; align-items: center; gap: 12px;">
-      <button class="btn-header" onclick="abrirModalNotificacoes()" style="position: relative; padding: 10px 16px;" title="Ver Respostas do Suporte">
-        🔔 Suporte
+      <button class="btn-header" onclick="abrirModalNotificacoes()" style="position: relative; padding: 10px 16px;" title="Ver Mensagens">
+        💬 Mensagens
         <span id="badgeNotif" style="position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; font-size: 11px; font-weight: 800; border-radius: 50%; padding: 2px 6px; display: none;">0</span>
       </button>
       <button class="btn-header filled" onclick="abrirPerfilTopo()" title="Acessar Perfil e Empresa">
         👤 Perfil e Empresa
+      </button>
+      <button class="btn-header" onclick="auth.signOut()" style="border-color: #ef4444; color: #ef4444; padding: 10px 16px; font-size: 13px;" title="Sair da Conta">
+        Sair
       </button>
     </div>
   </header>
@@ -435,18 +434,10 @@
     <div class="modal modal-lg" id="modalNotificacoes" style="display:none;">
       <button class="modal-close" onclick="closeModal()">&times;</button>
       <h2 style="margin-bottom: 16px; font-weight: 800; display:flex; align-items:center; gap:10px;">
-        🔔 Suporte Técnico e Central de Atendimento
+        💬 Central de Mensagens e Suporte
       </h2>
-      
-      <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 18px; border-radius: 12px; margin-bottom: 24px;">
-        <h4 style="margin-bottom: 8px; color: var(--neon-green); font-size: 14px;">Precisa de mais ajuda? Envie para os engenheiros:</h4>
-        <textarea id="modalDuvidaTexto" rows="2" placeholder="Descreva aqui sua dúvida ou solicitação técnica..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: #fff; font-size: 13px; outline: none; resize: none; margin-bottom: 10px;"></textarea>
-        <button onclick="enviarDuvidaInternaPeloModal()" class="btn-primary" style="padding: 10px; font-size: 13px;">Despachar Nova Solicitação</button>
-      </div>
-
-      <h4 style="margin-bottom: 10px; color: var(--text-light); font-size: 12px; text-transform: uppercase;">Acompanhamento de Conversas Ativas</h4>
-      <div id="notifListBody" style="max-height: 300px; overflow-y: auto; padding-right: 8px;">
-        <p style="color: var(--text-light); font-size: 14px;">Buscando chamados associados ao seu e-mail...</p>
+      <div id="notifListBody" style="max-height: 400px; overflow-y: auto; padding-right: 8px;">
+        <p style="color: var(--text-light); font-size: 14px;">Buscando mensagens associadas ao seu e-mail...</p>
       </div>
     </div>
 
@@ -513,80 +504,69 @@
           <button class="tab" data-tab="eng">⚡ Eletricista / Engenheiro</button>
           <button class="tab" data-tab="hist-prof">📚 Histórico</button>
         </nav>
-
-        <button class="logout-btn" onclick="auth.signOut()">Encerrar Sessão</button>
       </aside>
 
       <main class="dashboard-main">
-        
         <div class="tab-content active" id="tab-orc">
           <article class="card">
-            
-            <div class="header-com-toggle">
-              <h3 id="orcFormHeaderTitle" style="margin:0;">📄 Gerador de Novo Orçamento</h3>
-              <button class="btn-toggle-padrao" onclick="alternarRecolhimento('conteudo-aba-orc', this)">▼ Recolher</button>
-            </div>
-            
+            <h3 id="orcFormHeaderTitle">📄 Gerador de Novo Orçamento</h3>
             <input type="hidden" id="currentEditingBudgetId" value="">
             
-            <div id="conteudo-aba-orc" class="conteudo-colapsavel">
-              <div class="orc-form-grid">
-                <div>
-                  <div class="profile-grid">
-                    <div class="form-group"><label>Nome do Cliente</label><input id="orcCliNome"></div>
-                    <div class="form-group"><label>Telefone</label><input id="orcCliTel"></div>
-                    <div class="form-group"><label>Data de Validade</label><input type="date" id="orcValidDate"></div>
-                    
-                    <div class="form-group"><label>Rua / Logradouro</label><input id="orcRua" placeholder="Ex: Av. Paulista"></div>
-                    <div class="form-group"><label>Número</label><input id="orcNum" placeholder="Ex: 1000"></div>
-                    <div class="form-group"><label>Bairro</label><input id="orcBairro" placeholder="Ex: Centro"></div>
-                    <div class="form-group"><label>CEP</label><input id="orcCep" placeholder="Ex: 01310-100"></div>
-                    <div class="form-group"><label>Cidade</label><input id="orcCidade" placeholder="Ex: São Paulo"></div>
-                    <div class="form-group"><label>Estado (UF)</label><input id="orcEstado" placeholder="Ex: SP"></div>
-                    <input type="hidden" id="orcCliEnd">
-                  </div>
+            <div class="orc-form-grid">
+              <div>
+                <div class="profile-grid">
+                  <div class="form-group"><label>Nome do Cliente</label><input id="orcCliNome"></div>
+                  <div class="form-group"><label>Telefone</label><input id="orcCliTel"></div>
+                  <div class="form-group"><label>Data de Validade</label><input type="date" id="orcValidDate"></div>
                   
-                  <div class="orc-items-header print-only">
-                    <span>Ambiente</span>
-                    <span>Descrição do Serviço</span>
-                    <span style="text-align:center;">Qtd</span>
-                    <span>V. Unitário</span>
-                    <span style="text-align:right;">Subtotal</span>
-                  </div>
-
-                  <div class="orc-item-list" id="orcItemsContainer"></div>
-                  
-                  <button class="btn-add-item" id="btnAddOrcItem">+ Adicionar Serviço da Tabela Nacional</button>
-                  <button class="btn-add-item" style="background:transparent; color:var(--text-light); border-color: var(--border-color);" id="btnAddCustomItem">+ Adicionar Serviço Personalizado</button>
-                  
-                  <div class="form-group" style="margin-top: 24px;">
-                    <label>Observações / Condições de Pagamento</label>
-                    <textarea id="orcObs" rows="3" placeholder="Ex: 50% de entrada e 50% na conclusão da entrega técnica. Garantia de 1 ano sobre a mão de obra."></textarea>
-                  </div>
+                  <div class="form-group"><label>Rua / Logradouro</label><input id="orcRua" placeholder="Ex: Av. Paulista"></div>
+                  <div class="form-group"><label>Número</label><input id="orcNum" placeholder="Ex: 1000"></div>
+                  <div class="form-group"><label>Bairro</label><input id="orcBairro" placeholder="Ex: Centro"></div>
+                  <div class="form-group"><label>CEP</label><input id="orcCep" placeholder="Ex: 01310-100"></div>
+                  <div class="form-group"><label>Cidade</label><input id="orcCidade" placeholder="Ex: São Paulo"></div>
+                  <div class="form-group"><label>Estado (UF)</label><input id="orcEstado" placeholder="Ex: SP"></div>
+                  <input type="hidden" id="orcCliEnd">
                 </div>
                 
-                <div>
-                  <div class="card" style="position: sticky; top: 100px;">
-                    <h4>Resumo Financeiro</h4>
-                    <div style="margin: 20px 0 10px 0;">
-                      <div class="form-group">
-                        <label>Desconto (%)</label>
-                        <input type="number" id="orcDiscount" value="0" min="0" max="100">
-                      </div>
+                <div class="orc-items-header print-only">
+                  <span>Ambiente</span>
+                  <span>Descrição do Serviço</span>
+                  <span style="text-align:center;">Qtd</span>
+                  <span>V. Unitário</span>
+                  <span style="text-align:right;">Subtotal</span>
+                </div>
+
+                <div class="orc-item-list" id="orcItemsContainer"></div>
+                
+                <button class="btn-add-item" id="btnAddOrcItem">+ Adicionar Serviço da Tabela Nacional</button>
+                <button class="btn-add-item" style="background:transparent; color:var(--text-light); border-color: var(--border-color);" id="btnAddCustomItem">+ Adicionar Serviço Personalizado</button>
+                
+                <div class="form-group" style="margin-top: 24px;">
+                  <label>Observações / Condições de Pagamento</label>
+                  <textarea id="orcObs" rows="3" placeholder="Ex: 50% de entrada e 50% na conclusão da entrega técnica. Garantia de 1 ano sobre a mão de obra."></textarea>
+                </div>
+              </div>
+              
+              <div>
+                <div class="card" style="position: sticky; top: 100px;">
+                  <h4>Resumo Financeiro</h4>
+                  <div style="margin: 20px 0 10px 0;">
+                    <div class="form-group">
+                      <label>Desconto (%)</label>
+                      <input type="number" id="orcDiscount" value="0" min="0" max="100">
                     </div>
-                    <div class="summary-box">
-                      <div class="summary-row"><span>Subtotal:</span><span>R$ <span id="orcSubtotalValue">0,00</span></span></div>
-                      <div class="summary-row"><span>Desconto:</span><span>R$ <span id="orcDiscountValue">0,00</span></span></div>
-                      <div class="summary-row total"><span>Total:</span><span>R$ <span id="orcTotalValue">0,00</span></span></div>
-                    </div>
-                    <button class="btn-primary" id="btnSaveOrc">Salvar no Histórico</button>
-                    <button class="btn-secondary-action" id="btnCancelEditStyle" style="display:none; background:transparent; color:#ef4444; border-color:#ef4444;" onclick="clearOrcFormState()">Cancelar Edição</button>
-                    <button class="btn-secondary-action" onclick="window.print()">🖨️ Imprimir / Gerar PDF</button>
                   </div>
+                  <div class="summary-box">
+                    <div class="summary-row"><span>Subtotal:</span><span>R$ <span id="orcSubtotalValue">0,00</span></span></div>
+                    <div class="summary-row"><span>Desconto:</span><span>R$ <span id="orcDiscountValue">0,00</span></span></div>
+                    <div class="summary-row total"><span>Total:</span><span>R$ <span id="orcTotalValue">0,00</span></span></div>
+                  </div>
+                  <button class="btn-primary" id="btnSaveOrc">Salvar no Histórico</button>
+                  <button class="btn-secondary-action" id="btnCancelEditStyle" style="display:none; background:transparent; color:#ef4444; border-color:#ef4444;" onclick="clearOrcFormState()">Cancelar Edição</button>
+                  <button class="btn-secondary-action" onclick="window.print()">🖨️ Imprimir / Gerar PDF</button>
                 </div>
               </div>
             </div>
-
           </article>
 
           <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border-color); margin-top: 40px;">
@@ -618,53 +598,50 @@
                 </div>
               </div>
 
-              <div class="print-hidden header-com-toggle" style="margin-bottom: 24px;">
+              <div class="print-hidden" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
                 <div>
-                  <h3 style="font-size: 22px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px; margin:0;">📐 Planilha de Dimensionamento (ABNT NBR 5410)</h3>
+                  <h3 style="font-size: 22px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px;">📐 Planilha de Dimensionamento (ABNT NBR 5410)</h3>
                   <p style="color: var(--text-light); font-size: 14px; margin-top: 4px;">Altere a carga, tensão e distância. O sistema calcula a Corrente de Projeto ($I_b$), Seção mínima em Cobre, Disjuntor de proteção e Queda admissível.</p>
                 </div>
-                <div style="display: flex; gap: 12px; align-items: center;">
-                  <button class="btn-toggle-padrao" onclick="alternarRecolhimento('conteudo-aba-dimens', this)">▼ Recolher</button>
+                <div style="display: flex; gap: 12px;">
                   <button class="btn-header filled" onclick="addDimensRow('', 1200, 127, 15)">+ Novo Circuito</button>
                   <button class="btn-header" onclick="prepararImpressaoDimens()" style="color: var(--text); border-color: var(--border-color);">🖨️ Imprimir Planilha</button>
                 </div>
               </div>
 
-              <div id="conteudo-aba-dimens" class="conteudo-colapsavel">
-                <div class="print-hidden" style="background: var(--bg-color); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 24px;">
-                  <div class="profile-grid" style="grid-template-columns: 2fr 1fr;">
-                    <div class="form-group" style="margin: 0;"><label>Identificação da Obra / Setor</label><input type="text" id="dimInputObra" placeholder="Ex: Residência Família Souza - Pavimento Superior" oninput="document.getElementById('dimPrintObra').textContent = this.value || 'Estudo de Instalação Elétrica'"></div>
-                    <div class="form-group" style="margin: 0;"><label>Data do Estudo</label><input type="date" id="dimInputData" oninput="formatarDataDim(this.value)"></div>
-                  </div>
+              <div class="print-hidden" style="background: var(--bg-color); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 24px;">
+                <div class="profile-grid" style="grid-template-columns: 2fr 1fr;">
+                  <div class="form-group" style="margin: 0;"><label>Identificação da Obra / Setor</label><input type="text" id="dimInputObra" placeholder="Ex: Residência Família Souza - Pavimento Superior" oninput="document.getElementById('dimPrintObra').textContent = this.value || 'Estudo de Instalação Elétrica'"></div>
+                  <div class="form-group" style="margin: 0;"><label>Data do Estudo</label><input type="date" id="dimInputData" oninput="formatarDataDim(this.value)"></div>
                 </div>
+              </div>
 
-                <div class="ptable-wrap">
-                  <table class="dimens-table">
-                    <thead>
-                      <tr>
-                        <th style="min-width: 190px; text-align: left;">Circuito / Destino</th>
-                        <th style="width: 105px;">Carga (W)</th>
-                        <th style="width: 130px;">Tensão (V)</th>
-                        <th style="width: 110px;">F. Potência</th>
-                        <th style="width: 85px;">Dist. (m)</th>
-                        <th style="width: 95px; color: var(--secondary);">Corrente ($I_b$)</th>
-                        <th style="width: 100px; color: var(--neon-green);">Bitola Mín.</th>
-                        <th style="width: 95px; color: #818cf8;">Disjuntor</th>
-                        <th style="width: 85px;">Queda %</th>
-                        <th style="width: 115px;">Diagnóstico</th>
-                        <th class="print-hidden" style="width: 40px;"></th>
-                      </tr>
-                    </thead>
-                    <tbody id="dimensTbody"></tbody>
-                  </table>
-                </div>
+              <div class="ptable-wrap">
+                <table class="dimens-table">
+                  <thead>
+                    <tr>
+                      <th style="min-width: 190px; text-align: left;">Circuito / Destino</th>
+                      <th style="width: 105px;">Carga (W)</th>
+                      <th style="width: 130px;">Tensão (V)</th>
+                      <th style="width: 110px;">F. Potência</th>
+                      <th style="width: 85px;">Dist. (m)</th>
+                      <th style="width: 95px; color: var(--secondary);">Corrente ($I_b$)</th>
+                      <th style="width: 100px; color: var(--neon-green);">Bitola Mín.</th>
+                      <th style="width: 95px; color: #818cf8;">Disjuntor</th>
+                      <th style="width: 85px;">Queda %</th>
+                      <th style="width: 115px;">Diagnóstico</th>
+                      <th class="print-hidden" style="width: 40px;"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="dimensTbody"></tbody>
+                </table>
+              </div>
 
-                <div class="print-hidden" style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-                  <button class="btn-add-item" style="width: auto; padding: 14px 28px; margin: 0;" onclick="addDimensRow('', 1000, 127, 10)">+ Inserir Linha em Branco na Planilha</button>
-                  <div style="font-size: 12px; color: var(--text-light); text-align: right;">
-                    *Queda de Tensão máxima configurada: <strong>4.0%</strong> (Padrão NBR 5410).<br>
-                    *Capacidade de condução ($I_z$) baseada em condutores de Cobre, Isolação PVC 70°C, Método B1.
-                  </div>
+              <div class="print-hidden" style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                <button class="btn-add-item" style="width: auto; padding: 14px 28px; margin: 0;" onclick="addDimensRow('', 1000, 127, 10)">+ Inserir Linha em Branco na Planilha</button>
+                <div style="font-size: 12px; color: var(--text-light); text-align: right;">
+                  *Queda de Tensão máxima configurada: <strong>4.0%</strong> (Padrão NBR 5410).<br>
+                  *Capacidade de condução ($I_z$) baseada em condutores de Cobre, Isolação PVC 70°C, Método B1.
                 </div>
               </div>
 
@@ -673,15 +650,9 @@
         </div>
 
         <div class="tab-content" id="tab-hist-prof">
-          <div class="header-com-toggle">
-            <div>
-              <h3 style="margin:0;">📚 Histórico de Orçamentos</h3>
-              <p style="color:var(--text-light); margin-top: 4px;">Revise orçamentos antigos, altere dados estruturais, reimprima, envie via WhatsApp ou exclua registros indesejados.</p>
-            </div>
-            <button class="btn-toggle-padrao" onclick="alternarRecolhimento('profHistContainer', this)">▼ Recolher</button>
-          </div>
-          
-          <div id="profHistContainer" class="conteudo-colapsavel" style="margin-top: 20px;"></div>
+          <h3>📚 Histórico de Orçamentos</h3>
+          <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, altere dados estruturais, reimprima, envie via WhatsApp ou exclua registros indesejados.</p>
+          <div id="profHistContainer"></div>
 
           <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border-color); margin-top: 40px;">
             <div style="max-width: 500px; margin: 0 auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
@@ -712,19 +683,6 @@
     var currentUser = null;
     var base64LogoToSave = ""; 
     var globalSavedBudgets = []; 
-
-    // ── FUNÇÃO PADRÃO DE COLAPSO (RECOLHER/ABRIR) ──
-    function alternarRecolhimento(idConteudo, btnEl) {
-      var el = document.getElementById(idConteudo);
-      if(!el) return;
-      if(el.classList.contains('recolhido')) {
-        el.classList.remove('recolhido');
-        btnEl.innerHTML = '▼ Recolher';
-      } else {
-        el.classList.add('recolhido');
-        btnEl.innerHTML = '▶ Abrir';
-      }
-    }
 
     document.addEventListener('DOMContentLoaded', function() {
       if(!localStorage.getItem('cookiesAceitos')) {
@@ -898,42 +856,6 @@
       openModal('modalNotificacoes');
     }
 
-    // ── GATILHOS DO FORMULÁRIO DO MODAL DE SUPORTE ──
-    function enviarDuvidaInternaPeloModal() {
-      if(!currentUser || !currentUser.email) return alert("Sessão inválida.");
-      var texto = document.getElementById('modalDuvidaTexto').value.trim();
-      if(!texto) return alert("Escreva a sua necessidade antes de enviar.");
-
-      db.collection("chamados").add({
-        nome: currentUser.displayName || document.getElementById('profNameTitleInput').value || "Profissional",
-        email: currentUser.email,
-        telefone: "Registrado via Modal Interno",
-        mensagem: texto,
-        status: "Pendente",
-        arquivado: false,
-        data: new Date()
-      }).then(() => {
-        alert("Sua solicitação foi encaminhada para a central técnica!");
-        document.getElementById('modalDuvidaTexto').value = '';
-      }).catch(err => alert("Erro: " + err.message));
-    }
-
-    // Funções de Arquivar e Apagar no Suporte (sem quebrar índices do Firestore!)
-    function acaoArquivarConversaSuporte(docId) {
-      db.collection('chamados').doc(docId).update({ arquivado: true })
-        .then(() => alert("Conversa arquivada e ocultada da lista!"))
-        .catch(err => alert("Erro ao arquivar: " + err));
-    }
-
-    function acaoApagarConversaSuporte(docId) {
-      if(confirm("Tem certeza que deseja apagar definitivamente este registro de suporte?")) {
-        db.collection('chamados').doc(docId).delete()
-          .then(() => alert("Conversa apagada com sucesso!"))
-          .catch(err => alert("Erro ao apagar: " + err));
-      }
-    }
-
-    // ── ESCUTA REAL-TIME DO SUPORTE COM FILTRO DE ARQUIVADOS ──
     function escutarNotificacoesSuporte() {
       if(!currentUser || !currentUser.email) return;
       const notifBody = document.getElementById('notifListBody');
@@ -953,17 +875,10 @@
           const c = doc.data();
           const cId = doc.id;
 
-          // Ignora conversas que o usuário arquivou!
-          if(c.arquivado) return;
-
           html += `<div style="background:var(--bg-color); border:1px solid var(--border-color); padding:16px; border-radius:12px; margin-bottom:12px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-light); margin-bottom:8px; font-weight:600;">
-              <span>Chamado: "${c.mensagem ? c.mensagem.substring(0, 30) + '...' : 'Sem Assunto'}"</span>
-              <div style="display:flex; gap:6px; align-items:center;">
-                <span style="color:${c.status === 'Resolvido' ? 'var(--neon-green)' : '#f59e0b'}; margin-right:8px;">${c.status || 'Em Análise'}</span>
-                <button onclick="acaoArquivarConversaSuporte('${cId}')" style="background:#1e293b; color:#94a3b8; border:1px solid #334155; padding:3px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">📁 Arquivar</button>
-                <button onclick="acaoApagarConversaSuporte('${cId}')" style="background:#1e293b; color:#ef4444; border:1px solid #ef4444; padding:3px 8px; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">🗑️ Apagar</button>
-              </div>
+            <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-light); margin-bottom:8px; font-weight:600;">
+              <span>Chamado: "${c.mensagem ? c.mensagem.substring(0, 35) + '...' : 'Sem Assunto'}"</span>
+              <span style="color:${c.status === 'Resolvido' ? 'var(--neon-green)' : '#f59e0b'};">${c.status || 'Em Análise'}</span>
             </div>`;
 
           db.collection('chamados').doc(cId).collection('mensagens').orderBy('data', 'asc').get().then(function(msgSnap) {
@@ -1050,17 +965,15 @@
       ]}
     ];
 
-    // ── ITEM 2: Injeção do Botão Recolher/Abrir na Tabela de Preços ──
     function renderPrecosTable() {
-      var h = '<div class="card"><div class="header-com-toggle"><h3 style="margin:0;">💰 Tabela Mão de Obra (Referência Nacional)</h3><button class="btn-toggle-padrao" onclick="alternarRecolhimento(\'conteudo-aba-precos\', this)">▼ Recolher</button></div>';
-      h += '<div id="conteudo-aba-precos" class="conteudo-colapsavel"><div class="ptable-wrap" style="margin-top: 16px;"><table class="ptable"><thead><tr><th>Serviço</th><th>Mín</th><th>Máx</th><th>Méd</th></tr></thead><tbody>';
+      var h = '<h2>💰 Tabela Mão de Obra (Referência Nacional)</h2><div class="ptable-wrap"><table class="ptable"><thead><tr><th>Serviço</th><th>Mín</th><th>Máx</th><th>Méd</th></tr></thead><tbody>';
       priceData.forEach(function(c) {
         h += '<tr class="cat-row"><td colspan="4">'+c.cat+'</td></tr>';
         c.items.forEach(function(i) {
           h += '<tr><td>'+i.d+'</td><td class="mn">R$ '+i.mn.toFixed(2)+'</td><td class="mx">R$ '+i.mx.toFixed(2)+'</td><td class="md">R$ '+i.md.toFixed(2)+'</td></tr>';
         });
       });
-      h += '</tbody></table></div></div></div>';
+      h += '</tbody></table></div>';
       document.getElementById('tab-precos').innerHTML = h;
     }
 
@@ -1594,6 +1507,7 @@
       };
     }
 
+    /* ── LÓGICA DA PLANILHA TÉCNICA DE DIMENSIONAMENTO ── */
     function addDimensRow(nomePreset = '', wPreset = 1200, vPreset = 127, distPreset = 15) {
       var tbody = document.getElementById('dimensTbody');
       if(!tbody) return;
@@ -1737,6 +1651,7 @@
       document.getElementById('dimPrintData').textContent = p[2] + '/' + p[1] + '/' + p[0];
     }
 
+    // ── CIRURGIA 2: Oculta a tabela de preços 1 segundo antes de imprimir a planilha ──
     function prepararImpressaoDimens() {
       var profName = document.getElementById('profNameTitleInput').value || document.getElementById('printProfName').textContent || 'Engenheiro / Eletricista Responsável';
       document.getElementById('dimPrintProf').textContent = profName;
@@ -1747,7 +1662,10 @@
         inputData.value = hoje;
         formatarDataDim(hoje);
       }
+      
+      document.body.classList.add('imprimindo-dimens');
       window.print();
+      setTimeout(function(){ document.body.classList.remove('imprimindo-dimens'); }, 1000);
     }
   </script>
 
