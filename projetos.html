@@ -2,82 +2,97 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>VoltCalc Pro - CAD Profissional Completo</title>
+    <title>VoltCalc Pro - AutoCAD Professional Engine</title>
     <script src="https://unpkg.com/konva@9.3.1/konva.min.js"></script>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #1a1b2f; font-family: 'Segoe UI', sans-serif; }
-        .cad-container { display: flex; height: 100vh; }
-        .toolbar { width: 280px; background: #111827; padding: 15px; border-right: 1px solid #1f4068; color: #fff; z-index: 10; overflow-y: auto; }
-        .toolbar h3 { color: #39FF14; margin-bottom: 10px; text-transform: uppercase; font-size: 11px; border-bottom: 1px solid #1f4068; padding-bottom: 5px; }
-        .toolbar button { width: 100%; padding: 8px; margin-bottom: 4px; background: #162447; border: 1px solid #1f4068; color: #fff; cursor: pointer; border-radius: 4px; font-size: 12px; text-align: left; }
-        .toolbar button:hover { background: #39FF14; color: #000; font-weight: bold; }
-        #container-canvas { flex: 1; background-color: #f0f0f0; background-image: linear-gradient(#ccc 1px, transparent 1px), linear-gradient(90deg, #ccc 1px, transparent 1px); background-size: 20px 20px; }
-        .sidebar-calculo { width: 250px; background: #111827; padding: 20px; border-left: 1px solid #1f4068; color: #fff; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #0f172a; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        .cad-wrapper { display: flex; height: 100vh; }
+        
+        /* Barra de Ferramentas (Ribbon) */
+        .ribbon { width: 260px; background: #1e293b; border-right: 1px solid #334155; padding: 15px; overflow-y: auto; }
+        .ribbon h3 { color: #39FF14; font-size: 11px; margin: 15px 0 5px; text-transform: uppercase; }
+        .btn-cmd { width: 100%; padding: 8px; margin-bottom: 4px; background: #334155; border: none; color: #fff; cursor: pointer; border-radius: 3px; font-size: 12px; text-align: left; }
+        .btn-cmd:hover { background: #39FF14; color: #000; font-weight: bold; }
+        
+        /* Área de Desenho */
+        #viewport { flex: 1; background-color: #020617; position: relative; }
+        
+        /* Painel de Propriedades */
+        .inspector { width: 260px; background: #1e293b; border-left: 1px solid #334155; padding: 15px; }
+        .prop-item { margin-bottom: 15px; }
+        .prop-item label { font-size: 11px; color: #94a3b8; display: block; }
+        .prop-item input { width: 100%; background: #0f172a; border: 1px solid #475569; color: white; padding: 5px; border-radius: 3px; }
     </style>
 </head>
 <body>
 
-<div class="cad-container">
-    <div class="toolbar">
+<div class="cad-wrapper">
+    <div class="ribbon">
         <h3>Desenho 2D</h3>
-        <button onclick="adicionarElemento('line')">LINE - Linha</button>
-        <button onclick="adicionarElemento('rect')">RECTANGLE - Retângulo</button>
-        <button onclick="adicionarElemento('circle')">CIRCLE - Círculo</button>
+        <button class="btn-cmd" onclick="draw('line')">LINE - Linha</button>
+        <button class="btn-cmd" onclick="draw('rect')">RECTANGLE - Retângulo</button>
+        <button class="btn-cmd" onclick="draw('circle')">CIRCLE - Círculo</button>
+        <button class="btn-cmd" onclick="draw('poly')">PLINE - Polilinha</button>
         
-        <h3>Modificação</h3>
-        <button onclick="cadEngine.modificar('MOVE')">MOVE - Mover</button>
-        <button onclick="cadEngine.modificar('COPY')">COPY - Copiar</button>
-        <button onclick="cadEngine.modificar('ROTATE')">ROTATE - Rotacionar</button>
-        <button onclick="cadEngine.modificar('SCALE')">SCALE - Escalonar</button>
-        <button onclick="cadEngine.modificar('MIRROR')">MIRROR - Espelhar</button>
-        <button onclick="cadEngine.modificar('OFFSET')">OFFSET - Deslocamento</button>
-        <button onclick="cadEngine.modificar('TRIM')">TRIM - Cortar</button>
-        <button onclick="cadEngine.modificar('DELETE')">ERASE - Apagar</button>
+        <h3>Modificação (Relatório)</h3>
+        <button class="btn-cmd" onclick="apply('MOVE')">MOVE - Mover</button>
+        <button class="btn-cmd" onclick="apply('COPY')">COPY - Copiar</button>
+        <button class="btn-cmd" onclick="apply('ROTATE')">ROTATE - Rotacionar</button>
+        <button class="btn-cmd" onclick="apply('SCALE')">SCALE - Escalonar</button>
+        <button class="btn-cmd" onclick="apply('MIRROR')">MIRROR - Espelhar</button>
+        <button class="btn-cmd" onclick="apply('OFFSET')">OFFSET - Deslocar</button>
+        <button class="btn-cmd" onclick="apply('TRIM')">TRIM - Cortar</button>
+        <button class="btn-cmd" onclick="apply('DELETE')" style="color: #ef4444;">ERASE - Apagar</button>
     </div>
-    <div id="container-canvas"></div>
-    <div class="sidebar-calculo">
-        <h3>Comando Ativo</h3>
-        <div id="status-cmd" style="color: #39FF14;">Pronto</div>
+
+    <div id="viewport"></div>
+
+    <div class="inspector">
+        <h3>Properties</h3>
+        <div id="prop-content">Selecione um objeto.</div>
     </div>
 </div>
 
 <script>
-    const stage = new Konva.Stage({ container: 'container-canvas', width: window.innerWidth - 530, height: window.innerHeight });
+    const stage = new Konva.Stage({ container: 'viewport', width: window.innerWidth - 520, height: window.innerHeight });
     const layer = new Konva.Layer();
     stage.add(layer);
 
     let selected = null;
-    let modo = 'SELECT';
 
-    const cadEngine = {
-        modificar(cmd) {
-            document.getElementById('status-cmd').innerText = cmd;
-            if (cmd === 'DELETE' && selected) selected.destroy();
-            if (cmd === 'MOVE' && selected) selected.draggable(true);
-            if (cmd === 'COPY' && selected) {
-                let clone = selected.clone({ x: selected.x() + 20, y: selected.y() + 20 });
-                layer.add(clone);
-            }
-            if (cmd === 'ROTATE' && selected) selected.rotate(selected.rotation() + 45);
-            if (cmd === 'SCALE' && selected) selected.scale({ x: selected.scaleX() * 1.2, y: selected.scaleY() * 1.2 });
-            if (cmd === 'MIRROR' && selected) selected.scaleX(selected.scaleX() * -1);
-            if (cmd === 'OFFSET' && selected) {
-                let offset = selected.clone({ x: selected.x() + 10, y: selected.y() + 10 });
-                layer.add(offset);
-            }
-            layer.draw();
-        }
-    };
-
-    function adicionarElemento(tipo) {
-        let shape;
-        if (tipo === 'line') shape = new Konva.Line({ points: [0, 0, 50, 50], stroke: 'black', strokeWidth: 2, draggable: true });
-        if (tipo === 'rect') shape = new Konva.Rect({ x: 50, y: 50, width: 100, height: 50, stroke: 'black', strokeWidth: 2, draggable: true });
-        if (tipo === 'circle') shape = new Konva.Circle({ x: 100, y: 100, radius: 30, stroke: 'black', strokeWidth: 2, draggable: true });
+    function draw(type) {
+        let el;
+        if (type === 'line') el = new Konva.Line({ points: [0, 0, 100, 0], stroke: '#fff', strokeWidth: 2, draggable: true });
+        if (type === 'rect') el = new Konva.Rect({ x: 50, y: 50, width: 100, height: 100, stroke: '#fff', strokeWidth: 2, draggable: true });
+        if (type === 'circle') el = new Konva.Circle({ x: 100, y: 100, radius: 50, stroke: '#fff', strokeWidth: 2, draggable: true });
         
-        shape.on('click', function() { selected = this; });
-        layer.add(shape);
+        el.on('click', function() { selected = this; updateInspector(); });
+        layer.add(el);
         layer.draw();
+    }
+
+    function apply(cmd) {
+        if (!selected) return;
+        if (cmd === 'MOVE') selected.draggable(true);
+        if (cmd === 'COPY') selected.clone().moveTo(layer);
+        if (cmd === 'ROTATE') selected.rotate(45);
+        if (cmd === 'SCALE') selected.scale({ x: selected.scaleX() * 1.2, y: selected.scaleY() * 1.2 });
+        if (cmd === 'MIRROR') selected.scaleX(-selected.scaleX());
+        if (cmd === 'DELETE') selected.destroy();
+        if (cmd === 'OFFSET') {
+            let clone = selected.clone({ x: selected.x() + 10, y: selected.y() + 10 });
+            layer.add(clone);
+        }
+        layer.draw();
+    }
+
+    function updateInspector() {
+        if (!selected) return;
+        document.getElementById('prop-content').innerHTML = `
+            <div class="prop-item"><label>X</label><input type="number" value="${selected.x()}" onchange="selected.x(this.value); layer.draw()"></div>
+            <div class="prop-item"><label>Y</label><input type="number" value="${selected.y()}" onchange="selected.y(this.value); layer.draw()"></div>
+            <div class="prop-item"><label>Rotation</label><input type="number" value="${selected.rotation()}" onchange="selected.rotation(this.value); layer.draw()"></div>
+        `;
     }
 </script>
 </body>
