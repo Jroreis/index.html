@@ -2,189 +2,83 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>VoltCalc Pro - CAD NBR 5410 Completo</title>
+    <title>VoltCalc Pro - CAD Profissional Completo</title>
     <script src="https://unpkg.com/konva@9.3.1/konva.min.js"></script>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #1a1b2f; font-family: 'Segoe UI', sans-serif; }
         .cad-container { display: flex; height: 100vh; }
-        .toolbar { width: 250px; background: #111827; padding: 20px; border-right: 1px solid #1f4068; color: #fff; z-index: 10; overflow-y: auto; }
-        .toolbar h3 { color: #39FF14; margin-bottom: 15px; text-transform: uppercase; font-size: 13px;}
-        .toolbar button { width: 100%; padding: 10px; margin-bottom: 8px; background: #162447; border: 1px solid #1f4068; color: #fff; cursor: pointer; border-radius: 4px; font-size: 13px; text-align: left; }
+        .toolbar { width: 280px; background: #111827; padding: 15px; border-right: 1px solid #1f4068; color: #fff; z-index: 10; overflow-y: auto; }
+        .toolbar h3 { color: #39FF14; margin-bottom: 10px; text-transform: uppercase; font-size: 11px; border-bottom: 1px solid #1f4068; padding-bottom: 5px; }
+        .toolbar button { width: 100%; padding: 8px; margin-bottom: 4px; background: #162447; border: 1px solid #1f4068; color: #fff; cursor: pointer; border-radius: 4px; font-size: 12px; text-align: left; }
         .toolbar button:hover { background: #39FF14; color: #000; font-weight: bold; }
-        #container-canvas { flex: 1; background-color: #f0f0f0; background-image: linear-gradient(#ccc 1px, transparent 1px), linear-gradient(90deg, #ccc 1px, transparent 1px); background-size: 20px 20px; position: relative; }
-        .sidebar-calculo { width: 320px; background: #111827; padding: 20px; border-left: 1px solid #1f4068; color: #fff; z-index: 10; overflow-y: auto; }
-        .prop-box { background: #162447; border: 1px solid #1f4068; padding: 15px; border-radius: 6px; margin-bottom: 15px; }
-        
-        /* Estilo da aba de Documentação AutoCAD */
-        #doc-autocad { display: none; height: 100%; padding: 20px; background: #111827; color: #fff; overflow-y: auto; }
-        .cad-report { line-height: 1.6; font-size: 14px; }
-        .cad-report h3 { color: #39FF14; margin-top: 20px; }
-        .cad-report ul { margin-left: 20px; margin-bottom: 10px; }
+        #container-canvas { flex: 1; background-color: #f0f0f0; background-image: linear-gradient(#ccc 1px, transparent 1px), linear-gradient(90deg, #ccc 1px, transparent 1px); background-size: 20px 20px; }
+        .sidebar-calculo { width: 250px; background: #111827; padding: 20px; border-left: 1px solid #1f4068; color: #fff; }
     </style>
 </head>
 <body>
 
 <div class="cad-container">
     <div class="toolbar">
-        <h3>Tomadas (NBR 5410)</h3>
-        <button onclick="adicionarElemento('tomada_baixa')">⏏️ Tomada Baixa</button>
-        <button onclick="adicionarElemento('tomada_media')">⏏️ Tomada Média</button>
-        <button onclick="adicionarElemento('tomada_alta')">⏏️ Tomada Alta</button>
-        <h3>Ferramentas CAD</h3>
-        <button onclick="cadEngine.modificar('ROTATE')">⟳ Rotacionar</button>
-        <button onclick="cadEngine.modificar('SCALE')">⤢ Escalonar</button>
-        <button onclick="cadEngine.modificar('TRIM')">✂️ Trim (Cortar)</button>
-        <h3>Manual Técnico</h3>
-        <button onclick="toggleDoc()" style="background:#39FF14; color:#000; font-weight:bold;">📖 Documentação AutoCAD</button>
+        <h3>Desenho 2D</h3>
+        <button onclick="adicionarElemento('line')">LINE - Linha</button>
+        <button onclick="adicionarElemento('rect')">RECTANGLE - Retângulo</button>
+        <button onclick="adicionarElemento('circle')">CIRCLE - Círculo</button>
+        
+        <h3>Modificação</h3>
+        <button onclick="cadEngine.modificar('MOVE')">MOVE - Mover</button>
+        <button onclick="cadEngine.modificar('COPY')">COPY - Copiar</button>
+        <button onclick="cadEngine.modificar('ROTATE')">ROTATE - Rotacionar</button>
+        <button onclick="cadEngine.modificar('SCALE')">SCALE - Escalonar</button>
+        <button onclick="cadEngine.modificar('MIRROR')">MIRROR - Espelhar</button>
+        <button onclick="cadEngine.modificar('OFFSET')">OFFSET - Deslocamento</button>
+        <button onclick="cadEngine.modificar('TRIM')">TRIM - Cortar</button>
+        <button onclick="cadEngine.modificar('DELETE')">ERASE - Apagar</button>
     </div>
-    
     <div id="container-canvas"></div>
-    
-    <!-- Aba de Documentação (Oculta por padrão) -->
-    <div id="doc-autocad">
-        <article class="cad-report">
-            <button onclick="toggleDoc()" style="margin-bottom:10px;">Fechar Documentação</button>
-            <h2>RELATÓRIO AVANÇADO PROFISSIONAL - AUTOCAD[span_0](start_span)[span_0](end_span)</h2>
-            
-            <h3>1. Introdução ao AutoCAD</h3>
-            <p>O AutoCAD é um software CAD desenvolvido pela Autodesk para criação de desenhos técnicos 2D e modelagem 3D. É amplamente utilizado em engenharia, arquitetura, elétrica, mecânica, topografia e construção civil[span_1](start_span)[span_1](end_span).</p>
-
-            <h3>2. História e Evolução</h3>
-            <p>Lançado em 1982, revolucionou o desenho técnico ao substituir pranchetas físicas por projetos digitais de alta precisão[span_2](start_span)[span_2](end_span).</p>
-
-            <h3>3. Funcionamento Interno</h3>
-            <p>Baseado em coordenadas X, Y e Z, utiliza banco de entidades geométricas, camadas, blocos e referências para representar projetos técnicos[span_3](start_span)[span_3](end_span).</p>
-
-            <h3>4. Interface Completa</h3>
-            <p>Ribbon, barra de acesso rápido, linha de comando, Model Space, Layouts, ViewCube, Navigation Bar, propriedades e gerenciadores de camadas[span_4](start_span)[span_4](end_span).</p>
-
-            <h3>5. Lógica de Trabalho</h3>
-            <p>Configuração inicial, criação de layers, desenho, revisão, documentação, impressão e compartilhamento[span_5](start_span)[span_5](end_span).</p>
-
-            <h3>6. Ferramentas de Desenho 2D</h3>
-            <p>LINE, PLINE, CIRCLE, ARC, RECTANGLE, POLYGON, ELLIPSE, SPLINE, HATCH, TEXT, MLEADER e DIM[span_6](start_span)[span_6](end_span).</p>
-
-            <h3>7. Ferramentas de Modificação</h3>
-            <p>MOVE, COPY, ROTATE, MIRROR, SCALE, OFFSET, FILLET, CHAMFER, TRIM, EXTEND, ARRAY e ALIGN[span_7](start_span)[span_7](end_span).</p>
-
-            <h3>8. Modelagem 3D</h3>
-            <p>EXTRUDE, REVOLVE, SWEEP, LOFT, PRESSPULL, UNION, SUBTRACT e INTERSECT[span_8](start_span)[span_8](end_span).</p>
-
-            <h3>9. Layers</h3>
-            <p>Permitem organizar elementos por disciplina, cores, espessuras e tipos de linha[span_9](start_span)[span_9](end_span).</p>
-
-            <h3>10. Blocos e Bibliotecas</h3>
-            <p>Componentes reutilizáveis para acelerar projetos e padronizar desenhos[span_10](start_span)[span_10](end_span).</p>
-
-            <h3>11. Referências Externas (XREF)</h3>
-            <p>Permitem trabalhar com arquivos vinculados sem incorporar totalmente os dados[span_11](start_span)[span_11](end_span).</p>
-
-            <h3>12. Cotas e Documentação</h3>
-            <p>Ferramentas de dimensionamento, tolerâncias, textos técnicos e tabelas[span_12](start_span)[span_12](end_span).</p>
-
-            <h3>13. Plotagem e Impressão</h3>
-            <p>Configuração de escalas, penas, formatos de papel e exportação PDF[span_13](start_span)[span_13](end_span).</p>
-
-            <h3>14. Automação</h3>
-            <p>Suporte para AutoLISP, VBA, .NET API, scripts e integração com sistemas corporativos[span_14](start_span)[span_14](end_span).</p>
-
-            <h3>15. Formatos Compatíveis</h3>
-            <p>DWG, DXF, PDF, DGN, STEP, STL, IFC, IGES, SAT e diversos outros[span_15](start_span)[span_15](end_span).</p>
-
-            <h3>16. Hardware Recomendado</h3>
-            <p>Processador multicore, SSD, 16 GB ou mais de RAM, GPU dedicada e monitor Full HD ou superior[span_16](start_span)[span_16](end_span).</p>
-
-            <h3>17. Aplicação em Projetos Elétricos</h3>
-            <p>Diagramas unifilares, plantas elétricas, detalhamento de quadros e infraestrutura[span_17](start_span)[span_17](end_span).</p>
-
-            <h3>18. Aplicação em Arquitetura</h3>
-            <p>Plantas baixas, cortes, fachadas, detalhamento executivo e compatibilização[span_18](start_span)[span_18](end_span).</p>
-
-            <h3>19. Aplicação em Mecânica</h3>
-            <p>Peças, conjuntos, detalhamento de fabricação e modelagem tridimensional[span_19](start_span)[span_19](end_span).</p>
-
-            <h3>20. Vantagens e Benefícios</h3>
-            <p>Precisão, produtividade, padronização, integração e ampla aceitação no mercado[span_20](start_span)[span_20](end_span).</p>
-
-            <h3>21. Conclusão</h3>
-            <p>O AutoCAD permanece como uma das plataformas CAD mais importantes do mundo, sendo referência em documentação técnica e desenvolvimento de projetos[span_21](start_span)[span_21](end_span).</p>
-
-            <h3>ANEXO - COMANDOS IMPORTANTES</h3>
-            <p>LINE, PLINE, CIRCLE, ARC, RECTANGLE, POLYGON, MOVE, COPY, ROTATE, SCALE, MIRROR, OFFSET, TRIM, EXTEND, FILLET, CHAMFER, ARRAY, BLOCK, WBLOCK, XREF, DIMSTYLE, HATCH, LAYER, MATCHPROP, EXTRUDE, REVOLVE, SWEEP, LOFT[span_22](start_span)[span_22](end_span).</p>
-        </article>
-    </div>
-
-    <div class="sidebar-calculo" id="sidebar-calc">
-        <h3>Properties & Circuitos</h3>
-        <div id="resultado-calculo"><div class="prop-box">Selecione um item...</div></div>
+    <div class="sidebar-calculo">
+        <h3>Comando Ativo</h3>
+        <div id="status-cmd" style="color: #39FF14;">Pronto</div>
     </div>
 </div>
 
 <script>
-    const stage = new Konva.Stage({ container: 'container-canvas', width: window.innerWidth - 570, height: window.innerHeight, draggable: true });
+    const stage = new Konva.Stage({ container: 'container-canvas', width: window.innerWidth - 530, height: window.innerHeight });
     const layer = new Konva.Layer();
     stage.add(layer);
 
     let selected = null;
-    const COR_TRACO = '#1e293b';
-
-    function toggleDoc() {
-        const doc = document.getElementById('doc-autocad');
-        const canvas = document.getElementById('container-canvas');
-        const side = document.getElementById('sidebar-calc');
-        const isVisible = doc.style.display === 'block';
-        doc.style.display = isVisible ? 'none' : 'block';
-        canvas.style.display = isVisible ? 'block' : 'none';
-        side.style.display = isVisible ? 'block' : 'none';
-    }
+    let modo = 'SELECT';
 
     const cadEngine = {
-        modificar(acao) {
-            if (!selected) return alert("Selecione um objeto!");
-            if (acao === 'ROTATE') selected.rotate(45);
-            if (acao === 'SCALE') selected.scale({ x: selected.scaleX() * 1.1, y: selected.scaleY() * 1.1 });
-            if (acao === 'TRIM') selected.visible(false);
+        modificar(cmd) {
+            document.getElementById('status-cmd').innerText = cmd;
+            if (cmd === 'DELETE' && selected) selected.destroy();
+            if (cmd === 'MOVE' && selected) selected.draggable(true);
+            if (cmd === 'COPY' && selected) {
+                let clone = selected.clone({ x: selected.x() + 20, y: selected.y() + 20 });
+                layer.add(clone);
+            }
+            if (cmd === 'ROTATE' && selected) selected.rotate(selected.rotation() + 45);
+            if (cmd === 'SCALE' && selected) selected.scale({ x: selected.scaleX() * 1.2, y: selected.scaleY() * 1.2 });
+            if (cmd === 'MIRROR' && selected) selected.scaleX(selected.scaleX() * -1);
+            if (cmd === 'OFFSET' && selected) {
+                let offset = selected.clone({ x: selected.x() + 10, y: selected.y() + 10 });
+                layer.add(offset);
+            }
             layer.draw();
         }
     };
 
-    function criarSímboloBase(x, y, tipo) {
-        const group = new Konva.Group({ x, y, draggable: true, name: tipo });
-        group.circuito = "01";
-        
-        if (tipo.includes('tomada')) {
-            group.add(new Konva.RegularPolygon({ sides: 3, radius: 14, stroke: COR_TRACO, strokeWidth: 2 }));
-        } else if (tipo === 'luz_teto') {
-            group.add(new Konva.Circle({ radius: 14, stroke: COR_TRACO, strokeWidth: 2 }));
-            group.add(new Konva.Line({ points: [-10, -10, 10, 10], stroke: COR_TRACO, strokeWidth: 2 }));
-        } else if (tipo === 'quadro') {
-            group.add(new Konva.Rect({ x: -15, y: -25, width: 30, height: 50, stroke: COR_TRACO, strokeWidth: 2 }));
-        }
-        group.add(new Konva.Circle({ radius: 18, fill: 'rgba(0,0,0,0)' }));
-        return group;
-    }
-
     function adicionarElemento(tipo) {
-        let shape = criarSímboloBase(100, 100, tipo);
-        shape.on('click', (e) => { e.cancelBubble = true; selected = shape; atualizarPainel(); });
+        let shape;
+        if (tipo === 'line') shape = new Konva.Line({ points: [0, 0, 50, 50], stroke: 'black', strokeWidth: 2, draggable: true });
+        if (tipo === 'rect') shape = new Konva.Rect({ x: 50, y: 50, width: 100, height: 50, stroke: 'black', strokeWidth: 2, draggable: true });
+        if (tipo === 'circle') shape = new Konva.Circle({ x: 100, y: 100, radius: 30, stroke: 'black', strokeWidth: 2, draggable: true });
+        
+        shape.on('click', function() { selected = this; });
         layer.add(shape);
         layer.draw();
     }
-
-    function atualizarPainel() {
-        if (!selected) return;
-        document.getElementById('resultado-calculo').innerHTML = `
-            <div class="prop-box">
-                <p><strong>Tipo:</strong> ${selected.name()}</p>
-                <label>Circuito NBR:</label>
-                <select onchange="selected.circuito = this.value">
-                    ${Array.from({length: 10}, (_, i) => `<option value="${(i+1).toString().padStart(2, '0')}" ${selected.circuito == (i+1).toString().padStart(2, '0') ? 'selected' : ''}>Circuito ${(i+1).toString().padStart(2, '0')}</option>`).join('')}
-                </select>
-            </div>
-        `;
-    }
-
-    stage.on('click', (e) => { if (e.target === stage) { selected = null; } });
 </script>
 </body>
 </html>
