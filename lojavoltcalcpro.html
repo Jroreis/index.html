@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Loja VoltCalc Pro | O Lugar da Promoção</title>
+    <meta name="description" content="Encontre as melhores ofertas e produtos selecionados para eletricistas. A Loja VoltCalc Pro reúne promoções diárias e equipamentos de alta performance.">
+    <!-- Meta tags de SEO para rankeamento -->
+    <meta property="og:title" content="Loja VoltCalc Pro | O Lugar da Promoção">
+    <meta property="og:type" content="website">
+    <style>
+        :root { --bg: #020617; --card: #0f172a; --accent: #39FF14; --text: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        
+        /* Banner de Destaque */
+        .banner-destaque { width: 100%; height: 300px; background: linear-gradient(45deg, #1e293b, #0f172a); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 40px; border: 2px solid var(--accent); position: relative; overflow: hidden; }
+        .banner-destaque h2 { font-size: 3rem; color: var(--accent); text-transform: uppercase; }
+
+        /* Vitrine de Produtos */
+        .vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .produto-card { background: var(--card); border-radius: 16px; padding: 20px; transition: 0.3s; border: 1px solid #1e293b; }
+        .produto-card:hover { transform: translateY(-10px); border-color: var(--accent); }
+        .produto-card img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; }
+        .produto-card h3 { font-size: 1.2rem; margin-bottom: 10px; }
+        .btn-oferta { display: block; text-align: center; background: var(--accent); color: #020617; padding: 12px; border-radius: 8px; font-weight: 800; text-decoration: none; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <section class="banner-destaque" id="bannerDiario">
+        <h2>Oferta do Dia: Eletricista Profissional</h2>
+    </section>
+
+    <main class="vitrine" id="vitrineProdutos">
+        <!-- Vitrine gerada via JS -->
+    </main>
+
+    <script>
+        // Modelos de produtos (Substitua os links depois)
+        const produtos = [
+            { nome: "Multímetro Profissional", img: "https://via.placeholder.com/300", link: "#" },
+            { nome: "Alicate Amperímetro Digital", img: "https://via.placeholder.com/300", link: "#" },
+            { nome: "Kit Chaves Isoladas 1000V", img: "https://via.placeholder.com/300", link: "#" },
+            { nome: "Furadeira de Impacto Industrial", img: "https://via.placeholder.com/300", link: "#" }
+        ];
+
+        function carregarVitrine() {
+            const vitrine = document.getElementById('vitrineProdutos');
+            // Embaralha produtos para destacar aleatoriamente
+            const aleatorio = produtos.sort(() => 0.5 - Math.random());
+            
+            vitrine.innerHTML = aleatorio.map(p => `
+                <div class="produto-card">
+                    <img src="${p.img}" alt="${p.nome}">
+                    <h3>${p.nome}</h3>
+                    <a href="${p.link}" class="btn-oferta" target="_blank">VER PROMOÇÃO</a>
+                </div>
+            `).join('');
+        }
+
+        carregarVitrine();
+    </script>
+</body>
+</html>
