@@ -2,7 +2,6 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VoltCalc Pro - CAD NBR 5410 Completo</title>
     <script src="https://unpkg.com/konva@9.3.1/konva.min.js"></script>
     <style>
@@ -10,12 +9,11 @@
         .cad-container { display: flex; height: 100vh; }
         .toolbar { width: 250px; background: #111827; padding: 20px; border-right: 1px solid #1f4068; color: #fff; z-index: 10; overflow-y: auto; }
         .toolbar h3 { color: #39FF14; margin-bottom: 15px; text-transform: uppercase; font-size: 13px;}
-        .toolbar button { width: 100%; padding: 10px; margin-bottom: 8px; background: #162447; border: 1px solid #1f4068; color: #fff; cursor: pointer; border-radius: 4px; font-size: 13px; text-align: left; transition: 0.2s; }
+        .toolbar button { width: 100%; padding: 10px; margin-bottom: 8px; background: #162447; border: 1px solid #1f4068; color: #fff; cursor: pointer; border-radius: 4px; font-size: 13px; text-align: left; }
         .toolbar button:hover { background: #39FF14; color: #000; font-weight: bold; }
-        #container-canvas { flex: 1; background-color: #f0f0f0; background-image: linear-gradient(#ccc 1px, transparent 1px), linear-gradient(90deg, #ccc 1px, transparent 1px); background-size: 20px 20px; position: relative; cursor: grab; }
-        .sidebar-calculo { width: 320px; background: #111827; padding: 20px; border-left: 1px solid #1f4068; color: #fff; z-index: 10; display: flex; flex-direction: column; overflow-y: auto; }
+        #container-canvas { flex: 1; background-color: #f0f0f0; background-image: linear-gradient(#ccc 1px, transparent 1px), linear-gradient(90deg, #ccc 1px, transparent 1px); background-size: 20px 20px; position: relative; }
+        .sidebar-calculo { width: 320px; background: #111827; padding: 20px; border-left: 1px solid #1f4068; color: #fff; z-index: 10; overflow-y: auto; }
         .prop-box { background: #162447; border: 1px solid #1f4068; padding: 15px; border-radius: 6px; margin-bottom: 15px; }
-        .valor-total { font-size: 20px; color: #39FF14; font-weight: bold; text-align: center; margin: 10px 0; }
     </style>
 </head>
 <body>
@@ -26,11 +24,10 @@
         <button onclick="adicionarElemento('tomada_baixa')">⏏️ Tomada Baixa</button>
         <button onclick="adicionarElemento('tomada_media')">⏏️ Tomada Média</button>
         <button onclick="adicionarElemento('tomada_alta')">⏏️ Tomada Alta</button>
-        <h3>Iluminação</h3>
-        <button onclick="adicionarElemento('luz_teto')">⊗ Ponto de Teto</button>
-        <button onclick="adicionarElemento('int_simples')">⚬ Interruptor</button>
-        <h3>Quadros</h3>
-        <button onclick="adicionarElemento('quadro')">🗄️ Quadro (QDC)</button>
+        <h3>Ferramentas CAD</h3>
+        <button onclick="cadEngine.modificar('ROTATE')">⟳ Rotacionar</button>
+        <button onclick="cadEngine.modificar('SCALE')">⤢ Escalonar</button>
+        <button onclick="cadEngine.modificar('TRIM')">✂️ Trim (Cortar)</button>
     </div>
     <div id="container-canvas"></div>
     <div class="sidebar-calculo">
@@ -47,9 +44,20 @@
     let selected = null;
     const COR_TRACO = '#1e293b';
 
+    // --- MÓDULO CAD ENGINE (Injeção de Funcionalidades) ---
+    const cadEngine = {
+        modificar(acao) {
+            if (!selected) return alert("Selecione um objeto!");
+            if (acao === 'ROTATE') selected.rotate(45);
+            if (acao === 'SCALE') selected.scale({ x: selected.scaleX() * 1.1, y: selected.scaleY() * 1.1 });
+            if (acao === 'TRIM') selected.visible(false);
+            layer.draw();
+        }
+    };
+
     function criarSímboloBase(x, y, tipo) {
         const group = new Konva.Group({ x, y, draggable: true, name: tipo });
-        group.circuito = "01"; // Inicializa o Circuito como padrão
+        group.circuito = "01";
         
         if (tipo.includes('tomada')) {
             group.add(new Konva.RegularPolygon({ sides: 3, radius: 14, stroke: COR_TRACO, strokeWidth: 2 }));
@@ -65,13 +73,7 @@
 
     function adicionarElemento(tipo) {
         let shape = criarSímboloBase(100, 100, tipo);
-        
-        shape.on('click', (e) => {
-            e.cancelBubble = true;
-            selected = shape;
-            atualizarPainel();
-        });
-
+        shape.on('click', (e) => { e.cancelBubble = true; selected = shape; atualizarPainel(); });
         layer.add(shape);
         layer.draw();
     }
@@ -85,7 +87,6 @@
                 <select onchange="selected.circuito = this.value">
                     ${Array.from({length: 10}, (_, i) => `<option value="${(i+1).toString().padStart(2, '0')}" ${selected.circuito == (i+1).toString().padStart(2, '0') ? 'selected' : ''}>Circuito ${(i+1).toString().padStart(2, '0')}</option>`).join('')}
                 </select>
-                <p>Status: Editável</p>
             </div>
         `;
     }
