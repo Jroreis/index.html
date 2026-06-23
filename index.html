@@ -436,7 +436,14 @@
       <h2 style="margin-bottom: 16px; font-weight: 800; display:flex; align-items:center; gap:10px;">
         💬 Central de Mensagens e Suporte
       </h2>
-      <div id="notifListBody" style="max-height: 400px; overflow-y: auto; padding-right: 8px;">
+
+      <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+        <label style="display:block; font-weight:700; font-size:13px; color:var(--neon-green); margin-bottom:8px;">Enviar nova dúvida / solicitação técnica ao suporte:</label>
+        <textarea id="novaMensagemSuporteTexto" rows="2" placeholder="Descreva sua dúvida técnica ou solicitação aqui..." style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text); font-size:14px; margin-bottom:10px; resize:vertical; font-family:inherit;"></textarea>
+        <button onclick="enviarMensagemDiretaSuporte()" class="btn-primary" style="padding: 10px 16px; font-size: 14px; width: auto; display: inline-block;">Enviar Chamado</button>
+      </div>
+
+      <div id="notifListBody" style="max-height: 350px; overflow-y: auto; padding-right: 8px;">
         <p style="color: var(--text-light); font-size: 14px;">Buscando mensagens associadas ao seu e-mail...</p>
       </div>
     </div>
@@ -509,61 +516,66 @@
       <main class="dashboard-main">
         <div class="tab-content active" id="tab-orc">
           <article class="card">
-            <h3 id="orcFormHeaderTitle">📄 Gerador de Novo Orçamento</h3>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+              <h3 id="orcFormHeaderTitle" style="margin:0;">📄 Gerador de Novo Orçamento</h3>
+              <button class="btn-header print-hidden" onclick="alternarRecolhimento('conteudo-orc', this)" style="padding: 4px 10px; font-size: 12px;">▼ Recolher</button>
+            </div>
             <input type="hidden" id="currentEditingBudgetId" value="">
             
-            <div class="orc-form-grid">
-              <div>
-                <div class="profile-grid">
-                  <div class="form-group"><label>Nome do Cliente</label><input id="orcCliNome"></div>
-                  <div class="form-group"><label>Telefone</label><input id="orcCliTel"></div>
-                  <div class="form-group"><label>Data de Validade</label><input type="date" id="orcValidDate"></div>
+            <div id="conteudo-orc">
+              <div class="orc-form-grid">
+                <div>
+                  <div class="profile-grid">
+                    <div class="form-group"><label>Nome do Cliente</label><input id="orcCliNome"></div>
+                    <div class="form-group"><label>Telefone</label><input id="orcCliTel"></div>
+                    <div class="form-group"><label>Data de Validade</label><input type="date" id="orcValidDate"></div>
+                    
+                    <div class="form-group"><label>Rua / Logradouro</label><input id="orcRua" placeholder="Ex: Av. Paulista"></div>
+                    <div class="form-group"><label>Número</label><input id="orcNum" placeholder="Ex: 1000"></div>
+                    <div class="form-group"><label>Bairro</label><input id="orcBairro" placeholder="Ex: Centro"></div>
+                    <div class="form-group"><label>CEP</label><input id="orcCep" placeholder="Ex: 01310-100"></div>
+                    <div class="form-group"><label>Cidade</label><input id="orcCidade" placeholder="Ex: São Paulo"></div>
+                    <div class="form-group"><label>Estado (UF)</label><input id="orcEstado" placeholder="Ex: SP"></div>
+                    <input type="hidden" id="orcCliEnd">
+                  </div>
                   
-                  <div class="form-group"><label>Rua / Logradouro</label><input id="orcRua" placeholder="Ex: Av. Paulista"></div>
-                  <div class="form-group"><label>Número</label><input id="orcNum" placeholder="Ex: 1000"></div>
-                  <div class="form-group"><label>Bairro</label><input id="orcBairro" placeholder="Ex: Centro"></div>
-                  <div class="form-group"><label>CEP</label><input id="orcCep" placeholder="Ex: 01310-100"></div>
-                  <div class="form-group"><label>Cidade</label><input id="orcCidade" placeholder="Ex: São Paulo"></div>
-                  <div class="form-group"><label>Estado (UF)</label><input id="orcEstado" placeholder="Ex: SP"></div>
-                  <input type="hidden" id="orcCliEnd">
-                </div>
-                
-                <div class="orc-items-header print-only">
-                  <span>Ambiente</span>
-                  <span>Descrição do Serviço</span>
-                  <span style="text-align:center;">Qtd</span>
-                  <span>V. Unitário</span>
-                  <span style="text-align:right;">Subtotal</span>
-                </div>
+                  <div class="orc-items-header print-only">
+                    <span>Ambiente</span>
+                    <span>Descrição do Serviço</span>
+                    <span style="text-align:center;">Qtd</span>
+                    <span>V. Unitário</span>
+                    <span style="text-align:right;">Subtotal</span>
+                  </div>
 
-                <div class="orc-item-list" id="orcItemsContainer"></div>
-                
-                <button class="btn-add-item" id="btnAddOrcItem">+ Adicionar Serviço da Tabela Nacional</button>
-                <button class="btn-add-item" style="background:transparent; color:var(--text-light); border-color: var(--border-color);" id="btnAddCustomItem">+ Adicionar Serviço Personalizado</button>
-                
-                <div class="form-group" style="margin-top: 24px;">
-                  <label>Observações / Condições de Pagamento</label>
-                  <textarea id="orcObs" rows="3" placeholder="Ex: 50% de entrada e 50% na conclusão da entrega técnica. Garantia de 1 ano sobre a mão de obra."></textarea>
+                  <div class="orc-item-list" id="orcItemsContainer"></div>
+                  
+                  <button class="btn-add-item" id="btnAddOrcItem">+ Adicionar Serviço da Tabela Nacional</button>
+                  <button class="btn-add-item" style="background:transparent; color:var(--text-light); border-color: var(--border-color);" id="btnAddCustomItem">+ Adicionar Serviço Personalizado</button>
+                  
+                  <div class="form-group" style="margin-top: 24px;">
+                    <label>Observações / Condições de Pagamento</label>
+                    <textarea id="orcObs" rows="3" placeholder="Ex: 50% de entrada e 50% na conclusão da entrega técnica. Garantia de 1 ano sobre a mão de obra."></textarea>
+                  </div>
                 </div>
-              </div>
-              
-              <div>
-                <div class="card" style="position: sticky; top: 100px;">
-                  <h4>Resumo Financeiro</h4>
-                  <div style="margin: 20px 0 10px 0;">
-                    <div class="form-group">
-                      <label>Desconto (%)</label>
-                      <input type="number" id="orcDiscount" value="0" min="0" max="100">
+                
+                <div>
+                  <div class="card" style="position: sticky; top: 100px;">
+                    <h4>Resumo Financeiro</h4>
+                    <div style="margin: 20px 0 10px 0;">
+                      <div class="form-group">
+                        <label>Desconto (%)</label>
+                        <input type="number" id="orcDiscount" value="0" min="0" max="100">
+                      </div>
                     </div>
+                    <div class="summary-box">
+                      <div class="summary-row"><span>Subtotal:</span><span>R$ <span id="orcSubtotalValue">0,00</span></span></div>
+                      <div class="summary-row"><span>Desconto:</span><span>R$ <span id="orcDiscountValue">0,00</span></span></div>
+                      <div class="summary-row total"><span>Total:</span><span>R$ <span id="orcTotalValue">0,00</span></span></div>
+                    </div>
+                    <button class="btn-primary" id="btnSaveOrc">Salvar no Histórico</button>
+                    <button class="btn-secondary-action" id="btnCancelEditStyle" style="display:none; background:transparent; color:#ef4444; border-color:#ef4444;" onclick="clearOrcFormState()">Cancelar Edição</button>
+                    <button class="btn-secondary-action" onclick="window.print()">🖨️ Imprimir / Gerar PDF</button>
                   </div>
-                  <div class="summary-box">
-                    <div class="summary-row"><span>Subtotal:</span><span>R$ <span id="orcSubtotalValue">0,00</span></span></div>
-                    <div class="summary-row"><span>Desconto:</span><span>R$ <span id="orcDiscountValue">0,00</span></span></div>
-                    <div class="summary-row total"><span>Total:</span><span>R$ <span id="orcTotalValue">0,00</span></span></div>
-                  </div>
-                  <button class="btn-primary" id="btnSaveOrc">Salvar no Histórico</button>
-                  <button class="btn-secondary-action" id="btnCancelEditStyle" style="display:none; background:transparent; color:#ef4444; border-color:#ef4444;" onclick="clearOrcFormState()">Cancelar Edição</button>
-                  <button class="btn-secondary-action" onclick="window.print()">🖨️ Imprimir / Gerar PDF</button>
                 </div>
               </div>
             </div>
@@ -600,48 +612,51 @@
 
               <div class="print-hidden" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
                 <div>
-                  <h3 style="font-size: 22px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px;">📐 Planilha de Dimensionamento (ABNT NBR 5410)</h3>
+                  <h3 style="font-size: 22px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px; margin:0;">📐 Planilha de Dimensionamento (ABNT NBR 5410)</h3>
                   <p style="color: var(--text-light); font-size: 14px; margin-top: 4px;">Altere a carga, tensão e distância. O sistema calcula a Corrente de Projeto ($I_b$), Seção mínima em Cobre, Disjuntor de proteção e Queda admissível.</p>
                 </div>
-                <div style="display: flex; gap: 12px;">
+                <div style="display: flex; gap: 12px; align-items: center;">
                   <button class="btn-header filled" onclick="addDimensRow('', 1200, 127, 15)">+ Novo Circuito</button>
                   <button class="btn-header" onclick="prepararImpressaoDimens()" style="color: var(--text); border-color: var(--border-color);">🖨️ Imprimir Planilha</button>
+                  <button class="btn-header print-hidden" onclick="alternarRecolhimento('conteudo-dimens', this)" style="padding: 4px 10px; font-size: 12px;">▼ Recolher</button>
                 </div>
               </div>
 
-              <div class="print-hidden" style="background: var(--bg-color); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 24px;">
-                <div class="profile-grid" style="grid-template-columns: 2fr 1fr;">
-                  <div class="form-group" style="margin: 0;"><label>Identificação da Obra / Setor</label><input type="text" id="dimInputObra" placeholder="Ex: Residência Família Souza - Pavimento Superior" oninput="document.getElementById('dimPrintObra').textContent = this.value || 'Estudo de Instalação Elétrica'"></div>
-                  <div class="form-group" style="margin: 0;"><label>Data do Estudo</label><input type="date" id="dimInputData" oninput="formatarDataDim(this.value)"></div>
+              <div id="conteudo-dimens">
+                <div class="print-hidden" style="background: var(--bg-color); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 24px;">
+                  <div class="profile-grid" style="grid-template-columns: 2fr 1fr;">
+                    <div class="form-group" style="margin: 0;"><label>Identificação da Obra / Setor</label><input type="text" id="dimInputObra" placeholder="Ex: Residência Família Souza - Pavimento Superior" oninput="document.getElementById('dimPrintObra').textContent = this.value || 'Estudo de Instalação Elétrica'"></div>
+                    <div class="form-group" style="margin: 0;"><label>Data do Estudo</label><input type="date" id="dimInputData" oninput="formatarDataDim(this.value)"></div>
+                  </div>
                 </div>
-              </div>
 
-              <div class="ptable-wrap">
-                <table class="dimens-table">
-                  <thead>
-                    <tr>
-                      <th style="min-width: 190px; text-align: left;">Circuito / Destino</th>
-                      <th style="width: 105px;">Carga (W)</th>
-                      <th style="width: 130px;">Tensão (V)</th>
-                      <th style="width: 110px;">F. Potência</th>
-                      <th style="width: 85px;">Dist. (m)</th>
-                      <th style="width: 95px; color: var(--secondary);">Corrente ($I_b$)</th>
-                      <th style="width: 100px; color: var(--neon-green);">Bitola Mín.</th>
-                      <th style="width: 95px; color: #818cf8;">Disjuntor</th>
-                      <th style="width: 85px;">Queda %</th>
-                      <th style="width: 115px;">Diagnóstico</th>
-                      <th class="print-hidden" style="width: 40px;"></th>
-                    </tr>
-                  </thead>
-                  <tbody id="dimensTbody"></tbody>
-                </table>
-              </div>
+                <div class="ptable-wrap">
+                  <table class="dimens-table">
+                    <thead>
+                      <tr>
+                        <th style="min-width: 190px; text-align: left;">Circuito / Destino</th>
+                        <th style="width: 105px;">Carga (W)</th>
+                        <th style="width: 130px;">Tensão (V)</th>
+                        <th style="width: 110px;">F. Potência</th>
+                        <th style="width: 85px;">Dist. (m)</th>
+                        <th style="width: 95px; color: var(--secondary);">Corrente ($I_b$)</th>
+                        <th style="width: 100px; color: var(--neon-green);">Bitola Mín.</th>
+                        <th style="width: 95px; color: #818cf8;">Disjuntor</th>
+                        <th style="width: 85px;">Queda %</th>
+                        <th style="width: 115px;">Diagnóstico</th>
+                        <th class="print-hidden" style="width: 40px;"></th>
+                      </tr>
+                    </thead>
+                    <tbody id="dimensTbody"></tbody>
+                  </table>
+                </div>
 
-              <div class="print-hidden" style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-                <button class="btn-add-item" style="width: auto; padding: 14px 28px; margin: 0;" onclick="addDimensRow('', 1000, 127, 10)">+ Inserir Linha em Branco na Planilha</button>
-                <div style="font-size: 12px; color: var(--text-light); text-align: right;">
-                  *Queda de Tensão máxima configurada: <strong>4.0%</strong> (Padrão NBR 5410).<br>
-                  *Capacidade de condução ($I_z$) baseada em condutores de Cobre, Isolação PVC 70°C, Método B1.
+                <div class="print-hidden" style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                  <button class="btn-add-item" style="width: auto; padding: 14px 28px; margin: 0;" onclick="addDimensRow('', 1000, 127, 10)">+ Inserir Linha em Branco na Planilha</button>
+                  <div style="font-size: 12px; color: var(--text-light); text-align: right;">
+                    *Queda de Tensão máxima configurada: <strong>4.0%</strong> (Padrão NBR 5410).<br>
+                    *Capacidade de condução ($I_z$) baseada em condutores de Cobre, Isolação PVC 70°C, Método B1.
+                  </div>
                 </div>
               </div>
 
@@ -650,21 +665,27 @@
         </div>
 
         <div class="tab-content" id="tab-hist-prof">
-          <h3>📚 Histórico de Orçamentos</h3>
-          <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, altere dados estruturais, reimprima, envie via WhatsApp ou exclua registros indesejados.</p>
-          <div id="profHistContainer"></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+            <h3 style="margin:0;">📚 Histórico de Orçamentos</h3>
+            <button class="btn-header print-hidden" onclick="alternarRecolhimento('conteudo-hist', this)" style="padding: 4px 10px; font-size: 12px;">▼ Recolher</button>
+          </div>
+          
+          <div id="conteudo-hist">
+            <p style="color:var(--text-light); margin-bottom: 20px;">Revise orçamentos antigos, altere dados estruturais, reimprima, envie via WhatsApp ou exclua registros indesejados.</p>
+            <div id="profHistContainer"></div>
 
-          <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border-color); margin-top: 40px;">
-            <div style="max-width: 500px; margin: 0 auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
-              <p style="font-weight: 700; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                ☕ Apoie o Projeto VoltCalc Pro
-              </p>
-              <p style="font-size: 12px; color: var(--text-light);">Gostou da ferramenta? Contribua com qualquer valor para ajudar a manter o servidor ativo!</p>
-              <button onclick="copiarChavePix()" class="btn-pix-donation">
-                📋 Copiar Chave PIX
-              </button>
-            </div>
-          </footer>
+            <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border-color); margin-top: 40px;">
+              <div style="max-width: 500px; margin: 0 auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
+                <p style="font-weight: 700; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                  ☕ Apoie o Projeto VoltCalc Pro
+                </p>
+                <p style="font-size: 12px; color: var(--text-light);">Gostou da ferramenta? Contribua com qualquer valor para ajudar a manter o servidor ativo!</p>
+                <button onclick="copiarChavePix()" class="btn-pix-donation">
+                  📋 Copiar Chave PIX
+                </button>
+              </div>
+            </footer>
+          </div>
         </div>
 
         <div class="tab-content" id="tab-perfil"></div>
@@ -876,9 +897,12 @@
           const cId = doc.id;
 
           html += `<div style="background:var(--bg-color); border:1px solid var(--border-color); padding:16px; border-radius:12px; margin-bottom:12px;">
-            <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-light); margin-bottom:8px; font-weight:600;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-light); margin-bottom:8px; font-weight:600; align-items: center;">
               <span>Chamado: "${c.mensagem ? c.mensagem.substring(0, 35) + '...' : 'Sem Assunto'}"</span>
-              <span style="color:${c.status === 'Resolvido' ? 'var(--neon-green)' : '#f59e0b'};">${c.status || 'Em Análise'}</span>
+              <div style="display:flex; gap: 10px; align-items: center;">
+                <span style="color:${c.status === 'Resolvido' ? 'var(--neon-green)' : '#f59e0b'};">${c.status || 'Em Análise'}</span>
+                <button onclick="apagarChamadoSuporte('${cId}')" title="Apagar esta mensagem de suporte" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:14px;">🗑️</button>
+              </div>
             </div>`;
 
           db.collection('chamados').doc(cId).collection('mensagens').orderBy('data', 'asc').get().then(function(msgSnap) {
@@ -966,14 +990,14 @@
     ];
 
     function renderPrecosTable() {
-      var h = '<h2>💰 Tabela Mão de Obra (Referência Nacional)</h2><div class="ptable-wrap"><table class="ptable"><thead><tr><th>Serviço</th><th>Mín</th><th>Máx</th><th>Méd</th></tr></thead><tbody>';
+      var h = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;"><h2 style="margin:0;">💰 Tabela Mão de Obra (Referência Nacional)</h2><button class="btn-header print-hidden" onclick="alternarRecolhimento(\'conteudo-precos\', this)" style="padding: 4px 10px; font-size: 12px;">▼ Recolher</button></div><div id="conteudo-precos"><div class="ptable-wrap"><table class="ptable"><thead><tr><th>Serviço</th><th>Mín</th><th>Máx</th><th>Méd</th></tr></thead><tbody>';
       priceData.forEach(function(c) {
         h += '<tr class="cat-row"><td colspan="4">'+c.cat+'</td></tr>';
         c.items.forEach(function(i) {
           h += '<tr><td>'+i.d+'</td><td class="mn">R$ '+i.mn.toFixed(2)+'</td><td class="mx">R$ '+i.mx.toFixed(2)+'</td><td class="md">R$ '+i.md.toFixed(2)+'</td></tr>';
         });
       });
-      h += '</tbody></table></div>';
+      h += '</tbody></table></div></div>';
       document.getElementById('tab-precos').innerHTML = h;
     }
 
@@ -1344,31 +1368,36 @@
     function renderProfileForm(tid) {
       var h = `
         <div class="card">
-          <h3>👤 Perfil Profissional e Empresa</h3>
-          <p style="color:var(--text-light); margin-bottom: 24px;">Configure os dados e a logo que aparecerão nos seus orçamentos em PDF e WhatsApp.</p>
-          
-          <div style="display:flex; gap:20px; margin-bottom:32px; align-items: center; flex-wrap: wrap;">
-            <div id="logoPreviewContainer" style="width: 100px; height: 100px; border-radius: 12px; border: 2px dashed var(--border-color); display:flex; align-items:center; justify-content:center; overflow:hidden; background: var(--input-bg);">
-              <span style="font-size: 24px; color: var(--text-light);">📷</span>
-            </div>
-            <div>
-              <label style="display:block; font-weight:600; margin-bottom:8px; font-size:14px;">Logo da Empresa</label>
-              <input type="file" id="pLogoInput" accept="image/png, image/jpeg, image/webp" style="font-size: 14px; padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; background: transparent; color: var(--text);">
-              <p style="font-size: 12px; color: var(--text-light); margin-top: 6px;">Envie uma imagem com fundo transparente ou branco (Máx 1MB).</p>
-            </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+            <h3 style="margin:0;">👤 Perfil Profissional e Empresa</h3>
+            <button class="btn-header print-hidden" onclick="alternarRecolhimento('conteudo-perfil', this)" style="padding: 4px 10px; font-size: 12px;">▼ Recolher</button>
           </div>
+          <div id="conteudo-perfil">
+            <p style="color:var(--text-light); margin-bottom: 24px;">Configure os dados e a logo que aparecerão nos seus orçamentos em PDF e WhatsApp.</p>
+            
+            <div style="display:flex; gap:20px; margin-bottom:32px; align-items: center; flex-wrap: wrap;">
+              <div id="logoPreviewContainer" style="width: 100px; height: 100px; border-radius: 12px; border: 2px dashed var(--border-color); display:flex; align-items:center; justify-content:center; overflow:hidden; background: var(--input-bg);">
+                <span style="font-size: 24px; color: var(--text-light);">📷</span>
+              </div>
+              <div>
+                <label style="display:block; font-weight:600; margin-bottom:8px; font-size:14px;">Logo da Empresa</label>
+                <input type="file" id="pLogoInput" accept="image/png, image/jpeg, image/webp" style="font-size: 14px; padding: 8px; border: 1px solid var(--border-color); border-radius: 8px; background: transparent; color: var(--text);">
+                <p style="font-size: 12px; color: var(--text-light); margin-top: 6px;">Envie uma imagem com fundo transparente ou branco (Máx 1MB).</p>
+              </div>
+            </div>
 
-          <div class="profile-grid">
-            <div class="form-group full"><label>Nome / Razão Social da Empresa</label><input id="pNom"></div>
-            <div class="form-group"><label>Telefone / WhatsApp</label><input id="pTel" placeholder="(00) 00000-0000"></div>
-            <div class="form-group"><label>CPF / CNPJ</label><input id="pDoc" placeholder="000.000.000-00"></div>
-            <div class="form-group"><label>Registro Profissional (CREA / CFT) - Opcional</label><input id="pReg" placeholder="Opcional - Apenas letras e números"></div>
-            <div class="form-group"><label>Chave PIX (Para receber adiantamentos)</label><input id="pPix" placeholder="Ex: CNPJ, Email, Celular"></div>
-            <div class="form-group full"><label>Endereço Completo (Rua, Nº, Bairro, CEP)</label><input id="pEnd"></div>
-            <div class="form-group full"><label>Site ou Instagram</label><input id="pSite" placeholder="Ex: @minhaempresa"></div>
+            <div class="profile-grid">
+              <div class="form-group full"><label>Nome / Razão Social da Empresa</label><input id="pNom"></div>
+              <div class="form-group"><label>Telefone / WhatsApp</label><input id="pTel" placeholder="(00) 00000-0000"></div>
+              <div class="form-group"><label>CPF / CNPJ</label><input id="pDoc" placeholder="000.000.000-00"></div>
+              <div class="form-group"><label>Registro Profissional (CREA / CFT) - Opcional</label><input id="pReg" placeholder="Opcional - Apenas letras e números"></div>
+              <div class="form-group"><label>Chave PIX (Para receber adiantamentos)</label><input id="pPix" placeholder="Ex: CNPJ, Email, Celular"></div>
+              <div class="form-group full"><label>Endereço Completo (Rua, Nº, Bairro, CEP)</label><input id="pEnd"></div>
+              <div class="form-group full"><label>Site ou Instagram</label><input id="pSite" placeholder="Ex: @minhaempresa"></div>
+            </div>
+            
+            <button class="btn-primary" id="btnSaveProfile" style="margin-top: 16px;">Salvar Perfil</button>
           </div>
-          
-          <button class="btn-primary" id="btnSaveProfile" style="margin-top: 16px;">Salvar Perfil</button>
         </div>
 
         <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border-color); margin-top: 40px;">
@@ -1666,6 +1695,56 @@
       document.body.classList.add('imprimindo-dimens');
       window.print();
       setTimeout(function(){ document.body.classList.remove('imprimindo-dimens'); }, 1000);
+    }
+
+    /* =================================================================================== */
+    /* ── FUNÇÕES NOVAS DE RECOLHER E SUPORTE (INJETADAS) ── */
+    /* =================================================================================== */
+    function alternarRecolhimento(idConteudo, btnEl) {
+      var el = document.getElementById(idConteudo);
+      if(!el) return;
+      if(el.style.display === 'none') {
+        el.style.display = '';
+        btnEl.innerHTML = '▼ Recolher';
+      } else {
+        el.style.display = 'none';
+        btnEl.innerHTML = '▶ Abrir';
+      }
+    }
+
+    function apagarChamadoSuporte(docId) {
+      if(confirm('Tem certeza que deseja apagar esta mensagem de suporte? Esta ação não pode ser desfeita.')) {
+        db.collection('chamados').doc(docId).delete().catch(function(err) {
+          alert('Erro ao apagar registro: ' + err.message);
+        });
+      }
+    }
+
+    function enviarMensagemDiretaSuporte() {
+      if(!currentUser || !currentUser.email) {
+        alert("Você precisa estar autenticado no painel para despachar mensagens ao suporte.");
+        return;
+      }
+      var texto = document.getElementById('novaMensagemSuporteTexto').value.trim();
+      if(!texto) {
+        alert("Digite o conteúdo da sua dúvida ou solicitação antes de enviar.");
+        return;
+      }
+
+      var profName = document.getElementById('profNameTitleInput').value || currentUser.displayName || "Profissional Técnico";
+
+      db.collection("chamados").add({
+        nome: profName,
+        email: currentUser.email,
+        telefone: "Disparado via Painel Interno",
+        mensagem: texto,
+        status: "Pendente",
+        arquivado: false,
+        data: new Date()
+      }).then(() => {
+        alert("Chamado transmitido com sucesso para a nossa equipe de engenharia!");
+        document.getElementById('novaMensagemSuporteTexto').value = '';
+      }).catch(error => alert("Erro na transmissão do chamado: " + error.message));
     }
   </script>
 
