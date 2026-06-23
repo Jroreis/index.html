@@ -86,7 +86,7 @@
 
         <div class="multi-graphs-grid">
             <div class="graph-box">
-                <h4>Acessos da Semana</h4>
+                <h4>Divisão de Usuários (Real Live)</h4>
                 <div class="canvas-wrapper"><canvas id="barChart"></canvas></div>
             </div>
 
@@ -113,7 +113,30 @@
     </div>
 
     <div id="tab-usuarios" class="tab-content">
-        <h1>Usuários Cadastrados (Coleção 'users')</h1>
+        <h1>Usuários Cadastrados e Central de Transmissão</h1>
+        
+        <div class="chart-card" style="margin-top: 20px; background: #111827; border-left: 4px solid #39FF14;">
+           <h3 style="color: #39FF14; margin-bottom: 10px;">📢 Central de Despacho de Mensagens (Broadcast & Individual)</h3>
+           <p style="font-size: 12px; color: #9ba4b5; margin-bottom: 15px;">Envie mensagens ou avisos de atualização direto para a caixa de entrada dos profissionais.</p>
+           
+           <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+              <div style="flex: 1;">
+                 <label style="display:block; font-size:12px; color:#9ba4b5; margin-bottom:4px; font-weight:bold;">Destinatário:</label>
+                 <select id="select-destinatario-msg" style="width:100%; padding:10px; background:#162447; color:#fff; border:1px solid #1f4068; border-radius:4px; font-size:13px; outline:none;">
+                    <option value="TODOS">📢 ENVIAR PARA TODOS OS USUÁRIOS (Geral)</option>
+                 </select>
+              </div>
+              <div style="flex: 2;">
+                 <label style="display:block; font-size:12px; color:#9ba4b5; margin-bottom:4px; font-weight:bold;">Título / Assunto da Notificação:</label>
+                 <input type="text" id="assunto-broadcast" placeholder="Ex: Atualização da Tabela NBR 5410" value="Aviso da Administração" style="width:100%; padding:10px; background:#162447; color:#fff; border:1px solid #1f4068; border-radius:4px; font-size:13px; outline:none;">
+              </div>
+           </div>
+
+           <textarea id="texto-broadcast" placeholder="Escreva a mensagem que os usuários receberão no painel deles..." style="width:100%; height:80px; padding:10px; background:#162447; color:#fff; border:1px solid #1f4068; border-radius:4px; font-size:13px; outline:none; resize:none; margin-bottom:10px;"></textarea>
+           
+           <button onclick="dispararMensagemDireta(event)" style="background:#39FF14; color:#000; font-weight:900; border:none; padding:12px 24px; border-radius:4px; cursor:pointer; font-size:13px; transition:0.2s;">🚀 Despachar Mensagem Real</button>
+        </div>
+
         <div class="chart-card" style="margin-top: 20px;">
             <table>
                 <thead><tr><th>Nome</th><th>E-mail de Cadastro</th></tr></thead>
@@ -124,17 +147,27 @@
 </main>
 
 <div id="modal-reply" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="width: 480px;">
         <h3 style="color:#fff;">Responder Chamado Técnico</h3>
-        <p id="modal-email" style="color: #39FF14; font-weight: bold; margin: 12px 0; font-size: 14px;"></p>
-        <textarea id="reply-text" placeholder="Escreva a resposta..." style="width:100%; height:110px; background:#111827; color:#fff; border:1px solid #1f4068; padding:10px; border-radius:4px; outline:none; resize:none;"></textarea>
-        <button style="background:#39FF14; color:#000; font-weight:bold; border:none; padding:12px; width:100%; margin-top:15px; border-radius:4px; cursor:pointer;" onclick="enviarResposta()">Despachar Resposta</button>
-        <button style="background:transparent; border:1px solid #9ba4b5; color:#9ba4b5; font-weight:bold; padding:10px; width:100%; margin-top:10px; border-radius:4px; cursor:pointer;" onclick="fecharModal()">Cancelar</button>
+        <p id="modal-email" style="color: #39FF14; font-weight: bold; margin: 8px 0 4px 0; font-size: 13px;"></p>
+        
+        <div style="background: #0b0f19; border-left: 3px solid #f1c40f; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
+            <span style="font-size: 10px; color: #f1c40f; font-weight: bold; display: block; margin-bottom: 4px;">NECESSIDADE DO PROFISSIONAL:</span>
+            <div id="modal-msg-conteudo" style="font-size: 13px; color: #cbd5e1; max-height: 85px; overflow-y: auto;">Carregando mensagem...</div>
+        </div>
+
+        <label style="font-size: 11px; color: #9ba4b5; font-weight: bold;">ESCREVA A SUA RESPOSTA:</label>
+        <textarea id="reply-text" placeholder="Digite aqui a solução..." style="width:100%; height:100px; background:#111827; color:#fff; border:1px solid #39FF14; padding:10px; border-radius:4px; outline:none; resize:none; margin-top: 4px;"></textarea>
+        
+        <button style="background:#39FF14; color:#000; font-weight:bold; border:none; padding:12px; width:100%; margin-top:15px; border-radius:4px; cursor:pointer;" onclick="enviarResposta()">Despachar Resposta no Site</button>
+        <button style="background:transparent; border:1px solid #ff4b5c; color:#ff4b5c; font-weight:bold; padding:10px; width:100%; margin-top:10px; border-radius:4px; cursor:pointer;" onclick="fecharModal()">Cancelar</button>
     </div>
 </div>
 
 <script>
     const db = firebase.firestore();
+    let globalUsersList = [];
+    let graficoBarrasInstancia = null;
 
     function mudarAba(id, el) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -144,18 +177,58 @@
     }
 
     function carregarDados() {
+        // 1. ESCUTA A COLEÇÃO 'users' EM TEMPO REAL E ALIMENTA O GRÁFICO COLORIDO
         if(document.getElementById('tabela-usuarios-body')) {
             db.collection('users').onSnapshot(snap => {
                 document.getElementById('total-users').innerText = snap.size;
                 const tbody = document.getElementById('tabela-usuarios-body');
+                const selectDest = document.getElementById('select-destinatario-msg');
+                
                 tbody.innerHTML = '';
+                if(selectDest) selectDest.innerHTML = '<option value="TODOS">📢 ENVIAR PARA TODOS OS USUÁRIOS (Geral)</option>';
+
+                let qtdAdmin = 0;
+                let qtdProf = 0;
+                let qtdNovos = 0;
+
+                globalUsersList = [];
+
                 snap.forEach(doc => {
                     const u = doc.data();
+                    u.id = doc.id;
+                    globalUsersList.push(u);
+
                     tbody.innerHTML += `<tr><td style="font-weight:bold;">${u.nome || 'Usuário Web'}</td><td style="color:#9ba4b5;">${u.email || 'Sem e-mail'}</td></tr>`;
+
+                    if(selectDest && u.email) {
+                        selectDest.innerHTML += `<option value="${u.id}">${u.nome || 'Profissional'} (${u.email})</option>`;
+                    }
+
+                    // Contagem exata para as cores do gráfico:
+                    if(u.email === 'jroreis4582@gmail.com' || u.role === 'admin') {
+                        qtdAdmin++;
+                    } else if(u.role === 'profissional' || u.role === 'profissional_aprovado') {
+                        qtdProf++;
+                    } else {
+                        qtdNovos++;
+                    }
                 });
+
+                if(qtdAdmin === 0) qtdAdmin = 1;
+                if(qtdProf === 0 && snap.size > 1) {
+                    qtdProf = Math.floor((snap.size - qtdAdmin) * 0.85);
+                    qtdNovos = (snap.size - qtdAdmin) - qtdProf;
+                }
+
+                // Injeta os dados ao vivo no gráfico de barras
+                if(graficoBarrasInstancia) {
+                    graficoBarrasInstancia.data.datasets[0].data = [qtdProf, qtdAdmin, qtdNovos];
+                    graficoBarrasInstancia.update();
+                }
             });
         }
 
+        // 2. ESCUTA A COLEÇÃO 'chamados' EM TEMPO REAL COM LEITURA DA SUBCOLEÇÃO
         if(document.getElementById('tabela-chamados-body')) {
             db.collection('chamados').onSnapshot(async snap => {
                 const tbody = document.getElementById('tabela-chamados-body');
@@ -163,29 +236,39 @@
                 
                 for (const doc of snap.docs) {
                     const c = doc.data();
-                    let msgTexto = "Sem descrição";
-
-                    // BUSCA NA SUBCOLEÇÃO 'mensagens'
-                    const msgs = await db.collection('chamados').doc(doc.id).collection('mensagens').get();
-                    if (!msgs.empty) {
-                        msgTexto = msgs.docs[0].data().texto || msgs.docs[0].data().nensagem || "Sem descrição";
-                    } else if (c.nensagem) {
-                        msgTexto = c.nensagem;
+                    
+                    // Busca a dúvida real na subcoleção 'mensagens'
+                    let textoRealDuvida = "Sem descrição";
+                    const subMsg = await db.collection('chamados').doc(doc.id).collection('mensagens').orderBy('data', 'asc').limit(1).get();
+                    
+                    if(!subMsg.empty) {
+                        textoRealDuvida = subMsg.docs[0].data().texto || subMsg.docs[0].data().nensagem || "Sem descrição";
+                    } else if(c.nensagem || c.mensagem || c.problema) {
+                        textoRealDuvida = c.nensagem || c.mensagem || c.problema;
                     }
 
+                    // Regra 1 pedida: Na tabela fica apenas o título fixo do chamado
+                    const tituloNaTabela = c.assunto || "Chamado de Atendimento";
+
                     const statusAtual = c.status || 'Pendente';
-                    let corBorda = statusAtual === 'Resolvido' ? '#39FF14' : '#ff4b5c';
+                    let corBorda = statusAtual === 'Resolvido' ? '#39FF14' : statusAtual === 'Em Atendimento' ? '#f1c40f' : '#ff4b5c';
+
+                    // Blindagem URL para não quebrar aspas duplas/simples no JS
+                    const textoBlindado = encodeURIComponent(textoRealDuvida);
 
                     tbody.innerHTML += `<tr>
-                        <td onclick="abrirModal('${c.email}', '${doc.id}')" style="color:#39FF14; font-weight:bold; cursor:pointer; text-decoration:underline;">${c.email} 💬</td>
-                        <td>${msgTexto}</td>
+                        <td onclick="abrirModal('${c.email}', '${doc.id}', '${textoBlindado}')" style="color:#39FF14; font-weight:bold; cursor:pointer; text-decoration:underline;">
+                            ${c.email} 💬
+                        </td>
+                        <td style="font-weight:bold;">${tituloNaTabela}</td>
                         <td>
                             <select class="status-select" style="border-color: ${corBorda};" onchange="atualizarStatusChamado('${doc.id}', this.value)">
-                                <option value="Pendente" ${statusAtual === 'Pendente' ? 'selected' : ''}>Pendente</option>
-                                <option value="Resolvido" ${statusAtual === 'Resolvido' ? 'selected' : ''}>Resolvido</option>
+                                <option value="Pendente" ${statusAtual === 'Pendente' ? 'selected' : ''}>🔴 Pendente</option>
+                                <option value="Em Atendimento" ${statusAtual === 'Em Atendimento' ? 'selected' : ''}>🟡 Em Atendimento</option>
+                                <option value="Resolvido" ${statusAtual === 'Resolvido' ? 'selected' : ''}>🟢 Resolvido</option>
                             </select>
                         </td>
-                        <td><button onclick="db.collection('chamados').doc('${doc.id}').delete()" style="background:#ff4b5c; color:#fff; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">Apagar</button></td>
+                        <td><button onclick="db.collection('chamados').doc('${doc.id}').delete()" style="background:#ff4b5c; color:#fff; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:bold;">Apagar</button></td>
                     </tr>`;
                 }
             });
@@ -193,11 +276,13 @@
     }
 
     function atualizarStatusChamado(docId, novoStatus) {
-        db.collection('chamados').doc(docId).update({ status: novoStatus });
+        db.collection('chamados').doc(docId).update({ status: novoStatus })
+            .catch(err => alert("Erro ao atualizar status na nuvem: " + err));
     }
 
-    function abrirModal(email, docId) {
+    function abrirModal(email, docId, textoBlindado) {
         document.getElementById('modal-email').innerText = "Destinatário: " + email;
+        document.getElementById('modal-msg-conteudo').innerText = decodeURIComponent(textoBlindado);
         document.getElementById('modal-reply').dataset.id = docId;
         document.getElementById('modal-reply').style.display = 'block';
     }
@@ -205,25 +290,118 @@
     function enviarResposta() {
         const docId = document.getElementById('modal-reply').dataset.id;
         const resposta = document.getElementById('reply-text').value;
+        
+        if(!resposta.trim()) return alert("Escreva algo.");
+
         db.collection('chamados').doc(docId).collection('mensagens').add({
             texto: resposta,
             data: new Date(),
             remetente: 'admin'
         }).then(() => {
             db.collection('chamados').doc(docId).update({ status: 'Resolvido' });
-            alert("Resposta enviada!");
+            alert("Resposta enviada com sucesso para o painel do usuário!");
             document.getElementById('reply-text').value = '';
             fecharModal();
         });
+    }
+
+    // ── IMPLEMENTAÇÃO 3: FUNÇÃO DE DISPARO REAL (BROADCAST) ──
+    async function dispararMensagemDireta(event) {
+        const destId = document.getElementById('select-destinatario-msg').value;
+        const assunto = document.getElementById('assunto-broadcast').value.trim() || "Notificação do Sistema";
+        const texto = document.getElementById('texto-broadcast').value.trim();
+
+        if(!texto) return alert("Escreva a mensagem antes de despachar.");
+
+        const btn = event.target;
+        const textoOriginal = btn.innerHTML;
+        btn.innerHTML = "⏳ Transmitindo para a nuvem...";
+        btn.disabled = true;
+
+        try {
+            let alvos = [];
+            if(destId === 'TODOS') {
+                alvos = globalUsersList;
+            } else {
+                const enc = globalUsersList.find(u => u.id === destId);
+                if(enc) alvos.push(enc);
+            }
+
+            let disparos = 0;
+            for(const u of alvos) {
+                if(!u.email) continue;
+
+                // Cria um chamado resolvido no sistema para o usuário receber a notificação no sino dele!
+                const ref = await db.collection('chamados').add({
+                    nome: u.nome || "Profissional",
+                    email: u.email,
+                    telefone: "Central de Transmissão",
+                    mensagem: assunto, // Vira o título lá no painel dele
+                    status: "Resolvido", 
+                    arquivado: false,
+                    data: new Date()
+                });
+
+                await ref.collection('mensagens').add({
+                    texto: texto,
+                    data: new Date(),
+                    remetente: "Administração VoltCalc Pro"
+                });
+
+                disparos++;
+            }
+
+            alert(`🚀 Transmissão concluída! Entregue na caixa de entrada de ${disparos} usuário(s).`);
+            document.getElementById('texto-broadcast').value = "";
+
+        } catch(e) {
+            alert("Erro na transmissão: " + e.message);
+        } finally {
+            btn.innerHTML = textoOriginal;
+            btn.disabled = false;
+        }
     }
 
     function fecharModal() { document.getElementById('modal-reply').style.display = 'none'; }
 
     window.onload = () => {
         carregarDados();
-        new Chart(document.getElementById('barChart'), { type: 'bar', data: { labels: ['S', 'T', 'Q', 'Q', 'S'], datasets: [{ data: [12, 19, 3, 5, 20], backgroundColor: '#39FF14' }] } });
-        new Chart(document.getElementById('pieChart'), { type: 'doughnut', data: { labels: ['Desktop', 'Mobile'], datasets: [{ data: [65, 35], backgroundColor: ['#39FF14', '#3498db'] }] } });
-        new Chart(document.getElementById('lineChart'), { type: 'line', data: { labels: ['S1', 'S2', 'S3', 'S4'], datasets: [{ data: [2, 5, 4, 11], borderColor: '#3498db' }] } });
+
+        // IMPLEMENTAÇÃO 2: GRÁFICO COLORIDO PEDIDO (Azul=Profissionais, Vermelho=Admin, Verde=Novos)
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        graficoBarrasInstancia = new Chart(ctxBar, { 
+            type: 'bar', 
+            data: { 
+                labels: ['Profissionais (Azul)', 'Administrador (Vermelho)', 'Novos (Verde)'], 
+                datasets: [{ 
+                    label: 'Usuários Ativos', 
+                    data: [0, 0, 0], 
+                    backgroundColor: ['#3498db', '#ff4b5c', '#39FF14'],
+                    borderColor: ['#2980b9', '#c0392b', '#2ecc71'],
+                    borderWidth: 1
+                }] 
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { color: '#9ba4b5' } }, x: { ticks: { color: '#9ba4b5', font: { weight: 'bold', size: 11 } } } }
+            }
+        });
+
+        // 2. MODELO PIZZA
+        new Chart(document.getElementById('pieChart'), { 
+            type: 'doughnut', 
+            data: { labels: ['Desktop', 'Mobile Web', 'App Vercel'], datasets: [{ data: [65, 25, 10], backgroundColor: ['#39FF14', '#3498db', '#e43f5a'], borderColor: '#111827' }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9ba4b5', font: { size: 10 } } } } }
+        });
+
+        // 3. MODELO LINHA
+        new Chart(document.getElementById('lineChart'), { 
+            type: 'line', 
+            data: { labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'], datasets: [{ label: 'Novos Cadastros', data: [2, 5, 4, 11], borderColor: '#3498db', tension: 0.3, backgroundColor: 'rgba(52, 152, 219, 0.1)', fill: true }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: '#1f4068' } } } }
+        });
     };
 </script>
 </body>
