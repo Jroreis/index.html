@@ -14,11 +14,11 @@
   <link rel="manifest" href="manifest.json">
 
   <meta name="robots" content="index, follow, max-image-preview:large">
-  <meta name="description" content="A ferramenta definitiva para eletricistas: orçamentos profissionais, tabelas de preços de elétrica 2026 completas e gestão técnica de instalações residenciais e industriais.">
-  <meta name="keywords" content="orçamento elétrico, eletricista, tabela de preços elétrica 2026, serviços elétricos, NBR 5410, VoltCalc Pro, instalações elétricas, quadro de distribuição, cálculo elétrico">
+  <meta name="description" content="A ferramenta definitiva para eletricistas: orçamentos profissionais, tabelas de preços de elétrica 2026 completas, loja do eletricista com ferramentas e gestão técnica de instalações.">
+  <meta name="keywords" content="orçamento elétrico, eletricista, loja do eletricista, ferramentas eletricista, comprar ferramentas, tabela de preços elétrica 2026, serviços elétricos, NBR 5410, VoltCalc Pro, instalações elétricas, quadro de distribuição, cálculo elétrico">
   <meta name="author" content="VoltCalc Pro">
   <meta property="og:title" content="VoltCalc Pro - Gestão para Eletricistas">
-  <meta property="og:description" content="Gestão completa de serviços elétricos com conformidade NBR 5410 e geração de propostas profissionais em PDF.">
+  <meta property="og:description" content="Gestão completa de serviços elétricos com conformidade NBR 5410, loja de ferramentas e geração de propostas profissionais em PDF.">
   <meta property="og:image" content="21310.png">
   <link rel="canonical" href="https://www.voltcalcpro.com/">
   
@@ -217,6 +217,18 @@
     .dimens-table input, .dimens-table select { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; font-size: 13px; color: var(--text); width: 100%; text-align: center; transition: 0.2s; }
     .dimens-table input:focus, .dimens-table select:focus { border-color: var(--neon-green); outline: none; }
     .dimens-print-header { display: none; }
+
+    /* ── LOJA VOLTCALC PRO (ESTILOS) ── */
+    .store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px; margin-top: 20px; }
+    .product-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; transition: 0.3s; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; box-shadow: var(--shadow); }
+    .product-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: var(--shadow-lg); }
+    .product-badge { position: absolute; top: 12px; right: 12px; background: var(--secondary); color: #000; font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
+    .product-img-placeholder { width: 100%; height: 160px; background: var(--bg-color); border-radius: 10px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; font-size: 40px; border: 1px dashed var(--border-color); }
+    .product-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .product-cat { font-size: 12px; color: var(--text-light); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+    .btn-buy-ml { width: 100%; padding: 12px; background: #ffe600; color: #2d3277; border: none; border-radius: 10px; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; margin-top: 16px; }
+    .btn-buy-ml:hover { background: #ffcc00; transform: scale(1.02); }
+    .store-section-title { margin-top: 32px; margin-bottom: 16px; font-size: 20px; color: var(--neon-green); font-weight: 800; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
 
     @media (max-width: 992px) { 
       .dashboard-layout { flex-direction: column; }
@@ -437,6 +449,7 @@
         💬 Central de Mensagens e Suporte
       </h2>
 
+      <!-- FORMULÁRIO DE ENVIO DA CENTRAL DE SUPORTE -->
       <div style="background: var(--input-bg); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
         <label style="display:block; font-weight:700; font-size:13px; color:var(--neon-green); margin-bottom:8px;">Enviar nova dúvida / solicitação técnica ao suporte:</label>
         <textarea id="novaMensagemSuporteTexto" rows="2" placeholder="Descreva sua dúvida técnica ou solicitação aqui..." style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:var(--card-bg); color:var(--text); font-size:14px; margin-bottom:10px; resize:vertical; font-family:inherit;"></textarea>
@@ -510,6 +523,7 @@
           <button class="tab active" data-tab="orc">📋 Novo Orçamento</button>
           <button class="tab" data-tab="eng">⚡ Eletricista / Engenheiro</button>
           <button class="tab" data-tab="hist-prof">📚 Histórico</button>
+          <button class="tab" data-tab="loja" style="color: var(--secondary);">🛒 Loja do Eletricista</button>
         </nav>
       </aside>
 
@@ -689,6 +703,115 @@
         </div>
 
         <div class="tab-content" id="tab-perfil"></div>
+
+        <!-- ── NOVO MÓDULO: LOJA DO ELETRICISTA ── -->
+        <div class="tab-content" id="tab-loja">
+          <div class="card" style="border-color: var(--secondary); box-shadow: 0 0 15px rgba(245, 158, 11, 0.1);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+              <h3 style="margin:0; color: var(--secondary);">🛒 Loja do Eletricista - Parceiros Oficiais</h3>
+              <button class="btn-header print-hidden" onclick="alternarRecolhimento('conteudo-loja', this)" style="padding: 4px 10px; font-size: 12px; border-color: var(--secondary); color: var(--secondary);">▼ Recolher</button>
+            </div>
+            
+            <div id="conteudo-loja">
+              <p style="color:var(--text-light); margin-bottom: 24px;">As melhores ferramentas e equipamentos selecionados a dedo para o profissional moderno. Ao comprar pelos links abaixo, você acessa nossos parceiros verificados no Mercado Livre.</p>
+              
+              <h4 class="store-section-title">🔧 Ferramentas Manuais & Acessórios</h4>
+              <div class="store-grid">
+                <!-- Item Específico Solicitado -->
+                <div class="product-card">
+                  <div class="product-badge">Recomendado</div>
+                  <div class="product-img-placeholder">🔧</div>
+                  <div>
+                    <div class="product-cat">Chaves Especiais</div>
+                    <div class="product-title">Chave Tigre Universal 48 Em 1 Combinada Soquete 360° Aço Inoxidável</div>
+                  </div>
+                  <a href="https://www.mercadolivre.com.br/chave-tigre-com-8-bocas-universal-48-em-1-combinada-soquete-360-em-aco-inoxidavel-cromado/p/MLB69138231?pdp_filters=item_id:MLB4786696785#origin=share&sid=share&wid=MLB4786696785" target="_blank" class="btn-buy-ml">🛒 Ver no Mercado Livre</a>
+                </div>
+                
+                <div class="product-card">
+                  <div class="product-img-placeholder">🛠️</div>
+                  <div>
+                    <div class="product-cat">Kits e Conjuntos</div>
+                    <div class="product-title">Kit de Ferramentas Premium para Eletricista Profissional</div>
+                  </div>
+                  <a href="https://meli.la/1PXjNhV" target="_blank" class="btn-buy-ml">🛒 Ver no Mercado Livre</a>
+                </div>
+
+                <div class="product-card">
+                  <div class="product-img-placeholder">🧰</div>
+                  <div>
+                    <div class="product-cat">Kits e Conjuntos</div>
+                    <div class="product-title">Maleta Completa de Ferramentas de Precisão e Desencape</div>
+                  </div>
+                  <a href="https://meli.la/2ew9kNf" target="_blank" class="btn-buy-ml">🛒 Ver no Mercado Livre</a>
+                </div>
+              </div>
+
+              <h4 class="store-section-title">⚡ Instrumentos de Medição & Teste</h4>
+              <div class="store-grid">
+                <div class="product-card">
+                  <div class="product-badge">Top Vendas</div>
+                  <div class="product-img-placeholder">📟</div>
+                  <div>
+                    <div class="product-cat">Medição</div>
+                    <div class="product-title">Multímetro Digital Profissional de Alta Precisão (True RMS)</div>
+                  </div>
+                  <a href="https://meli.la/2HvToNV" target="_blank" class="btn-buy-ml">🛒 Ver no Mercado Livre</a>
+                </div>
+
+                <div class="product-card">
+                  <div class="product-img-placeholder">⚡</div>
+                  <div>
+                    <div class="product-cat">Medição e Corrente</div>
+                    <div class="product-title">Alicate Amperímetro Digital e Testador de Tensão</div>
+                  </div>
+                  <a href="https://meli.la/1hWJ4MU" target="_blank" class="btn-buy-ml">🛒 Ver no Mercado Livre</a>
+                </div>
+                
+                <div class="product-card">
+                  <div class="product-img-placeholder">🔍</div>
+                  <div>
+                    <div class="product-cat">Testadores e Localizadores</div>
+                    <div class="product-title">Caneta Testadora de Tensão e Continuidade com Alerta Sonoro</div>
+                  </div>
+                  <a href="https://meli.la/2kxCuWo" target="_blank" class="btn-buy-ml">🛒 Ver no Mercado Livre</a>
+                </div>
+              </div>
+
+              <h4 class="store-section-title">🛡️ Equipamentos, Epi's & Consumíveis</h4>
+              <div class="store-grid">
+                <div class="product-card">
+                  <div class="product-img-placeholder">🦺</div>
+                  <div>
+                    <div class="product-cat">Segurança / EPI</div>
+                    <div class="product-title">Kit Proteção Individual para Trabalhos de Baixa e Média Tensão</div>
+                  </div>
+                  <a href="https://meli.la/26QkhAq" target="_blank" class="btn-buy-ml">🛒 Ver no Mercado Livre</a>
+                </div>
+
+                <div class="product-card">
+                  <div class="product-img-placeholder">🧵</div>
+                  <div>
+                    <div class="product-cat">Consumíveis e Fitas</div>
+                    <div class="product-title">Conjunto de Fitas Isolantes de Alta Fusão para Acabamento</div>
+                  </div>
+                  <a href="https://meli.la/1gk7jUc" target="_blank" class="btn-buy-ml">🛒 Ver no Mercado Livre</a>
+                </div>
+
+                <div class="product-card">
+                  <div class="product-img-placeholder">📦</div>
+                  <div>
+                    <div class="product-cat">Armazenamento</div>
+                    <div class="product-title">Bolsa Organizadora Resistente para Transporte de Equipamentos</div>
+                  </div>
+                  <a href="https://meli.la/2JyAj8D" target="_blank" class="btn-buy-ml">🛒 Ver no Mercado Livre</a>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
