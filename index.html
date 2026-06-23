@@ -14,12 +14,12 @@
   <link rel="manifest" href="manifest.json">
 
   <meta name="robots" content="index, follow, max-image-preview:large">
-  <meta name="description" content="A ferramenta definitiva para eletricistas e engenheiros: orçamentos profissionais, tabelas de preços de elétrica completas e memória de cálculo NBR 5410.">
-  <meta name="keywords" content="orçamento elétrico, eletricista, tabela de preços elétrica, serviços elétricos, NBR 5410, VoltCalc Pro, instalações elétricas, quadro de distribuição, dimensionamento elétrico">
+  <meta name="description" content="A ferramenta definitiva para eletricistas e engenheiros: orçamentos profissionais, tabelas de preços de elétrica completas e projeto de dimensionamento NBR 5410.">
+  <meta name="keywords" content="orçamento elétrico, eletricista, tabela de preços elétrica, serviços elétricos, NBR 5410, VoltCalc Pro, instalações elétricas, quadro de distribuição, cálculo de demanda">
   <meta name="author" content="VoltCalc Pro">
   <meta property="og:title" content="VoltCalc Pro - Gestão para Eletricistas">
-  <meta property="og:description" content="Gestão completa de serviços elétricos com conformidade NBR 5410 e geração de propostas e relatórios profissionais em PDF.">
-  <meta property="og:image" content="21310.png">
+  <meta property="og:description" content="Gestão completa de serviços elétricos com conformidade NBR 5410 e geração de propostas e relatórios técnicos em PDF.">
+  <meta property="og:image" content="https://i.postimg.cc/gj7VxGHL/file-000000001c9c720ea77ce48405b163db.png">
   <link rel="canonical" href="https://www.voltcalcpro.com/">
   
   <script type="application/ld+json">
@@ -28,7 +28,7 @@
     "@type": "WebApplication",
     "name": "VoltCalc Pro",
     "applicationCategory": "BusinessApplication",
-    "description": "Sistema completo para eletricistas autônomos e empresas gerarem orçamentos elétricos precisos e cálculos de dimensionamento conforme NBR 5410.",
+    "description": "Sistema completo para eletricistas autônomos e empresas gerarem orçamentos elétricos precisos e projetos de dimensionamento conforme NBR 5410.",
     "operatingSystem": "All"
   }
   </script>
@@ -77,7 +77,8 @@
 
     .bg-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background-image: url('21310.png'); background-size: cover; background-position: center; background-repeat: no-repeat;
+      background-image: url('https://i.postimg.cc/gj7VxGHL/file-000000001c9c720ea77ce48405b163db.png'); 
+      background-size: cover; background-position: center; background-repeat: no-repeat;
       opacity: 0.02; z-index: -1; pointer-events: none;
     }
 
@@ -86,15 +87,18 @@
       display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000;
       border-bottom: 1px solid var(--border-color);
     }
-    .logo { font-size: 24px; font-weight: 800; color: var(--neon-green); text-shadow: 0 0 10px rgba(57, 255, 20, 0.4); text-decoration: none; display: flex; align-items: center; gap: 12px; }
-    .logo img { height: 36px; width: 36px; object-fit: contain; border-radius: 6px; }
+    
+    /* Cabeçalho com a Logo acoplada ao lado do nome */
+    .logo { font-size: 24px; font-weight: 800; color: var(--neon-green); text-shadow: 0 0 10px rgba(57, 255, 20, 0.4); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+    .logo img { height: 38px; width: auto; object-fit: contain; filter: drop-shadow(0 0 8px rgba(57,255,20,0.4)); }
     .logo span { color: var(--text); font-weight: 400; text-shadow: none; }
+    
     .header-btns { display: flex; gap: 12px; }
     .btn-header { padding: 10px 20px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; border: 2px solid var(--neon-green); color: var(--neon-green); background: transparent; }
     .btn-header.filled { background: var(--neon-green); color: #020617; font-weight: 700; border-color: var(--neon-green); }
     .btn-header:hover { transform: translateY(-1px); box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
 
-    .hero { padding: 80px 24px 40px; text-align: center; position: relative; }
+    .hero { padding: 60px 24px 40px; text-align: center; position: relative; }
     .hero h1 { font-size: clamp(32px, 7vw, 56px); font-weight: 800; color: var(--text); margin-bottom: 20px; line-height: 1.15; letter-spacing: -0.02em; }
     .hero h1 span { color: var(--primary); }
     .hero p { font-size: clamp(16px, 3vw, 20px); max-width: 800px; margin: 0 auto 36px; color: var(--text-light); }
@@ -210,7 +214,6 @@
     .dimens-table input:focus, .dimens-table select:focus { border-color: var(--neon-green); outline: none; }
     .dimens-print-header { display: none; }
 
-    /* Módulo de Configuração Global de Dimensionamento */
     .dim-config-panel { background: var(--bg-color); border: 1px solid var(--primary); padding: 18px; border-radius: 14px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
     .dim-config-panel label { font-size: 12px; font-weight: 700; color: var(--neon-green); text-transform: uppercase; display: block; margin-bottom: 6px; }
 
@@ -221,22 +224,39 @@
       .orc-item-row { grid-template-columns: 1fr; gap: 8px; } 
     }
 
+    /* Container invisível em tela, visível apenas na impressão para travar a Marca d'Água */
+    .print-watermark-wrapper { display: none; }
     .print-only { display: none; }
     
     @media print {
       @page { margin: 1cm; size: A4 portrait; }
-      body { background: #fff !important; color: #000 !important; font-size: 11px; line-height: 1.3; }
+      body { background: #fff !important; color: #000 !important; font-size: 11px; line-height: 1.3; position: relative; }
       .bg-overlay, .ads-container, .adsbygoogle, .video-container { display: none !important; }
       .header, .dashboard-sidebar, .btn-add-item, .btn-primary, .btn-secondary-action, .orc-item button, #authBtns, footer { display: none !important; }
       .card > h3, .print-hidden, .dim-config-panel { display: none !important; }
       
+      /* ── MARCA D'ÁGUA CENTRALIZADA E FORÇADA NA IMPRESSÃO ── */
+      .print-watermark-wrapper {
+         display: block !important;
+         position: fixed;
+         top: 50%;
+         left: 50%;
+         transform: translate(-50%, -50%);
+         width: 75%;
+         max-width: 550px;
+         opacity: 0.08;
+         z-index: -999;
+         pointer-events: none;
+      }
+      .print-watermark-wrapper img { width: 100%; height: auto; }
+
       .dashboard-layout { display: block !important; margin: 0 !important; }
       .dashboard-main { padding: 0 !important; }
       .app-screen { padding: 0; margin: 0; display: block !important; }
       
       .tab-content { display: none !important; }
       .tab-content.active { display: block !important; }
-      .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; background: #fff !important; }
+      .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; background: transparent !important; }
       .orc-form-grid { display: block !important; }
       
       body.imprimindo-dimens #tab-precos { display: none !important; }
@@ -246,8 +266,8 @@
       .form-group.full { flex: 1 1 100% !important; }
       .form-group label { color: #475569 !important; font-size: 10px !important; margin-bottom: 2px !important; text-transform: uppercase; font-weight: 700 !important; }
       
-      .form-group input, .form-group textarea, .form-group select, .orc-item input, .orc-item select, .dimens-table select, .dimens-table input { background: transparent !important; border: none !important; padding: 0 0 2px 0 !important; font-size: 11px !important; color: #000 !important; font-weight: 600 !important; border-radius: 0 !important; box-shadow: none !important; height: auto !important; outline: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; background-image: none !important; }
-      .form-group select::-ms-expand, .orc-item select::-ms-expand, .dimens-table select::-ms-expand { display: none !important; }
+      .form-group input, .form-group textarea, .form-group select, .orc-item input, .orc-item select { background: transparent !important; border: none !important; padding: 0 0 2px 0 !important; font-size: 11px !important; color: #000 !important; font-weight: 600 !important; border-radius: 0 !important; box-shadow: none !important; height: auto !important; outline: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; background-image: none !important; }
+      .form-group select::-ms-expand, .orc-item select::-ms-expand { display: none !important; }
 
       .print-only { display: grid !important; }
       .orc-items-header { display: grid; grid-template-columns: 2fr 3fr 1fr 1fr 1fr; font-weight: 800; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; color: #000 !important; }
@@ -261,11 +281,15 @@
       .summary-row.total { color: #000 !important; border-top: 2px solid #000 !important; padding-top: 6px !important; font-size: 14px !important;}
       .print-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; }
 
-      .dimens-print-header { display: block !important; margin-bottom: 20px; }
-      .dimens-table { width: 100% !important; border-collapse: collapse !important; font-size: 10px !important; }
-      .dimens-table th { background: #f1f5f9 !important; color: #000 !important; font-weight: bold !important; border: 1px solid #475569 !important; padding: 6px 2px !important; text-align: center !important; }
-      .dimens-table td { border: 1px solid #475569 !important; padding: 5px 2px !important; text-align: center !important; color: #000 !important; background: #fff !important; }
-      .dimens-table td:first-child input { text-align: left !important; font-weight: bold !important; }
+      /* ── CALIBRAGEM EXATA DA TABELA DE DIMENSIONAMENTO IMPRESSA ── */
+      .dimens-print-header { display: block !important; margin-bottom: 15px; }
+      .dimens-table { width: 100% !important; border-collapse: collapse !important; font-size: 8.5pt !important; border: 1px solid #000 !important; }
+      .dimens-table th { background: #f1f5f9 !important; color: #000 !important; font-weight: 800 !important; border: 1px solid #000 !important; padding: 5px 2px !important; text-align: center !important; }
+      .dimens-table td { border: 1px solid #94a3b8 !important; padding: 4px 2px !important; text-align: center !important; color: #000 !important; background: transparent !important; }
+      
+      .dimens-table select, .dimens-table input { background: transparent !important; border: none !important; padding: 0 !important; font-size: 8.5pt !important; color: #000 !important; font-weight: 600 !important; width: 100% !important; text-align: center !important; outline: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; }
+      .dimens-table select::-ms-expand { display: none !important; }
+      .dimens-table td:first-child input { text-align: left !important; font-weight: 800 !important; white-space: normal !important; }
 
       .ptable, .ptable th, .ptable td, .cat-row { background: #fff !important; color: #000 !important; border-color: #000 !important; }
 
@@ -276,11 +300,15 @@
 </head>
 <body>
 
+  <div class="print-watermark-wrapper">
+     <img src="https://i.postimg.cc/gj7VxGHL/file-000000001c9c720ea77ce48405b163db.png" alt="Marca d'Água VoltCalc Pro">
+  </div>
+
   <div class="bg-overlay"></div>
 
   <header class="header">
     <a href="/" class="logo" id="headerLogoContainer">
-      <img src="21310.png" alt="VoltCalc Logo" onerror="this.style.display='none'">
+      <img src="https://i.postimg.cc/gj7VxGHL/file-000000001c9c720ea77ce48405b163db.png" alt="Selo Oficial">
       VoltCalc<span>Pro</span>
     </a>
     <div class="header-btns" id="authBtns">
@@ -304,8 +332,12 @@
 
   <main id="landingPage">
     <section class="hero">
+      <div style="margin-bottom: 24px; display: flex; justify-content: center;">
+        <img src="https://i.postimg.cc/gj7VxGHL/file-000000001c9c720ea77ce48405b163db.png" alt="Selo de Autoridade VoltCalc Pro" style="height: 110px; width: auto; filter: drop-shadow(0 0 15px rgba(57, 255, 20, 0.4));">
+      </div>
+      
       <h1>A plataforma de cálculo e orçamentação do <span>eletricista profissional</span>.</h1>
-      <p>Desenvolvida para autônomos e engenheiros que exigem rigor técnico: propostas financeiras padronizadas e memória de cálculo de dimensionamento conforme a ABNT NBR 5410.</p>
+      <p>Desenvolvida para autônomos e engenheiros que exigem rigor técnico: propostas financeiras padronizadas e projeto de dimensionamento e cálculo de demanda conforme a ABNT NBR 5410.</p>
       <div class="hero-actions">
         <button class="btn-hero primary" onclick="openModal('modalCadastro')">Criar Painel Profissional</button>
         <button class="btn-hero secondary" onclick="openModal('modalLogin')">Fazer Login</button>
@@ -452,7 +484,7 @@
           <button class="tab active" data-tab="orc">📋 Novo Orçamento</button>
           <button class="tab" data-tab="eng">⚡ Eletricista / Engenheiro</button>
           <button class="tab" data-tab="hist-prof">📚 Histórico</button>
-          </nav>
+        </nav>
       </aside>
 
       <main class="dashboard-main">
@@ -538,11 +570,16 @@
 
           <div id="tab-dimens">
             <div class="card">
+              
               <div class="dimens-print-header">
-                <h2 style="font-size: 18px; font-weight: 800; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 12px;">📐 MEMÓRIA DE CÁLCULO DE DIMENSIONAMENTO - NBR 5410</h2>
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px; font-size: 12px; margin-bottom: 16px;">
-                  <div><strong>OBRA / CLIENTE:</strong> <span id="dimPrintObra">Estudo de Instalação Elétrica</span></div>
+                <h2 style="font-size: 17px; font-weight: 800; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 12px;">
+                  📐 PROJETO DE DIMENSIONAMENTO E CÁLCULO DE DEMANDA NBR5410
+                </h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11px; margin-bottom: 16px; border: 1px solid #000; padding: 8px;">
+                  <div><strong>CLIENTE:</strong> <span id="dimPrintCliNome">Não informado</span></div>
                   <div><strong>DATA:</strong> <span id="dimPrintData"></span></div>
+                  <div><strong>OBRA / SETOR:</strong> <span id="dimPrintObra">Estudo de Instalação Elétrica</span></div>
+                  <div><strong>ENDEREÇO DA OBRA:</strong> <span id="dimPrintCliEnd">Não informado</span></div>
                   <div><strong>RESPONSÁVEL TÉCNICO:</strong> <span id="dimPrintProf"></span></div>
                   <div><strong>MÉTODO DE INSTALAÇÃO:</strong> <span id="dimPrintMetodo">B1 - Embutido em Alvenaria (Cobre / PVC 70°C)</span></div>
                 </div>
@@ -550,12 +587,14 @@
 
               <div class="print-hidden" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
                 <div>
-                  <h3 style="font-size: 22px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px; margin:0;">📐 Planilha de Dimensionamento (ABNT NBR 5410)</h3>
-                  <p style="color: var(--text-light); font-size: 14px; margin-top: 4px;">Configuração completa de métodos de instalação, materiais e isolação conforme a NBR 5410 revisada.</p>
+                  <h3 style="font-size: 22px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px; margin:0;">
+                    📐 Projeto de Dimensionamento e Cálculo de Demanda (NBR 5410)
+                  </h3>
+                  <p style="color: var(--text-light); font-size: 14px; margin-top: 4px;">Configuração de métodos, materiais e dados do cliente para emissão de relatório técnico.</p>
                 </div>
                 <div style="display: flex; gap: 12px; align-items: center;">
                   <button class="btn-header filled" onclick="addDimensRow('', 1200, 127, 15)">+ Novo Circuito</button>
-                  <button class="btn-header" onclick="prepararImpressaoDimens()" style="color: var(--text); border-color: var(--border-color);">🖨️ Imprimir Planilha</button>
+                  <button class="btn-header" onclick="prepararImpressaoDimens()" style="color: var(--text); border-color: var(--border-color);">🖨️ Imprimir Projeto</button>
                   <button class="btn-header print-hidden" onclick="alternarRecolhimento('conteudo-dimens', this)" style="padding: 4px 10px; font-size: 12px;">▼ Recolher</button>
                 </div>
               </div>
@@ -601,9 +640,15 @@
                 </div>
 
                 <div class="print-hidden" style="background: var(--bg-color); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 24px;">
-                  <div class="profile-grid" style="grid-template-columns: 2fr 1fr;">
-                    <div class="form-group" style="margin: 0;"><label>Identificação da Obra / Setor</label><input type="text" id="dimInputObra" placeholder="Ex: Residência Família Souza - Pavimento Superior" oninput="document.getElementById('dimPrintObra').textContent = this.value || 'Estudo de Instalação Elétrica'"></div>
-                    <div class="form-group" style="margin: 0;"><label>Data do Estudo</label><input type="date" id="dimInputData" oninput="formatarDataDim(this.value)"></div>
+                  <h4 style="color: var(--neon-green); margin-bottom: 12px; font-size: 14px;">Dados de Cabeçalho do Relatório Técnico</h4>
+                  <div class="profile-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div class="form-group" style="margin: 0;"><label>Nome do Cliente</label><input type="text" id="dimInputCliNome" placeholder="Ex: Sr. Alberto Santos" oninput="document.getElementById('dimPrintCliNome').textContent = this.value || 'Não informado'"></div>
+                    <div class="form-group" style="margin: 0;"><label>Endereço da Obra</label><input type="text" id="dimInputCliEnd" placeholder="Ex: Av. Brasil, 456 - Galpão 2" oninput="document.getElementById('dimPrintCliEnd').textContent = this.value || 'Não informado'"></div>
+                    <div class="form-group" style="margin: 0;"><label>Setor / Descrição do Projeto</label><input type="text" id="dimInputObra" placeholder="Ex: Instalação Elétrica Térreo" oninput="document.getElementById('dimPrintObra').textContent = this.value || 'Estudo de Instalação Elétrica'"></div>
+                  </div>
+                  <div class="profile-grid" style="grid-template-columns: 1fr 2fr; margin-top: 12px;">
+                    <div class="form-group" style="margin: 0;"><label>Data de Emissão</label><input type="date" id="dimInputData" oninput="formatarDataDim(this.value)"></div>
+                    <div></div>
                   </div>
                 </div>
 
@@ -611,16 +656,16 @@
                   <table class="dimens-table">
                     <thead>
                       <tr>
-                        <th style="min-width: 190px; text-align: left;">Circuito / Destino</th>
-                        <th style="width: 95px;">Carga (W)</th>
-                        <th style="width: 120px;">Tensão (V)</th>
-                        <th style="width: 100px;">F. Potência</th>
-                        <th style="width: 80px;">Dist. (m)</th>
-                        <th style="width: 95px; color: var(--secondary);">Corrente ($I_b$)</th>
-                        <th style="width: 100px; color: var(--neon-green);">Bitola Mín.</th>
-                        <th style="width: 95px; color: #818cf8;">Disjuntor</th>
-                        <th style="width: 80px;">Queda %</th>
-                        <th style="width: 115px;">Diagnóstico</th>
+                        <th style="width: 25%; text-align: left;">Circuito / Destino</th>
+                        <th style="width: 8%;">Carga (W)</th>
+                        <th style="width: 8%;">Tensão</th>
+                        <th style="width: 7%;">F.P.</th>
+                        <th style="width: 7%;">Dist (m)</th>
+                        <th style="width: 8%; color: var(--secondary);">Corrente ($I_b$)</th>
+                        <th style="width: 10%; color: var(--neon-green);">Bitola Mín.</th>
+                        <th style="width: 9%; color: #818cf8;">Disjuntor</th>
+                        <th style="width: 7%;">Queda %</th>
+                        <th style="width: 11%;">Diagnóstico</th>
                         <th class="print-hidden" style="width: 35px;"></th>
                       </tr>
                     </thead>
@@ -663,7 +708,7 @@
 
         <div class="tab-content" id="tab-perfil"></div>
 
-        </main>
+      </main>
     </div>
   </div>
 
@@ -866,7 +911,7 @@
               <span>Chamado: "${c.mensagem ? c.mensagem.substring(0, 35) + '...' : 'Sem Assunto'}"</span>
               <div style="display:flex; gap: 10px; align-items: center;">
                 <span style="color:${c.status === 'Resolvido' ? 'var(--neon-green)' : '#f59e0b'};">${c.status || 'Em Análise'}</span>
-                <button onclick="apagarChamadoSuporte('${cId}')" title="Apagar esta mensagem" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:14px;">🗑️</button>
+                <button onclick="apagarChamadoSuporte('${cId}')" title="Apagar" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:14px;">🗑️</button>
               </div>
             </div>`;
 
@@ -1147,7 +1192,6 @@
       };
     }
 
-    /* ── ALTERAÇÃO 3: CÁLCULOS NORMATIVOS REVISADOS (TABELAS 36 A 39) ── */
     function atualizarMetodoGlobal() {
       var mat = document.getElementById('cfgMaterial').value;
       var iso = document.getElementById('cfgIsolacao').value;
@@ -1202,7 +1246,6 @@
         var k_fases = v === 380 ? 1.732 : 1;
         var ib = w / (k_fases * v * fp);
 
-        // Matriz Normativa ABNT NBR 5410 de Capacidade de Condução Iz (A)
         var tabelaIz = [
           { s: 1.5, Cu_PVC_2: 17.5, Cu_PVC_3: 15.5, Cu_XLPE_2: 23, Cu_XLPE_3: 20, Al_PVC_2: 13.5 },
           { s: 2.5, Cu_PVC_2: 24, Cu_PVC_3: 21, Cu_XLPE_2: 31, Cu_XLPE_3: 28, Al_PVC_2: 18.5 },
@@ -1220,7 +1263,6 @@
 
         var chaveBusca = `${mat}_${iso}_${car===3?3:2}`;
         var fatorMetodo = met.includes('A') ? 0.85 : (met.includes('E') || met.includes('F') ? 1.15 : 1.0);
-
         var bitolaMinimaMecanica = mat === 'Al' ? 16.0 : (row.querySelector('.dim-nome').value.toLowerCase().includes('luz') ? 1.5 : 2.5);
 
         var escolhido = tabelaIz[tabelaIz.length - 1];
