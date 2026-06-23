@@ -5,64 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loja VoltCalc Pro | O Lugar da Promoção</title>
     <style>
-        :root { --bg: #020617; --card: #0f172a; --accent: #39FF14; --text: #f8fafc; --price: #f59e0b; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 50px; }
+        :root { 
+            --bg-body: #f4f4f4; 
+            --header-bg: #232f3e; 
+            --accent: #39FF14; 
+            --btn-buy: #ff9900; 
+            --text-dark: #333; 
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; }
         
-        /* Cabeçalho tipo MarketPlace */
-        .header-shop { background: var(--card); padding: 15px; border-bottom: 2px solid var(--accent); text-align: center; font-weight: 800; font-size: 1.2rem; color: var(--accent); }
+        /* Cabeçalho Profissional */
+        .header-shop { background: var(--header-bg); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .search-bar { width: 60%; padding: 10px; border-radius: 4px; border: none; }
         
-        /* Banner rotativo de ofertas */
-        .banner-container { width: 100%; height: 200px; background: #1e293b; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 1.5rem; font-weight: bold; border-bottom: 4px solid var(--accent); margin-bottom: 20px; }
+        /* Banner de Oferta */
+        .banner-destaque { width: 100%; height: 250px; background: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border-bottom: 4px solid var(--accent); font-size: 2rem; color: var(--header-bg); font-weight: 800; text-align: center; }
 
-        /* Vitrine de Conversão Rápida */
-        .vitrine { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
-        .produto-card { background: var(--card); border-radius: 10px; padding: 10px; border: 1px solid #1e293b; display: flex; flex-direction: column; }
-        .produto-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; }
-        .produto-card h3 { font-size: 0.9rem; margin: 5px 0; height: 35px; overflow: hidden; }
-        .preco { color: var(--price); font-weight: 800; font-size: 1.1rem; margin: 5px 0; }
-        .btn-compra { background: var(--accent); color: #020617; border: none; padding: 10px; border-radius: 6px; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 0.8rem; }
+        /* Vitrine em Grid */
+        .vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; padding: 15px; max-width: 1200px; margin: 0 auto; }
+        .produto-card { background: white; padding: 15px; border-radius: 4px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .produto-card img { width: 100%; height: 150px; object-fit: contain; }
+        .produto-card h3 { font-size: 0.9rem; height: 40px; overflow: hidden; margin: 10px 0; }
+        .preco-info { font-size: 1.2rem; font-weight: 700; color: #b12704; margin-bottom: 10px; }
+        .btn-compra { background: var(--btn-buy); color: black; border: none; width: 100%; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: 700; }
+        .btn-compra:hover { background: #e78e00; }
         
-        .destaque-label { background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; align-self: flex-start; }
+        .cat-bar { background: #37475a; color: white; padding: 10px; display: flex; gap: 20px; justify-content: center; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-    <header class="header-shop">LOJA VOLTCALC PRO | O LUGAR DA PROMOÇÃO</header>
+    <header class="header-shop">
+        <div><strong>VoltCalc</strong>PRO</div>
+        <input type="text" class="search-bar" placeholder="Buscar ferramentas e infoprodutos...">
+        <div>Login / Carrinho</div>
+    </header>
 
-    <div class="banner-container" id="bannerRotativo">
-        OFERTAS FLASH 24H
+    <nav class="cat-bar">
+        <span>Tabela de Preços</span> | <span>Ferramentas</span> | <span>Cursos</span> | <span>Ofertas</span>
+    </nav>
+
+    <div class="banner-destaque">
+        <div>OFERTAS EXCLUSIVAS<br><span style="font-size: 1rem; color: #666;">Para Eletricistas Profissionais</span></div>
     </div>
 
-    <main class="vitrine" id="vitrineProdutos">
-        <!-- JS injeta os produtos -->
-    </main>
+    <main class="vitrine" id="vitrineProdutos"></main>
 
     <script>
         const produtos = [
-            { nome: "Multímetro Profissional Digital", preco: "R$ 159,90", img: "22146.png", dest: "OFERTA" },
-            { nome: "Alicate Amperímetro Profissional", preco: "R$ 229,00", img: "22146.png", dest: "TOP VENDAS" },
-            { nome: "Kit de Chaves Isoladas 1000V", preco: "R$ 89,90", img: "22146.png", dest: "OFERTA" },
-            { nome: "Furadeira de Impacto Industrial", preco: "R$ 349,00", img: "22146.png", dest: "NOVO" }
+            { nome: "Multímetro Profissional Digital True RMS", preco: "R$ 159,90", img: "22146.png", desc: "Precisão absoluta para medições de alta tensão." },
+            { nome: "Alicate Amperímetro Digital 600A", preco: "R$ 229,00", img: "22146.png", desc: "Ideal para painéis e manutenção industrial." },
+            { nome: "Kit Chaves Isoladas 1000V - 7 Peças", preco: "R$ 89,90", img: "22146.png", desc: "Segurança total contra descargas elétricas." },
+            { nome: "Furadeira de Impacto Industrial 750W", preco: "R$ 349,00", img: "22146.png", desc: "Potência extrema para concreto e alvenaria." }
         ];
 
         function renderizar() {
             const container = document.getElementById('vitrineProdutos');
             container.innerHTML = produtos.map(p => `
                 <div class="produto-card">
-                    <span class="destaque-label">${p.dest}</span>
                     <img src="${p.img}" alt="${p.nome}">
                     <h3>${p.nome}</h3>
-                    <div class="preco">${p.preco}</div>
-                    <button class="btn-compra" onclick="window.location='#'">Comprar Agora</button>
+                    <p style="font-size: 0.75rem; color: #777;">${p.desc}</p>
+                    <div class="preco-info">${p.preco}</div>
+                    <button class="btn-compra">ADICIONAR AO CARRINHO</button>
                 </div>
             `).join('');
         }
-        
-        // Simula rotação de banner
-        setInterval(() => {
-            document.getElementById('bannerRotativo').textContent = Math.random() > 0.5 ? "FRETE GRÁTIS HOJE!" : "OFERTAS FLASH 24H";
-        }, 3000);
-
         renderizar();
     </script>
 </body>
