@@ -2,97 +2,632 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>VoltCalc Pro - AutoCAD Professional Engine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoCAD Electrical 2018 - [PD1997 Sheet 05.dwg]</title>
     <script src="https://unpkg.com/konva@9.3.1/konva.min.js"></script>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #0f172a; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        .cad-wrapper { display: flex; height: 100vh; }
+        :root {
+            --cad-bg: #1e2024;
+            --cad-panel: #2b2e33;
+            --cad-ribbon: #35383e;
+            --cad-btn: #42464d;
+            --cad-btn-hover: #545962;
+            --cad-accent: #005fb8;
+            --cad-accent-green: #39FF14;
+            --cad-viewport: #08090a;
+            --cad-border: #1a1b1e;
+            --cad-text: #f0f2f5;
+            --cad-text-muted: #94a3b8;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body, html {
+            width: 100vw; height: 100vh; overflow: hidden;
+            background: var(--cad-bg); color: var(--cad-text); font-family: var(--font-main);
+            display: flex; flex-direction: column;
+        }
+
+        /* ─── 1. TOP QUICK ACCESS & TITLE BAR ─── */
+        .top-titlebar {
+            height: 32px; background: #141518; border-bottom: 1px solid var(--cad-border);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 12px; user-select: none;
+        }
+        .quick-access-tools { display: flex; align-items: center; gap: 12px; }
+        .cad-app-icon { font-weight: 900; color: #e53e3e; letter-spacing: 1px; font-size: 14px; }
+        .quick-btn { background: transparent; border: none; color: var(--cad-text); cursor: pointer; font-size: 12px; padding: 2px 6px; border-radius: 2px; }
+        .quick-btn:hover { background: rgba(255,255,255,0.1); }
+        .window-title { color: var(--cad-text-muted); font-weight: 500; }
+        .window-controls { display: flex; gap: 12px; color: var(--cad-text-muted); cursor: pointer; }
+
+        /* ─── 2. MAIN RIBBON BAR ─── */
+        .ribbon-container {
+            background: var(--cad-ribbon); border-bottom: 1px solid #1f2125;
+            display: flex; flex-direction: column; user-select: none;
+        }
+        .ribbon-tabs {
+            display: flex; background: #282a2f; border-bottom: 1px solid #1f2125; padding-left: 10px;
+        }
+        .ribbon-tab {
+            padding: 6px 16px; font-size: 11px; font-weight: 600; color: var(--cad-text-muted); cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .ribbon-tab.active { background: var(--cad-ribbon); color: #fff; border-top: 2px solid var(--cad-accent); }
         
-        /* Barra de Ferramentas (Ribbon) */
-        .ribbon { width: 260px; background: #1e293b; border-right: 1px solid #334155; padding: 15px; overflow-y: auto; }
-        .ribbon h3 { color: #39FF14; font-size: 11px; margin: 15px 0 5px; text-transform: uppercase; }
-        .btn-cmd { width: 100%; padding: 8px; margin-bottom: 4px; background: #334155; border: none; color: #fff; cursor: pointer; border-radius: 3px; font-size: 12px; text-align: left; }
-        .btn-cmd:hover { background: #39FF14; color: #000; font-weight: bold; }
+        .ribbon-tools-row {
+            display: flex; padding: 8px 12px; gap: 20px; overflow-x: auto; height: 86px; align-items: center;
+        }
+        .tool-group { display: flex; flex-direction: column; align-items: center; border-right: 1px solid rgba(255,255,255,0.06); padding-right: 15px; height: 100%; justify-content: space-between; }
+        .tool-group-title { font-size: 10px; color: var(--cad-text-muted); font-weight: 600; text-transform: uppercase; margin-top: auto; }
+        .tool-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+        .tool-grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .tool-grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+        .btn-tool {
+            background: var(--cad-btn); border: 1px solid transparent; color: var(--cad-text); font-size: 11px; padding: 5px 10px; border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 500; transition: 0.15s;
+        }
+        .btn-tool:hover { background: var(--cad-btn-hover); border-color: #64748b; }
+        .btn-tool.active { background: var(--cad-accent); color: white; font-weight: 700; box-shadow: 0 0 10px rgba(0, 95, 184, 0.5); }
         
-        /* Área de Desenho */
-        #viewport { flex: 1; background-color: #020617; position: relative; }
+        .layer-select { background: #141518; border: 1px solid #475569; color: #fff; padding: 4px 8px; font-size: 11px; border-radius: 3px; outline: none; }
+
+        /* ─── 3. WORKSPACE BODY (SIDEBARS & VIEWPORT) ─── */
+        .workspace-body { display: flex; flex: 1; min-height: 0; position: relative; }
+
+        /* Lateral Esquerda: Project Manager & References */
+        .left-sidebar {
+            width: 260px; background: var(--cad-panel); border-right: 1px solid #1b1d20; display: flex; flex-direction: column; font-size: 12px;
+        }
+        .panel-header { background: #202226; padding: 6px 12px; font-weight: 700; font-size: 11px; color: #cbd5e1; border-bottom: 1px solid #1b1d20; display: flex; justify-content: space-between; }
+        .panel-section { flex: 1; overflow-y: auto; padding: 8px; border-bottom: 2px solid #18191c; }
+        .tree-item { padding: 4px 6px; cursor: pointer; border-radius: 3px; display: flex; align-items: center; gap: 8px; color: var(--cad-text-muted); }
+        .tree-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .tree-item.active { background: rgba(0, 95, 184, 0.3); color: #fff; border-left: 3px solid var(--cad-accent); font-weight: 600; }
+
+        /* Viewport Central */
+        .viewport-container { flex: 1; background: var(--cad-viewport); display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        .sheet-tabs { display: flex; background: #181a1f; border-bottom: 1px solid #222; }
+        .sheet-tab { padding: 6px 14px; font-size: 11px; color: #888; border-right: 1px solid #222; cursor: pointer; background: #141518; }
+        .sheet-tab.active { background: var(--cad-viewport); color: #fff; font-weight: bold; border-top: 2px solid #e53e3e; }
         
-        /* Painel de Propriedades */
-        .inspector { width: 260px; background: #1e293b; border-left: 1px solid #334155; padding: 15px; }
-        .prop-item { margin-bottom: 15px; }
-        .prop-item label { font-size: 11px; color: #94a3b8; display: block; }
-        .prop-item input { width: 100%; background: #0f172a; border: 1px solid #475569; color: white; padding: 5px; border-radius: 3px; }
+        /* Grid de Coordenadas da Moldura (Estilo AutoCAD Elétrico) */
+        .frame-header-x { position: absolute; top: 0; left: 24px; right: 0; height: 24px; border-bottom: 1px solid #222; display: flex; font-size: 10px; color: #666; align-items: center; user-select: none; pointer-events: none; z-index: 5; }
+        .frame-header-x span { flex: 1; text-align: center; border-right: 1px solid #1a1a1a; }
+        .frame-header-y { position: absolute; top: 24px; left: 0; bottom: 0; width: 24px; border-right: 1px solid #222; display: flex; flex-direction: column; font-size: 10px; color: #666; justify-content: space-between; padding: 20px 0; align-items: center; user-select: none; pointer-events: none; z-index: 5; }
+        
+        #canvas-area { flex: 1; width: 100%; height: 100%; cursor: crosshair; position: relative; }
+        
+        .view-cube { position: absolute; top: 35px; right: 20px; width: 60px; height: 60px; border: 1px solid #333; background: rgba(255,255,255,0.05); color: #666; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; border-radius: 4px; pointer-events: none; z-select: none; }
+
+        /* Lateral Direita: Properties & Layers */
+        .right-sidebar { width: 280px; background: var(--cad-panel); border-left: 1px solid #1b1d20; display: flex; flex-direction: column; font-size: 12px; }
+        .prop-grid { display: grid; grid-template-columns: 100px 1fr; border-bottom: 1px solid #1f2125; align-items: center; }
+        .prop-label { padding: 6px 10px; color: var(--cad-text-muted); font-size: 11px; background: #22252a; border-right: 1px solid #1f2125; height: 100%; }
+        .prop-val { padding: 4px 8px; }
+        .prop-input { width: 100%; background: #141518; border: 1px solid #333; color: #39FF14; font-weight: 600; padding: 3px 6px; font-size: 11px; border-radius: 2px; outline: none; font-family: monospace; }
+        .prop-input:focus { border-color: var(--cad-accent); background: #000; }
+
+        /* ─── 4. BOTTOM COMMAND LINE & STATUS BAR ─── */
+        .bottom-console { background: #141518; border-top: 1px solid #222; display: flex; flex-direction: column; }
+        .command-log { height: 42px; overflow-y: auto; padding: 4px 12px; font-family: monospace; font-size: 12px; color: #cbd5e1; line-height: 1.4; }
+        .command-input-row { display: flex; align-items: center; background: #0c0d0e; border-top: 1px solid #1f2125; padding: 4px 12px; }
+        .cmd-prompt { color: var(--cad-accent-green); font-family: monospace; font-weight: 800; font-size: 13px; margin-right: 8px; }
+        #cmdInput { flex: 1; background: transparent; border: none; color: #fff; font-family: monospace; font-size: 13px; outline: none; font-weight: 600; }
+        
+        .status-bar { background: #1e2024; height: 26px; border-top: 1px solid #18191c; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 11px; color: var(--cad-text-muted); }
+        .status-coords { font-family: monospace; font-weight: bold; color: var(--cad-accent-green); letter-spacing: 0.5px; }
+        .status-toggles { display: flex; gap: 4px; }
+        .status-toggle { padding: 2px 8px; background: #282b30; border-radius: 2px; cursor: pointer; font-weight: 600; }
+        .status-toggle.on { background: var(--cad-accent); color: white; }
+
+        /* Modal Manual AutoCAD */
+        .modal-doc { display: none; position: absolute; inset: 30px 280px 50px 280px; background: var(--cad-panel); border: 2px solid var(--cad-accent); box-shadow: 0 0 30px rgba(0,0,0,0.8); z-index: 2000; border-radius: 6px; flex-direction: column; overflow: hidden; }
+        .modal-doc-header { background: var(--cad-ribbon); padding: 12px 20px; font-weight: bold; color: var(--cad-accent-green); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; }
+        .modal-doc-body { padding: 24px; overflow-y: auto; flex: 1; line-height: 1.6; color: #e2e8f0; font-size: 13px; }
+        .modal-doc-body h3 { color: #39FF14; margin-top: 20px; border-bottom: 1px solid #333; padding-bottom: 4px; margin-bottom: 8px; }
     </style>
 </head>
 <body>
 
-<div class="cad-wrapper">
-    <div class="ribbon">
-        <h3>Desenho 2D</h3>
-        <button class="btn-cmd" onclick="draw('line')">LINE - Linha</button>
-        <button class="btn-cmd" onclick="draw('rect')">RECTANGLE - Retângulo</button>
-        <button class="btn-cmd" onclick="draw('circle')">CIRCLE - Círculo</button>
-        <button class="btn-cmd" onclick="draw('poly')">PLINE - Polilinha</button>
+    <div class="top-titlebar">
+        <div class="quick-access-tools">
+            <span class="cad-app-icon">A</span>
+            <button class="quick-btn" onclick="execCmd('NEW')" title="Novo Projeto">📄</button>
+            <button class="quick-btn" onclick="execCmd('OPEN')" title="Abrir Arquivo DWG">📂</button>
+            <button class="quick-btn" onclick="execCmd('SAVE')" title="Salvar Projeto">💾</button>
+            <button class="quick-btn" onclick="execCmd('PLOT')" title="Plotar / Imprimir PDF">🖨️</button>
+            <div style="width:1px; height:14px; background:#333; margin:0 4px;"></div>
+            <button class="quick-btn" onclick="execCmd('UNDO')" title="Desfazer">↶</button>
+            <button class="quick-btn" onclick="execCmd('REDO')" title="Refazer">↷</button>
+        </div>
+        <div class="window-title">AutoCAD Electrical 2018 - [PD1997 Sheet 05.dwg]</div>
+        <div class="window-controls">
+            <span>—</span><span>□</span><span>✕</span>
+        </div>
+    </div>
+
+    <div class="ribbon-container">
+        <div class="ribbon-tabs">
+            <span class="ribbon-tab">Project</span>
+            <span class="ribbon-tab active">Schematic</span>
+            <span class="ribbon-tab">Panel</span>
+            <span class="ribbon-tab">Reports</span>
+            <span class="ribbon-tab">Import/Export Data</span>
+            <span class="ribbon-tab">Electromechanical</span>
+        </div>
+        <div class="ribbon-tools-row">
+            <div class="tool-group">
+                <div class="tool-grid tool-grid-4">
+                    <button class="btn-tool" onclick="setTool('LINE')">Line</button>
+                    <button class="btn-tool" onclick="setTool('PLINE')">Pline</button>
+                    <button class="btn-tool" onclick="setTool('CIRCLE')">Circle</button>
+                    <button class="btn-tool" onclick="setTool('ARC')">Arc</button>
+                    <button class="btn-tool" onclick="setTool('RECT')">Rectangle</button>
+                    <button class="btn-tool" onclick="setTool('POLYGON')">Polygon</button>
+                    <button class="btn-tool" onclick="setTool('ELLIPSE')">Ellipse</button>
+                    <button class="btn-tool" onclick="setTool('TEXT')">Text</button>
+                </div>
+                <span class="tool-group-title">Draw 2D</span>
+            </div>
+
+            <div class="tool-group">
+                <div class="tool-grid tool-grid-4">
+                    <button class="btn-tool" onclick="applyModify('MOVE')">Move</button>
+                    <button class="btn-tool" onclick="applyModify('COPY')">Copy</button>
+                    <button class="btn-tool" onclick="applyModify('ROTATE')">Rotate</button>
+                    <button class="btn-tool" onclick="applyModify('SCALE')">Scale</button>
+                    <button class="btn-tool" onclick="applyModify('MIRROR')">Mirror</button>
+                    <button class="btn-tool" onclick="applyModify('OFFSET')">Offset</button>
+                    <button class="btn-tool" onclick="applyModify('TRIM')">Trim</button>
+                    <button class="btn-tool" onclick="applyModify('DELETE')" style="color:#ef4444;">Erase</button>
+                </div>
+                <span class="tool-group-title">Modify</span>
+            </div>
+
+            <div class="tool-group">
+                <div style="display:flex; flex-direction:column; gap:6px; width:170px;">
+                    <select class="layer-select" id="layerSelect" onchange="changeActiveLayer()">
+                        <option value="0_WHITE">0_WHITE (Default)</option>
+                        <option value="1_POWER_BUS" selected>1_POWER_BUS (Yellow)</option>
+                        <option value="2_CONTROL">2_CONTROL (Red)</option>
+                        <option value="3_DIMENS">3_DIMENSIONS (Blue)</option>
+                    </select>
+                    <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa;">
+                        <span>Color: <strong id="layerColorIndicator" style="color:yellow;">BYLAYER</strong></span>
+                        <span>LineWeight: <strong>0.25mm</strong></span>
+                    </div>
+                </div>
+                <span class="tool-group-title">Layers</span>
+            </div>
+
+            <div class="tool-group">
+                <div class="tool-grid tool-grid-2">
+                    <button class="btn-tool active" onclick="insertSymbol('MCB')">Insert MCB</button>
+                    <button class="btn-tool" onclick="insertSymbol('RELAY')">Relay / Fuse</button>
+                </div>
+                <span class="tool-group-title">Insert Component</span>
+            </div>
+
+            <div class="tool-group" style="border-right:none;">
+                <button class="btn-tool" onclick="toggleCadManual()" style="background:#16a34a; color:#fff; height:100%; font-weight:bold;">📖 Manual AutoCAD</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="workspace-body">
         
-        <h3>Modificação (Relatório)</h3>
-        <button class="btn-cmd" onclick="apply('MOVE')">MOVE - Mover</button>
-        <button class="btn-cmd" onclick="apply('COPY')">COPY - Copiar</button>
-        <button class="btn-cmd" onclick="apply('ROTATE')">ROTATE - Rotacionar</button>
-        <button class="btn-cmd" onclick="apply('SCALE')">SCALE - Escalonar</button>
-        <button class="btn-cmd" onclick="apply('MIRROR')">MIRROR - Espelhar</button>
-        <button class="btn-cmd" onclick="apply('OFFSET')">OFFSET - Deslocar</button>
-        <button class="btn-cmd" onclick="apply('TRIM')">TRIM - Cortar</button>
-        <button class="btn-cmd" onclick="apply('DELETE')" style="color: #ef4444;">ERASE - Apagar</button>
+        <div class="left-sidebar">
+            <div class="panel-header"><span>PROJECT MANAGER</span><span>⚙️</span></div>
+            <div class="panel-section">
+                <div style="color:#fff; font-weight:bold; margin-bottom:6px;">🗂️ PD1997_Substation_Project</div>
+                <div class="tree-item">📄 PD1997 Sheet 20.dwg</div>
+                <div class="tree-item">📄 PD1997 Sheet 18.dwg</div>
+                <div class="tree-item">📄 PD1997 Sheet 11.dwg</div>
+                <div class="tree-item active">📄 PD1997 Sheet 05.dwg</div>
+                <div class="tree-item">📄 PD1997 Sheet 10.dwg</div>
+            </div>
+            <div class="panel-header"><span>REFERENCES (XREF)</span><span>🔗</span></div>
+            <div class="panel-section" style="border-bottom:none;">
+                <div class="tree-item" style="color:#39FF14;">🔗 Sheet_04_interconnect (Opened)</div>
+                <div class="tree-item">🔗 Substation_Grounding_grid (Loaded)</div>
+                <div style="font-size:10px; color:#666; margin-top:12px;">*XREF status: Validated (192 KB)</div>
+            </div>
+        </div>
+
+        <div class="viewport-container">
+            <div class="sheet-tabs">
+                <span class="sheet-tab">PD1997 Sheet 11*</span>
+                <span class="sheet-tab active">PD1997 Sheet 05*</span>
+                <span class="sheet-tab">PD1997 Sheet 10*</span>
+                <span class="sheet-tab">PD1997 Sheet 20*</span>
+            </div>
+
+            <div class="frame-header-x">
+                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+            </div>
+            <div class="frame-header-y">
+                <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span>
+            </div>
+
+            <div id="canvas-area"></div>
+
+            <div class="view-cube">[TOP]<br>2D Wireframe</div>
+        </div>
+
+        <div class="right-sidebar">
+            <div class="panel-header"><span>PROPERTIES INSPECTOR</span><span>📋</span></div>
+            <div class="panel-section" style="padding:0; overflow-y:auto; flex:1;">
+                <div class="prop-grid"><div class="prop-label">Entity</div><div class="prop-val"><strong id="pType" style="color:#fff;">No Selection</strong></div></div>
+                <div class="prop-grid"><div class="prop-label">Layer</div><div class="prop-val"><span id="pLayer">--</span></div></div>
+                <div class="prop-grid"><div class="prop-label">Color</div><div class="prop-val"><span id="pColor">--</span></div></div>
+                <div class="prop-grid"><div class="prop-label">Pos X (mm)</div><div class="prop-val"><input type="number" class="prop-input" id="pX" onchange="updateSelectedProp('x', this.value)" disabled></div></div>
+                <div class="prop-grid"><div class="prop-label">Pos Y (mm)</div><div class="prop-val"><input type="number" class="prop-input" id="pY" onchange="updateSelectedProp('y', this.value)" disabled></div></div>
+                <div class="prop-grid"><div class="prop-label">Rotation (°)</div><div class="prop-val"><input type="number" class="prop-input" id="pRot" value="0" onchange="updateSelectedProp('rotation', this.value)" disabled></div></div>
+                <div class="prop-grid"><div class="prop-label">Scale Factor</div><div class="prop-val"><input type="number" class="prop-input" id="pScale" value="1" step="0.1" onchange="updateSelectedProp('scale', this.value)" disabled></div></div>
+            </div>
+
+            <div class="panel-header"><span>LAYER DISCIPLINE CONTROL</span><span>📁</span></div>
+            <div class="panel-section" style="height:140px; flex:none; padding:4px;">
+                <div style="display:flex; justify-content:space-between; font-size:11px; padding:4px; border-bottom:1px solid #333; color:#aaa;"><span>Layer Name</span><span>State / Color</span></div>
+                <div class="tree-item" style="justify-content:space-between;"><span>0_WHITE</span><span style="color:white;">👁️ ⚪</span></div>
+                <div class="tree-item active" style="justify-content:space-between;"><span>1_POWER_BUS</span><span style="color:yellow;">👁️ 🟡</span></div>
+                <div class="tree-item" style="justify-content:space-between;"><span>2_CONTROL</span><span style="color:#ef4444;">👁️ 🔴</span></div>
+                <div class="tree-item" style="justify-content:space-between;"><span>3_DIMENSIONS</span><span style="color:#3b82f6;">👁️ 🔵</span></div>
+            </div>
+        </div>
+
+        <div class="modal-doc" id="modalCadManual">
+            <div class="modal-doc-header">
+                <span>📐 MANUAL TÉCNICO E RELATÓRIO DE ESPECIFICAÇÕES - AUTOCAD</span>
+                <button onclick="toggleCadManual()" style="background:transparent; border:none; color:#fff; cursor:pointer; font-size:16px;">✕</button>
+            </div>
+            <div class="modal-doc-body">
+                <h3>1. Introdução e Arquitetura do AutoCAD</h3>
+                <p>O AutoCAD é a plataforma de software CAD desenvolvida pela Autodesk, mundialmente consolidada para elaboração de desenhos técnicos 2D e modelagem geométrica 3D. O motor opera através de coordenadas cartesianas exatas (X, Y, Z), mantendo um banco de dados estruturado de entidades geométricas, atributos de texto e blocos parametrizados.</p>
+                
+                <h3>2. Lógica de Camadas (Layers) e Conformidade</h3>
+                <p>O controle por Layers permite que o engenheiro gerencie espessuras de pena, tipos de linha e visibilidade por disciplina. No ecossistema elétrico, padronizamos as fiações de potência (Barramentos) em amarelo, comandos em vermelho e documentação dimensional em azul.</p>
+                
+                <h3>3. Referências Externas (XREF) e Produtividade</h3>
+                <p>A tecnologia XREF permite acoplar bases arquitetônicas ou diagramas de interligação sem incorporar o peso de arquivo binário ao arquivo de trabalho, promovendo atualização dinâmica em tempo real.</p>
+                
+                <h3>4. Relação de Comandos Operacionais (Anexo do Relatório)</h3>
+                <p><strong>Desenho:</strong> LINE, PLINE, CIRCLE, ARC, RECTANGLE, POLYGON, ELLIPSE, SPLINE, HATCH, TEXT, MLEADER, DIM.</p>
+                <p><strong>Modificação:</strong> MOVE, COPY, ROTATE, MIRROR, SCALE, OFFSET, FILLET, CHAMFER, TRIM, EXTEND, ARRAY, ERASE.</p>
+            </div>
+        </div>
+
     </div>
 
-    <div id="viewport"></div>
-
-    <div class="inspector">
-        <h3>Properties</h3>
-        <div id="prop-content">Selecione um objeto.</div>
+    <div class="bottom-console">
+        <div class="command-log" id="cmdLog">
+            Autodesk AutoCAD Electrical 2018. Engine initialized successfully.<br>
+            Type a command or select a tool from the Ribbon to begin editing.
+        </div>
+        <div class="command-input-row">
+            <span class="cmd-prompt">Command:</span>
+            <input type="text" id="cmdInput" placeholder="Type a command (e.g. LINE, CIRCLE, MOVE, ERASE)..." onkeydown="handleCommandInput(event)">
+        </div>
+        <div class="status-bar">
+            <span class="status-coords" id="liveCoords">X: 250.00, Y: 140.00, Z: 0.00</span>
+            <div class="status-toggles">
+                <span class="status-toggle on">MODEL</span>
+                <span class="status-toggle on">GRID</span>
+                <span class="status-toggle on">SNAP</span>
+                <span class="status-toggle">ORTHO</span>
+                <span class="status-toggle on">OSNAP</span>
+                <span class="status-toggle">LWT</span>
+                <span style="border-left:1px solid #333; margin-left:8px; padding-left:8px; color:#fff;">Scale: 1:1</span>
+            </div>
+        </div>
     </div>
-</div>
 
 <script>
-    const stage = new Konva.Stage({ container: 'viewport', width: window.innerWidth - 520, height: window.innerHeight });
-    const layer = new Konva.Layer();
-    stage.add(layer);
+    // ─── KONVA CAD ENGINE IMPLEMENTATION ───
+    const containerEl = document.getElementById('canvas-area');
+    const stage = new Konva.Stage({
+        container: 'canvas-area',
+        width: containerEl.clientWidth,
+        height: containerEl.clientHeight,
+        draggable: false
+    });
 
-    let selected = null;
+    const bgLayer = new Konva.Layer();
+    const cadLayer = new Konva.Layer();
+    stage.add(bgLayer);
+    stage.add(cadLayer);
 
-    function draw(type) {
-        let el;
-        if (type === 'line') el = new Konva.Line({ points: [0, 0, 100, 0], stroke: '#fff', strokeWidth: 2, draggable: true });
-        if (type === 'rect') el = new Konva.Rect({ x: 50, y: 50, width: 100, height: 100, stroke: '#fff', strokeWidth: 2, draggable: true });
-        if (type === 'circle') el = new Konva.Circle({ x: 100, y: 100, radius: 50, stroke: '#fff', strokeWidth: 2, draggable: true });
-        
-        el.on('click', function() { selected = this; updateInspector(); });
-        layer.add(el);
-        layer.draw();
-    }
+    let currentTool = 'SELECT';
+    let activeLayerColor = '#ffff00'; // Default Power bus yellow
+    let activeLayerName = '1_POWER_BUS';
 
-    function apply(cmd) {
-        if (!selected) return;
-        if (cmd === 'MOVE') selected.draggable(true);
-        if (cmd === 'COPY') selected.clone().moveTo(layer);
-        if (cmd === 'ROTATE') selected.rotate(45);
-        if (cmd === 'SCALE') selected.scale({ x: selected.scaleX() * 1.2, y: selected.scaleY() * 1.2 });
-        if (cmd === 'MIRROR') selected.scaleX(-selected.scaleX());
-        if (cmd === 'DELETE') selected.destroy();
-        if (cmd === 'OFFSET') {
-            let clone = selected.clone({ x: selected.x() + 10, y: selected.y() + 10 });
-            layer.add(clone);
+    // Draw Coordinate Grid Background
+    function drawGridBackground() {
+        bgLayer.destroyChildren();
+        const step = 40;
+        const w = stage.width();
+        const h = stage.height();
+
+        for (let x = 0; x < w; x += step) {
+            bgLayer.add(new Konva.Line({ points: [x, 0, x, h], stroke: '#14161a', strokeWidth: 1 }));
         }
-        layer.draw();
+        for (let y = 0; y < h; y += step) {
+            bgLayer.add(new Konva.Line({ points: [0, y, w, y], stroke: '#14161a', strokeWidth: 1 }));
+        }
+        bgLayer.draw();
+    }
+    drawGridBackground();
+    window.addEventListener('resize', () => {
+        stage.width(containerEl.clientWidth);
+        stage.height(containerEl.clientHeight);
+        drawGridBackground();
+    });
+
+    // Rastreio Live de Coordenadas
+    stage.on('mousemove', (e) => {
+        const pos = stage.getPointerPosition();
+        if(pos) {
+            document.getElementById('liveCoords').textContent = `X: ${pos.x.toFixed(2)}, Y: ${pos.y.toFixed(2)}, Z: 0.00`;
+        }
+    });
+
+    // ─── CARREGAMENTO DO ESQUEMÁTICO PADRÃO (REFERÊNCIA 22248.png) ───
+    function loadDefaultSchematic() {
+        // Barramento Superior (Yellow Busbar)
+        const busbar = new Konva.Line({
+            points: [80, 60, 680, 60], stroke: '#ffff00', strokeWidth: 3, draggable: true, name: 'POWER_BUSBAR'
+        });
+        busbar.cadLayer = '1_POWER_BUS';
+        cadLayer.add(busbar);
+
+        // Linhas de Derivação e Disjuntores (Feeders)
+        const xPositions = [200, 350, 500, 650];
+        xPositions.forEach((x, idx) => {
+            const feeder = new Konva.Line({
+                points: [x, 60, x, 380], stroke: '#ffff00', strokeWidth: 1.5, draggable: true, name: `FEEDER_LINE_0${idx+1}`
+            });
+            feeder.cadLayer = '1_POWER_BUS';
+            cadLayer.add(feeder);
+
+            // Símbolo de Disjuntor (MCB)
+            const mcbGroup = new Konva.Group({ x: x - 15, y: 120, draggable: true, name: `MCB_82${idx+1}` });
+            mcbGroup.cadLayer = '2_CONTROL';
+            mcbGroup.add(new Konva.Rect({ width: 30, height: 40, stroke: '#ffffff', strokeWidth: 1.5, fill: '#08090a' }));
+            mcbGroup.add(new Konva.Circle({ x: 15, y: 10, radius: 4, stroke: '#ffffff', strokeWidth: 1.5 }));
+            mcbGroup.add(new Konva.Line({ points: [15, 14, 15, 26], stroke: '#ef4444', strokeWidth: 2 }));
+            mcbGroup.add(new Konva.Text({ text: `MCB${idx+1}`, x: 35, y: 12, fill: '#94a3b8', fontSize: 10, fontFamily: 'monospace' }));
+            cadLayer.add(mcbGroup);
+        });
+
+        cadLayer.draw();
+        logConsole('Reference DWG PD1997_Sheet_05 loaded successfully.');
+    }
+    loadDefaultSchematic();
+
+    // ─── SELEÇÃO E INSPEÇÃO DE ENTIDADES ───
+    let selectedEntity = null;
+
+    stage.on('click', (e) => {
+        if (e.target === stage || e.target === bgLayer) {
+            clearSelection();
+            return;
+        }
+
+        let node = e.target;
+        if (node.getParent() && node.getParent().className === 'Group') {
+            node = node.getParent();
+        }
+
+        selectEntity(node);
+    });
+
+    function selectEntity(node) {
+        clearSelection();
+        selectedEntity = node;
+
+        // Apply visual glow
+        selectedEntity.setAttrs({
+            shadowColor: '#005fb8',
+            shadowBlur: 15,
+            shadowOffset: { x: 0, y: 0 },
+            shadowOpacity: 0.9
+        });
+        cadLayer.draw();
+
+        // Update Inspector
+        document.getElementById('pType').textContent = node.name() || node.className;
+        document.getElementById('pLayer').textContent = node.cadLayer || activeLayerName;
+        document.getElementById('pColor').textContent = node.stroke() || 'BYLAYER';
+        
+        document.getElementById('pX').value = node.x().toFixed(1);
+        document.getElementById('pY').value = node.y().toFixed(1);
+        document.getElementById('pRot').value = node.rotation().toFixed(1);
+        document.getElementById('pScale').value = node.scaleX().toFixed(2);
+
+        document.querySelectorAll('.prop-input').forEach(inp => inp.disabled = false);
+        logConsole(`Selected entity: ${node.name() || node.className}. Coordinates: (${node.x().toFixed(1)}, ${node.y().toFixed(1)})`);
     }
 
-    function updateInspector() {
-        if (!selected) return;
-        document.getElementById('prop-content').innerHTML = `
-            <div class="prop-item"><label>X</label><input type="number" value="${selected.x()}" onchange="selected.x(this.value); layer.draw()"></div>
-            <div class="prop-item"><label>Y</label><input type="number" value="${selected.y()}" onchange="selected.y(this.value); layer.draw()"></div>
-            <div class="prop-item"><label>Rotation</label><input type="number" value="${selected.rotation()}" onchange="selected.rotation(this.value); layer.draw()"></div>
-        `;
+    function clearSelection() {
+        if (selectedEntity) {
+            selectedEntity.setAttrs({ shadowBlur: 0 });
+            selectedEntity = null;
+            cadLayer.draw();
+        }
+        document.getElementById('pType').textContent = 'No Selection';
+        document.getElementById('pLayer').textContent = '--';
+        document.getElementById('pColor').textContent = '--';
+        document.querySelectorAll('.prop-input').forEach(inp => { inp.value = ''; inp.disabled = true; });
+    }
+
+    function updateSelectedProp(prop, value) {
+        if (!selectedEntity) return;
+        const val = parseFloat(value) || 0;
+        if (prop === 'x') selectedEntity.x(val);
+        if (prop === 'y') selectedEntity.y(val);
+        if (prop === 'rotation') selectedEntity.rotation(val);
+        if (prop === 'scale') selectedEntity.scale({ x: val, y: val });
+        cadLayer.draw();
+        logConsole(`Updated entity ${prop} to ${val}`);
+    }
+
+    // ─── FERRAMENTAS DE DESENHO (DRAW 2D) ───
+    function setTool(tool) {
+        currentTool = tool;
+        logConsole(`Command active: _${tool}. Click on canvas to place entity.`);
+        
+        // Simulação instantânea de inserção ao clicar na ferramenta para fluidez
+        const pos = { x: stage.width() / 2 + (Math.random()*60 - 30), y: stage.height() / 2 + (Math.random()*60 - 30) };
+        
+        let newEl = null;
+        if (tool === 'LINE') {
+            newEl = new Konva.Line({ points: [pos.x, pos.y, pos.x + 100, pos.y + 50], stroke: activeLayerColor, strokeWidth: 2, draggable: true, name: 'LINE_2D' });
+        } else if (tool === 'RECT') {
+            newEl = new Konva.Rect({ x: pos.x, y: pos.y, width: 90, height: 60, stroke: activeLayerColor, strokeWidth: 2, draggable: true, name: 'RECTANGLE' });
+        } else if (tool === 'CIRCLE') {
+            newEl = new Konva.Circle({ x: pos.x, y: pos.y, radius: 35, stroke: activeLayerColor, strokeWidth: 2, draggable: true, name: 'CIRCLE' });
+        } else if (tool === 'ARC') {
+            newEl = new Konva.Arc({ x: pos.x, y: pos.y, innerRadius: 30, outerRadius: 32, angle: 120, rotation: -60, fill: activeLayerColor, draggable: true, name: 'ARC' });
+        } else if (tool === 'POLYGON') {
+            newEl = new Konva.RegularPolygon({ x: pos.x, y: pos.y, sides: 6, radius: 40, stroke: activeLayerColor, strokeWidth: 2, draggable: true, name: 'POLYGON_HEX' });
+        } else if (tool === 'ELLIPSE') {
+            newEl = new Konva.Ellipse({ x: pos.x, y: pos.y, radiusX: 50, radiusY: 25, stroke: activeLayerColor, strokeWidth: 2, draggable: true, name: 'ELLIPSE' });
+        } else if (tool === 'PLINE') {
+            newEl = new Konva.Line({ points: [pos.x, pos.y, pos.x+40, pos.y+40, pos.x+90, pos.y+20], stroke: activeLayerColor, strokeWidth: 2.5, draggable: true, name: 'POLYLINE' });
+        } else if (tool === 'TEXT') {
+            newEl = new Konva.Text({ x: pos.x, y: pos.y, text: 'SPECIFICATION_TEXT', fontSize: 14, fontFamily: 'monospace', fill: '#ffffff', draggable: true, name: 'TEXT_LABEL' });
+        }
+
+        if (newEl) {
+            newEl.cadLayer = activeLayerName;
+            cadLayer.add(newEl);
+            cadLayer.draw();
+            selectEntity(newEl);
+        }
+    }
+
+    // ─── FERRAMENTAS DE MODIFICAÇÃO (MODIFY) ───
+    function applyModify(cmd) {
+        if (!selectedEntity) {
+            alert('Por favor, selecione uma entidade geométrica no canvas primeiro!');
+            return;
+        }
+
+        logConsole(`Applying modification command: _${cmd} on ${selectedEntity.name()}`);
+
+        if (cmd === 'DELETE') {
+            selectedEntity.destroy();
+            clearSelection();
+        } else if (cmd === 'MOVE') {
+            selectedEntity.draggable(true);
+            logConsole('Entity unlocked for live dragging.');
+        } else if (cmd === 'COPY') {
+            const clone = selectedEntity.clone({
+                x: selectedEntity.x() + 30,
+                y: selectedEntity.y() + 30
+            });
+            cadLayer.add(clone);
+            cadLayer.draw();
+            selectEntity(clone);
+            logConsole('Entity duplicated successfully.');
+        } else if (cmd === 'ROTATE') {
+            selectedEntity.rotate(45);
+            cadLayer.draw();
+            updateSelectedProp('rotation', selectedEntity.rotation());
+        } else if (cmd === 'SCALE') {
+            const currScale = selectedEntity.scaleX();
+            selectedEntity.scale({ x: currScale * 1.25, y: currScale * 1.25 });
+            cadLayer.draw();
+            updateSelectedProp('scale', selectedEntity.scaleX());
+        } else if (cmd === 'MIRROR') {
+            selectedEntity.scaleX(-selectedEntity.scaleX());
+            cadLayer.draw();
+        } else if (cmd === 'OFFSET') {
+            const offsetEl = selectedEntity.clone({
+                x: selectedEntity.x() + 15,
+                y: selectedEntity.y() + 15,
+                stroke: '#3b82f6'
+            });
+            cadLayer.add(offsetEl);
+            cadLayer.draw();
+        } else if (cmd === 'TRIM') {
+            // Efeito visual de Trim (redução de dimensão)
+            selectedEntity.scale({ x: selectedEntity.scaleX() * 0.7, y: selectedEntity.scaleY() * 0.7 });
+            cadLayer.draw();
+        }
+    }
+
+    // ─── INSERÇÃO DE COMPONENTES ELÉTRICOS ───
+    function insertSymbol(sym) {
+        const cx = stage.width() / 2;
+        const cy = stage.height() / 2;
+        
+        let grp = new Konva.Group({ x: cx, y: cy, draggable: true, name: `SYM_${sym}` });
+        grp.cadLayer = activeLayerName;
+
+        if (sym === 'MCB') {
+            grp.add(new Konva.Rect({ width: 35, height: 50, stroke: '#39FF14', strokeWidth: 2, fill: '#141518' }));
+            grp.add(new Konva.Line({ points: [17, 10, 17, 40], stroke: '#ffffff', strokeWidth: 2 }));
+            grp.add(new Konva.Circle({ x: 17, y: 25, radius: 6, stroke: '#ef4444', strokeWidth: 2 }));
+        } else if (sym === 'RELAY') {
+            grp.add(new Konva.Circle({ radius: 22, stroke: '#e53e3e', strokeWidth: 2, fill: '#141518' }));
+            grp.add(new Konva.Line({ points: [-12, -12, 12, 12], stroke: '#e53e3e', strokeWidth: 2 }));
+        }
+        
+        cadLayer.add(grp);
+        cadLayer.draw();
+        selectEntity(grp);
+        logConsole(`Component inserted: ${sym}`);
+    }
+
+    // ─── GERENCIAMENTO DE CAMADAS (LAYERS) ───
+    function changeActiveLayer() {
+        const sel = document.getElementById('layerSelect').value;
+        activeLayerName = sel;
+        const ind = document.getElementById('layerColorIndicator');
+        
+        if (sel.includes('WHITE')) { activeLayerColor = '#ffffff'; ind.style.color = 'white'; }
+        else if (sel.includes('POWER')) { activeLayerColor = '#ffff00'; ind.style.color = 'yellow'; }
+        else if (sel.includes('CONTROL')) { activeLayerColor = '#ef4444'; ind.style.color = '#ef4444'; }
+        else if (sel.includes('DIMENS')) { activeLayerColor = '#3b82f6'; ind.style.color = '#3b82f6'; }
+        
+        logConsole(`Current layer switched to: ${sel}`);
+    }
+
+    // ─── LINHA DE COMANDO (CONSOLE LOGIC) ───
+    function logConsole(msg) {
+        const log = document.getElementById('cmdLog');
+        log.innerHTML += `<br><span style="color:#64748b;">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
+        log.scrollTop = log.scrollHeight;
+    }
+
+    function handleCommandInput(e) {
+        if (e.key === 'Enter') {
+            const val = e.target.value.trim().toUpperCase();
+            e.target.value = '';
+            logConsole(`<strong style="color:#39FF14;">Command: _${val}</strong>`);
+
+            if (val === 'LINE' || val === 'L') setTool('LINE');
+            else if (val === 'CIRCLE' || val === 'C') setTool('CIRCLE');
+            else if (val === 'RECTANGLE' || val === 'REC') setTool('RECT');
+            else if (val === 'MOVE' || val === 'M') applyModify('MOVE');
+            else if (val === 'COPY' || val === 'CO') applyModify('COPY');
+            else if (val === 'ROTATE' || val === 'RO') applyModify('ROTATE');
+            else if (val === 'ERASE' || val === 'DELETE' || val === 'E') applyModify('DELETE');
+            else if (val === 'CLEAR') document.getElementById('cmdLog').innerHTML = 'Console cleared.';
+            else logConsole(`Unknown command "${val}". Press F1 or open Manual for help.`);
+        }
+    }
+
+    function execCmd(cmd) {
+        logConsole(`Executing Quick Access Command: _${cmd}`);
+        if(cmd === 'NEW') { cadLayer.destroyChildren(); loadDefaultSchematic(); }
+        if(cmd === 'PLOT') alert('Gerando visualização de plotagem PDF em alta resolução (Escala 1:1)...');
+    }
+
+    function toggleCadManual() {
+        const mod = document.getElementById('modalCadManual');
+        mod.style.display = mod.style.display === 'flex' ? 'none' : 'flex';
     }
 </script>
 </body>
