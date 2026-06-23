@@ -14,6 +14,12 @@
         #container-canvas { flex: 1; background-color: #f0f0f0; background-image: linear-gradient(#ccc 1px, transparent 1px), linear-gradient(90deg, #ccc 1px, transparent 1px); background-size: 20px 20px; position: relative; }
         .sidebar-calculo { width: 320px; background: #111827; padding: 20px; border-left: 1px solid #1f4068; color: #fff; z-index: 10; overflow-y: auto; }
         .prop-box { background: #162447; border: 1px solid #1f4068; padding: 15px; border-radius: 6px; margin-bottom: 15px; }
+        
+        /* Estilo da aba de Documentação AutoCAD */
+        #doc-autocad { display: none; height: 100%; padding: 20px; background: #111827; color: #fff; overflow-y: auto; }
+        .cad-report { line-height: 1.6; font-size: 14px; }
+        .cad-report h3 { color: #39FF14; margin-top: 20px; }
+        .cad-report ul { margin-left: 20px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -28,9 +34,87 @@
         <button onclick="cadEngine.modificar('ROTATE')">⟳ Rotacionar</button>
         <button onclick="cadEngine.modificar('SCALE')">⤢ Escalonar</button>
         <button onclick="cadEngine.modificar('TRIM')">✂️ Trim (Cortar)</button>
+        <h3>Manual Técnico</h3>
+        <button onclick="toggleDoc()" style="background:#39FF14; color:#000; font-weight:bold;">📖 Documentação AutoCAD</button>
     </div>
+    
     <div id="container-canvas"></div>
-    <div class="sidebar-calculo">
+    
+    <!-- Aba de Documentação (Oculta por padrão) -->
+    <div id="doc-autocad">
+        <article class="cad-report">
+            <button onclick="toggleDoc()" style="margin-bottom:10px;">Fechar Documentação</button>
+            <h2>RELATÓRIO AVANÇADO PROFISSIONAL - AUTOCAD[span_0](start_span)[span_0](end_span)</h2>
+            
+            <h3>1. Introdução ao AutoCAD</h3>
+            <p>O AutoCAD é um software CAD desenvolvido pela Autodesk para criação de desenhos técnicos 2D e modelagem 3D. É amplamente utilizado em engenharia, arquitetura, elétrica, mecânica, topografia e construção civil[span_1](start_span)[span_1](end_span).</p>
+
+            <h3>2. História e Evolução</h3>
+            <p>Lançado em 1982, revolucionou o desenho técnico ao substituir pranchetas físicas por projetos digitais de alta precisão[span_2](start_span)[span_2](end_span).</p>
+
+            <h3>3. Funcionamento Interno</h3>
+            <p>Baseado em coordenadas X, Y e Z, utiliza banco de entidades geométricas, camadas, blocos e referências para representar projetos técnicos[span_3](start_span)[span_3](end_span).</p>
+
+            <h3>4. Interface Completa</h3>
+            <p>Ribbon, barra de acesso rápido, linha de comando, Model Space, Layouts, ViewCube, Navigation Bar, propriedades e gerenciadores de camadas[span_4](start_span)[span_4](end_span).</p>
+
+            <h3>5. Lógica de Trabalho</h3>
+            <p>Configuração inicial, criação de layers, desenho, revisão, documentação, impressão e compartilhamento[span_5](start_span)[span_5](end_span).</p>
+
+            <h3>6. Ferramentas de Desenho 2D</h3>
+            <p>LINE, PLINE, CIRCLE, ARC, RECTANGLE, POLYGON, ELLIPSE, SPLINE, HATCH, TEXT, MLEADER e DIM[span_6](start_span)[span_6](end_span).</p>
+
+            <h3>7. Ferramentas de Modificação</h3>
+            <p>MOVE, COPY, ROTATE, MIRROR, SCALE, OFFSET, FILLET, CHAMFER, TRIM, EXTEND, ARRAY e ALIGN[span_7](start_span)[span_7](end_span).</p>
+
+            <h3>8. Modelagem 3D</h3>
+            <p>EXTRUDE, REVOLVE, SWEEP, LOFT, PRESSPULL, UNION, SUBTRACT e INTERSECT[span_8](start_span)[span_8](end_span).</p>
+
+            <h3>9. Layers</h3>
+            <p>Permitem organizar elementos por disciplina, cores, espessuras e tipos de linha[span_9](start_span)[span_9](end_span).</p>
+
+            <h3>10. Blocos e Bibliotecas</h3>
+            <p>Componentes reutilizáveis para acelerar projetos e padronizar desenhos[span_10](start_span)[span_10](end_span).</p>
+
+            <h3>11. Referências Externas (XREF)</h3>
+            <p>Permitem trabalhar com arquivos vinculados sem incorporar totalmente os dados[span_11](start_span)[span_11](end_span).</p>
+
+            <h3>12. Cotas e Documentação</h3>
+            <p>Ferramentas de dimensionamento, tolerâncias, textos técnicos e tabelas[span_12](start_span)[span_12](end_span).</p>
+
+            <h3>13. Plotagem e Impressão</h3>
+            <p>Configuração de escalas, penas, formatos de papel e exportação PDF[span_13](start_span)[span_13](end_span).</p>
+
+            <h3>14. Automação</h3>
+            <p>Suporte para AutoLISP, VBA, .NET API, scripts e integração com sistemas corporativos[span_14](start_span)[span_14](end_span).</p>
+
+            <h3>15. Formatos Compatíveis</h3>
+            <p>DWG, DXF, PDF, DGN, STEP, STL, IFC, IGES, SAT e diversos outros[span_15](start_span)[span_15](end_span).</p>
+
+            <h3>16. Hardware Recomendado</h3>
+            <p>Processador multicore, SSD, 16 GB ou mais de RAM, GPU dedicada e monitor Full HD ou superior[span_16](start_span)[span_16](end_span).</p>
+
+            <h3>17. Aplicação em Projetos Elétricos</h3>
+            <p>Diagramas unifilares, plantas elétricas, detalhamento de quadros e infraestrutura[span_17](start_span)[span_17](end_span).</p>
+
+            <h3>18. Aplicação em Arquitetura</h3>
+            <p>Plantas baixas, cortes, fachadas, detalhamento executivo e compatibilização[span_18](start_span)[span_18](end_span).</p>
+
+            <h3>19. Aplicação em Mecânica</h3>
+            <p>Peças, conjuntos, detalhamento de fabricação e modelagem tridimensional[span_19](start_span)[span_19](end_span).</p>
+
+            <h3>20. Vantagens e Benefícios</h3>
+            <p>Precisão, produtividade, padronização, integração e ampla aceitação no mercado[span_20](start_span)[span_20](end_span).</p>
+
+            <h3>21. Conclusão</h3>
+            <p>O AutoCAD permanece como uma das plataformas CAD mais importantes do mundo, sendo referência em documentação técnica e desenvolvimento de projetos[span_21](start_span)[span_21](end_span).</p>
+
+            <h3>ANEXO - COMANDOS IMPORTANTES</h3>
+            <p>LINE, PLINE, CIRCLE, ARC, RECTANGLE, POLYGON, MOVE, COPY, ROTATE, SCALE, MIRROR, OFFSET, TRIM, EXTEND, FILLET, CHAMFER, ARRAY, BLOCK, WBLOCK, XREF, DIMSTYLE, HATCH, LAYER, MATCHPROP, EXTRUDE, REVOLVE, SWEEP, LOFT[span_22](start_span)[span_22](end_span).</p>
+        </article>
+    </div>
+
+    <div class="sidebar-calculo" id="sidebar-calc">
         <h3>Properties & Circuitos</h3>
         <div id="resultado-calculo"><div class="prop-box">Selecione um item...</div></div>
     </div>
@@ -44,7 +128,16 @@
     let selected = null;
     const COR_TRACO = '#1e293b';
 
-    // --- MÓDULO CAD ENGINE (Injeção de Funcionalidades) ---
+    function toggleDoc() {
+        const doc = document.getElementById('doc-autocad');
+        const canvas = document.getElementById('container-canvas');
+        const side = document.getElementById('sidebar-calc');
+        const isVisible = doc.style.display === 'block';
+        doc.style.display = isVisible ? 'none' : 'block';
+        canvas.style.display = isVisible ? 'block' : 'none';
+        side.style.display = isVisible ? 'block' : 'none';
+    }
+
     const cadEngine = {
         modificar(acao) {
             if (!selected) return alert("Selecione um objeto!");
