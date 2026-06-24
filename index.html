@@ -208,9 +208,14 @@
 
     .dimens-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 850px; }
     .dimens-table th { background: rgba(79, 70, 229, 0.15); color: #a5b4fc; padding: 14px 10px; text-align: center; font-weight: 700; border-bottom: 1px solid var(--border-color); }
-    .dimens-table td { padding: 10px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); vertical-align: middle; text-align: center; }
+    .dimens-table td { padding: 10px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); vertical-align: middle; text-align: center; position: relative; } /* position relative inserida para controle do input */
     .dimens-table input, .dimens-table select { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; font-size: 13px; color: var(--text); width: 100%; text-align: center; transition: 0.2s; }
     .dimens-table input:focus, .dimens-table select:focus { border-color: var(--neon-green); outline: none; }
+    
+    /* Configuração de Input Seletor Dinâmico do Circuito */
+    .dim-nome { width: 100%; min-width: 100px; text-overflow: ellipsis; transition: all 0.2s ease; }
+    .dim-nome:focus { position: absolute; top: 50%; transform: translateY(-50%); left: 4px; width: 280px; z-index: 50; box-shadow: 0 5px 15px rgba(0,0,0,0.7); background: var(--card-bg); border: 1px solid var(--neon-green); text-overflow: clip; }
+
     .dimens-print-header { display: none; }
 
     .dim-config-panel { background: var(--bg-color); border: 1px solid var(--primary); padding: 18px; border-radius: 14px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
@@ -277,13 +282,14 @@
 
       /* Tabela e Caixas Totais formatadas para o PDF */
       .dimens-print-header { display: block !important; margin-bottom: 15px; }
-      .dimens-table { width: 100% !important; border-collapse: collapse !important; font-size: 8pt !important; border: 1px solid #000 !important; }
-      .dimens-table th { background: #e2e8f0 !important; color: #000 !important; font-weight: 800 !important; border: 1px solid #000 !important; padding: 4px 2px !important; text-align: center !important; }
-      .dimens-table td { border: 1px solid #000 !important; padding: 3px 2px !important; text-align: center !important; color: #000 !important; background: transparent !important; }
+      .dimens-table { width: 100% !important; border-collapse: collapse !important; font-size: 7pt !important; border: 1px solid #000 !important; }
+      .dimens-table th { background: #e2e8f0 !important; color: #000 !important; font-weight: 800 !important; border: 1px solid #000 !important; padding: 2px !important; text-align: center !important; font-size: 7pt !important; }
+      .dimens-table td { border: 1px solid #000 !important; padding: 2px !important; text-align: center !important; color: #000 !important; background: transparent !important; font-size: 7pt !important; }
       
-      .dimens-table select, .dimens-table input { background: transparent !important; border: none !important; padding: 0 !important; font-size: 8pt !important; color: #000 !important; font-weight: 600 !important; width: 100% !important; text-align: center !important; outline: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; }
+      .dimens-table select, .dimens-table input { font-size: 7pt !important; background: transparent !important; border: none !important; padding: 0 !important; color: #000 !important; font-weight: 600 !important; width: 100% !important; text-align: center !important; outline: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; word-wrap: break-word !important; white-space: normal !important; position: static !important; }
       .dimens-table select::-ms-expand { display: none !important; }
-      .dimens-table td:first-child input { text-align: left !important; font-weight: 800 !important; white-space: normal !important; }
+      .dim-nome { width: 100% !important; max-width: 100% !important; position: static !important; }
+      .dimens-table td:first-child input { width: 100% !important; position: static !important; text-align: left !important; font-weight: 800 !important; white-space: normal !important; }
 
       .dim-totais-box { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; gap: 6px !important; border: 2px solid #000 !important; background: #f8fafc !important; padding: 10px !important; border-radius: 8px !important; margin-top: 15px !important; page-break-inside: avoid !important; }
       .dim-totais-box div { background: #fff !important; border: 1px solid #000 !important; padding: 6px !important; border-radius: 4px !important; }
@@ -565,9 +571,7 @@
 
         <div class="tab-content" id="tab-eng">
           
-          <div id="tab-precos" style="margin-bottom: 40px;"></div>
-
-          <div id="tab-dimens">
+          <div id="tab-dimens" style="margin-bottom: 40px;">
             <div class="card">
               
               <div class="dimens-print-header">
@@ -655,16 +659,18 @@
                   <table class="dimens-table">
                     <thead>
                       <tr>
-                        <th style="width: 25%; text-align: left;">Circuito / Destino</th>
-                        <th style="width: 8%;">Carga (W)</th>
-                        <th style="width: 8%;">Tensão</th>
-                        <th style="width: 7%;">F.P.</th>
-                        <th style="width: 7%;">Dist (m)</th>
-                        <th style="width: 8%; color: var(--secondary);">Corrente ($I_b$)</th>
-                        <th style="width: 10%; color: var(--neon-green);">Bitola Mín.</th>
-                        <th style="width: 9%; color: #818cf8;">Disjuntor</th>
-                        <th style="width: 7%;">Queda %</th>
-                        <th style="width: 11%;">Diagnóstico</th>
+                        <th style="width: 15%; text-align: left;">Circuito / Destino</th>
+                        <th style="width: 6%;">Carga (W)</th>
+                        <th style="width: 6%;">Tensão</th>
+                        <th style="width: 5%;">F.P.</th>
+                        <th style="width: 5%;">Dist (m)</th>
+                        <th style="width: 7%; color: var(--secondary);">Corrente ($I_b$)</th>
+                        <th style="width: 8%; color: var(--neon-green);">Bitola Mín.</th>
+                        <th style="width: 10%; color: #818cf8;">Disjuntor</th>
+                        <th style="width: 9%; color: #a855f7;">DR (IDR)</th>
+                        <th style="width: 9%; color: #f43f5e;">DPS</th>
+                        <th style="width: 6%;">Queda %</th>
+                        <th style="width: 10%;">Diagnóstico</th>
                         <th class="print-hidden" style="width: 35px;"></th>
                       </tr>
                     </thead>
@@ -691,6 +697,9 @@
 
             </div>
           </div>
+
+          <div id="tab-precos" style="margin-bottom: 40px;"></div>
+
         </div>
 
         <div class="tab-content" id="tab-hist-prof">
@@ -961,24 +970,61 @@
         { d: 'Interruptor paralelos (3-way) / Intermediário (4-way)', mn: 80, mx: 120, md: 100 },
         { d: 'Instalação de spot ou luminária LED de embutir', mn: 45, mx: 80, md: 60 },
         { d: 'Instalação de lustre simples/pendente', mn: 90, mx: 150, md: 120 },
+        { d: 'Instalação de lustre de alto padrão / cristal', mn: 250, mx: 500, md: 350 },
         { d: 'Instalação de fita LED (por metro)', mn: 25, mx: 45, md: 35 },
-        { d: 'Fotocélula, minuterias ou sensor de presença', mn: 85, mx: 130, md: 107 }
+        { d: 'Fotocélula, minuterias ou sensor de presença', mn: 85, mx: 130, md: 107 },
+        { d: 'Instalação de refletor LED (área externa)', mn: 70, mx: 120, md: 95 },
+        { d: 'Perfil de LED embutido (corte e fixação por metro)', mn: 60, mx: 100, md: 80 }
       ]},
       { cat: '🔌 TOMADAS E INTERRUPTORES', items: [
         { d: 'Instalação / Troca de tomada simples (10A/20A)', mn: 35, mx: 70, md: 50 },
         { d: 'Conjunto conjugado (Tomada + Interruptor)', mn: 50, mx: 85, md: 65 },
-        { d: 'Passagem de fiação nova (por ponto até 10m)', mn: 80, mx: 150, md: 110 }
+        { d: 'Instalação de tomada inteligente / USB', mn: 45, mx: 80, md: 60 },
+        { d: 'Passagem de fiação nova (por ponto até 10m)', mn: 80, mx: 150, md: 110 },
+        { d: 'Troca de espelho/placa (sem mexer na fiação)', mn: 10, mx: 20, md: 15 },
+        { d: 'Ponto de rede RJ45 (Passagem de cabo + conectorização)', mn: 90, mx: 160, md: 125 }
       ]},
       { cat: '🚿 AQUECIMENTO E MOTORIZAÇÃO', items: [
         { d: 'Instalação de chuveiro elétrico básico (sem fiação)', mn: 80, mx: 130, md: 100 },
         { d: 'Instalação de chuveiro elétrico (com fiação até 10m)', mn: 200, mx: 350, md: 250 },
-        { d: 'Ponto elétrico para Ar Condicionado (até 15m)', mn: 250, mx: 450, md: 350 }
+        { d: 'Troca de resistência de chuveiro', mn: 40, mx: 80, md: 60 },
+        { d: 'Ponto elétrico para Ar Condicionado (até 15m)', mn: 250, mx: 450, md: 350 },
+        { d: 'Ponto elétrico para bomba de piscina ou motor', mn: 180, mx: 300, md: 240 },
+        { d: 'Ligação de boia elétrica em caixa d’água', mn: 120, mx: 200, md: 160 },
+        { d: 'Ligação de contatora e relé térmico', mn: 150, mx: 250, md: 200 }
       ]},
       { cat: '⚡ QUADROS E INFRAESTRUTURA', items: [
         { d: 'Montagem de QDC (até 12 disjuntores)', mn: 350, mx: 600, md: 450 },
         { d: 'Montagem de QDC (13 a 24 disjuntores)', mn: 600, mx: 1100, md: 850 },
+        { d: 'Montagem de QDC (25 a 40 disjuntores)', mn: 1100, mx: 1800, md: 1400 },
         { d: 'Instalação de DPS / IDR Residual (por dispositivo)', mn: 80, mx: 160, md: 120 },
-        { d: 'Aterramento (Haste + Caixa de inspeção)', mn: 200, mx: 400, md: 300 }
+        { d: 'Troca de disjuntor termomagnético', mn: 50, mx: 90, md: 70 },
+        { d: 'Aterramento (Haste + Caixa de inspeção + Solda)', mn: 200, mx: 400, md: 300 },
+        { d: 'Malha de aterramento (por haste adicional)', mn: 120, mx: 200, md: 160 },
+        { d: 'Eletroduto/ conduíte aparente (por metro)', mn: 15, mx: 35, md: 25 },
+        { d: 'Instalação de eletrocalha / perfilado (por metro)', mn: 40, mx: 80, md: 60 },
+        { d: 'Organização e padronização de QDC antigo', mn: 400, mx: 800, md: 600 }
+      ]},
+      { cat: '🏡 PADRÃO DE ENTRADA (MEDIDOR)', items: [
+        { d: 'Instalação de Padrão Monofásico (sem poste)', mn: 400, mx: 700, md: 550 },
+        { d: 'Instalação de Padrão Bifásico (sem poste)', mn: 500, mx: 900, md: 700 },
+        { d: 'Instalação de Padrão Trifásico (sem poste)', mn: 800, mx: 1500, md: 1150 },
+        { d: 'Aumento de carga (Projeto + Execução local)', mn: 1500, mx: 3000, md: 2200 }
+      ]},
+      { cat: '🤖 AUTOMAÇÃO E SEGURANÇA', items: [
+        { d: 'Instalação de interruptor inteligente (Sonoff/Tuya)', mn: 70, mx: 130, md: 100 },
+        { d: 'Configuração de assistente virtual (Alexa/Google)', mn: 80, mx: 150, md: 115 },
+        { d: 'Câmera CFTV Wi-Fi (Instalação e configuração)', mn: 100, mx: 180, md: 140 },
+        { d: 'Câmera CFTV Cabeada (por ponto)', mn: 120, mx: 220, md: 170 },
+        { d: 'Instalação de fechadura digital', mn: 150, mx: 350, md: 250 },
+        { d: 'Motor de portão eletrônico (Instalação)', mn: 250, mx: 450, md: 350 }
+      ]},
+      { cat: '📋 SERVIÇOS TÉCNICOS E PROJETOS', items: [
+        { d: 'Visita Técnica / Diagnóstico de falha', mn: 100, mx: 200, md: 150 },
+        { d: 'Projeto Elétrico Residencial (por m²)', mn: 15, mx: 40, md: 25 },
+        { d: 'Projeto Elétrico Comercial (por m²)', mn: 25, mx: 60, md: 40 },
+        { d: 'Emissão de TRT/ART (Apenas taxa do profissional)', mn: 250, mx: 500, md: 350 },
+        { d: 'Laudo de SPDA e Aterramento', mn: 800, mx: 2000, md: 1400 }
       ]}
     ];
 
@@ -1213,7 +1259,7 @@
       var tr = document.createElement('tr'); tr.id = 'dimrow-' + id;
       
       tr.innerHTML = `
-        <td><input type="text" class="dim-nome" placeholder="Ex: Circuito Tomadas" value="${nomePreset}" style="text-align: left; font-weight: 600;"></td>
+        <td style="position: relative;"><input type="text" class="dim-nome" placeholder="Ex: Circuito Tomadas" value="${nomePreset}"></td>
         <td><input type="number" class="dim-w" value="${wPreset}" min="0" step="100"></td>
         <td><select class="dim-v"><option value="127" ${vPreset==127?'selected':''}>127V</option><option value="220" ${vPreset==220?'selected':''}>220V</option><option value="380" ${vPreset==380?'selected':''}>380V (3~)</option></select></td>
         <td><select class="dim-fp"><option value="1.0">1.00</option><option value="0.95" selected>0.95</option><option value="0.85">0.85</option></select></td>
@@ -1221,8 +1267,10 @@
         <td class="dim-res-ib" style="font-weight: 700;">0.00 A</td>
         <td class="dim-res-bitola" style="font-weight: 900; color: var(--neon-green);">--</td>
         <td class="dim-res-disj" style="font-weight: 700;">--</td>
+        <td class="dim-res-dr" style="font-weight: 700; color: #a855f7; font-size: 11px;">--</td>
+        <td class="dim-res-dps" style="font-weight: 700; color: #f43f5e; font-size: 11px;">--</td>
         <td class="dim-res-queda" style="font-weight: 600;">0.0%</td>
-        <td class="dim-res-status">--</td>
+        <td class="dim-res-status" style="font-size: 11px;">--</td>
         <td class="print-hidden"><button onclick="removeDimensRow(${id})" style="color: #ef4444; background: none; border: none; cursor: pointer; font-size: 16px; font-weight: bold;">✕</button></td>
       `;
       tbody.appendChild(tr);
@@ -1252,7 +1300,7 @@
 
         if(w === 0) {
           row.querySelector('.dim-res-ib').textContent = '0.00 A'; row.querySelector('.dim-res-bitola').textContent = '--';
-          row.querySelector('.dim-res-disj').textContent = '--'; row.querySelector('.dim-res-queda').textContent = '0.0%'; row.querySelector('.dim-res-status').textContent = '--';
+          row.querySelector('.dim-res-disj').textContent = '--'; row.querySelector('.dim-res-dr').textContent = '--'; row.querySelector('.dim-res-dps').textContent = '--'; row.querySelector('.dim-res-queda').textContent = '0.0%'; row.querySelector('.dim-res-status').textContent = '--';
           return;
         }
 
@@ -1306,9 +1354,17 @@
         var disjComerciais = [6, 10, 16, 20, 25, 32, 40, 50, 63, 70, 80, 100, 125, 160, 200, 250];
         var disj = disjComerciais.find(dj => dj >= ib * 1.1) || "Especial";
 
+        // Análise NBR 5410 para Proteções Adicionais
+        var nomeCirc = row.querySelector('.dim-nome').value.toLowerCase();
+        var curva = nomeCirc.match(/(chuveiro|aquecedor|torneira|resist)/) ? 'Curva B' : 'Curva C';
+        var reqDR = nomeCirc.match(/(chuveiro|banheiro|cozinha|externa|externo|lavanderia|área de serviço|tug|tomada|hidro|piscina|molhada)/) ? 'Obrig. (30mA)' : 'Opcional';
+        var reqDPS = nomeCirc.match(/(ar condicionado|pc|computador|tv|televisão|geladeira|motor|bomba|eletrônico|inversor)/) ? 'Classe III (Local)' : 'Classe II (QDC)';
+
         row.querySelector('.dim-res-ib').textContent = ib.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' A';
         row.querySelector('.dim-res-bitola').textContent = escolhido.s.toLocaleString('pt-BR') + ' mm²';
-        row.querySelector('.dim-res-disj').textContent = disj + ' A';
+        row.querySelector('.dim-res-disj').textContent = disj + 'A ' + curva;
+        row.querySelector('.dim-res-dr').textContent = reqDR;
+        row.querySelector('.dim-res-dps').textContent = reqDPS;
         row.querySelector('.dim-res-queda').textContent = dV_perc.toLocaleString('pt-BR', {minimumFractionDigits:1, maximumFractionDigits:1}) + '%';
         row.querySelector('.dim-res-queda').style.color = dV_perc > 4.0 ? '#ef4444' : 'inherit';
         row.querySelector('.dim-res-status').textContent = statusText; row.querySelector('.dim-res-status').style.color = statusColor; row.querySelector('.dim-res-status').style.fontWeight = "700";
