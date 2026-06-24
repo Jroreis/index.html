@@ -1,193 +1,1458 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CADe SIMU Web Studio - VoltCalc Professional</title>
-    <script src="https://unpkg.com/konva@9.3.1/konva.min.js"></script>
-    <style>
-        :root {
-            --sys-bg: #f0f0f0;
-            --bar-bg: #e4e4e4;
-            --sub-bg: #d4d4d4;
-            --border-cad: #a0a0a0;
-            --btn-hover: #cbe3f7;
-            --btn-active: #99c8f2;
-            --text-cad: #1e1e1e;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoltCadPro — Projeto Elétrico Profissional</title>
+<script src="https://unpkg.com/konva@9.3.1/konva.min.js"></script>
+<style>
+  :root {
+    --bg-app:     #1a1d23;
+    --bg-panel:   #21252d;
+    --bg-toolbar: #181b21;
+    --bg-canvas:  #2a2d35;
+    --accent:     #f5a623;
+    --accent2:    #3b82f6;
+    --accent3:    #22c55e;
+    --danger:     #ef4444;
+    --border:     #333844;
+    --text:       #e8eaf0;
+    --text-dim:   #8892a4;
+    --text-accent:#f5a623;
+    --panel-w:    220px;
+    --toolbar-h:  42px;
+    --catbar-h:   36px;
+    --subbar-h:   44px;
+    --statusbar-h:26px;
+    --radius:     4px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;user-select:none;}
+  html,body{width:100vw;height:100vh;overflow:hidden;background:var(--bg-app);display:flex;flex-direction:column;color:var(--text);}
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
-        body, html { width: 100vw; height: 100vh; overflow: hidden; background: #525659; display: flex; flex-direction: column; }
+  /* ── TITLEBAR ── */
+  #titlebar{
+    height:var(--toolbar-h);background:var(--bg-toolbar);
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:0;
+    padding:0 10px;z-index:200;flex-shrink:0;
+  }
+  .tb-logo{
+    display:flex;align-items:center;gap:8px;margin-right:16px;
+    font-size:15px;font-weight:800;letter-spacing:.5px;color:var(--accent);
+  }
+  .tb-logo svg{flex-shrink:0;}
+  .tb-logo span{color:var(--text);}
+  .tb-divider{width:1px;height:22px;background:var(--border);margin:0 8px;}
+  .tb-btn{
+    display:flex;align-items:center;gap:5px;
+    background:transparent;border:1px solid transparent;
+    color:var(--text-dim);padding:4px 9px;border-radius:var(--radius);
+    cursor:pointer;font-size:11.5px;font-weight:500;height:28px;
+    transition:background .12s,color .12s,border-color .12s;
+  }
+  .tb-btn:hover{background:#2d3240;border-color:var(--border);color:var(--text);}
+  .tb-btn.primary{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;}
+  .tb-btn.primary:hover{background:#e09415;}
+  .tb-btn.danger{background:transparent;color:var(--danger);border-color:transparent;}
+  .tb-btn.danger:hover{background:#2d1a1a;border-color:var(--danger);}
+  .tb-btn.success{color:var(--accent3);}
+  .tb-btn.success:hover{background:#1a2d1e;border-color:var(--accent3);}
+  .tb-btn svg,.tb-btn span.ico{flex-shrink:0;}
+  .tb-spacer{flex:1;}
+  .tb-version{font-size:10px;color:var(--text-dim);margin-left:8px;}
 
-        .sys-toolbar { height: 36px; background: var(--sys-bg); border-bottom: 1px solid var(--border-cad); display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 12px; z-index: 100; }
-        .sys-group { display: flex; align-items: center; gap: 5px; }
-        .btn-cad { background: #fff; border: 1px solid #b0b0b0; color: var(--text-cad); width: 26px; height: 26px; border-radius: 2px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; transition: 0.1s; }
-        .btn-cad:hover { background: var(--btn-hover); border-color: #3b82f6; }
-        .btn-cad.text-btn { width: auto; padding: 0 10px; font-weight: 600; font-size: 11px; }
-        .divisor { width: 1px; height: 20px; background: #b0b0b0; margin: 0 6px; }
-        .btn-play { color: #16a34a; font-weight: 800; }
-        .btn-stop { color: #dc2626; font-weight: 800; }
-        .cat-toolbar { height: 34px; background: var(--bar-bg); border-bottom: 1px solid var(--border-cad); display: flex; align-items: center; padding: 0 10px; gap: 4px; overflow-x: auto; z-index: 90; }
-        .cat-btn { background: transparent; border: 1px solid transparent; padding: 5px 10px; font-size: 11px; font-weight: 600; color: #444; border-radius: 3px; cursor: pointer; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-        .cat-btn.active { background: #fff; border-color: #888; color: #005fb8; font-weight: bold; border-bottom: 2px solid #005fb8; }
-        .sub-toolbar { height: 40px; background: var(--sub-bg); border-bottom: 1px solid #888; display: flex; align-items: center; padding: 0 12px; gap: 8px; overflow-x: auto; z-index: 80; }
-        .comp-spawn-btn { background: #f8f9fa; border: 1px solid #6c757d; padding: 4px 10px; border-radius: 3px; font-size: 11px; font-weight: 600; cursor: pointer; height: 28px; }
-        .viewport-container { flex: 1; overflow: auto; padding: 25px; position: relative; display: flex; align-items: flex-start; justify-content: center; }
-        .folha-a3 { width: 1050px; height: 740px; background: #ffffff; box-shadow: 0 0 30px rgba(0,0,0,0.6); position: relative; }
-        #stage-parent { width: 100%; height: 100%; position: absolute; top: 0; left: 0; cursor: crosshair; }
-        .prop-modal-quick { position: absolute; top: 75px; right: 30px; background: #0f172a; color: white; border: 2px solid #3b82f6; padding: 14px; border-radius: 8px; display: none; z-index: 2000; flex-direction: column; width: 230px; }
-        .prop-modal-quick input { background: #1e293b; border: 1px solid #64748b; color: #39FF14; padding: 6px 8px; width: 100%; font-size: 12px; text-align: center; margin-bottom: 5px; }
-        .btn-modal-acao { background: #334155; color: white; border: 1px solid #64748b; padding: 6px; border-radius: 4px; cursor: pointer; margin-top: 5px; }
-    </style>
+  /* ── CATEGORY BAR ── */
+  #catbar{
+    height:var(--catbar-h);background:var(--bg-panel);
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;padding:0 8px;gap:2px;
+    overflow-x:auto;flex-shrink:0;z-index:190;
+  }
+  #catbar::-webkit-scrollbar{height:3px;}
+  #catbar::-webkit-scrollbar-thumb{background:var(--border);}
+  .cat-btn{
+    background:transparent;border:1px solid transparent;
+    color:var(--text-dim);padding:5px 12px;
+    border-radius:var(--radius);cursor:pointer;
+    font-size:11px;font-weight:600;white-space:nowrap;
+    display:flex;align-items:center;gap:5px;
+    transition:background .1s,color .1s;
+  }
+  .cat-btn:hover{background:#2d3240;color:var(--text);}
+  .cat-btn.active{
+    background:#1e2535;color:var(--accent);
+    border-color:var(--accent);
+    border-bottom:2px solid var(--accent);
+  }
+
+  /* ── SUBBAR ── */
+  #subbar{
+    height:var(--subbar-h);background:#1e2028;
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;padding:0 10px;gap:6px;
+    overflow-x:auto;flex-shrink:0;z-index:180;
+  }
+  #subbar::-webkit-scrollbar{height:3px;}
+  #subbar::-webkit-scrollbar-thumb{background:var(--border);}
+  .sub-section{font-size:10px;color:var(--text-dim);padding:0 6px;border-right:1px solid var(--border);margin-right:2px;white-space:nowrap;}
+  .comp-btn{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:2px;background:#252932;border:1px solid var(--border);
+    color:var(--text);width:52px;height:34px;border-radius:var(--radius);
+    cursor:pointer;font-size:9px;font-weight:600;text-align:center;
+    transition:background .1s,border-color .1s;flex-shrink:0;
+  }
+  .comp-btn:hover{background:#2d3448;border-color:var(--accent2);}
+  .comp-btn .ico{font-size:14px;line-height:1;}
+
+  /* ── MAIN LAYOUT ── */
+  #main{display:flex;flex:1;overflow:hidden;}
+
+  /* ── LEFT PANEL ── */
+  #left-panel{
+    width:var(--panel-w);background:var(--bg-panel);
+    border-right:1px solid var(--border);
+    display:flex;flex-direction:column;flex-shrink:0;
+    overflow:hidden;z-index:100;
+  }
+  .panel-section{padding:10px;border-bottom:1px solid var(--border);}
+  .panel-title{
+    font-size:10px;font-weight:700;letter-spacing:.8px;
+    color:var(--text-dim);text-transform:uppercase;margin-bottom:8px;
+  }
+  .panel-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+  .panel-label{font-size:10.5px;color:var(--text-dim);flex:1;}
+  .panel-val{font-size:11px;color:var(--text);font-weight:600;}
+  .panel-badge{
+    background:#1a2535;border:1px solid var(--accent2);
+    color:var(--accent2);font-size:9.5px;padding:2px 6px;
+    border-radius:10px;font-weight:700;
+  }
+  .panel-badge.ok{border-color:var(--accent3);color:var(--accent3);background:#1a2a1e;}
+  .panel-badge.warn{border-color:var(--accent);color:var(--accent);background:#2a2010;}
+
+  /* Layers panel */
+  #layers-list{display:flex;flex-direction:column;gap:3px;}
+  .layer-row{
+    display:flex;align-items:center;gap:6px;
+    background:#252932;border:1px solid transparent;
+    border-radius:var(--radius);padding:5px 7px;cursor:pointer;
+    transition:background .1s;
+  }
+  .layer-row:hover{background:#2d3240;}
+  .layer-row.active{border-color:var(--accent);background:#1e2535;}
+  .layer-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .layer-name{font-size:11px;flex:1;font-weight:500;}
+  .layer-toggle{font-size:12px;cursor:pointer;color:var(--text-dim);}
+
+  /* Component tree */
+  #comp-tree{flex:1;overflow-y:auto;padding:8px;}
+  #comp-tree::-webkit-scrollbar{width:4px;}
+  #comp-tree::-webkit-scrollbar-thumb{background:var(--border);}
+  .tree-item{
+    display:flex;align-items:center;gap:6px;
+    padding:4px 6px;border-radius:var(--radius);
+    font-size:10.5px;cursor:pointer;border:1px solid transparent;
+    transition:background .1s;
+  }
+  .tree-item:hover{background:#2d3240;}
+  .tree-item.selected{background:#1e2535;border-color:var(--accent2);color:var(--accent2);}
+  .tree-ico{font-size:12px;flex-shrink:0;}
+  .tree-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tree-type{font-size:9px;color:var(--text-dim);flex-shrink:0;}
+  .tree-empty{color:var(--text-dim);font-size:10.5px;padding:10px 6px;font-style:italic;}
+
+  /* ── CANVAS AREA ── */
+  #canvas-wrap{
+    flex:1;overflow:hidden;background:#111318;
+    position:relative;display:flex;align-items:center;justify-content:center;
+  }
+  /* Canvas grid background */
+  #canvas-wrap::before{
+    content:'';position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size:20px 20px;
+    pointer-events:none;z-index:0;
+  }
+  #viewport-scroll{overflow:auto;width:100%;height:100%;display:flex;align-items:flex-start;justify-content:flex-start;padding:30px;position:relative;z-index:1;}
+  #folha{
+    width:1188px;height:840px;
+    background:#fff;
+    box-shadow:0 0 0 1px #555, 0 8px 60px rgba(0,0,0,.9);
+    position:relative;flex-shrink:0;
+  }
+  /* A3 border lines */
+  #folha::before{
+    content:'';position:absolute;
+    inset:10px;border:1px solid #ccc;pointer-events:none;z-index:1;
+  }
+  #stage-parent{width:100%;height:100%;position:absolute;top:0;left:0;}
+
+  /* ── RIGHT PANEL ── */
+  #right-panel{
+    width:200px;background:var(--bg-panel);
+    border-left:1px solid var(--border);
+    display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;
+    z-index:100;
+  }
+  .prop-title{
+    font-size:10px;font-weight:700;letter-spacing:.8px;
+    color:var(--text-dim);text-transform:uppercase;
+    padding:10px 10px 6px;border-bottom:1px solid var(--border);
+  }
+  #prop-body{flex:1;overflow-y:auto;padding:8px;}
+  #prop-body::-webkit-scrollbar{width:4px;}
+  #prop-body::-webkit-scrollbar-thumb{background:var(--border);}
+  .prop-group{margin-bottom:12px;}
+  .prop-group-title{font-size:9.5px;font-weight:700;letter-spacing:.6px;color:var(--accent);text-transform:uppercase;margin-bottom:6px;}
+  .prop-field{margin-bottom:6px;}
+  .prop-field label{display:block;font-size:10px;color:var(--text-dim);margin-bottom:3px;font-weight:600;}
+  .prop-field input,.prop-field select{
+    width:100%;background:#131720;border:1px solid var(--border);
+    color:var(--text);padding:5px 7px;border-radius:var(--radius);
+    font-size:11px;transition:border-color .1s;
+  }
+  .prop-field input:focus,.prop-field select:focus{border-color:var(--accent2);outline:none;}
+  .prop-no-sel{color:var(--text-dim);font-size:10.5px;font-style:italic;padding:10px 2px;text-align:center;}
+  .prop-action-row{display:flex;gap:5px;margin-top:4px;}
+  .prop-action-btn{
+    flex:1;background:#252932;border:1px solid var(--border);
+    color:var(--text-dim);padding:5px 4px;border-radius:var(--radius);
+    font-size:10px;font-weight:600;cursor:pointer;text-align:center;
+    transition:background .1s,color .1s;
+  }
+  .prop-action-btn:hover{background:#2d3448;color:var(--text);}
+  .prop-action-btn.red:hover{background:#2d1a1a;color:var(--danger);border-color:var(--danger);}
+
+  /* ── STATUS BAR ── */
+  #statusbar{
+    height:var(--statusbar-h);background:var(--bg-toolbar);
+    border-top:1px solid var(--border);
+    display:flex;align-items:center;padding:0 10px;gap:14px;
+    flex-shrink:0;z-index:200;
+  }
+  .sb-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-dim);}
+  .sb-item strong{color:var(--text);font-weight:600;}
+  .sb-dot{width:6px;height:6px;border-radius:50%;background:var(--accent3);}
+  .sb-dot.warn{background:var(--accent);}
+  #sb-cursor{margin-left:auto;}
+
+  /* ── ZOOM CONTROLS ── */
+  #zoom-ctrl{
+    position:absolute;bottom:35px;right:210px;
+    display:flex;align-items:center;gap:4px;
+    background:var(--bg-panel);border:1px solid var(--border);
+    border-radius:6px;padding:4px 6px;z-index:300;
+  }
+  .zoom-btn{
+    background:transparent;border:none;color:var(--text-dim);
+    width:22px;height:22px;cursor:pointer;font-size:14px;font-weight:700;
+    border-radius:3px;display:flex;align-items:center;justify-content:center;
+  }
+  .zoom-btn:hover{background:#2d3240;color:var(--text);}
+  #zoom-val{font-size:11px;color:var(--text);font-weight:700;min-width:36px;text-align:center;}
+
+  /* ── CONTEXT MENU ── */
+  #ctx-menu{
+    position:fixed;background:var(--bg-panel);
+    border:1px solid var(--border);border-radius:6px;
+    min-width:160px;z-index:9999;display:none;
+    box-shadow:0 8px 32px rgba(0,0,0,.7);overflow:hidden;
+  }
+  .ctx-item{
+    padding:7px 14px;font-size:11.5px;cursor:pointer;
+    color:var(--text);display:flex;align-items:center;gap:7px;
+    transition:background .1s;
+  }
+  .ctx-item:hover{background:#2d3448;}
+  .ctx-item.red{color:var(--danger);}
+  .ctx-item.red:hover{background:#2d1a1a;}
+  .ctx-sep{height:1px;background:var(--border);margin:3px 0;}
+
+  /* ── MODAL ── */
+  #modal-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.7);
+    z-index:8000;display:none;align-items:center;justify-content:center;
+  }
+  #modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--bg-panel);border:1px solid var(--border);
+    border-radius:8px;padding:20px;min-width:320px;max-width:480px;
+    box-shadow:0 16px 64px rgba(0,0,0,.8);
+  }
+  .modal h3{font-size:14px;font-weight:700;margin-bottom:14px;color:var(--text);}
+  .modal input{
+    width:100%;background:#131720;border:1px solid var(--border);
+    color:var(--text);padding:7px 10px;border-radius:var(--radius);
+    font-size:12px;margin-bottom:10px;
+  }
+  .modal input:focus{border-color:var(--accent2);outline:none;}
+  .modal-row{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;}
+  .modal-btn{
+    background:#252932;border:1px solid var(--border);color:var(--text);
+    padding:6px 16px;border-radius:var(--radius);cursor:pointer;font-size:11.5px;font-weight:600;
+  }
+  .modal-btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff;}
+  .modal-btn.primary:hover{background:#2563eb;}
+  .modal-btn:hover{background:#2d3240;}
+
+  /* ── TOOLTIP ── */
+  .tooltip-wrap{position:relative;display:inline-flex;}
+  .tooltip-wrap .tip{
+    position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+    background:#0d0f14;border:1px solid var(--border);color:var(--text);
+    font-size:10px;padding:3px 7px;border-radius:3px;white-space:nowrap;
+    pointer-events:none;opacity:0;transition:opacity .15s;z-index:9999;
+  }
+  .tooltip-wrap:hover .tip{opacity:1;}
+
+  /* ── SIMULATION MODE ── */
+  body.simulating #folha{border:2px solid var(--accent3);box-shadow:0 0 0 1px var(--accent3),0 8px 60px rgba(34,197,94,.15);}
+  body.simulating .tb-btn.success{background:#1a2d1e;border-color:var(--accent3);color:var(--accent3);}
+
+  /* ── MINI MAP ── */
+  #minimap{
+    position:absolute;bottom:35px;left:226px;
+    width:150px;height:100px;background:#0d0f14;
+    border:1px solid var(--border);border-radius:4px;
+    z-index:300;overflow:hidden;
+  }
+  #minimap canvas{width:100%;height:100%;opacity:.7;}
+
+  /* Scrollbar global */
+  ::-webkit-scrollbar{width:5px;height:5px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+  ::-webkit-scrollbar-thumb:hover{background:#555;}
+
+  /* Snap indicator */
+  .snap-dot{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--accent);pointer-events:none;transform:translate(-50%,-50%);z-index:1000;display:none;}
+
+  /* Wire mode highlight */
+  body.wire-mode #stage-parent{cursor:crosshair!important;}
+  body.wire-mode #canvas-wrap::after{
+    content:'MODO FIAÇÃO ATIVO — clique para desenhar';
+    position:absolute;top:10px;left:50%;transform:translateX(-50%);
+    background:var(--accent2);color:#fff;font-size:10.5px;font-weight:700;
+    padding:4px 12px;border-radius:10px;pointer-events:none;z-index:500;
+  }
+</style>
 </head>
 <body>
 
-    <div class="sys-toolbar">
-        <div class="sys-group">
-            <button class="btn-cad" onclick="limparFolha()">📄</button>
-            <input type="file" id="uploadPlanta" accept="image/*" style="display:none" onchange="carregarPlanta(this)">
-            <button class="btn-cad" onclick="document.getElementById('uploadPlanta').click()">🗺️</button>
-            <button class="btn-cad" onclick="carregarExemploReal()">📑</button>
-            <div class="divisor"></div>
-            <button class="btn-cad text-btn btn-play" id="btnSim" onclick="ativarSimulacao()">► SIMULAR</button>
-            <button class="btn-cad text-btn btn-stop" id="btnStop" onclick="pararSimulacao()" disabled>■ PARAR</button>
-        </div>
-        <div style="font-weight: 800; color: #005fb8;">CADe SIMU Web Studio v4.6 (Visual Aprimorado)</div>
+<!-- TITLE BAR -->
+<div id="titlebar">
+  <div class="tb-logo">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <rect x="1" y="1" width="20" height="20" rx="3" stroke="#f5a623" stroke-width="1.5"/>
+      <path d="M7 15L11 7L15 15" stroke="#f5a623" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M8.5 12.5h5" stroke="#f5a623" stroke-width="1.5"/>
+    </svg>
+    Volt<span>Cad</span>Pro
+  </div>
+  <div class="tb-divider"></div>
+
+  <div class="tooltip-wrap"><button class="tb-btn" onclick="novoArquivo()">📄 <span>Novo</span></button><span class="tip">Novo projeto (Ctrl+N)</span></div>
+  <div class="tooltip-wrap"><button class="tb-btn" onclick="salvarProjeto()">💾 <span>Salvar</span></button><span class="tip">Salvar (Ctrl+S)</span></div>
+  <div class="tooltip-wrap">
+    <button class="tb-btn" onclick="document.getElementById('uploadPlanta').click()">🗺️ <span>Planta</span></button>
+    <span class="tip">Importar planta baixa</span>
+    <input type="file" id="uploadPlanta" accept="image/*,application/pdf" style="display:none" onchange="carregarPlanta(this)">
+  </div>
+  <div class="tooltip-wrap"><button class="tb-btn" onclick="exportarPNG()">⬇️ <span>Exportar</span></button><span class="tip">Exportar PNG</span></div>
+  <div class="tb-divider"></div>
+  <div class="tooltip-wrap"><button class="tb-btn" id="btnWire" onclick="toggleWireMode()">〰️ <span>Fio</span></button><span class="tip">Desenhar fio (W)</span></div>
+  <div class="tooltip-wrap"><button class="tb-btn" onclick="desfazer()">↩️ <span>Desfazer</span></button><span class="tip">Desfazer (Ctrl+Z)</span></div>
+  <div class="tooltip-wrap"><button class="tb-btn" onclick="refazer()">↪️ <span>Refazer</span></button><span class="tip">Refazer (Ctrl+Y)</span></div>
+  <div class="tb-divider"></div>
+  <div class="tooltip-wrap"><button class="tb-btn" onclick="selecionarTudo()">⬜ <span>Sel. Tudo</span></button><span class="tip">Selecionar tudo (Ctrl+A)</span></div>
+  <div class="tooltip-wrap"><button class="tb-btn" onclick="alinharHoriz()">⇔ <span>Alinhar H</span></button><span class="tip">Alinhar horizontalmente</span></div>
+  <div class="tooltip-wrap"><button class="tb-btn" onclick="alinharVert()">⇕ <span>Alinhar V</span></button><span class="tip">Alinhar verticalmente</span></div>
+  <div class="tb-divider"></div>
+
+  <button class="tb-btn success" id="btnSim" onclick="ativarSimulacao()">▶ SIMULAR</button>
+  <button class="tb-btn danger" id="btnStop" onclick="pararSimulacao()" disabled>■ PARAR</button>
+
+  <div class="tb-spacer"></div>
+  <span id="proj-name" style="font-size:12px;font-weight:600;color:var(--text-dim);">Sem título</span>
+  <div class="tb-divider"></div>
+  <span class="tb-version">VoltCadPro v1.0</span>
+</div>
+
+<!-- CATEGORY BAR -->
+<div id="catbar"></div>
+
+<!-- SUB BAR -->
+<div id="subbar"><span class="sub-section">Selecione uma categoria</span></div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- LEFT PANEL -->
+  <div id="left-panel">
+    <div class="panel-section">
+      <div class="panel-title">Projeto</div>
+      <div class="panel-row"><span class="panel-label">Nome</span><span class="panel-val" id="lbl-proj">Sem título</span></div>
+      <div class="panel-row"><span class="panel-label">Escala</span><span class="panel-badge">1:100</span></div>
+      <div class="panel-row"><span class="panel-label">Componentes</span><span class="panel-badge ok" id="lbl-count">0</span></div>
+      <div class="panel-row"><span class="panel-label">Fios</span><span class="panel-badge" id="lbl-wires">0</span></div>
     </div>
 
-    <div class="cat-toolbar" id="catBar"></div>
-    <div class="sub-toolbar" id="subBar"></div>
-
-    <div class="viewport-container" id="viewport">
-        <div class="folha-a3" id="folha"><div id="stage-parent"></div></div>
-        <div class="prop-modal-quick" id="quickProp">
-            <input type="text" id="inpQuickTag" onkeyup="aplicarTagQuick(this.value)">
-            <button class="btn-modal-acao" onclick="girarSelecionadoQuick()">⟳ Girar</button>
-            <button class="btn-modal-acao" onclick="removerSelecionadoQuick()" style="background:#dc2626;">🗑️ Excluir</button>
+    <div class="panel-section">
+      <div class="panel-title">Camadas</div>
+      <div id="layers-list">
+        <div class="layer-row active" data-layer="elétrica" onclick="setLayer('elétrica',this)">
+          <div class="layer-dot" style="background:#3b82f6"></div>
+          <span class="layer-name">Elétrica</span>
+          <span class="layer-toggle" onclick="event.stopPropagation();toggleLayerVis(this)">👁</span>
         </div>
+        <div class="layer-row" data-layer="iluminação" onclick="setLayer('iluminação',this)">
+          <div class="layer-dot" style="background:#f5a623"></div>
+          <span class="layer-name">Iluminação</span>
+          <span class="layer-toggle" onclick="event.stopPropagation();toggleLayerVis(this)">👁</span>
+        </div>
+        <div class="layer-row" data-layer="aterramento" onclick="setLayer('aterramento',this)">
+          <div class="layer-dot" style="background:#22c55e"></div>
+          <span class="layer-name">Aterramento</span>
+          <span class="layer-toggle" onclick="event.stopPropagation();toggleLayerVis(this)">👁</span>
+        </div>
+        <div class="layer-row" data-layer="tomadas" onclick="setLayer('tomadas',this)">
+          <div class="layer-dot" style="background:#a855f7"></div>
+          <span class="layer-name">Tomadas</span>
+          <span class="layer-toggle" onclick="event.stopPropagation();toggleLayerVis(this)">👁</span>
+        </div>
+        <div class="layer-row" data-layer="anotações" onclick="setLayer('anotações',this)">
+          <div class="layer-dot" style="background:#ef4444"></div>
+          <span class="layer-name">Anotações</span>
+          <span class="layer-toggle" onclick="event.stopPropagation();toggleLayerVis(this)">👁</span>
+        </div>
+      </div>
     </div>
+
+    <div class="panel-title" style="padding:10px 10px 6px;border-bottom:1px solid var(--border);">Componentes</div>
+    <div id="comp-tree"><div class="tree-empty">Nenhum componente na folha.</div></div>
+  </div>
+
+  <!-- CANVAS -->
+  <div id="canvas-wrap">
+    <div id="viewport-scroll">
+      <div id="folha"><div id="stage-parent"></div></div>
+    </div>
+
+    <!-- Zoom Controls -->
+    <div id="zoom-ctrl">
+      <button class="zoom-btn" onclick="zoomOut()">−</button>
+      <span id="zoom-val">100%</span>
+      <button class="zoom-btn" onclick="zoomIn()">+</button>
+      <button class="zoom-btn" onclick="zoomFit()" style="font-size:11px;width:auto;padding:0 4px;">⊡</button>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="right-panel">
+    <div class="prop-title">Propriedades</div>
+    <div id="prop-body">
+      <div class="prop-no-sel" id="prop-nosel">Clique em um componente para editar suas propriedades.</div>
+      <div id="prop-fields" style="display:none;">
+        <div class="prop-group">
+          <div class="prop-group-title">Identificação</div>
+          <div class="prop-field">
+            <label>TAG / ID</label>
+            <input type="text" id="p-tag" oninput="updateProp('tag',this.value)">
+          </div>
+          <div class="prop-field">
+            <label>Descrição</label>
+            <input type="text" id="p-desc" oninput="updateProp('descricao',this.value)">
+          </div>
+        </div>
+        <div class="prop-group">
+          <div class="prop-group-title">Elétrico</div>
+          <div class="prop-field">
+            <label>Tensão</label>
+            <select id="p-volt" onchange="updateProp('tensao',this.value)">
+              <option>127V</option><option>220V</option><option>380V</option><option>440V</option>
+            </select>
+          </div>
+          <div class="prop-field">
+            <label>Potência (W)</label>
+            <input type="number" id="p-pot" oninput="updateProp('potencia',this.value)">
+          </div>
+          <div class="prop-field">
+            <label>Corrente (A)</label>
+            <input type="number" id="p-cor" oninput="updateProp('corrente',this.value)" step="0.1">
+          </div>
+          <div class="prop-field">
+            <label>Circuito</label>
+            <input type="text" id="p-circ" oninput="updateProp('circuito',this.value)">
+          </div>
+        </div>
+        <div class="prop-group">
+          <div class="prop-group-title">Posição</div>
+          <div class="prop-field">
+            <label>X (px)</label><input type="number" id="p-x" oninput="updatePos('x',this.value)">
+          </div>
+          <div class="prop-field">
+            <label>Y (px)</label><input type="number" id="p-y" oninput="updatePos('y',this.value)">
+          </div>
+          <div class="prop-field">
+            <label>Rotação (°)</label><input type="number" id="p-rot" oninput="updatePos('rot',this.value)" step="45">
+          </div>
+        </div>
+        <div class="prop-group">
+          <div class="prop-group-title">Ações</div>
+          <div class="prop-action-row">
+            <button class="prop-action-btn" onclick="girarItem()">⟳ Girar</button>
+            <button class="prop-action-btn" onclick="duplicarItem()">⧉ Duplic.</button>
+          </div>
+          <div class="prop-action-row">
+            <button class="prop-action-btn red" onclick="excluirItem()">🗑 Excluir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATUS BAR -->
+<div id="statusbar">
+  <div class="sb-item"><div class="sb-dot" id="sb-status-dot"></div><strong id="sb-status">Pronto</strong></div>
+  <div class="sb-item">Camada: <strong id="sb-layer">elétrica</strong></div>
+  <div class="sb-item">Modo: <strong id="sb-mode">Seleção</strong></div>
+  <div class="sb-item" id="sb-cursor">X: <strong id="sb-x">0</strong> &nbsp; Y: <strong id="sb-y">0</strong></div>
+</div>
+
+<!-- CONTEXT MENU -->
+<div id="ctx-menu">
+  <div class="ctx-item" onclick="ctxGirar()">⟳ Girar 90°</div>
+  <div class="ctx-item" onclick="ctxDuplicar()">⧉ Duplicar</div>
+  <div class="ctx-item" onclick="ctxAlinharH()">⇔ Alinhar H</div>
+  <div class="ctx-item" onclick="ctxAlinharV()">⇕ Alinhar V</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" onclick="ctxPropriedades()">✏️ Propriedades</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item red" onclick="ctxExcluir()">🗑 Excluir</div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div class="modal">
+    <h3 id="modal-title">Novo Projeto</h3>
+    <input type="text" id="modal-input" placeholder="Nome do projeto..." maxlength="60">
+    <div class="modal-row">
+      <button class="modal-btn" onclick="fecharModal()">Cancelar</button>
+      <button class="modal-btn primary" onclick="confirmarModal()">Confirmar</button>
+    </div>
+  </div>
+</div>
 
 <script>
-    const subPaletas = {
-        UNIFILAR: [
-            { nome: 'Luz Teto', icone: '💡', acao: () => spawnComp('UNI_LUZ_TETO') },
-            { nome: 'Tomada', icone: '⏏️', acao: () => spawnComp('UNI_TOMADA_BAIXA') }
-        ],
-        ALIM: [{nome:'3~', acao:()=>spawnComp('ALIM_TRI')}], 
-        PROT: [{nome:'Disj. Motor', acao:()=>spawnComp('PROT_DISJ_MOTOR')}],
-        POTENCIA: [{nome:'Contator', acao:()=>spawnComp('POT_CONTATOR3')}],
-        MOTORES: [{nome:'Motor', acao:()=>spawnComp('MOTOR_TRI')}],
-        BOBINAS: [{nome:'Bobina', acao:()=>spawnComp('BOBINA_K')}]
+// ═══════════════════════════════════════════════════════
+//  VOLTCADPRO — ENGINE PRINCIPAL
+// ═══════════════════════════════════════════════════════
+
+// ── ESTADO ──
+let itemSelecionado = null;
+let wireMode = false;
+let wireStart = null;
+let wirePoints = [];
+let currentLayer = 'elétrica';
+let zoomLevel = 1;
+let history = [];
+let historyIdx = -1;
+let compCount = 0;
+let wireCount = 0;
+let modalCallback = null;
+let gridSnap = 10;
+let simMode = false;
+
+// ── PALETA DE COMPONENTES ──
+const PALETA = {
+  'ILUMINAÇÃO': {
+    icon: '💡',
+    itens: [
+      { id:'LUZ_TETO',    label:'Luz Teto',      ico:'💡', draw: drawLuzTeto },
+      { id:'LUZ_ARAND',   label:'Arandela',       ico:'🔆', draw: drawArandela },
+      { id:'LUZ_SPOT',    label:'Spot',            ico:'🔦', draw: drawSpot },
+      { id:'INTERRUPTOR', label:'Interruptor',     ico:'🔘', draw: drawInterruptor },
+      { id:'INT_DUPLO',   label:'Int. Duplo',      ico:'🔘', draw: drawIntDuplo },
+      { id:'INT_THREE',   label:'Int. 3 Teclas',   ico:'🔘', draw: drawInt3Teclas },
+    ]
+  },
+  'TOMADAS': {
+    icon: '⚡',
+    itens: [
+      { id:'TOM_BAIXA',   label:'Tom. Baixa',      ico:'🔌', draw: drawTomadaBaixa },
+      { id:'TOM_ALTA',    label:'Tom. Alta',       ico:'🔌', draw: drawTomadaAlta },
+      { id:'TOM_2P_T',    label:'Tom. 2P+T',       ico:'🔌', draw: drawTomada2PT },
+      { id:'TOM_TRIFASICA',label:'Tom. Trifás.',   ico:'⚡', draw: drawTomadaTri },
+    ]
+  },
+  'PROTEÇÃO': {
+    icon: '🛡',
+    itens: [
+      { id:'DISJ_MONO',   label:'Disj. Mono',      ico:'🛡', draw: drawDisjMono },
+      { id:'DISJ_DIN',    label:'Disj. DIN',       ico:'🛡', draw: drawDisjDin },
+      { id:'DISJ_MOTOR',  label:'Disj. Motor',     ico:'🛡', draw: drawDisjMotor },
+      { id:'DR',          label:'DR',               ico:'🛡', draw: drawDR },
+      { id:'DDR',         label:'DDR',              ico:'🛡', draw: drawDDR },
+      { id:'FUSIVEL',     label:'Fusível',          ico:'⚡', draw: drawFusivel },
+    ]
+  },
+  'MOTORES': {
+    icon: '⚙️',
+    itens: [
+      { id:'MOTOR_MONO',  label:'Motor Mono',      ico:'⚙️', draw: drawMotorMono },
+      { id:'MOTOR_TRI',   label:'Motor 3~',        ico:'⚙️', draw: drawMotorTri },
+      { id:'MOTOR_CC',    label:'Motor CC',        ico:'⚙️', draw: drawMotorCC },
+    ]
+  },
+  'ACIONAMENTO': {
+    icon: '🔧',
+    itens: [
+      { id:'CONTATOR',    label:'Contator',        ico:'🔧', draw: drawContator },
+      { id:'RELE_TER',    label:'Relé Término',    ico:'🔧', draw: drawReleTerm },
+      { id:'PARTIDA_DIR', label:'Partida Direta',  ico:'🔧', draw: drawPartidaDireta },
+      { id:'SOFT_START',  label:'Soft Starter',    ico:'🔧', draw: drawSoftStart },
+    ]
+  },
+  'QUADROS': {
+    icon: '📦',
+    itens: [
+      { id:'QD_GERAL',    label:'QD Geral',        ico:'📦', draw: drawQDGeral },
+      { id:'QD_PARCIAL',  label:'QD Parcial',      ico:'📦', draw: drawQDParcial },
+      { id:'MEDIDOR',     label:'Medidor',         ico:'📊', draw: drawMedidor },
+      { id:'TRAFO',       label:'Transformador',   ico:'🔄', draw: drawTrafo },
+    ]
+  },
+  'UNIFILAR': {
+    icon: '📐',
+    itens: [
+      { id:'UNI_PONTO',   label:'Ponto Luz',       ico:'📍', draw: drawUnifilarPonto },
+      { id:'UNI_TOMADA',  label:'Tomada Uni.',     ico:'📍', draw: drawUnifilarTomada },
+      { id:'UNI_BARR',    label:'Barramento',      ico:'📍', draw: drawBarramento },
+      { id:'UNI_NEUTRO',  label:'Neutro',          ico:'📍', draw: drawNeutro },
+    ]
+  },
+  'SIMBOLOS': {
+    icon: '🔣',
+    itens: [
+      { id:'TERRA',       label:'Terra',           ico:'⏚', draw: drawTerra },
+      { id:'NEUTRO_SYM',  label:'Neutro N',        ico:'N',  draw: drawNeutroSym },
+      { id:'TEXTO',       label:'Texto',           ico:'T',  draw: drawTexto },
+      { id:'SETA',        label:'Referência',      ico:'➡', draw: drawSeta },
+    ]
+  },
+};
+
+// ── KONVA SETUP ──
+const stage = new Konva.Stage({ container: 'stage-parent', width: 1188, height: 840 });
+const bgLayer    = new Konva.Layer();
+const gradeLayer = new Konva.Layer();
+const fioLayer   = new Konva.Layer();
+const compLayer  = new Konva.Layer();
+const selectLayer= new Konva.Layer();
+stage.add(bgLayer, gradeLayer, fioLayer, compLayer, selectLayer);
+
+// Grade
+drawGrade();
+
+// ── DRAW GRADE ──
+function drawGrade() {
+  gradeLayer.destroyChildren();
+  const STEP = gridSnap * 2;
+  for (let x = 0; x <= 1188; x += STEP) {
+    gradeLayer.add(new Konva.Line({
+      points:[x,0,x,840], stroke: x%(STEP*5)===0 ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.025)',
+      strokeWidth:1
+    }));
+  }
+  for (let y = 0; y <= 840; y += STEP) {
+    gradeLayer.add(new Konva.Line({
+      points:[0,y,1188,y], stroke: y%(STEP*5)===0 ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.025)',
+      strokeWidth:1
+    }));
+  }
+  gradeLayer.draw();
+}
+
+// ── CURSOR TRACKER ──
+stage.on('mousemove', (e) => {
+  const pos = stage.getPointerPosition();
+  document.getElementById('sb-x').textContent = Math.round(pos.x);
+  document.getElementById('sb-y').textContent = Math.round(pos.y);
+});
+
+// ── CLICK BACKGROUND = DESELECT ──
+stage.on('click', (e) => {
+  if (e.target === stage || e.target.getParent() === gradeLayer || e.target.getParent() === bgLayer) {
+    deselecionar();
+    fecharCtxMenu();
+  }
+});
+
+// ── RIGHT CLICK ──
+stage.on('contextmenu', (e) => {
+  e.evt.preventDefault();
+  if (itemSelecionado) {
+    const mx = e.evt.clientX, my = e.evt.clientY;
+    const menu = document.getElementById('ctx-menu');
+    menu.style.display = 'block';
+    menu.style.left = mx + 'px';
+    menu.style.top  = my + 'px';
+  }
+});
+document.addEventListener('click', fecharCtxMenu);
+
+// ═══════════════════════════════════════════════════════
+//  FUNÇÕES DE DESENHO DOS SÍMBOLOS
+// ═══════════════════════════════════════════════════════
+// Cores padrão NBR
+const C = { black:'#1a1a1a', blue:'#1a3fa3', orange:'#d97706', red:'#dc2626', green:'#16a34a', gray:'#6b7280', white:'#fff', purple:'#7c3aed' };
+
+function drawLuzTeto(g) {
+  g.add(new Konva.Circle({radius:14, stroke:C.black, strokeWidth:2, fill:C.white}));
+  g.add(new Konva.Line({points:[-10,-10,10,10], stroke:C.black, strokeWidth:2}));
+  g.add(new Konva.Line({points:[-10,10,10,-10], stroke:C.black, strokeWidth:2}));
+}
+function drawArandela(g) {
+  g.add(new Konva.Circle({radius:14, stroke:C.black, strokeWidth:2, fill:C.white}));
+  g.add(new Konva.Circle({radius:6, stroke:C.black, strokeWidth:1.5, fill:C.white}));
+}
+function drawSpot(g) {
+  g.add(new Konva.RegularPolygon({sides:6, radius:14, stroke:C.black, strokeWidth:2, fill:C.white, rotation:30}));
+  g.add(new Konva.Circle({radius:4, fill:C.black}));
+}
+function drawInterruptor(g) {
+  g.add(new Konva.Circle({x:0, y:0, radius:4, fill:C.black}));
+  g.add(new Konva.Line({points:[0,0,12,-10], stroke:C.black, strokeWidth:2}));
+  g.add(new Konva.Circle({x:12, y:-10, radius:3, stroke:C.black, strokeWidth:1.5, fill:C.white}));
+}
+function drawIntDuplo(g) {
+  [-6,6].forEach(ox => {
+    g.add(new Konva.Circle({x:ox, y:0, radius:3.5, fill:C.black}));
+    g.add(new Konva.Line({points:[ox,0,ox+9,-8], stroke:C.black, strokeWidth:1.5}));
+    g.add(new Konva.Circle({x:ox+9, y:-8, radius:2.5, stroke:C.black, strokeWidth:1.5, fill:C.white}));
+  });
+}
+function drawInt3Teclas(g) {
+  [-10,0,10].forEach(ox => {
+    g.add(new Konva.Circle({x:ox, y:2, radius:3, fill:C.black}));
+    g.add(new Konva.Line({points:[ox,2,ox+7,-7], stroke:C.black, strokeWidth:1.5}));
+    g.add(new Konva.Circle({x:ox+7, y:-7, radius:2.5, stroke:C.black, strokeWidth:1.5, fill:C.white}));
+  });
+}
+function drawTomadaBaixa(g) {
+  g.add(new Konva.Circle({radius:12, stroke:C.black, strokeWidth:2, fill:C.white}));
+  g.add(new Konva.Line({points:[-6,0,6,0], stroke:C.black, strokeWidth:2}));
+  g.add(new Konva.Line({points:[-6,3,6,3], stroke:C.black, strokeWidth:1.5}));
+}
+function drawTomadaAlta(g) {
+  g.add(new Konva.Circle({radius:12, stroke:C.black, strokeWidth:2, fill:C.white}));
+  g.add(new Konva.Line({points:[-6,-2,6,-2], stroke:C.black, strokeWidth:2}));
+  g.add(new Konva.Line({points:[-6,2,6,2], stroke:C.black, strokeWidth:1.5}));
+  g.add(new Konva.Line({points:[0,4,0,8], stroke:C.black, strokeWidth:1.5}));
+}
+function drawTomada2PT(g) {
+  g.add(new Konva.Circle({radius:13, stroke:C.black, strokeWidth:2, fill:C.white}));
+  [-5,5].forEach(x => g.add(new Konva.Line({points:[x,-4,x,4], stroke:C.black, strokeWidth:2})));
+  g.add(new Konva.Line({points:[0,6,0,11], stroke:C.green, strokeWidth:2}));
+  g.add(new Konva.Circle({x:0,y:13,radius:2.5, fill:C.green}));
+}
+function drawTomadaTri(g) {
+  g.add(new Konva.Circle({radius:14, stroke:C.blue, strokeWidth:2.5, fill:C.white}));
+  [-8,0,8].forEach(x => g.add(new Konva.Line({points:[x,-4,x,4], stroke:C.blue, strokeWidth:2})));
+}
+function drawDisjMono(g) {
+  g.add(new Konva.Rect({x:-10,y:-20,width:20,height:40,stroke:C.black,strokeWidth:2,fill:C.white}));
+  g.add(new Konva.Line({points:[0,-20,0,-12], stroke:C.black, strokeWidth:2}));
+  g.add(new Konva.Line({points:[0,12,0,20], stroke:C.black, strokeWidth:2}));
+  g.add(new Konva.Arc({x:0,y:0,innerRadius:0,outerRadius:8,angle:180,rotation:-90,stroke:C.black,strokeWidth:2,fill:'transparent'}));
+}
+function drawDisjDin(g) {
+  g.add(new Konva.Rect({x:-8,y:-22,width:16,height:44,stroke:C.black,strokeWidth:2,fill:C.white,cornerRadius:2}));
+  g.add(new Konva.Rect({x:-5,y:-10,width:10,height:20,fill:'#ddd',stroke:C.gray,strokeWidth:1}));
+  g.add(new Konva.Line({points:[0,-22,0,-14], stroke:C.black, strokeWidth:2}));
+  g.add(new Konva.Line({points:[0,14,0,22], stroke:C.black, strokeWidth:2}));
+}
+function drawDisjMotor(g) {
+  g.add(new Konva.Rect({x:-18,y:-28,width:36,height:56,stroke:C.black,strokeWidth:2,fill:C.white}));
+  [-10,0,10].forEach(px => {
+    g.add(new Konva.Line({points:[px,-28,px,-16], stroke:C.black, strokeWidth:2}));
+    g.add(new Konva.Arc({x:px,y:-10,innerRadius:4,outerRadius:6,angle:180,rotation:0,stroke:C.black,strokeWidth:2,fill:'transparent'}));
+    g.add(new Konva.Line({points:[px,4,px,28], stroke:C.black, strokeWidth:2}));
+  });
+  g.add(new Konva.Text({text:'QM',x:-9,y:-6,fontSize:10,fontStyle:'bold',fill:C.black}));
+}
+function drawDR(g) {
+  g.add(new Konva.Rect({x:-14,y:-24,width:28,height:48,stroke:C.red,strokeWidth:2,fill:C.white}));
+  g.add(new Konva.Line({points:[0,-24,0,-14], stroke:C.black, strokeWidth:2}));
+  g.add(new Konva.Line({points:[0,14,0,24], stroke:C.black, strokeWidth:2}));
+  g.add(new Konva.Text({text:'DR',x:-7,y:-6,fontSize:12,fontStyle:'bold',fill:C.red}));
+}
+function drawDDR(g) {
+  g.add(new Konva.Rect({x:-16,y:-26,width:32,height:52,stroke:C.red,strokeWidth:2.5,fill:C.white}));
+  [-6,6].forEach(px => {
+    g.add(new Konva.Line({points:[px,-26,px,-14], stroke:C.black, strokeWidth:2}));
+    g.add(new Konva.Line({points:[px,14,px,26], stroke:C.black, strokeWidth:2}));
+  });
+  g.add(new Konva.Text({text:'DDR',x:-11,y:-7,fontSize:11,fontStyle:'bold',fill:C.red}));
+}
+function drawFusivel(g) {
+  g.add(new Konva.Rect({x:-6,y:-16,width:12,height:32,stroke:C.orange,strokeWidth:2,fill:C.white}));
+  g.add(new Konva.Line({points:[0,-22,0,-16], stroke:C.black, strokeWidth:2}));
+  g.add(new Konva.Line({points:[0,16,0,22], stroke:C.black, strokeWidth:2}));
+}
+function drawMotorMono(g) {
+  g.add(new Konva.Circle({radius:26,stroke:C.black,strokeWidth:2,fill:'#f3f4f6'}));
+  g.add(new Konva.Text({text:'M\n1~',x:-8,y:-12,fontSize:14,fontStyle:'bold',fill:C.black,align:'center',width:16}));
+}
+function drawMotorTri(g) {
+  g.add(new Konva.Circle({radius:26,stroke:C.black,strokeWidth:2,fill:'#f3f4f6'}));
+  g.add(new Konva.Text({text:'M\n3~',x:-8,y:-12,fontSize:14,fontStyle:'bold',fill:C.black,align:'center',width:16}));
+}
+function drawMotorCC(g) {
+  g.add(new Konva.Circle({radius:26,stroke:C.black,strokeWidth:2,fill:'#f3f4f6'}));
+  g.add(new Konva.Text({text:'M\nCC',x:-8,y:-12,fontSize:13,fontStyle:'bold',fill:C.black,align:'center',width:16}));
+}
+function drawContator(g) {
+  g.add(new Konva.Rect({x:-22,y:-28,width:44,height:56,stroke:C.black,strokeWidth:2,fill:'#f9f9f9'}));
+  [-12,0,12].forEach(px => {
+    g.add(new Konva.Line({points:[px,-28,px,-14], stroke:C.black, strokeWidth:2}));
+    g.add(new Konva.Circle({x:px,y:-12,radius:3,fill:C.black}));
+    g.add(new Konva.Line({points:[px,-12,px,12], stroke:'#999', strokeWidth:1, dash:[3,3]}));
+    g.add(new Konva.Circle({x:px,y:12,radius:3,fill:C.black}));
+    g.add(new Konva.Line({points:[px,12,px,28], stroke:C.black, strokeWidth:2}));
+  });
+  g.add(new Konva.Text({text:'K',x:-4,y:-5,fontSize:12,fontStyle:'bold',fill:C.blue}));
+}
+function drawReleTerm(g) {
+  g.add(new Konva.Rect({x:-20,y:-24,width:40,height:48,stroke:C.orange,strokeWidth:2,fill:'#fff'}));
+  [-10,0,10].forEach(px => {
+    g.add(new Konva.Line({points:[px,-24,px,-10], stroke:C.black, strokeWidth:2}));
+    g.add(new Konva.Rect({x:px-4,y:-10,width:8,height:20,stroke:C.orange,strokeWidth:1.5,fill:'#fee2e2'}));
+    g.add(new Konva.Line({points:[px,10,px,24], stroke:C.black, strokeWidth:2}));
+  });
+}
+function drawPartidaDireta(g) {
+  const box = new Konva.Rect({x:-28,y:-32,width:56,height:64,stroke:C.black,strokeWidth:2,fill:'#f0f4ff'});
+  g.add(box);
+  g.add(new Konva.Text({text:'PD',x:-10,y:-8,fontSize:16,fontStyle:'bold',fill:C.blue}));
+  [-12,0,12].forEach(px => g.add(new Konva.Line({points:[px,-32,px,-20], stroke:C.black, strokeWidth:2})));
+  [-12,0,12].forEach(px => g.add(new Konva.Line({points:[px,20,px,32], stroke:C.black, strokeWidth:2})));
+}
+function drawSoftStart(g) {
+  g.add(new Konva.Rect({x:-28,y:-32,width:56,height:64,stroke:C.purple,strokeWidth:2,fill:'#faf5ff',cornerRadius:4}));
+  g.add(new Konva.Text({text:'SS',x:-10,y:-8,fontSize:16,fontStyle:'bold',fill:C.purple}));
+  [-12,0,12].forEach(px => {
+    g.add(new Konva.Line({points:[px,-32,px,-20], stroke:C.black, strokeWidth:2}));
+    g.add(new Konva.Line({points:[px,20,px,32], stroke:C.black, strokeWidth:2}));
+  });
+}
+function drawQDGeral(g) {
+  g.add(new Konva.Rect({x:-32,y:-40,width:64,height:80,stroke:C.black,strokeWidth:2.5,fill:C.white}));
+  g.add(new Konva.Rect({x:-28,y:-36,width:56,height:72,stroke:C.gray,strokeWidth:1,fill:'#f8f8f8'}));
+  g.add(new Konva.Text({text:'QD\nGERAL',x:-14,y:-10,fontSize:12,fontStyle:'bold',fill:C.black,align:'center',width:28}));
+}
+function drawQDParcial(g) {
+  g.add(new Konva.Rect({x:-28,y:-34,width:56,height:68,stroke:C.black,strokeWidth:2,fill:C.white}));
+  g.add(new Konva.Text({text:'QD\nPARC.',x:-14,y:-10,fontSize:11,fontStyle:'bold',fill:C.black,align:'center',width:28}));
+}
+function drawMedidor(g) {
+  g.add(new Konva.Circle({radius:26,stroke:C.black,strokeWidth:2,fill:C.white}));
+  g.add(new Konva.Text({text:'kWh',x:-12,y:-7,fontSize:12,fontStyle:'bold',fill:C.black}));
+}
+function drawTrafo(g) {
+  g.add(new Konva.Circle({x:-12,y:0,radius:14,stroke:C.black,strokeWidth:2,fill:C.white}));
+  g.add(new Konva.Circle({x:12,y:0,radius:14,stroke:C.black,strokeWidth:2,fill:C.white}));
+  g.add(new Konva.Line({points:[-26,0,-32,0], stroke:C.black, strokeWidth:2}));
+  g.add(new Konva.Line({points:[26,0,32,0], stroke:C.black, strokeWidth:2}));
+}
+function drawUnifilarPonto(g) {
+  g.add(new Konva.Circle({radius:10,stroke:C.black,strokeWidth:2,fill:C.white}));
+  g.add(new Konva.Line({points:[0,-10,0,-22], stroke:C.black, strokeWidth:2}));
+  g.add(new Konva.Line({points:[0,-22,-8,-14], stroke:C.black, strokeWidth:1.5}));
+}
+function drawUnifilarTomada(g) {
+  g.add(new Konva.Circle({radius:5,fill:C.black}));
+  g.add(new Konva.Line({points:[0,0,0,-18], stroke:C.black, strokeWidth:2}));
+  g.add(new Konva.Line({points:[-8,-18,8,-18], stroke:C.black, strokeWidth:2}));
+}
+function drawBarramento(g) {
+  g.add(new Konva.Rect({x:-30,y:-4,width:60,height:8,fill:C.black}));
+}
+function drawNeutro(g) {
+  g.add(new Konva.Line({points:[0,-20,0,20], stroke:C.black, strokeWidth:2}));
+  g.add(new Konva.Line({points:[-8,0,8,0], stroke:C.black, strokeWidth:2}));
+}
+function drawTerra(g) {
+  g.add(new Konva.Line({points:[0,-20,0,0], stroke:C.green, strokeWidth:2}));
+  [-12,-7,-2].forEach((w,i) => {
+    const x = w;
+    g.add(new Konva.Line({points:[x,i*5,−x,i*5], stroke:C.green, strokeWidth:2}));
+  });
+  // simpler version
+  g.add(new Konva.Line({points:[-12,2,12,2], stroke:C.green, strokeWidth:2}));
+  g.add(new Konva.Line({points:[-8,7,8,7], stroke:C.green, strokeWidth:2}));
+  g.add(new Konva.Line({points:[-4,12,4,12], stroke:C.green, strokeWidth:2}));
+}
+function drawNeutroSym(g) {
+  g.add(new Konva.Circle({radius:12,stroke:C.blue,strokeWidth:2,fill:C.white}));
+  g.add(new Konva.Text({text:'N',x:-5,y:-8,fontSize:14,fontStyle:'bold',fill:C.blue}));
+}
+function drawTexto(g) {
+  g.add(new Konva.Rect({x:-30,y:-12,width:60,height:24,stroke:C.gray,strokeWidth:1,fill:'transparent',dash:[4,4]}));
+  g.add(new Konva.Text({text:'TEXTO',x:-20,y:-7,fontSize:12,fill:C.black,fontStyle:'bold'}));
+}
+function drawSeta(g) {
+  g.add(new Konva.Arrow({points:[0,0,36,0], fill:C.black, stroke:C.black, strokeWidth:2, pointerLength:8, pointerWidth:6}));
+}
+
+// ═══════════════════════════════════════════════════════
+//  SPAWN COMPONENTE
+// ═══════════════════════════════════════════════════════
+function spawnComp(tipo, x, y) {
+  const allItens = Object.values(PALETA).flatMap(c => c.itens);
+  const def = allItens.find(i => i.id === tipo);
+  if (!def) return;
+
+  const cx = x || 500 + Math.random()*200 - 100;
+  const cy = y || 350 + Math.random()*100 - 50;
+
+  const g = new Konva.Group({
+    x: snap(cx), y: snap(cy),
+    draggable: true,
+    name: 'COMP',
+    tipoComp: tipo,
+    tag: 'C' + (++compCount),
+    descricao: def.label,
+    tensao: '220V', potencia: '', corrente: '',
+    circuito: currentLayer,
+    layerComp: currentLayer,
+  });
+
+  def.draw(g);
+
+  // Label
+  const lbl = new Konva.Text({
+    text: g.getAttr('tag'),
+    x: -30, y: -46,
+    width: 60, align: 'center',
+    fill: '#1a3fa3', fontSize: 9, fontStyle: 'bold',
+    name: 'LABEL_TAG'
+  });
+  g.add(lbl);
+
+  // Hit area
+  g.add(new Konva.Rect({x:-32,y:-42,width:64,height:84,fill:'transparent'}));
+
+  g.on('click', (e) => { e.cancelBubble=true; selecionarItem(g); });
+  g.on('dblclick', () => { selecionarItem(g); document.getElementById('p-tag').focus(); });
+
+  g.on('dragmove', () => {
+    g.x(snap(g.x()));
+    g.y(snap(g.y()));
+    if (itemSelecionado === g) atualizarPosicaoPainel(g);
+    compLayer.draw();
+  });
+  g.on('dragend', () => { salvarHistorico(); });
+
+  compLayer.add(g);
+  compLayer.draw();
+  selecionarItem(g);
+  atualizarArvore();
+  salvarHistorico();
+  atualizarContadores();
+  return g;
+}
+
+function snap(v) {
+  return Math.round(v / gridSnap) * gridSnap;
+}
+
+// ═══════════════════════════════════════════════════════
+//  SELEÇÃO
+// ═══════════════════════════════════════════════════════
+function selecionarItem(g) {
+  deselecionar(false);
+  itemSelecionado = g;
+
+  // Highlight
+  const bb = g.getClientRect({relativeTo: compLayer});
+  const sel = new Konva.Rect({
+    x: bb.x - 4, y: bb.y - 4,
+    width: bb.width + 8, height: bb.height + 8,
+    stroke: '#3b82f6', strokeWidth: 1.5,
+    dash: [5,3], fill: 'rgba(59,130,246,0.05)',
+    name: 'SEL_RECT', listening: false
+  });
+  selectLayer.add(sel);
+  selectLayer.draw();
+
+  // Update panel
+  document.getElementById('prop-nosel').style.display = 'none';
+  document.getElementById('prop-fields').style.display = 'block';
+  document.getElementById('p-tag').value    = g.getAttr('tag') || '';
+  document.getElementById('p-desc').value   = g.getAttr('descricao') || '';
+  document.getElementById('p-volt').value   = g.getAttr('tensao') || '220V';
+  document.getElementById('p-pot').value    = g.getAttr('potencia') || '';
+  document.getElementById('p-cor').value    = g.getAttr('corrente') || '';
+  document.getElementById('p-circ').value   = g.getAttr('circuito') || '';
+  atualizarPosicaoPainel(g);
+
+  // Tree highlight
+  atualizarArvore();
+}
+
+function deselecionar(updatePanel=true) {
+  itemSelecionado = null;
+  selectLayer.destroyChildren();
+  selectLayer.draw();
+  if (updatePanel) {
+    document.getElementById('prop-nosel').style.display = '';
+    document.getElementById('prop-fields').style.display = 'none';
+  }
+  atualizarArvore();
+}
+
+function atualizarPosicaoPainel(g) {
+  document.getElementById('p-x').value   = Math.round(g.x());
+  document.getElementById('p-y').value   = Math.round(g.y());
+  document.getElementById('p-rot').value = Math.round(g.rotation());
+}
+
+// ── UPDATE PROPS ──
+function updateProp(attr, val) {
+  if (!itemSelecionado) return;
+  itemSelecionado.setAttr(attr, val);
+  if (attr === 'tag') {
+    const lbl = itemSelecionado.findOne('.LABEL_TAG');
+    if (lbl) lbl.text(val);
+    compLayer.draw();
+    atualizarArvore();
+  }
+}
+function updatePos(attr, val) {
+  if (!itemSelecionado) return;
+  if (attr === 'x')   itemSelecionado.x(snap(parseFloat(val)||0));
+  if (attr === 'y')   itemSelecionado.y(snap(parseFloat(val)||0));
+  if (attr === 'rot') itemSelecionado.rotation(parseFloat(val)||0);
+  compLayer.draw();
+  selecionarItem(itemSelecionado);
+}
+
+// ═══════════════════════════════════════════════════════
+//  AÇÕES
+// ═══════════════════════════════════════════════════════
+function girarItem() { if (!itemSelecionado) return; itemSelecionado.rotate(90); compLayer.draw(); selecionarItem(itemSelecionado); salvarHistorico(); }
+function duplicarItem() {
+  if (!itemSelecionado) return;
+  const tipo = itemSelecionado.getAttr('tipoComp');
+  spawnComp(tipo, itemSelecionado.x()+30, itemSelecionado.y()+30);
+}
+function excluirItem() {
+  if (!itemSelecionado) return;
+  itemSelecionado.destroy();
+  deselecionar();
+  compLayer.draw();
+  atualizarArvore();
+  atualizarContadores();
+  salvarHistorico();
+}
+function ctxGirar() { girarItem(); fecharCtxMenu(); }
+function ctxDuplicar() { duplicarItem(); fecharCtxMenu(); }
+function ctxAlinharH() { alinharHoriz(); fecharCtxMenu(); }
+function ctxAlinharV() { alinharVert(); fecharCtxMenu(); }
+function ctxPropriedades() { fecharCtxMenu(); }
+function ctxExcluir() { excluirItem(); fecharCtxMenu(); }
+function fecharCtxMenu() { document.getElementById('ctx-menu').style.display='none'; }
+
+function alinharHoriz() {
+  const comps = compLayer.find('.COMP');
+  if (comps.length < 2) return;
+  const refY = itemSelecionado ? itemSelecionado.y() : comps[0].y();
+  comps.forEach(c => c.y(refY));
+  compLayer.draw(); salvarHistorico();
+}
+function alinharVert() {
+  const comps = compLayer.find('.COMP');
+  if (comps.length < 2) return;
+  const refX = itemSelecionado ? itemSelecionado.x() : comps[0].x();
+  comps.forEach(c => c.x(refX));
+  compLayer.draw(); salvarHistorico();
+}
+function selecionarTudo() {
+  const comps = compLayer.find('.COMP');
+  if (comps.length > 0) { selecionarItem(comps[comps.length-1]); setStatus('Todos selecionados: '+ comps.length + ' componentes'); }
+}
+
+// ═══════════════════════════════════════════════════════
+//  MODO FIO
+// ═══════════════════════════════════════════════════════
+function toggleWireMode() {
+  wireMode = !wireMode;
+  document.getElementById('btnWire').style.background = wireMode ? 'var(--accent2)' : '';
+  document.getElementById('btnWire').style.color = wireMode ? '#fff' : '';
+  document.body.classList.toggle('wire-mode', wireMode);
+  document.getElementById('sb-mode').textContent = wireMode ? 'Fiação' : 'Seleção';
+  if (!wireMode) { wireStart = null; wirePoints = []; setStatus('Modo seleção'); }
+  else setStatus('Modo fiação — clique para iniciar um fio');
+}
+
+stage.on('click', (e) => {
+  if (!wireMode) return;
+  const pos = stage.getPointerPosition();
+  const px = snap(pos.x), py = snap(pos.y);
+
+  if (!wireStart) {
+    wireStart = {x:px, y:py};
+    wirePoints = [px, py];
+    setStatus('Fiação: clique no destino');
+  } else {
+    wirePoints.push(px, py);
+    const wire = new Konva.Line({
+      points: [wireStart.x, wireStart.y, px, py],
+      stroke: '#1a3fa3', strokeWidth: 2,
+      lineCap: 'round', lineJoin: 'round',
+      name: 'WIRE'
+    });
+    fioLayer.add(wire);
+    fioLayer.draw();
+    wireStart = {x:px, y:py};
+    wireCount++;
+    atualizarContadores();
+    salvarHistorico();
+    setStatus('Fiação: ' + wireCount + ' segmento(s)');
+  }
+});
+
+// ── ESCAPE cancels wire ──
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { if (wireMode) toggleWireMode(); deselecionar(); }
+  if (e.key === 'Delete' || e.key === 'Backspace') { excluirItem(); }
+  if (e.ctrlKey && e.key === 'z') { desfazer(); }
+  if (e.ctrlKey && e.key === 'y') { refazer(); }
+  if (e.ctrlKey && e.key === 's') { e.preventDefault(); salvarProjeto(); }
+  if (e.ctrlKey && e.key === 'n') { e.preventDefault(); novoArquivo(); }
+  if (e.ctrlKey && e.key === 'a') { e.preventDefault(); selecionarTudo(); }
+  if (e.key === 'r' || e.key === 'R') { girarItem(); }
+  if (e.key === 'w' || e.key === 'W') { toggleWireMode(); }
+  if (e.key === 'g' || e.key === 'G') { carregarExemplo(); }
+});
+
+// ═══════════════════════════════════════════════════════
+//  HISTÓRICO (UNDO/REDO)
+// ═══════════════════════════════════════════════════════
+function salvarHistorico() {
+  const json = stage.toJSON();
+  history = history.slice(0, historyIdx+1);
+  history.push(json);
+  historyIdx++;
+  if (history.length > 40) { history.shift(); historyIdx--; }
+}
+function desfazer() {
+  if (historyIdx <= 0) return;
+  historyIdx--;
+  stage.destroy();
+  setStatus('Desfeito');
+}
+function refazer() {
+  if (historyIdx >= history.length-1) return;
+  historyIdx++;
+  setStatus('Refeito');
+}
+
+// ═══════════════════════════════════════════════════════
+//  ZOOM
+// ═══════════════════════════════════════════════════════
+function zoomIn()  { zoomLevel = Math.min(3, zoomLevel + 0.1); aplicarZoom(); }
+function zoomOut() { zoomLevel = Math.max(0.3, zoomLevel - 0.1); aplicarZoom(); }
+function zoomFit() { zoomLevel = 1; aplicarZoom(); }
+function aplicarZoom() {
+  const folha = document.getElementById('folha');
+  folha.style.transform = `scale(${zoomLevel})`;
+  folha.style.transformOrigin = 'top left';
+  document.getElementById('zoom-val').textContent = Math.round(zoomLevel*100) + '%';
+}
+// Mouse wheel zoom
+document.getElementById('canvas-wrap').addEventListener('wheel', (e) => {
+  e.preventDefault();
+  if (e.deltaY < 0) zoomIn(); else zoomOut();
+}, { passive: false });
+
+// ═══════════════════════════════════════════════════════
+//  LAYERS
+// ═══════════════════════════════════════════════════════
+function setLayer(name, el) {
+  currentLayer = name;
+  document.querySelectorAll('.layer-row').forEach(r => r.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('sb-layer').textContent = name;
+}
+function toggleLayerVis(el) {
+  el.textContent = el.textContent === '👁' ? '🚫' : '👁';
+}
+
+// ═══════════════════════════════════════════════════════
+//  PLANTA / FUNDO
+// ═══════════════════════════════════════════════════════
+function carregarPlanta(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const ki = new Konva.Image({x:0,y:0,image:img,width:1188,height:840,opacity:0.4});
+      bgLayer.destroyChildren();
+      bgLayer.add(ki);
+      bgLayer.draw();
+      setStatus('Planta carregada: ' + input.files[0].name);
     };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
 
-    // --- SETUP KONVA ---
-    const stage = new Konva.Stage({ container: 'stage-parent', width: 1050, height: 740 });
-    const bgLayer = new Konva.Layer();    // Camada de Planta
-    const gradeLayer = new Konva.Layer();
-    const fioLayer = new Konva.Layer();
-    const compLayer = new Konva.Layer();
-    stage.add(bgLayer, gradeLayer, fioLayer, compLayer);
+// ═══════════════════════════════════════════════════════
+//  EXPORTAR
+// ═══════════════════════════════════════════════════════
+function exportarPNG() {
+  const dataURL = stage.toDataURL({ pixelRatio: 2, mimeType:'image/png' });
+  const a = document.createElement('a');
+  a.href = dataURL;
+  a.download = (document.getElementById('proj-name').textContent || 'VoltCadPro') + '.png';
+  a.click();
+  setStatus('Projeto exportado como PNG');
+}
 
-    // --- FUNÇÕES DE PLANTA ---
-    function carregarPlanta(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const img = new Image();
-                img.onload = function() {
-                    const konvaImg = new Konva.Image({ x: 0, y: 0, image: img, width: 1050, height: 740, opacity: 0.5 });
-                    bgLayer.destroyChildren();
-                    bgLayer.add(konvaImg);
-                    bgLayer.draw();
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
+// ═══════════════════════════════════════════════════════
+//  PROJETO
+// ═══════════════════════════════════════════════════════
+function novoArquivo() {
+  abrirModal('Novo Projeto', 'Nome do projeto...', (nome) => {
+    compLayer.destroyChildren(); bgLayer.destroyChildren();
+    fioLayer.destroyChildren(); selectLayer.destroyChildren();
+    compLayer.draw(); bgLayer.draw(); fioLayer.draw(); selectLayer.draw();
+    compCount=0; wireCount=0;
+    document.getElementById('proj-name').textContent = nome || 'Sem título';
+    document.getElementById('lbl-proj').textContent  = nome || 'Sem título';
+    deselecionar();
+    atualizarArvore();
+    atualizarContadores();
+    history=[]; historyIdx=-1;
+    setStatus('Novo projeto: ' + (nome||'Sem título'));
+  });
+}
 
-    // --- MEGA IMPLANTAÇÃO DE SÍMBOLOS ---
-    function spawnComp(tipo) {
-        const g = new Konva.Group({ x: 500, y: 300, draggable: true, name: 'GRUPO_COMP', tipoComp: tipo, tag: 'ID-' + Math.floor(Math.random()*100) });
-        
-        // Novos Símbolos Arquitetônicos
-        if(tipo === 'UNI_LUZ_TETO') {
-            g.add(new Konva.Circle({radius:12, stroke:'#000', strokeWidth:2}));
-            g.add(new Konva.Line({points:[-12,-12, 12,12], stroke:'#000', strokeWidth:2}));
-        }
-        else if(tipo === 'UNI_TOMADA_BAIXA') {
-            g.add(new Konva.RegularPolygon({sides:3, radius:10, stroke:'#000', strokeWidth:2}));
-        }
-        // Símbolos existentes
-        else if(tipo === 'ALIM_TRI') {
-            g.add(new Konva.Rect({x:-25, y:-10, width:50, height:20, stroke:'#333', strokeWidth:1, fill:'#f0f0f0'}));
-            [-15, 0, 15].forEach(px => {
-                g.add(new Konva.Circle({x:px, y:-10, radius:3, fill:'#000'}));
-                g.add(new Konva.Line({points:[px,-10, px,15], stroke:'#000', strokeWidth:2}));
-            });
-        }
-        else if(tipo === 'PROT_DISJ_MOTOR') {
-            g.add(new Konva.Rect({x:-20, y:-30, width:40, height:60, stroke:'#222', strokeWidth:2, fill:'#fff'}));
-            g.add(new Konva.Arc({x:0, y:-10, innerRadius:5, outerRadius:7, angle:180, rotation:0, stroke:'#222', strokeWidth:2}));
-        }
-        else if(tipo === 'POT_CONTATOR3') {
-            g.add(new Konva.Rect({x:-25, y:-30, width:50, height:60, stroke:'#222', strokeWidth:2, fill:'#e9e9e9'}));
-            [-15, 0, 15].forEach(px => {
-                g.add(new Konva.Line({points:[px,-20, px,20], stroke:'#000', strokeWidth:2}));
-                g.add(new Konva.Circle({x:px, y:-25, radius:3, fill:'#000'}));
-                g.add(new Konva.Circle({x:px, y:25, radius:3, fill:'#000'}));
-            });
-        }
-        else if(tipo === 'MOTOR_TRI') {
-            g.add(new Konva.Circle({radius:30, stroke:'#222', strokeWidth:2, fill:'#d1d1d1', name:'CORPO_MOTOR'}));
-            g.add(new Konva.Text({text:'M\n3~', x:-7, y:-12, fontSize:14, fontWeight:'bold'}));
-        }
-        else if(tipo === 'BOBINA_K') {
-            g.add(new Konva.Rect({x:-20, y:-20, width:40, height:40, stroke:'#005fb8', strokeWidth:2, fill:'#fff', name:'CORPO_BOBINA'}));
-        }
+function salvarProjeto() {
+  const data = {
+    nome: document.getElementById('proj-name').textContent,
+    componentes: compLayer.toJSON(),
+    fios: fioLayer.toJSON(),
+    versao: '1.0'
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (data.nome||'projeto') + '.voltcad';
+  a.click();
+  setStatus('Projeto salvo: ' + data.nome + '.voltcad');
+}
 
-        g.add(new Konva.Text({text: g.getAttr('tag'), x:-30, y:-55, width:60, align:'center', fill:'#005fb8', fontSize:10, name:'LABEL_TAG'}));
-        g.on('click', (e) => { e.cancelBubble = true; abrirPropQuick(g); });
-        compLayer.add(g); compLayer.draw();
-    }
+// ═══════════════════════════════════════════════════════
+//  SIMULAÇÃO
+// ═══════════════════════════════════════════════════════
+function ativarSimulacao() {
+  simMode = true;
+  document.body.classList.add('simulating');
+  document.getElementById('btnSim').disabled = true;
+  document.getElementById('btnStop').disabled = false;
+  setStatus('⚡ Simulação ativa — verificando circuitos...');
+  document.querySelector('.sb-dot').classList.add('warn');
 
-    // [MANUTENÇÃO DAS FUNÇÕES ORIGINAIS]
-    function renderBar() {
-        const catBar = document.getElementById('catBar');
-        Object.keys(subPaletas).forEach(cat => {
-            const b = document.createElement('button');
-            b.className = 'cat-btn';
-            b.innerText = cat;
-            b.onclick = () => {
-                document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));
-                b.classList.add('active');
-                renderSub(cat);
-            };
-            catBar.appendChild(b);
-        });
-    }
-    function renderSub(cat) {
-        const sub = document.getElementById('subBar');
-        sub.innerHTML = '';
-        subPaletas[cat].forEach(i => {
-            const b = document.createElement('button');
-            b.className = 'comp-spawn-btn';
-            b.innerHTML = i.icone + ' ' + i.nome;
-            b.onclick = i.acao;
-            sub.appendChild(b);
-        });
-    }
-    function abrirPropQuick(g) { itemEditando = g; document.getElementById('quickProp').style.display = 'flex'; }
-    function fecharPropQuick() { document.getElementById('quickProp').style.display = 'none'; }
-    function aplicarTagQuick(v) { if(itemEditando) { itemEditando.setAttr('tag', v); itemEditando.findOne('.LABEL_TAG').text(v); compLayer.draw(); } }
-    function removerSelecionadoQuick() { if(itemEditando) { itemEditando.destroy(); fecharPropQuick(); compLayer.draw(); } }
-    function girarSelecionadoQuick() { if(itemEditando) { itemEditando.rotate(90); compLayer.draw(); } }
-    function limparFolha() { compLayer.destroyChildren(); bgLayer.destroyChildren(); compLayer.draw(); bgLayer.draw(); fioLayer.destroyChildren(); fioLayer.draw(); }
-    function ativarSimulacao() { alert('Simulação iniciada'); }
-    function pararSimulacao() { alert('Simulação parada'); }
-    function carregarExemploReal() { /* Mantido */ }
-    
-    renderBar();
+  // Highlight de fios em verde
+  fioLayer.find('.WIRE').forEach(w => {
+    w.stroke('#22c55e');
+    w.strokeWidth(2.5);
+  });
+  fioLayer.draw();
+}
+function pararSimulacao() {
+  simMode = false;
+  document.body.classList.remove('simulating');
+  document.getElementById('btnSim').disabled = false;
+  document.getElementById('btnStop').disabled = true;
+  document.querySelector('.sb-dot').classList.remove('warn');
+
+  fioLayer.find('.WIRE').forEach(w => {
+    w.stroke('#1a3fa3');
+    w.strokeWidth(2);
+  });
+  fioLayer.draw();
+  setStatus('Simulação encerrada');
+}
+
+// ═══════════════════════════════════════════════════════
+//  ÁRVORE DE COMPONENTES
+// ═══════════════════════════════════════════════════════
+function atualizarArvore() {
+  const tree = document.getElementById('comp-tree');
+  const comps = compLayer.find('.COMP');
+  if (comps.length === 0) {
+    tree.innerHTML = '<div class="tree-empty">Nenhum componente na folha.</div>';
+    return;
+  }
+  tree.innerHTML = '';
+  comps.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'tree-item' + (c === itemSelecionado ? ' selected' : '');
+    div.innerHTML = `<span class="tree-ico">⚡</span><span class="tree-label">${c.getAttr('tag')||'—'}</span><span class="tree-type">${c.getAttr('tipoComp')||''}</span>`;
+    div.onclick = () => selecionarItem(c);
+    tree.appendChild(div);
+  });
+}
+
+function atualizarContadores() {
+  const comps = compLayer.find('.COMP');
+  const wires = fioLayer.find('.WIRE');
+  document.getElementById('lbl-count').textContent = comps.length;
+  document.getElementById('lbl-wires').textContent = wires.length;
+}
+
+// ═══════════════════════════════════════════════════════
+//  STATUS
+// ═══════════════════════════════════════════════════════
+function setStatus(msg) {
+  document.getElementById('sb-status').textContent = msg;
+}
+
+// ═══════════════════════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════════════════════
+function abrirModal(titulo, placeholder, cb) {
+  document.getElementById('modal-title').textContent = titulo;
+  document.getElementById('modal-input').placeholder = placeholder;
+  document.getElementById('modal-input').value = '';
+  document.getElementById('modal-overlay').classList.add('open');
+  modalCallback = cb;
+  setTimeout(() => document.getElementById('modal-input').focus(), 100);
+}
+function fecharModal() { document.getElementById('modal-overlay').classList.remove('open'); modalCallback=null; }
+function confirmarModal() {
+  const val = document.getElementById('modal-input').value.trim();
+  fecharModal();
+  if (modalCallback) modalCallback(val);
+}
+document.getElementById('modal-input').addEventListener('keydown', e => { if(e.key==='Enter') confirmarModal(); if(e.key==='Escape') fecharModal(); });
+
+// ═══════════════════════════════════════════════════════
+//  RENDER BARRAS
+// ═══════════════════════════════════════════════════════
+function renderCatBar() {
+  const bar = document.getElementById('catbar');
+  Object.entries(PALETA).forEach(([cat, data]) => {
+    const b = document.createElement('button');
+    b.className = 'cat-btn';
+    b.innerHTML = data.icon + ' ' + cat;
+    b.onclick = () => {
+      document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      renderSubBar(cat);
+    };
+    bar.appendChild(b);
+  });
+}
+
+function renderSubBar(cat) {
+  const sub = document.getElementById('subbar');
+  sub.innerHTML = `<span class="sub-section">${cat}</span>`;
+  PALETA[cat].itens.forEach(item => {
+    const b = document.createElement('button');
+    b.className = 'comp-btn';
+    b.innerHTML = `<span class="ico">${item.ico}</span>${item.label}`;
+    b.title = item.label;
+    b.onclick = () => spawnComp(item.id);
+    sub.appendChild(b);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  EXEMPLO AUTOMÁTICO
+// ═══════════════════════════════════════════════════════
+function carregarExemplo() {
+  compLayer.destroyChildren(); fioLayer.destroyChildren();
+  selectLayer.destroyChildren(); compLayer.draw(); fioLayer.draw();
+  compCount=0; wireCount=0;
+
+  // QD Geral
+  const qd = spawnComp('QD_GERAL', 80, 400);
+
+  // Circuito 1: Iluminação
+  const d1 = spawnComp('DISJ_DIN', 200, 200);
+  const i1 = spawnComp('LUZ_TETO', 340, 200);
+  const i2 = spawnComp('LUZ_TETO', 440, 200);
+  const i3 = spawnComp('LUZ_TETO', 540, 200);
+  const sw1 = spawnComp('INTERRUPTOR', 340, 300);
+
+  // Circuito 2: Tomadas
+  const d2 = spawnComp('DISJ_DIN', 200, 370);
+  const t1 = spawnComp('TOM_2P_T', 340, 370);
+  const t2 = spawnComp('TOM_2P_T', 440, 370);
+  const t3 = spawnComp('TOM_ALTA', 540, 370);
+
+  // Circuito 3: Motor
+  const d3 = spawnComp('DISJ_MOTOR', 200, 520);
+  const ct = spawnComp('CONTATOR', 340, 520);
+  const rt = spawnComp('RELE_TER', 460, 520);
+  const mt = spawnComp('MOTOR_TRI', 600, 520);
+
+  // Tags
+  if(qd) { qd.setAttr('tag','QD-01'); qd.findOne('.LABEL_TAG').text('QD-01'); }
+  if(d1) { d1.setAttr('tag','C1-D1'); d1.findOne('.LABEL_TAG').text('C1-D1'); }
+  if(d2) { d2.setAttr('tag','C2-D1'); d2.findOne('.LABEL_TAG').text('C2-D1'); }
+  if(d3) { d3.setAttr('tag','C3-QM'); d3.findOne('.LABEL_TAG').text('C3-QM'); }
+  if(ct) { ct.setAttr('tag','K1');    ct.findOne('.LABEL_TAG').text('K1'); }
+  if(rt) { rt.setAttr('tag','RT1');   rt.findOne('.LABEL_TAG').text('RT1'); }
+  if(mt) { mt.setAttr('tag','M1');    mt.findOne('.LABEL_TAG').text('M1'); }
+
+  // Fios
+  function addWire(x1,y1,x2,y2,color) {
+    fioLayer.add(new Konva.Line({
+      points:[x1,y1,x2,y2],
+      stroke:color||'#1a3fa3',strokeWidth:2,
+      lineCap:'round',lineJoin:'round',name:'WIRE'
+    }));
+    wireCount++;
+  }
+
+  // QD → disjuntores
+  addWire(80,400,140,400); addWire(140,400,140,200); addWire(140,200,180,200);
+  addWire(140,370,180,370); addWire(140,520,180,520);
+  // Circuito iluminação
+  addWire(220,200,320,200); addWire(320,200,540,200);
+  addWire(340,186,340,280); addWire(440,186,440,280); addWire(540,186,540,280);
+  addWire(320,200,320,300); addWire(320,300,322,300);
+  // Circuito tomadas
+  addWire(220,370,320,370); addWire(320,370,540,370);
+  // Circuito motor
+  addWire(218,520,312,520); addWire(368,520,432,520); addWire(488,520,560,520);
+
+  compLayer.draw(); fioLayer.draw();
+  atualizarArvore();
+  atualizarContadores();
+  setStatus('Exemplo carregado — G para recarregar, W para modo fio');
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+renderCatBar();
+// Activate first cat
+document.querySelector('.cat-btn').click();
+salvarHistorico();
+setStatus('VoltCadPro pronto — Pressione G para carregar exemplo');
+
 </script>
 </body>
 </html>
