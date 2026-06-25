@@ -581,6 +581,7 @@
           <button class="tab active" data-tab="orc">📋 Novo Orçamento</button>
           <button class="tab" data-tab="eng">⚡ Eletricista / Engenheiro</button>
           <button class="tab" data-tab="hist-prof">📚 Histórico</button>
+          <button class="tab" data-tab="planos" style="color: var(--secondary);">💎 Planos e Assinaturas</button>
         </nav>
       </aside>
 
@@ -854,6 +855,81 @@
 
         <div class="tab-content" id="tab-perfil"></div>
 
+        <!-- NOVA ABA: PLANOS E ASSINATURAS -->
+        <div class="tab-content" id="tab-planos">
+          <div class="card" style="border-top: 4px solid var(--secondary);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+              <h3 style="margin:0; font-size: 22px; color: var(--secondary);">💎 Planos e Assinaturas</h3>
+              <button class="btn-header print-hidden" onclick="alternarRecolhimento('conteudo-planos', this)" style="padding: 4px 10px; font-size: 12px;">▼ Recolher</button>
+            </div>
+            
+            <div id="conteudo-planos">
+              <p style="color: var(--text-light); margin-bottom: 32px; text-align: center; max-width: 600px; margin-left: auto; margin-right: auto;">
+                Evolua seu negócio com ferramentas exclusivas. Aproveite a plataforma com total liberdade e automatize seu fluxo de trabalho.
+              </p>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 24px;">
+                
+                <!-- PLANO FREE / AVALIAÇÃO -->
+                <div style="background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; position: relative;">
+                  <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #10b981; color: #020617; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase;">Acesso Atual</div>
+                  <h4 style="font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 8px;">Free / Trial</h4>
+                  <div style="text-align: center; margin-bottom: 20px;">
+                    <span style="font-size: 32px; font-weight: 900; color: var(--text);">R$ 0</span><span style="color: var(--text-light);">/mês</span>
+                  </div>
+                  <ul style="list-style: none; padding: 0; margin-bottom: 24px; flex: 1; color: var(--text-light); font-size: 14px;">
+                    <li style="margin-bottom: 12px;">✅ <strong>60 Dias Premium Grátis</strong></li>
+                    <li style="margin-bottom: 12px;">✅ Criar orçamentos básicos</li>
+                    <li style="margin-bottom: 12px;">✅ Acesso à Tabela Nacional</li>
+                    <li style="margin-bottom: 12px; color: #ef4444;">❌ Histórico ilimitado em nuvem</li>
+                    <li style="margin-bottom: 12px; color: #ef4444;">❌ Logo na impressão do PDF</li>
+                  </ul>
+                  <p style="font-size: 12px; color: var(--secondary); text-align: center; margin-bottom: 16px; font-weight: 600;">*Período de avaliação de 60 dias expira em 25/06/2026.</p>
+                  <button class="btn-secondary-action" disabled style="cursor: not-allowed; opacity: 0.5;">Seu Plano Atual</button>
+                </div>
+
+                <!-- PLANO PRO -->
+                <div style="background: var(--card-bg); border: 2px solid var(--primary); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; transform: scale(1.02); box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);">
+                  <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase;">Mais Escolhido</div>
+                  <h4 style="font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 8px; color: var(--primary);">Plano Pro</h4>
+                  <div style="text-align: center; margin-bottom: 20px;">
+                    <span style="font-size: 32px; font-weight: 900; color: var(--text);">R$ 9,90</span><span style="color: var(--text-light);">/mês</span>
+                  </div>
+                  <ul style="list-style: none; padding: 0; margin-bottom: 24px; flex: 1; color: var(--text-light); font-size: 14px;">
+                    <li style="margin-bottom: 12px;">✅ <strong>Sem doação PIX na tela</strong></li>
+                    <li style="margin-bottom: 12px;">✅ Histórico ilimitado salvo em Nuvem</li>
+                    <li style="margin-bottom: 12px;">✅ Geração de PDF Profissional</li>
+                    <li style="margin-bottom: 12px;">✅ Inserir Logo da Empresa</li>
+                    <li style="margin-bottom: 12px; color: #ef4444;">❌ Dimensionamento Avançado NBR 5410</li>
+                  </ul>
+                  <button class="btn-primary" onclick="alert('Redirecionando para o Asaas...')">Assinar Plano Pro</button>
+                </div>
+
+                <!-- PLANO MASTER -->
+                <div style="background: var(--bg-color); border: 1px solid var(--secondary); border-radius: 16px; padding: 24px; display: flex; flex-direction: column;">
+                  <h4 style="font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 8px; color: var(--secondary);">Plano Master</h4>
+                  <div style="text-align: center; margin-bottom: 20px;">
+                    <span style="font-size: 32px; font-weight: 900; color: var(--text);">R$ 19,90</span><span style="color: var(--text-light);">/mês</span>
+                  </div>
+                  <ul style="list-style: none; padding: 0; margin-bottom: 24px; flex: 1; color: var(--text-light); font-size: 14px;">
+                    <li style="margin-bottom: 12px;">✅ <strong>Tudo do plano Pro</strong></li>
+                    <li style="margin-bottom: 12px;">✅ Dimensionamento Completo NBR 5410</li>
+                    <li style="margin-bottom: 12px;">✅ Cálculo de Demanda Dinâmico</li>
+                    <li style="margin-bottom: 12px;">✅ Especificação de DR e DPS Automática</li>
+                    <li style="margin-bottom: 12px;">✅ Suporte Técnico Prioritário VIP</li>
+                  </ul>
+                  <button class="btn-primary" style="background: var(--secondary); color: #020617;" onclick="alert('Redirecionando para o Asaas...')">Assinar Plano Master</button>
+                </div>
+
+              </div>
+              <div style="text-align: center; margin-top: 24px; font-size: 13px; color: var(--text-light);">
+                <p>🚀 Os pagamentos serão processados com total segurança pela plataforma <strong>Asaas</strong>.</p>
+                <p>Cancele a qualquer momento direto pelo seu painel.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -867,7 +943,7 @@
     var auth, db;
     var loginRole = 'profissional', signupRole = 'profissional';
     var currentUser = null;
-    var userPlan = 'free'; // NOVA VARIÁVEL GLOBAL DE PLANO
+    var userPlan = 'free'; 
     var base64LogoToSave = ""; 
     var globalSavedBudgets = []; 
 
@@ -933,7 +1009,6 @@
       });
     });
 
-    // LÓGICA DE CHECAGEM DO PLANO PREMIUM E OCULTAÇÃO DO PIX
     function checkPremiumTransition() {
       var today = new Date();
       var deadline = new Date('2026-06-25T23:59:59');
@@ -944,12 +1019,10 @@
              var data = doc.data();
              userPlan = data.plano || 'free';
              
-             // Oculta blocos de PIX caso seja Premium
              document.querySelectorAll('.pix-footer-container').forEach(function(el) {
                 el.style.display = (userPlan === 'premium') ? 'none' : 'block';
              });
 
-             // Dispara modal se estiver no prazo e for free
              if (today <= deadline && userPlan !== 'premium') {
                if(!localStorage.getItem('premiumModalShown_' + currentUser.uid)) {
                  setTimeout(function() { openModal('modalPremium'); }, 1000);
@@ -957,7 +1030,6 @@
                }
              }
              
-             // Exibe Banner Premium se já for premium
              if (userPlan === 'premium') {
                var banner = document.getElementById('premiumBanner');
                if(banner) banner.style.display = 'flex';
@@ -1068,7 +1140,7 @@
       renderProfileForm('tab-perfil');
       loadHistory('profHistContainer');
       escutarNotificacoesSuporte(); 
-      checkPremiumTransition(); // CHAMADA DO NOVO MODAL PREMIUM
+      checkPremiumTransition(); 
 
       var tbodyDim = document.getElementById('dimensTbody');
       if(tbodyDim && tbodyDim.children.length === 0) {
@@ -1533,7 +1605,6 @@
 
     function removeDimensRow(id) { document.getElementById('dimrow-' + id)?.remove(); calcularPlanilhaDimens(); }
 
-    /* ── LÓGICA ATUALIZADA DE CÁLCULO GLOBAIS DE DIMENSIONAMENTO E DEMANDA ── */
     function calcularPlanilhaDimens() {
       var mat = document.getElementById('cfgMaterial')?.value || 'Cu';
       var iso = document.getElementById('cfgIsolacao')?.value || 'PVC';
@@ -1609,7 +1680,6 @@
         var disjComerciais = [6, 10, 16, 20, 25, 32, 40, 50, 63, 70, 80, 100, 125, 160, 200, 250];
         var disj = disjComerciais.find(dj => dj >= ib * 1.1) || "Especial";
 
-        // Análise NBR 5410 para Proteções Adicionais
         var nomeCirc = row.querySelector('.dim-nome').value.toLowerCase();
         var curva = nomeCirc.match(/(chuveiro|aquecedor|torneira|resist)/) ? 'Curva B' : 'Curva C';
         
@@ -1628,7 +1698,6 @@
         row.querySelector('.dim-res-status').textContent = statusText; row.querySelector('.dim-res-status').style.color = statusColor; row.querySelector('.dim-res-status').style.fontWeight = "700";
       });
 
-      // Cálculo de Totais de Demanda e Alimentador Geral
       var demandaVA = (somaW * 0.80) / 0.95; 
       var k_tot = maxV === 380 ? 1.732 : 1;
       var ibTotal = demandaVA / (k_tot * maxV);
@@ -1639,7 +1708,6 @@
       var bitolasAlimentador = [2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
       var bitolaGeral = bitolasAlimentador.find(b => b >= (ibTotal / 3.5)) || 16;
       
-      // NOVA LÓGICA DO DR: Calculando a corrente nominal em relação ao disjuntor geral!
       var drComerciais = [25, 40, 63, 80, 100, 125];
       var drNominal = (disjGeral === "Especial") ? "Especial" : (drComerciais.find(dr => dr >= disjGeral) || disjGeral);
 
@@ -1649,7 +1717,6 @@
       document.getElementById('resTotDisj').textContent = disjGeral + ' A';
       document.getElementById('resTotCabo').textContent = bitolaGeral + ' mm²';
       
-      // Atualização Dinâmica do Painel DR (Agora varia conforme a potência/disjuntor)
       document.getElementById('resTotDR').textContent = precisaDR ? "Obrigatório ("+drNominal+"A / 30mA)" : "Opcional ("+drNominal+"A / 300mA)";
       document.getElementById('resTotDPS').textContent = precisaDPSLocal ? "Cl. II (QDC) + Local" : "Classe II (QDC)";
 
