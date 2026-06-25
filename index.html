@@ -526,7 +526,7 @@
         Estamos evoluindo para entregar recursos cada vez mais robustos. Para retribuir sua forte parceria, estamos liberando <strong>60 dias de acesso 100% gratuito ao novo Plano Premium</strong>! Aproveite todas as funcionalidades exclusivas sem nenhum custo.
       </p>
       <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid var(--secondary); padding: 16px; border-radius: 12px; margin-bottom: 24px;">
-        <p style="color: var(--secondary); font-weight: 700; font-size: 14px; text-align: center;">Válido para inscrições e ativações até 25/06/2026.</p>
+        <p style="color: var(--secondary); font-weight: 700; font-size: 14px; text-align: center;">Válido para inscrições e ativações realizadas até 25/06/2026.</p>
       </div>
       <button class="btn-primary" style="background: var(--secondary); color: #000;" onclick="ativarPremium(); closeModal();">🚀 Ativar Meus 60 Dias Premium</button>
     </div>
@@ -554,7 +554,7 @@
     </div>
 
     <div id="premiumBanner" style="display:none; background: linear-gradient(90deg, #3730a3 0%, #4f46e5 100%); color: #fff; padding: 14px 24px; text-align: center; font-weight: 600; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; border-radius: 12px; border: 1px solid #818cf8; justify-content: space-between; align-items: center;">
-      <span>🚀 <strong>Plano Premium Ativado:</strong> Você tem 60 dias de acesso liberado com exclusividade! (Válido até 25/06/2026)</span>
+      <span>🚀 <strong>Plano Premium Ativado:</strong> Aproveite suas funções exclusivas!</span>
     </div>
 
     <div class="ads-container print-hidden">
@@ -646,7 +646,7 @@
                     </div>
                     <button class="btn-primary print-hidden" id="btnSaveOrc">Salvar no Histórico</button>
                     <button class="btn-secondary-action print-hidden" id="btnCancelEditStyle" style="display:none; background:transparent; color:#ef4444; border-color:#ef4444;" onclick="clearOrcFormState()">Cancelar Edição</button>
-                    <button class="btn-secondary-action print-hidden" onclick="window.print()">🖨️ Imprimir / Gerar PDF</button>
+                    <button class="btn-secondary-action print-hidden" onclick="imprimirOrcamento()">🖨️ Imprimir / Gerar PDF</button>
                   </div>
                 </div>
               </div>
@@ -855,7 +855,6 @@
 
         <div class="tab-content" id="tab-perfil"></div>
 
-        <!-- NOVA ABA: PLANOS E ASSINATURAS -->
         <div class="tab-content" id="tab-planos">
           <div class="card" style="border-top: 4px solid var(--secondary);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
@@ -870,7 +869,6 @@
 
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 24px;">
                 
-                <!-- PLANO FREE / AVALIAÇÃO -->
                 <div style="background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; position: relative;">
                   <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #10b981; color: #020617; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase;">Acesso Atual</div>
                   <h4 style="font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 8px;">Free / Trial</h4>
@@ -882,13 +880,12 @@
                     <li style="margin-bottom: 12px;">✅ Criar orçamentos básicos</li>
                     <li style="margin-bottom: 12px;">✅ Acesso à Tabela Nacional</li>
                     <li style="margin-bottom: 12px; color: #ef4444;">❌ Histórico ilimitado em nuvem</li>
-                    <li style="margin-bottom: 12px; color: #ef4444;">❌ Logo na impressão do PDF</li>
+                    <li style="margin-bottom: 12px; color: #ef4444;">❌ Logo na impressão do PDF (Limite 10 PDFs/mês)</li>
                   </ul>
-                  <p style="font-size: 12px; color: var(--secondary); text-align: center; margin-bottom: 16px; font-weight: 600;">*Período de avaliação de 60 dias expira em 25/06/2026.</p>
+                  <p style="font-size: 12px; color: var(--secondary); text-align: center; margin-bottom: 16px; font-weight: 600;">*Promoção de 60 dias válida para ativações realizadas até 25/06/2026.</p>
                   <button class="btn-secondary-action" disabled style="cursor: not-allowed; opacity: 0.5;">Seu Plano Atual</button>
                 </div>
 
-                <!-- PLANO PRO -->
                 <div style="background: var(--card-bg); border: 2px solid var(--primary); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; transform: scale(1.02); box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);">
                   <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase;">Mais Escolhido</div>
                   <h4 style="font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 8px; color: var(--primary);">Plano Pro</h4>
@@ -898,14 +895,13 @@
                   <ul style="list-style: none; padding: 0; margin-bottom: 24px; flex: 1; color: var(--text-light); font-size: 14px;">
                     <li style="margin-bottom: 12px;">✅ <strong>Sem doação PIX na tela</strong></li>
                     <li style="margin-bottom: 12px;">✅ Histórico ilimitado salvo em Nuvem</li>
-                    <li style="margin-bottom: 12px;">✅ Geração de PDF Profissional</li>
+                    <li style="margin-bottom: 12px;">✅ Geração de PDF Profissional (Ilimitado)</li>
                     <li style="margin-bottom: 12px;">✅ Inserir Logo da Empresa</li>
                     <li style="margin-bottom: 12px; color: #ef4444;">❌ Dimensionamento Avançado NBR 5410</li>
                   </ul>
-                  <button class="btn-primary" onclick="alert('Redirecionando para o Asaas...')">Assinar Plano Pro</button>
+                  <button class="btn-primary" onclick="window.open('https://www.asaas.com/c/6ab28cjqoacc1cdw', '_blank')">Assinar Plano Pro</button>
                 </div>
 
-                <!-- PLANO MASTER -->
                 <div style="background: var(--bg-color); border: 1px solid var(--secondary); border-radius: 16px; padding: 24px; display: flex; flex-direction: column;">
                   <h4 style="font-size: 18px; font-weight: 700; text-align: center; margin-bottom: 8px; color: var(--secondary);">Plano Master</h4>
                   <div style="text-align: center; margin-bottom: 20px;">
@@ -918,7 +914,7 @@
                     <li style="margin-bottom: 12px;">✅ Especificação de DR e DPS Automática</li>
                     <li style="margin-bottom: 12px;">✅ Suporte Técnico Prioritário VIP</li>
                   </ul>
-                  <button class="btn-primary" style="background: var(--secondary); color: #020617;" onclick="alert('Redirecionando para o Asaas...')">Assinar Plano Master</button>
+                  <button class="btn-primary" style="background: var(--secondary); color: #020617;" onclick="window.open('https://www.asaas.com/c/3331mpivr46kcqs0', '_blank')">Assinar Plano Master</button>
                 </div>
 
               </div>
@@ -996,11 +992,37 @@
       auth.onAuthStateChanged(function(user) {
         currentUser = user;
         if (user) {
-          db.collection('users').doc(user.uid).get().then(function(doc) {
-            var nameToDisplay = user.displayName || user.email;
-            if(doc.exists && doc.data().nome) {
-              nameToDisplay = doc.data().nome;
+          db.collection('users').doc(user.uid).get().then(async function(doc) {
+            let data = doc.exists ? doc.data() : {};
+            let updates = {};
+            let needsUpdate = false;
+
+            // AUTOMAÇÃO 1: Se o usuário não tem plano, cadastra ele automaticamente como 'free'
+            if (!data.plano) {
+                data.plano = 'free';
+                updates.plano = 'free';
+                needsUpdate = true;
             }
+
+            // AUTOMAÇÃO 2: Verificação do vencimento dos 60 dias Premium
+            if (data.plano === 'premium' && data.premiumExpireDate) {
+                let expireDate = data.premiumExpireDate.toDate ? data.premiumExpireDate.toDate() : new Date(data.premiumExpireDate);
+                if (new Date() > expireDate) {
+                    data.plano = 'free';
+                    updates.plano = 'free';
+                    needsUpdate = true;
+                    alert("Atenção: O seu período promocional de 60 dias Premium expirou. Você foi migrado para o plano Free. Confira a aba 'Planos e Assinaturas' para continuar com acesso ilimitado!");
+                }
+            }
+
+            if (needsUpdate) {
+                await db.collection('users').doc(user.uid).set(updates, { merge: true });
+            }
+
+            userPlan = data.plano; 
+            var nameToDisplay = user.displayName || user.email;
+            if(data.nome) { nameToDisplay = data.nome; }
+
             showApp('profissional', nameToDisplay);
           }).catch(function() {
             showApp('profissional', user.displayName || user.email);
@@ -1009,33 +1031,65 @@
       });
     });
 
+    // SISTEMA DE CONTROLE DE IMPRESSÃO / LIMITE DO PLANO FREE
+    window.checkPdfLimit = async function() {
+        if (!currentUser) return false;
+        if (userPlan === 'premium' || userPlan === 'master' || userPlan === 'pro') return true;
+
+        const currentMonth = new Date().getMonth() + "-" + new Date().getFullYear();
+        try {
+            const docRef = db.collection('users').doc(currentUser.uid);
+            const doc = await docRef.get();
+            let data = doc.data() || {};
+            let pMonth = data.pdfMonth || "";
+            let pCount = data.pdfCount || 0;
+
+            if (pMonth !== currentMonth) {
+                pMonth = currentMonth;
+                pCount = 0;
+            }
+
+            if (pCount >= 10) {
+                alert("⚠️ Limite Atingido: O plano Free permite apenas 10 impressões ou geração de PDFs por mês.\nAssine o plano Pro ou Master na aba 'Planos e Assinaturas' para gerar orçamentos ilimitados.");
+                return false;
+            }
+
+            await docRef.set({ pdfMonth: pMonth, pdfCount: pCount + 1 }, { merge: true });
+            return true;
+        } catch (e) {
+            console.error("Erro ao validar limite de PDF:", e);
+            return true;
+        }
+    };
+
     function checkPremiumTransition() {
       var today = new Date();
       var deadline = new Date('2026-06-25T23:59:59');
       
-      if(currentUser) {
-        db.collection('users').doc(currentUser.uid).get().then(function(doc) {
-          if(doc.exists) {
-             var data = doc.data();
-             userPlan = data.plano || 'free';
-             
-             document.querySelectorAll('.pix-footer-container').forEach(function(el) {
-                el.style.display = (userPlan === 'premium') ? 'none' : 'block';
-             });
+      document.querySelectorAll('.pix-footer-container').forEach(function(el) {
+          el.style.display = (userPlan === 'premium' || userPlan === 'master' || userPlan === 'pro') ? 'none' : 'block';
+      });
 
-             if (today <= deadline && userPlan !== 'premium') {
-               if(!localStorage.getItem('premiumModalShown_' + currentUser.uid)) {
-                 setTimeout(function() { openModal('modalPremium'); }, 1000);
-                 localStorage.setItem('premiumModalShown_' + currentUser.uid, 'true');
-               }
-             }
-             
-             if (userPlan === 'premium') {
-               var banner = document.getElementById('premiumBanner');
-               if(banner) banner.style.display = 'flex';
-             }
+      if (today <= deadline && userPlan === 'free') {
+          if(!localStorage.getItem('premiumModalShown_' + currentUser.uid)) {
+              setTimeout(function() { openModal('modalPremium'); }, 1000);
+              localStorage.setItem('premiumModalShown_' + currentUser.uid, 'true');
           }
-        });
+      }
+      
+      var banner = document.getElementById('premiumBanner');
+      if(banner) {
+          if (userPlan === 'premium' || userPlan === 'pro') {
+             banner.innerHTML = '<span>🚀 <strong>Plano Premium Ativado:</strong> Aproveite suas funções exclusivas!</span>';
+             banner.style.display = 'flex';
+             banner.style.background = 'linear-gradient(90deg, #3730a3 0%, #4f46e5 100%)';
+          } else if (userPlan === 'master') {
+             banner.innerHTML = '<span>🏆 <strong>Plano Master Ativado:</strong> Bem-vindo à elite! Todas as funções liberadas.</span>';
+             banner.style.background = 'linear-gradient(90deg, #b45309 0%, #f59e0b 100%)';
+             banner.style.display = 'flex';
+          } else {
+             banner.style.display = 'none';
+          }
       }
     }
 
@@ -1043,12 +1097,19 @@
       var today = new Date();
       var deadline = new Date('2026-06-25T23:59:59');
       if(today > deadline) {
-         alert("Infelizmente o prazo promocional para os 60 dias gratuitos encerrou em 25/06/2026.");
+         alert("Infelizmente o prazo promocional para ativar os 60 dias gratuitos encerrou em 25/06/2026.");
          return;
       }
       if(currentUser) {
-        db.collection('users').doc(currentUser.uid).set({ plano: 'premium' }, { merge: true }).then(function() {
-           alert("Plano Premium ativado com sucesso! Seja bem-vindo à elite.");
+        var expireDate = new Date();
+        expireDate.setDate(expireDate.getDate() + 60);
+
+        db.collection('users').doc(currentUser.uid).set({ 
+            plano: 'premium',
+            premiumExpireDate: expireDate
+        }, { merge: true }).then(function() {
+           alert("Plano Premium ativado com sucesso! Você tem 60 dias de acesso.");
+           userPlan = 'premium';
            checkPremiumTransition();
         });
       }
@@ -1068,6 +1129,7 @@
       if (!n || !e || !s) { alert('Campos obrigatórios.'); return; }
       auth.createUserWithEmailAndPassword(e, s).then(function(cred) {
         return cred.user.updateProfile({ displayName: n }).then(function() {
+          // AUTOMAÇÃO NO CADASTRO PARA NOVOS USUÁRIOS
           return db.collection('users').doc(cred.user.uid).set({ nome: n, email: e, role: signupRole, plano: 'free', createdAt: new Date() });
         });
       }).then(closeModal).catch(function(err) { alert(err.message); });
@@ -1445,8 +1507,23 @@
       document.querySelector('.tab[data-tab="orc"]').click(); updateOrcTotals();
     };
 
-    window.actionReprint = function(index) {
+    window.actionReprint = async function(index) {
+      if (!(await checkPdfLimit())) return;
+      
+      // Controle de logo do plano Free
+      if (userPlan === 'free') { document.getElementById('printLogoContainer').style.display = 'none'; }
+      else if (base64LogoToSave) { document.getElementById('printLogoContainer').style.display = 'block'; }
+
       actionEditOrc(index); setTimeout(function(){ window.print(); }, 500);
+    };
+
+    window.imprimirOrcamento = async function() {
+        if (await checkPdfLimit()) {
+            // Controle de logo do plano Free
+            if (userPlan === 'free') { document.getElementById('printLogoContainer').style.display = 'none'; }
+            else if (base64LogoToSave) { document.getElementById('printLogoContainer').style.display = 'block'; }
+            window.print();
+        }
     };
 
     window.actionShareWpp = function(index) {
@@ -1565,7 +1642,7 @@
           document.getElementById('profNameTitleInput').value = upd.nome;
           if(upd.logoBase64) { 
               document.getElementById('printLogoImage').src = upd.logoBase64; 
-              document.getElementById('printLogoContainer').style.display = 'block'; 
+              // A visibilidade do logo é testada na hora da impressão
           }
         }).catch(function(e) {
           alert("Erro ao salvar: " + e.message);
@@ -1738,7 +1815,13 @@
       document.getElementById('dimPrintData').textContent = p[2] + '/' + p[1] + '/' + p[0];
     }
 
-    function prepararImpressaoDimens() {
+    window.prepararImpressaoDimens = async function() {
+      if (!(await checkPdfLimit())) return;
+
+      // Controle de logo do plano Free
+      if (userPlan === 'free') { document.getElementById('printLogoContainer').style.display = 'none'; }
+      else if (base64LogoToSave) { document.getElementById('printLogoContainer').style.display = 'block'; }
+
       document.getElementById('dimPrintProf').textContent = document.getElementById('profNameTitleInput').value || "Engenheiro Responsável";
       if(!document.getElementById('dimInputData').value) {
         var hoje = new Date().toISOString().split('T')[0];
