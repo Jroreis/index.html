@@ -307,13 +307,13 @@
 
       .dimens-print-header { display: block !important; margin-bottom: 15px; }
       
-      /* CONTROLE RÍGIDO DE COLUNAS PARA A IMPRESSÃO COM COMPRESSÃO DO CIRCUITO */
-      .dimens-table { width: 100% !important; border-collapse: collapse !important; font-size: 7pt !important; border: 1px solid #000 !important; table-layout: fixed !important; }
-      .dimens-table th { background: #e2e8f0 !important; color: #000 !important; font-weight: 800 !important; border: 1px solid #000 !important; padding: 2px !important; text-align: center !important; font-size: 7pt !important; }
-      .dimens-table td { border: 1px solid #000 !important; padding: 2px !important; text-align: center !important; color: #000 !important; background: transparent !important; font-size: 7pt !important; overflow: hidden; }
+      /* CONTROLE RÍGIDO DE COLUNAS PARA A IMPRESSÃO COM COMPRESSÃO DO CIRCUITO - DESIGN ENGENHARIA (SEM BORDAS LATERAIS) */
+      .dimens-table { width: 100% !important; border-collapse: collapse !important; font-size: 7pt !important; border: none !important; border-top: 2px solid #000 !important; border-bottom: 2px solid #000 !important; table-layout: fixed !important; }
+      .dimens-table th { background: transparent !important; color: #000 !important; font-weight: 800 !important; border: none !important; border-bottom: 2px solid #000 !important; padding: 6px 2px !important; text-align: center !important; font-size: 7pt !important; }
+      .dimens-table td { border: none !important; border-bottom: 1px dashed #cbd5e1 !important; padding: 4px 2px !important; text-align: center !important; color: #000 !important; background: transparent !important; font-size: 7pt !important; overflow: hidden; }
       
       /* Reduzido para 16% com corte automático e reticências (ellipsis) */
-      .dimens-table th:nth-child(1), .dimens-table td:nth-child(1) { width: 16% !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+      .dimens-table th:nth-child(1), .dimens-table td:nth-child(1) { width: 16% !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; text-align: left !important; }
       .dimens-table th:nth-child(2), .dimens-table td:nth-child(2) { width: 8% !important; }
       .dimens-table th:nth-child(3), .dimens-table td:nth-child(3) { width: 8% !important; }
       .dimens-table th:nth-child(4), .dimens-table td:nth-child(4) { width: 6% !important; }
@@ -324,15 +324,18 @@
       .dimens-table th:nth-child(9), .dimens-table td:nth-child(9) { width: 9% !important; }
       .dimens-table th:nth-child(10), .dimens-table td:nth-child(10) { width: 15% !important; }
 
-      .dimens-table select, .dimens-table input { font-size: 7pt !important; background: transparent !important; border: none !important; padding: 0 !important; color: #000 !important; font-weight: 600 !important; width: 100% !important; text-align: center !important; outline: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; word-wrap: break-word !important; white-space: normal !important; position: static !important; }
+      .dimens-table select, .dimens-table input { font-size: 7pt !important; background: transparent !important; border: none !important; padding: 0 !important; color: #000 !important; font-weight: 600 !important; width: 100% !important; outline: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; word-wrap: break-word !important; white-space: normal !important; position: static !important; }
+      .dimens-table select { text-align: center !important; text-align-last: center !important; }
       .dimens-table select::-ms-expand { display: none !important; }
       
       /* Aplicação do ellipsis direto no input durante a impressão */
       .dim-nome { width: 100% !important; max-width: 100% !important; position: static !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
       .dimens-table td:first-child input { width: 100% !important; position: static !important; text-align: left !important; font-weight: 800 !important; font-size: 6.5pt !important; }
 
-      .dim-totais-box { display: grid !important; grid-template-columns: repeat(7, 1fr) !important; gap: 6px !important; border: 2px solid #000 !important; background: #f8fafc !important; padding: 10px !important; border-radius: 8px !important; margin-top: 15px !important; page-break-inside: avoid !important; }
-      .dim-totais-box div { background: #fff !important; border: 1px solid #000 !important; padding: 6px !important; border-radius: 4px !important; }
+      /* Ajuste da Caixa de Totais do Dimensionamento (Sem bordas fechadas laterais) */
+      .dim-totais-box { display: grid !important; grid-template-columns: repeat(7, 1fr) !important; gap: 6px !important; border: none !important; border-top: 2px solid #000 !important; border-bottom: 2px solid #000 !important; background: transparent !important; padding: 10px 0 !important; border-radius: 0 !important; margin-top: 15px !important; page-break-inside: avoid !important; }
+      .dim-totais-box div { background: transparent !important; border: none !important; border-right: 1px solid #cbd5e1 !important; padding: 4px !important; border-radius: 0 !important; }
+      .dim-totais-box div:last-child { border-right: none !important; }
       .dim-totais-box label { color: #000 !important; font-size: 7pt !important; font-weight: 800 !important; }
       .dim-totais-box span { color: #000 !important; font-size: 11pt !important; font-weight: 900 !important; }
 
@@ -470,14 +473,6 @@
     </section>
 
     <footer style="text-align: center; padding: 32px 24px; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border-color); background: var(--bg-color);">
-      <div style="max-width: 500px; margin: 0 auto 24px auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
-        <p style="font-weight: 700; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-          ☕ Apoie o Projeto VoltCalc Pro
-        </p>
-        <p style="font-size: 12px; color: var(--text-light);">Gostou da ferramenta? Contribua com qualquer valor para ajudar a manter o servidor ativo!</p>
-        <button onclick="copiarChavePix()" class="btn-pix-donation">📋 Copiar Chave PIX</button>
-      </div>
-
       <p>&copy; 2026 VoltCalc Pro. Todos os direitos reservados.</p>
       <p style="margin-top: 12px;">
         <a href="sobre.html" style="color: var(--primary); text-decoration: none; font-weight: 600; margin: 0 10px;">Sobre Nós</a> |
@@ -521,6 +516,21 @@
       <div id="notifListBody" style="max-height: 350px; overflow-y: auto; padding-right: 8px;"><p style="color: var(--text-light); font-size: 14px;">Buscando mensagens associadas ao seu e-mail...</p></div>
     </div>
 
+    <div class="modal" id="modalPremium" style="display:none; border-top: 5px solid var(--secondary);">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <h2 style="color: var(--secondary); margin-bottom: 16px;">🌟 Você é especial para nós!</h2>
+      <p style="color: var(--text-light); margin-bottom: 16px; font-size: 15px;">
+        Olá! Queremos tirar um momento para agradecer por escolher o <strong>VoltCalc Pro</strong> como sua principal ferramenta de trabalho. O seu talento, dedicação e profissionalismo elevam o padrão da elétrica no Brasil, e é uma honra fazer parte do seu dia a dia.
+      </p>
+      <p style="color: var(--text-light); margin-bottom: 24px; font-size: 15px;">
+        Estamos evoluindo para entregar recursos cada vez mais robustos. Para retribuir sua forte parceria, estamos liberando <strong>60 dias de acesso 100% gratuito ao novo Plano Premium</strong>! Aproveite todas as funcionalidades exclusivas sem nenhum custo.
+      </p>
+      <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid var(--secondary); padding: 16px; border-radius: 12px; margin-bottom: 24px;">
+        <p style="color: var(--secondary); font-weight: 700; font-size: 14px; text-align: center;">Válido para inscrições e ativações até 25/06/2026.</p>
+      </div>
+      <button class="btn-primary" style="background: var(--secondary); color: #000;" onclick="ativarPremium(); closeModal();">🚀 Ativar Meus 60 Dias Premium</button>
+    </div>
+
   </div>
 
   <div class="app-screen" id="profScreen">
@@ -541,6 +551,10 @@
         <p id="printProfPix"></p>
         <p id="printProfTel"></p>
       </div>
+    </div>
+
+    <div id="premiumBanner" style="display:none; background: linear-gradient(90deg, #3730a3 0%, #4f46e5 100%); color: #fff; padding: 14px 24px; text-align: center; font-weight: 600; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; border-radius: 12px; border: 1px solid #818cf8; justify-content: space-between; align-items: center;">
+      <span>🚀 <strong>Plano Premium Ativado:</strong> Você tem 60 dias de acesso liberado com exclusividade! (Válido até 25/06/2026)</span>
     </div>
 
     <div class="ads-container print-hidden">
@@ -638,7 +652,7 @@
             </div>
           </article>
 
-          <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border-color); margin-top: 40px;" class="print-hidden">
+          <footer class="print-hidden pix-footer-container" style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border-color); margin-top: 40px;">
             <div style="max-width: 500px; margin: 0 auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
               <p style="font-weight: 700; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">☕ Apoie o Projeto VoltCalc Pro</p>
               <p style="font-size: 12px; color: var(--text-light);">Gostou da ferramenta? Contribua com qualquer valor para ajudar a manter o servidor ativo!</p>
@@ -772,7 +786,7 @@
                   <div><label>Corrente Total</label><span id="resTotIb" style="color: var(--secondary);">0.00 A</span></div>
                   <div><label>Disjuntor Geral</label><span id="resTotDisj" style="color: #818cf8;">-- A</span></div>
                   <div><label>Cabo Alimentador</label><span id="resTotCabo">-- mm²</span></div>
-                  <div><label>DR (IDR)</label><span id="resTotDR" style="color: #a855f7;">--</span></div>
+                  <div><label>DR Geral (IDR)</label><span id="resTotDR" style="color: #a855f7;">--</span></div>
                   <div><label>DPS</label><span id="resTotDPS" style="color: #f43f5e;">--</span></div>
                 </div>
 
@@ -828,7 +842,7 @@
               </script>
             </div>
 
-            <footer style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border-color); margin-top: 40px;" class="print-hidden">
+            <footer class="print-hidden pix-footer-container" style="text-align: center; padding: 24px 0; color: var(--text-light); font-size: 14px; border-top: 1px solid var(--border-color); margin-top: 40px;">
               <div style="max-width: 500px; margin: 0 auto; padding: 16px; border-radius: 12px; background: rgba(79, 70, 229, 0.05); border: 1px dashed rgba(79, 70, 229, 0.3);">
                 <p style="font-weight: 700; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 6px;">☕ Apoie o Projeto VoltCalc Pro</p>
                 <p style="font-size: 12px; color: var(--text-light);">Gostou da ferramenta? Contribua com qualquer valor para ajudar a manter o servidor ativo!</p>
@@ -853,6 +867,7 @@
     var auth, db;
     var loginRole = 'profissional', signupRole = 'profissional';
     var currentUser = null;
+    var userPlan = 'free'; // NOVA VARIÁVEL GLOBAL DE PLANO
     var base64LogoToSave = ""; 
     var globalSavedBudgets = []; 
 
@@ -918,6 +933,55 @@
       });
     });
 
+    // LÓGICA DE CHECAGEM DO PLANO PREMIUM E OCULTAÇÃO DO PIX
+    function checkPremiumTransition() {
+      var today = new Date();
+      var deadline = new Date('2026-06-25T23:59:59');
+      
+      if(currentUser) {
+        db.collection('users').doc(currentUser.uid).get().then(function(doc) {
+          if(doc.exists) {
+             var data = doc.data();
+             userPlan = data.plano || 'free';
+             
+             // Oculta blocos de PIX caso seja Premium
+             document.querySelectorAll('.pix-footer-container').forEach(function(el) {
+                el.style.display = (userPlan === 'premium') ? 'none' : 'block';
+             });
+
+             // Dispara modal se estiver no prazo e for free
+             if (today <= deadline && userPlan !== 'premium') {
+               if(!localStorage.getItem('premiumModalShown_' + currentUser.uid)) {
+                 setTimeout(function() { openModal('modalPremium'); }, 1000);
+                 localStorage.setItem('premiumModalShown_' + currentUser.uid, 'true');
+               }
+             }
+             
+             // Exibe Banner Premium se já for premium
+             if (userPlan === 'premium') {
+               var banner = document.getElementById('premiumBanner');
+               if(banner) banner.style.display = 'flex';
+             }
+          }
+        });
+      }
+    }
+
+    window.ativarPremium = function() {
+      var today = new Date();
+      var deadline = new Date('2026-06-25T23:59:59');
+      if(today > deadline) {
+         alert("Infelizmente o prazo promocional para os 60 dias gratuitos encerrou em 25/06/2026.");
+         return;
+      }
+      if(currentUser) {
+        db.collection('users').doc(currentUser.uid).set({ plano: 'premium' }, { merge: true }).then(function() {
+           alert("Plano Premium ativado com sucesso! Seja bem-vindo à elite.");
+           checkPremiumTransition();
+        });
+      }
+    };
+
     function handleLogin() {
       var e = document.getElementById('loginEmail').value.trim();
       var s = document.getElementById('loginSenha').value;
@@ -932,7 +996,7 @@
       if (!n || !e || !s) { alert('Campos obrigatórios.'); return; }
       auth.createUserWithEmailAndPassword(e, s).then(function(cred) {
         return cred.user.updateProfile({ displayName: n }).then(function() {
-          return db.collection('users').doc(cred.user.uid).set({ nome: n, email: e, role: signupRole, createdAt: new Date() });
+          return db.collection('users').doc(cred.user.uid).set({ nome: n, email: e, role: signupRole, plano: 'free', createdAt: new Date() });
         });
       }).then(closeModal).catch(function(err) { alert(err.message); });
     }
@@ -955,6 +1019,7 @@
               nome: u.displayName || "Profissional", 
               email: u.email, 
               role: loginRole, 
+              plano: 'free',
               createdAt: new Date() 
             });
           }
@@ -1003,6 +1068,7 @@
       renderProfileForm('tab-perfil');
       loadHistory('profHistContainer');
       escutarNotificacoesSuporte(); 
+      checkPremiumTransition(); // CHAMADA DO NOVO MODAL PREMIUM
 
       var tbodyDim = document.getElementById('dimensTbody');
       if(tbodyDim && tbodyDim.children.length === 0) {
@@ -1567,12 +1633,15 @@
       var k_tot = maxV === 380 ? 1.732 : 1;
       var ibTotal = demandaVA / (k_tot * maxV);
 
-      // CORREÇÃO: Array de disjuntores gerais agora inclui valores menores (10A, 16A, 20A) para atualizar mesmo em cálculos de baixa carga
       var disjComerciaisGerais = [10, 16, 20, 25, 32, 40, 50, 63, 70, 80, 100, 125, 160, 200, 250, 315, 400];
       var disjGeral = disjComerciaisGerais.find(dj => dj >= ibTotal * 1.1) || "Especial";
 
       var bitolasAlimentador = [2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
       var bitolaGeral = bitolasAlimentador.find(b => b >= (ibTotal / 3.5)) || 16;
+      
+      // NOVA LÓGICA DO DR: Calculando a corrente nominal em relação ao disjuntor geral!
+      var drComerciais = [25, 40, 63, 80, 100, 125];
+      var drNominal = (disjGeral === "Especial") ? "Especial" : (drComerciais.find(dr => dr >= disjGeral) || disjGeral);
 
       document.getElementById('resTotCarga').textContent = somaW.toLocaleString('pt-BR') + ' W';
       document.getElementById('resTotDemanda').textContent = Math.round(demandaVA).toLocaleString('pt-BR') + ' VA';
@@ -1580,8 +1649,8 @@
       document.getElementById('resTotDisj').textContent = disjGeral + ' A';
       document.getElementById('resTotCabo').textContent = bitolaGeral + ' mm²';
       
-      // Atualização dos Painéis Globais DR e DPS
-      document.getElementById('resTotDR').textContent = precisaDR ? "Obrigatório (30mA)" : "Geral / Opcional";
+      // Atualização Dinâmica do Painel DR (Agora varia conforme a potência/disjuntor)
+      document.getElementById('resTotDR').textContent = precisaDR ? "Obrigatório ("+drNominal+"A / 30mA)" : "Opcional ("+drNominal+"A / 300mA)";
       document.getElementById('resTotDPS').textContent = precisaDPSLocal ? "Cl. II (QDC) + Local" : "Classe II (QDC)";
 
       var selMat = document.getElementById('cfgMaterial');
