@@ -439,8 +439,7 @@
 
     <section class="section-padding features-section">
       <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">⚡</div>
+        <div class="feature-icon">⚡</div>
           <h3>Conformidade NBR 5410</h3>
           <p>Módulo avançado de dimensionamento de condutores de Cobre e Alumínio cobrindo todos os métodos de instalação (A1 a G) e fatores de correção de temperatura e agrupamento.</p>
         </div>
@@ -474,7 +473,7 @@
               <li style="margin-bottom: 12px;">✅ Gestão de Clientes</li>
               <li style="margin-bottom: 12px;">✅ Criar orçamentos básicos</li>
               <li style="margin-bottom: 12px;">✅ Acesso à Tabela Nacional</li>
-              <li style="margin-bottom: 12px; color: #ef4444;">❌ Histórico salvo em nuvem</li>
+              <li style="margin-bottom: 12px;">✅ Histórico ilimitado em nuvem</li>
               <li style="margin-bottom: 12px; color: #ef4444;">❌ Logo no PDF (Limite 10/mês)</li>
               <li style="margin-bottom: 12px; color: #ef4444;">❌ Dimensionamento NBR 5410</li>
             </ul>
@@ -506,7 +505,7 @@
               <li style="margin-bottom: 12px;">✅ <strong>Tudo do plano Pro</strong></li>
               <li style="margin-bottom: 12px;">✅ Dimensionamento Completo NBR 5410</li>
               <li style="margin-bottom: 12px;">✅ Cálculo de Demanda Dinâmico</li>
-              <li style="margin-bottom: 12px;">✅ Especificação de DR e DPS Automática</li>
+              <li style="margin-bottom: 12px;">✅ Specification de DR e DPS Automática</li>
               <li style="margin-bottom: 12px;">✅ Suporte Técnico Prioritário VIP</li>
             </ul>
             <button class="btn-primary" style="background: var(--secondary); color: #020617;" onclick="openModal('modalCadastro')">Testar Master Grátis</button>
@@ -601,7 +600,7 @@
       <button class="modal-close" onclick="closeModal()">&times;</button>
       <h2 style="color: var(--secondary); margin-bottom: 16px;">🌟 Você é especial para nós!</h2>
       <p style="color: var(--text-light); margin-bottom: 16px; font-size: 15px;">
-        Olá! Queremos tirar um momento para agradecer por escolher o <strong>VoltCalc Pro</strong> como sua principal ferramenta de trabalho. O seu talento, dedicação e profissionalismo elevam o padrão da elétrica no Brasil, e é uma honra fazer parte do seu dia a dia.
+        Olá! Queremos tirar um momento para agradecer por escolher o <strong>VoltCalc Pro</strong> como sua principal ferramenta de trabalho. O seu talento, dedicação and profissionalismo elevam o padrão da elétrica no Brasil, e é uma honra fazer parte do seu dia a dia.
       </p>
       <p style="color: var(--text-light); margin-bottom: 24px; font-size: 15px;">
         Estamos evoluindo para entregar recursos cada vez mais robustos. Para retribuir sua forte parceria, estamos liberando <strong>60 dias de acesso 100% gratuito ao novo Plano Premium</strong>! Aproveite todas as funcionalidades exclusivas sem nenhum custo.
@@ -692,6 +691,13 @@
               <div class="orc-form-grid">
                 <div>
                   <div class="profile-grid">
+                    <div class="form-group full print-hidden" style="background: rgba(79, 70, 229, 0.05); padding: 12px; border-radius: 10px; border: 1px dashed var(--primary);">
+                      <label style="color: var(--neon-green); font-weight: 700; font-size: 13px;">🔗 Vincular Cliente Cadastrado (Opcional)</label>
+                      <select id="orcSelectCliente" onchange="preencherCamposClienteSelecionado()" style="border-color: var(--primary); margin-top: 4px;">
+                        <option value="">-- Escolha um cliente para preencher a ficha técnica abaixo --</option>
+                      </select>
+                    </div>
+                    
                     <div class="form-group"><label>Nome do Cliente</label><input id="orcCliNome"></div>
                     <div class="form-group"><label>Telefone</label><input id="orcCliTel"></div>
                     <div class="form-group"><label>Data de Validade</label><input type="date" id="orcValidDate"></div>
@@ -997,7 +1003,7 @@
                     <li style="margin-bottom: 12px;">✅ Gestão de Clientes</li>
                     <li style="margin-bottom: 12px;">✅ Criar orçamentos básicos</li>
                     <li style="margin-bottom: 12px;">✅ Acesso à Tabela Nacional</li>
-                    <li style="margin-bottom: 12px; color: #ef4444;">❌ Histórico salvo em nuvem</li>
+                    <li style="margin-bottom: 12px;">✅ Histórico ilimitado em nuvem</li>
                     <li style="margin-bottom: 12px; color: #ef4444;">❌ Logo no PDF (Limite 10/mês)</li>
                     <li style="margin-bottom: 12px; color: #ef4444;">❌ Dimensionamento NBR 5410</li>
                   </ul>
@@ -1333,11 +1339,9 @@
       renderPrecosTable();
       renderProfileForm('tab-perfil');
       loadHistory('profHistContainer');
-      carregarClientes(); // Carrega clientes na aba nova
+      carregarClientes(); // Carrega clientes na aba nova e atualiza o seletor do orçamento
       escutarNotificacoesSuporte(); 
       checkPremiumTransition(); 
-
-      // TRAVA DE VISIBILIDADE REMOVIDA: A aba sempre aparece. O bloqueio agora ocorre no clique (dentro da função setupTabs).
 
       var tbodyDim = document.getElementById('dimensTbody');
       if(tbodyDim && tbodyDim.children.length === 0) {
@@ -1402,17 +1406,11 @@
       });
     }
 
-    // NOVA LÓGICA DE BLOQUEIO DE ABAS (CLICK INTERCEPT)
+    // REQUISITO 2: ABA TOTALMENTE VISÍVEL PARA TODOS OS PLANOS (TRAVA DO BOTÃO DE CLIQUE REMOVIDA)
     function setupTabs() {
       document.querySelectorAll('.tab').forEach(function(t) {
         t.onclick = function() {
           var target = t.getAttribute('data-tab');
-
-          // BLOQUEIO PREMIUM: Se for free, bloqueia o clique e abre o modal de Upgrade.
-          if (target === 'eng' && userPlan === 'free') {
-             openModal('modalUpgradeMsg');
-             return; 
-          }
 
           var screen = t.closest('.app-screen');
           screen.querySelectorAll('.tab').forEach(function(x) { x.classList.remove('active'); });
@@ -1424,18 +1422,35 @@
       });
     }
 
-    // SISTEMA DE GESTÃO DE CLIENTES
+    // GESTÃO DE CLIENTES + REQUISITO 1: PREENCHIMENTO LINK ADICIONADO
     function carregarClientes() {
         var container = document.getElementById('listaClientesContainer');
         if(!container || !currentUser) return;
         container.innerHTML = '<p style="color:var(--text-light);">Buscando seus clientes...</p>';
         
         db.collection('clientes').where('profId', '==', currentUser.uid).get().then(function(qs) {
+            var selectOrcCli = document.getElementById('orcSelectCliente');
+            if(selectOrcCli) {
+               selectOrcCli.innerHTML = '<option value="">-- Escolha um cliente para preencher a ficha técnica abaixo --</option>';
+            }
+
             if(qs.empty) { container.innerHTML = '<p style="color:var(--text-light);">Nenhum cliente cadastrado ainda. Comece a adicionar!</p>'; return; }
             
             var listDocs = []; qs.forEach(function(doc) { var d = doc.data(); d.id = doc.id; listDocs.push(d); });
-            // Ordenar por data mais recente
             listDocs.sort(function(a, b) { return b.dataCadastro.toDate().getTime() - a.dataCadastro.toDate().getTime(); });
+
+            // Alimenta o Select do Novo Orçamento vinculando os 3 elementos
+            if(selectOrcCli) {
+               listDocs.forEach(function(cli) {
+                  var opt = document.createElement('option');
+                  opt.value = cli.id;
+                  opt.textContent = cli.nome + (cli.telefone ? ' (' + cli.telefone + ')' : '');
+                  opt.setAttribute('data-nome', cli.nome || '');
+                  opt.setAttribute('data-tel', cli.telefone || '');
+                  opt.setAttribute('data-end', cli.endereco || '');
+                  selectOrcCli.appendChild(opt);
+               });
+            }
 
             var h = '<div class="ptable-wrap"><table class="ptable"><thead><tr><th>Nome</th><th>Telefone</th><th>Endereço</th><th>Ação</th></tr></thead><tbody>';
             listDocs.forEach(function(d) {
@@ -1450,6 +1465,26 @@
             container.innerHTML = h;
         }).catch(e => console.log(e));
     }
+
+    // REQUISITO 1: FUNÇÃO EXCLUSIVA DE AUTOCOMPLETAR CAMPO ORÇAMENTO
+    window.preencherCamposClienteSelecionado = function() {
+        var sel = document.getElementById('orcSelectCliente');
+        if(!sel) return;
+        var opt = sel.options[sel.selectedIndex];
+        if(!opt || !sel.value) return;
+
+        document.getElementById('orcCliNome').value = opt.getAttribute('data-nome') || '';
+        document.getElementById('orcCliTel').value = opt.getAttribute('data-tel') || '';
+        document.getElementById('orcRua').value = opt.getAttribute('data-end') || '';
+        
+        // Deixa os campos complementares prontos para o profissional ajustar o número/bairro se desejar
+        document.getElementById('orcNum').value = '';
+        document.getElementById('orcBairro').value = '';
+        document.getElementById('orcCep').value = '';
+        document.getElementById('orcCidade').value = '';
+        document.getElementById('orcEstado').value = '';
+        updateOrcTotals();
+    };
 
     window.salvarNovoCliente = function() {
         var nome = document.getElementById('cliFormNome').value.trim();
@@ -1472,14 +1507,14 @@
             document.getElementById('cliFormTel').value = '';
             document.getElementById('cliFormEmail').value = '';
             document.getElementById('cliFormEnd').value = '';
-            carregarClientes(); // Atualiza a tabela
+            carregarClientes(); 
         }).catch(e => alert("Erro ao salvar cliente: " + e.message));
     };
     
     window.apagarCliente = function(id) {
         if(confirm('Tem certeza que deseja apagar permanentemente este cliente da sua base?')) {
             db.collection('clientes').doc(id).delete().then(() => {
-                carregarClientes(); // Atualiza a tabela
+                carregarClientes(); 
             });
         }
     };
@@ -1670,6 +1705,9 @@
       document.querySelectorAll('#conteudo-orc input, #conteudo-orc textarea').forEach(i => i.value = '');
       document.getElementById('orcDiscount').value = "0";
       document.getElementById('orcItemsContainer').innerHTML = "";
+      // Reseta o select de cliente também
+      var sel = document.getElementById('orcSelectCliente');
+      if(sel) sel.selectedIndex = 0;
       updateOrcTotals();
     }
 
@@ -1714,7 +1752,6 @@
     window.actionReprint = async function(index) {
       if (!(await checkPdfLimit())) return;
       
-      // Controle de logo do plano Free
       if (userPlan === 'free') { document.getElementById('printLogoContainer').style.display = 'none'; }
       else if (base64LogoToSave) { document.getElementById('printLogoContainer').style.display = 'block'; }
 
@@ -1723,7 +1760,6 @@
 
     window.imprimirOrcamento = async function() {
         if (await checkPdfLimit()) {
-            // Controle de logo do plano Free
             if (userPlan === 'free') { document.getElementById('printLogoContainer').style.display = 'none'; }
             else if (base64LogoToSave) { document.getElementById('printLogoContainer').style.display = 'block'; }
             window.print();
@@ -1885,7 +1921,13 @@
 
     function removeDimensRow(id) { document.getElementById('dimrow-' + id)?.remove(); calcularPlanilhaDimens(); }
 
+    // REQUISITO 2: INTERCEPTAÇÃO CIRÚRGICA DE SEGURANÇA BASEADA NO PLANO FREE NO DISPARO DO CÁLCULO
     function calcularPlanilhaDimens() {
+      if (userPlan === 'free') {
+          openModal('modalUpgradeMsg');
+          return;
+      }
+
       var mat = document.getElementById('cfgMaterial')?.value || 'Cu';
       var iso = document.getElementById('cfgIsolacao')?.value || 'PVC';
       var met = document.getElementById('cfgMetodo')?.value || 'B1';
@@ -1940,7 +1982,7 @@
 
         var resistividade = mat === 'Al' ? 0.0355 : (iso === 'XLPE' ? 0.0237 : 0.0219);
         var k_queda_calc = car === 3 ? 1.732 : 2.0;
-        var dV_volts = (k_queda_calc * resistividade * dist * ib) / escolhido.s;
+        var dV_volts = (k_queda_calc * resistividade * Math.max(dist, 1) * ib) / escolhido.s;
         var dV_perc = (dV_volts / v) * 100;
 
         var statusText = "OK (Norma)"; var statusColor = "#10b981";
@@ -1949,7 +1991,7 @@
           var nextIdx = tabelaIz.findIndex(x => x.s > escolhido.s);
           if (nextIdx !== -1) {
             escolhido = tabelaIz[nextIdx];
-            dV_volts = (k_queda_calc * resistividade * dist * ib) / escolhido.s;
+            dV_volts = (k_queda_calc * resistividade * Math.max(dist, 1) * ib) / escolhido.s;
             dV_perc = (dV_volts / v) * 100;
             statusText = "Bitola ↑ (Queda)"; statusColor = "#f59e0b";
           } else { break; }
