@@ -63,6 +63,8 @@
         <li><a onclick="mudarAba('tab-estatisticas', this)" class="active-nav">📊 Painel Live</a></li>
         <li><a onclick="mudarAba('tab-chamados', this)">✉️ Chamados</a></li>
         <li><a onclick="mudarAba('tab-usuarios', this)">👥 Base 'users'</a></li>
+        <!-- NOVA ABA ADICIONADA: Pagamentos Asaas -->
+        <li><a onclick="mudarAba('tab-pagamentos', this)">💳 Pagamentos Asaas</a></li>
     </ul>
     <div class="logout-btn" onclick="firebase.auth().signOut().then(() => location.href='login.html')">Sair da Sessão</div>
 </aside>
@@ -144,6 +146,30 @@
             </table>
         </div>
     </div>
+
+    <!-- NOVA SEÇÃO ADICIONADA: Interface do Asaas -->
+    <div id="tab-pagamentos" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1>Histórico de Pagamentos (Asaas)</h1>
+            <span style="color:#3498db; font-size: 12px; font-weight:bold;">● Webhook Live</span>
+        </div>
+        <div class="chart-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cliente (ID Asaas)</th>
+                        <th>Valor Recebido</th>
+                        <th>Status</th>
+                        <th>Data do Evento</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-pagamentos-body">
+                    <!-- Os dados do Asaas vão aparecer aqui automaticamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </main>
 
 <div id="modal-reply" class="modal">
@@ -273,6 +299,48 @@
                 }
             });
         }
+
+        // ================= NOVA ADIÇÃO: ESCUTA A COLEÇÃO 'pagamentos' DO ASAAS =================
+        if(document.getElementById('tabela-pagamentos-body')) {
+            // Vai ler a coleção "pagamentos" que o webhook enviará futuramente
+            db.collection('pagamentos').onSnapshot(snap => {
+                const tbody = document.getElementById('tabela-pagamentos-body');
+                tbody.innerHTML = '';
+                
+                if(snap.empty) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#9ba4b5;">Aguardando o primeiro pagamento via Webhook...</td></tr>`;
+                    return;
+                }
+
+                snap.forEach(doc => {
+                    const pag = doc.data();
+                    let corStatus = '#f1c40f'; // Pendente/Outros (Amarelo)
+                    let statusNome = 'Aguardando';
+
+                    if(pag.status === 'RECEIVED' || pag.status === 'CONFIRMED') {
+                        corStatus = '#39FF14'; // Pago (Verde)
+                        statusNome = 'Aprovado';
+                    } else if (pag.status === 'OVERDUE' || pag.status === 'CANCELED') {
+                        corStatus = '#ff4b5c'; // Vencido/Cancelado (Vermelho)
+                        statusNome = pag.status === 'OVERDUE' ? 'Vencido' : 'Cancelado';
+                    }
+
+                    // Formatação da data
+                    let dataFormatada = 'N/A';
+                    if (pag.data) {
+                        const d = pag.data.toDate ? pag.data.toDate() : new Date(pag.data);
+                        dataFormatada = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR');
+                    }
+
+                    tbody.innerHTML += `<tr>
+                        <td style="color:#9ba4b5;">${pag.clienteId || 'ID Não Informado'}</td>
+                        <td style="color:#39FF14; font-weight:bold; font-size:16px;">R$ ${pag.valor ? parseFloat(pag.valor).toFixed(2) : '0.00'}</td>
+                        <td style="color:${corStatus}; font-weight:bold; text-transform: uppercase;">● ${statusNome}</td>
+                        <td style="color:#9ba4b5; font-size:12px;">${dataFormatada}</td>
+                    </tr>`;
+                });
+            });
+        }
     }
 
     function atualizarStatusChamado(docId, novoStatus) {
@@ -367,40 +435,62 @@
     window.onload = () => {
         carregarDados();
 
-        // IMPLEMENTAÇÃO 2: GRÁFICO COLORIDO PEDIDO (Azul=Profissionais, Vermelho=Admin, Verde=Novos)
+        // IMPLEMENTAÇÃO 2: GRÁFICOS MAIS COLORIDOS E VIBRANTES COMO PEDIDO
         const ctxBar = document.getElementById('barChart').getContext('2d');
         graficoBarrasInstancia = new Chart(ctxBar, { 
             type: 'bar', 
             data: { 
-                labels: ['Profissionais (Azul)', 'Administrador (Vermelho)', 'Novos (Verde)'], 
+                labels: ['Profissionais', 'Administrador', 'Novos'], 
                 datasets: [{ 
                     label: 'Usuários Ativos', 
                     data: [0, 0, 0], 
-                    backgroundColor: ['#3498db', '#ff4b5c', '#39FF14'],
-                    borderColor: ['#2980b9', '#c0392b', '#2ecc71'],
-                    borderWidth: 1
+                    // CORES VIBRANTES APLICADAS AQUI
+                    backgroundColor: ['#00d2ff', '#ff0055', '#39FF14'],
+                    borderColor: ['#007bb5', '#cc0044', '#2eb80f'],
+                    borderWidth: 2
                 }] 
             },
             options: { 
                 responsive: true, 
                 maintainAspectRatio: false, 
                 plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true, ticks: { color: '#9ba4b5' } }, x: { ticks: { color: '#9ba4b5', font: { weight: 'bold', size: 11 } } } }
+                scales: { y: { beginAtZero: true, ticks: { color: '#fff' } }, x: { ticks: { color: '#fff', font: { weight: 'bold', size: 12 } } } }
             }
         });
 
-        // 2. MODELO PIZZA
+        // 2. MODELO PIZZA - CORES VIBRANTES
         new Chart(document.getElementById('pieChart'), { 
             type: 'doughnut', 
-            data: { labels: ['Desktop', 'Mobile Web', 'App Vercel'], datasets: [{ data: [65, 25, 10], backgroundColor: ['#39FF14', '#3498db', '#e43f5a'], borderColor: '#111827' }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9ba4b5', font: { size: 10 } } } } }
+            data: { 
+                labels: ['Desktop', 'Mobile Web', 'App Vercel'], 
+                datasets: [{ 
+                    data: [65, 25, 10], 
+                    backgroundColor: ['#39FF14', '#00d2ff', '#ff0055'], 
+                    borderColor: '#111827',
+                    borderWidth: 2 
+                }] 
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#fff', font: { size: 11, weight: 'bold' } } } } }
         });
 
-        // 3. MODELO LINHA
+        // 3. MODELO LINHA - NEON AZUL
         new Chart(document.getElementById('lineChart'), { 
             type: 'line', 
-            data: { labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'], datasets: [{ label: 'Novos Cadastros', data: [2, 5, 4, 11], borderColor: '#3498db', tension: 0.3, backgroundColor: 'rgba(52, 152, 219, 0.1)', fill: true }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: '#1f4068' } } } }
+            data: { 
+                labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'], 
+                datasets: [{ 
+                    label: 'Novos Cadastros', 
+                    data: [2, 5, 4, 11], 
+                    borderColor: '#00d2ff', 
+                    borderWidth: 3,
+                    tension: 0.4, 
+                    backgroundColor: 'rgba(0, 210, 255, 0.2)', 
+                    fill: true,
+                    pointBackgroundColor: '#39FF14',
+                    pointRadius: 4
+                }] 
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#fff' } }, y: { grid: { color: '#1f4068' }, ticks: { color: '#fff' } } } }
         });
     };
 </script>
