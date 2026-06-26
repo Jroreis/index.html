@@ -119,7 +119,7 @@
     .hero h1 { font-size: clamp(32px, 7vw, 56px); font-weight: 800; color: var(--text); margin-bottom: 20px; line-height: 1.15; letter-spacing: -0.02em; }
     .hero h1 span { color: var(--primary); }
     .hero p { font-size: clamp(16px, 3vw, 20px); max-width: 800px; margin: 0 auto 36px; color: var(--text-light); }
-    .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+    .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
     
     .btn-hero { padding: 16px 32px; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.3s; border: none; display: flex; align-items: center; gap: 10px; }
     .btn-hero.primary { background: var(--primary); color: #fff; box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); }
@@ -132,12 +132,25 @@
 
     .section-padding { padding: 50px 24px; }
     
-    /* GALERIA DE TELAS - HOMEPAGE */
-    .showcase-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
-    .showcase-item { border-radius: 16px; overflow: hidden; border: 2px solid var(--border-color); box-shadow: var(--shadow); transition: 0.3s; cursor: crosshair; }
-    .showcase-item img { width: 100%; height: auto; display: block; transition: 0.4s; }
-    .showcase-item:hover { transform: scale(1.03); border-color: var(--primary); z-index: 10; box-shadow: 0 0 30px rgba(79, 70, 229, 0.4); }
-    .showcase-item:hover img { transform: scale(1.05); }
+    /* GALERIA DE TELAS - HOMEPAGE (ESTILO POWERPOINT) */
+    .showcase-grid { 
+      display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 24px; 
+      padding: 20px 0 40px; max-width: 1000px; margin: 0 auto; scroll-behavior: smooth;
+    }
+    .showcase-grid::-webkit-scrollbar { height: 10px; }
+    .showcase-grid::-webkit-scrollbar-track { background: var(--bg-color); border-radius: 10px; }
+    .showcase-grid::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; border: 2px solid var(--bg-color); }
+    .showcase-item { 
+      flex: 0 0 100%; scroll-snap-align: center; border-radius: 16px; overflow: hidden; 
+      border: 2px solid var(--border-color); box-shadow: var(--shadow-lg); transition: 0.3s; 
+      background: var(--card-bg); display: flex; flex-direction: column;
+    }
+    .showcase-item img { width: 100%; height: auto; display: block; border-bottom: 1px solid var(--border-color); }
+    .showcase-item:hover { border-color: var(--neon-green); box-shadow: 0 0 30px rgba(57, 255, 20, 0.2); }
+    .slide-caption { 
+      padding: 16px; text-align: center; font-weight: 800; font-size: 18px; 
+      color: var(--neon-green); text-transform: uppercase; letter-spacing: 1px;
+    }
 
     .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
     .feature-card { background: var(--card-bg); padding: 40px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border-color); transition: 0.3s; text-align: left; }
@@ -219,7 +232,7 @@
     .summary-box { background: var(--bg-color); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 16px; }
     .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 15px; color: var(--text-light); }
     .summary-row.total { border-top: 2px dashed var(--border-color); padding-top: 14px; margin-top: 14px; font-size: 24px; font-weight: 800; color: var(--neon-green); }
-    .btn-secondary-action { width: 100%; padding: 16px; background: transparent; border: 2px solid var(--border-color); color: var(--text); border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 12px; transition: 0.2s; }
+    .btn-secondary-action { width: 100%; padding: 16px; background: transparent; border: 2px solid var(--border-color); color: var(--text); border-radius: 12px; font-weight: 700; font-size: 15px; cursor: margin-top: 12px; transition: 0.2s; }
     .btn-secondary-action:hover { background: rgba(255, 255, 255, 0.05); border-color: #475569; }
 
     .ptable-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow); background: var(--card-bg); }
@@ -420,26 +433,62 @@
         <button class="btn-hero primary" onclick="openModal('modalCadastro')">Começar Agora (Teste Grátis)</button>
         <button class="btn-hero secondary" onclick="openModal('modalLogin')">Fazer Login no Painel</button>
       </div>
+
+      <div class="video-container" style="margin-top: 20px;">
+        <div class="video-wrapper">
+          <iframe 
+            width="100%" 
+            height="100%" 
+            src="https://www.youtube.com/embed/n7ScOgKbdPY" 
+            title="VoltCalc Pro - Vídeo Institucional" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allowfullscreen>
+          </iframe>
+        </div>
+      </div>
     </section>
 
     <section class="section-padding" style="background: var(--card-bg); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
       <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
         <h2 style="font-size: 36px; margin-bottom: 16px; color: var(--text); font-weight: 800;">Veja o <span style="color: var(--neon-green);">VoltCalc Pro</span> em Ação</h2>
-        <p style="color: var(--text-light); margin-bottom: 40px; font-size: 18px;">Interface amigável, cálculos precisos e relatórios de engenharia gerados em segundos.</p>
+        <p style="color: var(--text-light); margin-bottom: 20px; font-size: 18px;">Interface amigável, cálculos precisos e relatórios de engenharia gerados em segundos.</p>
         
+        <p style="color: var(--neon-green); font-weight: 700; margin-bottom: 20px; font-size: 14px;">👉 Deslize para os lados para ver a apresentação</p>
+
         <div class="showcase-grid">
-          <div class="showcase-item" title="Gestão de Perfil e Logo"><img src="https://i.postimg.cc/NjMzsSPN/Screenshot-20260626-121026.png" alt="Gestão de Empresa VoltCalc Pro"></div>
-          <div class="showcase-item" title="Dimensionamento NBR 5410"><img src="https://i.postimg.cc/44WvfykR/Screenshot-20260626-121601.png" alt="Dimensionamento Técnico NBR 5410"></div>
-          <div class="showcase-item" title="Cálculos Automáticos e Disjuntores"><img src="https://i.postimg.cc/HxsJR0L4/Screenshot-20260626-121744.png" alt="Cálculo Automático Disjuntores e Demanda"></div>
-          <div class="showcase-item" title="Gerador de Orçamentos Financeiros"><img src="https://i.postimg.cc/Z0k5b6Jj/Screenshot-20260626-121908.png" alt="Gerador de Orçamentos Profissionais"></div>
-          <div class="showcase-item" title="Tabela Nacional de Preços"><img src="https://i.postimg.cc/gJnhrqbt/Screenshot-20260626-122042.png" alt="Tabela Nacional de Mão de Obra"></div>
+          <div class="showcase-item">
+            <img src="https://i.postimg.cc/NjMzsSPN/Screenshot-20260626-121026.png" alt="Gestão de Perfil e Empresa">
+            <div class="slide-caption">Gestão de Perfil e Empresa</div>
+          </div>
+          <div class="showcase-item">
+            <img src="https://i.postimg.cc/44WvfykR/Screenshot-20260626-121601.png" alt="Gerador de Novo Orçamento">
+            <div class="slide-caption">Gerador de Novo Orçamento</div>
+          </div>
+          <div class="showcase-item">
+            <img src="https://i.postimg.cc/HxsJR0L4/Screenshot-20260626-121744.png" alt="Projeto de Dimensionamento e Cálculos de Demanda NBR5410">
+            <div class="slide-caption">Projeto de Dimensionamento NBR5410</div>
+          </div>
+          <div class="showcase-item">
+            <img src="https://i.postimg.cc/Z0k5b6Jj/Screenshot-20260626-121908.png" alt="Tabela de Referência Nacional de Preços">
+            <div class="slide-caption">Tabela de Referência Nacional de Preços</div>
+          </div>
+          <div class="showcase-item">
+            <img src="https://i.postimg.cc/gJnhrqbt/Screenshot-20260626-122042.png" alt="Histórico">
+            <div class="slide-caption">Histórico de Orçamentos</div>
+          </div>
+          <div class="showcase-item">
+            <img src="https://i.postimg.cc/mkPcjQLC/Screenshot-20260626-140033.png" alt="Cadastro de Clientes">
+            <div class="slide-caption">Cadastro de Clientes</div>
+          </div>
         </div>
       </div>
     </section>
 
     <section class="section-padding features-section">
       <div class="features-grid">
-        <div class="feature-icon">⚡</div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
           <h3>Conformidade NBR 5410</h3>
           <p>Módulo avançado de dimensionamento de condutores de Cobre e Alumínio cobrindo todos os métodos de instalação (A1 a G) e fatores de correção de temperatura e agrupamento.</p>
         </div>
@@ -513,20 +562,6 @@
         </div>
       </div>
     </section>
-
-    <div class="video-container" style="margin-top: 40px;">
-      <div class="video-wrapper">
-        <iframe 
-          width="100%" 
-          height="100%" 
-          src="https://www.youtube.com/embed/n7ScOgKbdPY" 
-          title="VoltCalc Pro - Vídeo Institucional" 
-          frameborder="0" 
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-          allowfullscreen>
-        </iframe>
-      </div>
-    </div>
 
     <section id="suporte-section" class="section-padding" style="background: var(--bg-color); border-top: 1px solid var(--border-color); margin-top: 40px;">
       <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center;">
