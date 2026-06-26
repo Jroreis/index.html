@@ -1129,8 +1129,8 @@
       if (!n || !e || !s) { alert('Campos obrigatórios.'); return; }
       auth.createUserWithEmailAndPassword(e, s).then(function(cred) {
         return cred.user.updateProfile({ displayName: n }).then(function() {
-          // AUTOMAÇÃO NO CADASTRO PARA NOVOS USUÁRIOS
-          return db.collection('users').doc(cred.user.uid).set({ nome: n, email: e, role: signupRole, plano: 'free', createdAt: new Date() });
+          // AUTOMAÇÃO NO CADASTRO PARA NOVOS USUÁRIOS (ALTERADO O DEFAULT PARA FREE AQUI)
+          return db.collection('users').doc(cred.user.uid).set({ nome: n, email: e, role: 'free', plano: 'free', createdAt: new Date() });
         });
       }).then(closeModal).catch(function(err) { alert(err.message); });
     }
@@ -1149,10 +1149,11 @@
         var u = res.user;
         return db.collection('users').doc(u.uid).get().then(function(doc) {
           if (!doc.exists) {
+            // CADASTRO AUTOMÁTICO DO GOOGLE (ALTERADO O DEFAULT PARA FREE AQUI)
             return db.collection('users').doc(u.uid).set({ 
               nome: u.displayName || "Profissional", 
               email: u.email, 
-              role: loginRole, 
+              role: 'free', 
               plano: 'free',
               createdAt: new Date() 
             });
