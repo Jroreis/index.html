@@ -282,7 +282,7 @@
     @media print {
       @page { margin: 1cm; size: A4 portrait; }
       body { background: #fff !important; color: #000 !important; font-size: 10pt; line-height: 1.3; position: relative; }
-      .bg-overlay, .ads-container, .adsbygoogle, .video-container { display: none !important; }
+      .bg-overlay, .ads-container, .adsbygoogle, .video-container, .playstore-banner-hero, .playstore-banner-sidebar { display: none !important; }
       .header, .dashboard-sidebar, .btn-add-item, .btn-primary, .btn-secondary-action, .orc-item button, #authBtns, footer { display: none !important; }
       .card > h3, .print-hidden, .dim-config-panel { display: none !important; }
       
@@ -370,6 +370,83 @@
       body::after { content: "Documento técnico gerado e validado por VoltCalc Pro - A Plataforma do Profissional da Elétrica | www.voltcalcpro.com"; position: fixed; bottom: 0px; left: 0; width: 100%; text-align: center; font-size: 8pt; color: #475569; border-top: 1px solid #000; padding-top: 4px; font-weight: 800; }
     }
     .print-header { display: none; }
+
+    /* ================================================== */
+    /* ESTILOS DOS BANNERS DA PLAY STORE (NOVOS)         */
+    /* ================================================== */
+    .playstore-banner-hero {
+        background: rgba(79, 70, 229, 0.1);
+        border: 1px dashed var(--primary);
+        padding: 16px 24px;
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        gap: 20px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .playstore-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-align: left;
+    }
+    .btn-playstore {
+        background: #020617;
+        color: #fff;
+        border: 1px solid #333;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-weight: 700;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
+    }
+    .btn-playstore:hover {
+        background: #111;
+        border-color: var(--neon-green);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(57, 255, 20, 0.2);
+    }
+    .btn-playstore::before {
+        content: '';
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23fff" d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>');
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+    .playstore-banner-sidebar {
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(57, 255, 20, 0.05) 100%);
+        border: 1px solid var(--border-color);
+        padding: 16px;
+        border-radius: 12px;
+        margin-top: 24px;
+        text-align: center;
+    }
+    .btn-playstore-small {
+        background: var(--card-bg);
+        color: var(--neon-green);
+        border: 1px solid var(--neon-green);
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 13px;
+        text-decoration: none;
+        display: inline-block;
+        transition: 0.2s;
+        width: 100%;
+    }
+    .btn-playstore-small:hover {
+        background: var(--neon-green);
+        color: #000;
+    }
   </style>
 </head>
 <body>
@@ -434,7 +511,20 @@
         <button class="btn-hero secondary" onclick="openModal('modalLogin')">Fazer Login no Painel</button>
       </div>
 
-      <div class="video-container" style="margin-top: 20px;">
+      <div class="playstore-banner-hero print-hidden">
+          <div class="playstore-info">
+              <span style="font-size: 28px;">📱</span>
+              <div>
+                  <h4 style="color: var(--text); font-weight: 800; margin-bottom: 2px;">Já disponível para Android</h4>
+                  <p style="color: var(--text-light); font-size: 14px;">Leve o VoltCalc Pro no seu bolso para qualquer obra.</p>
+              </div>
+          </div>
+          <a href="https://play.google.com/store/apps/details?id=com.voltcalc.pro" target="_blank" class="btn-playstore">
+              Baixar na Play Store
+          </a>
+      </div>
+
+      <div class="video-container" style="margin-top: 40px;">
         <div class="video-wrapper">
           <iframe 
             width="100%" 
@@ -711,6 +801,15 @@
           <button class="tab" data-tab="hist-prof">📚 Histórico</button>
           <button class="tab" data-tab="planos" style="color: var(--secondary);">💎 Planos e Assinaturas</button>
         </nav>
+
+        <div class="playstore-banner-sidebar print-hidden">
+            <span style="font-size: 24px; margin-bottom: 5px; display: block;">📲</span>
+            <h4 style="color: #fff; font-size: 14px; margin-bottom: 5px; font-weight: 700;">Leve para a obra!</h4>
+            <p style="color: var(--text-light); font-size: 12px; margin-bottom: 12px; line-height: 1.4;">Tenha o VoltCalc na palma da mão.</p>
+            <a href="https://play.google.com/store/apps/details?id=com.voltcalc.pro" target="_blank" class="btn-playstore-small">
+                Baixar o Aplicativo
+            </a>
+        </div>
       </aside>
 
       <main class="dashboard-main">
