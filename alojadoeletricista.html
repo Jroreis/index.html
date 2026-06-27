@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Mega Estrutura SEO e Ads -->
+    <!-- Script do Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5688863534851791" crossorigin="anonymous"></script>
+    
     <meta name="description" content="VoltCalcPro - A Loja Do Eletricista. Encontre as melhores ferramentas e materiais elétricos das maiores plataformas com segurança e rapidez.">
     <meta name="keywords" id="seoKeywords" content="eletricista, ferramentas, elétrica, voltcalcpro">
     <meta name="author" content="VoltCalcPro">
@@ -11,7 +13,6 @@
     <title>VoltCalcPro - A Loja Do Eletricista</title>
     
     <style>
-        /* === NADA FOI ALTERADO NO CSS ORIGINAL === */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
@@ -153,7 +154,6 @@
 
         footer { border-top: 1px solid rgba(0, 255, 0, 0.1); padding: 2rem 0; text-align: center; color: var(--text-muted); margin-top: 3rem; }
         
-        /* ADIÇÃO DA ESTRUTURA PARA OS MODAIS LEGAIS DO GOOGLE ADS */
         .legal-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 2000; align-items: center; justify-content: center; padding: 1rem; }
         .legal-modal.active { display: flex; }
         .legal-content { background: var(--bg-dark); border: 1px solid rgba(0, 255, 0, 0.3); border-radius: 0.5rem; padding: 2rem; max-width: 800px; width: 100%; max-height: 80vh; overflow-y: auto; color: var(--text-light); text-align: left; }
@@ -205,7 +205,6 @@
         </section>
     </div>
 
-    <!-- Painel Admin Original Intacto -->
     <div class="admin-panel" id="adminPanel">
         <div class="admin-content">
             <div class="admin-header">
@@ -289,7 +288,6 @@
         </div>
     </div>
 
-    <!-- Mega Estrutura de Rodapé para Aprovação no Ads -->
     <footer>
         <div class="container">
             <p>© 2026 VoltCalcPro a Loja Do Eletricista. Todos os direitos reservados.</p>
@@ -301,7 +299,6 @@
         </div>
     </footer>
 
-    <!-- MODAL DE POLÍTICA DE PRIVACIDADE -->
     <div class="legal-modal" id="privacyModal">
         <div class="legal-content">
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -319,7 +316,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE TERMOS DE USO -->
     <div class="legal-modal" id="termsModal">
         <div class="legal-content">
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -337,7 +333,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE AVISO DE AFILIADO (Crucial para o Google Ads) -->
     <div class="legal-modal" id="affiliateModal">
         <div class="legal-content">
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -643,9 +638,6 @@
             document.getElementById("adminPanel").classList.remove("active");
         }
 
-        // ==========================================
-        // NOVAS FUNÇÕES PARA OS MODAIS LEGAIS (ADS)
-        // ==========================================
         function openLegalModal(modalId) {
             document.getElementById(modalId).classList.add('active');
         }
@@ -654,7 +646,6 @@
             document.getElementById(modalId).classList.remove('active');
         }
 
-        // Inicialização
         loadData();
         renderFilters();
         renderProducts();
