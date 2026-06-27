@@ -86,7 +86,6 @@
         }
         .filter-btn.active { background: var(--green); color: var(--bg-dark); border-color: var(--green); box-shadow: 0 0 15px rgba(0, 255, 0, 0.3); }
 
-        /* ====== NOVO: BANNER POWERPOINT ====== */
         .promo-slider-container {
             max-width: 1200px; margin: 0 auto 3rem auto; padding: 0 1rem;
             position: relative; height: 350px;
@@ -115,7 +114,6 @@
         .promo-image img { max-height: 250px; max-width: 100%; object-fit: contain; filter: drop-shadow(0 0 15px rgba(255,255,255,0.1)); transition: transform 0.5s ease; }
         .promo-slide.active .promo-image img { transform: scale(1.05); }
 
-        /* PRODUTOS */
         .products-section { padding: 1rem 0 3rem 0; }
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; margin-bottom: 3rem; }
 
@@ -130,7 +128,6 @@
             width: 100%; height: 220px; background: #ffffff; display: flex;
             align-items: center; justify-content: center; overflow: hidden; position: relative;
         }
-        /* Imagem como link para e-commerce realista */
         .product-image a { display: block; width: 100%; height: 100%; cursor: pointer; }
         .product-image img { width: 100%; height: 100%; object-fit: contain; padding: 15px; transition: transform 0.3s ease; }
         .product-card:hover .product-image img { transform: scale(1.08); }
@@ -147,14 +144,12 @@
         .product-info { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
         .product-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-light); line-height: 1.3; }
         
-        /* NOVO: Descrição Automática Realista */
         .product-desc {
             font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;
             line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3;
             -webkit-box-orient: vertical; overflow: hidden; flex: 1;
         }
         
-        /* NOVO: Estilo visual de Preço para parecer e-commerce */
         .ecommerce-price-hint {
             font-size: 0.8rem; color: var(--green); font-weight: bold;
             margin-bottom: 0.75rem; display: flex; align-items: center; gap: 5px;
@@ -216,7 +211,7 @@
             .promo-slide { padding: 1.5rem; flex-direction: column; text-align: center; justify-content: center; }
             .promo-content { max-width: 100%; margin-bottom: 1rem; }
             .promo-content h2 { font-size: 1.3rem; }
-            .promo-content p { display: none; /* Esconde texto longo no mobile no banner */ }
+            .promo-content p { display: none; }
             .promo-image img { max-height: 120px; }
             .promo-slider-container { height: 320px; }
         }
@@ -285,17 +280,14 @@
 
             <div id="adminDashboard" class="hidden">
                 <div class="form-group">
-                    <label>Título do Produto</label>
-                    <input type="text" id="productTitle" placeholder="Nome do produto">
+                    <label>Link de Afiliado</label>
+                    <input type="url" id="productLink" placeholder="https://..." oninput="previewTitle()">
+                    <span class="hint" id="autoTitleHint" style="color: var(--green); margin-top: 5px;">O título será extraído automaticamente do link.</span>
                 </div>
                 <div class="form-group">
                     <label>Tags (SEO e Busca)</label>
                     <input type="text" id="productTags" placeholder="ferramenta, elétrica, voltagem...">
-                    <span class="hint">Deixe em branco para gerar tags automáticas com base no título.</span>
-                </div>
-                <div class="form-group">
-                    <label>Link de Afiliado</label>
-                    <input type="url" id="productLink" placeholder="https://...">
+                    <span class="hint">Deixe em branco para gerar tags automáticas com base no título gerado.</span>
                 </div>
                 <div class="form-group">
                     <label>URL da Imagem do Produto</label>
@@ -495,20 +487,17 @@
             filtersDiv.innerHTML = html;
         }
 
-        // NOVO: Geração automática de descrição persuasiva
         function generateAutoDescription(title, category) {
             const cat = category || "Geral";
             return `Equipamento de alta performance para a categoria de ${cat}. O modelo original que garante máxima eficiência, segurança e durabilidade para os seus trabalhos ou instalações do dia a dia. Adquira com garantia e envio seguro!`;
         }
 
-        // NOVO: Lógica do Banner PowerPoint
         function initBanners() {
             const slider = document.getElementById('promoSliderContainer');
             if(!slider || products.length === 0) return;
             
             clearInterval(promoInterval);
             
-            // Pega 3 produtos aleatórios
             const shuffled = [...products].sort(() => 0.5 - Math.random());
             const promoItems = shuffled.slice(0, 3);
             
@@ -533,7 +522,7 @@
                 slides[currentSlide].classList.remove('active');
                 currentSlide = (currentSlide + 1) % slides.length;
                 slides[currentSlide].classList.add('active');
-            }, 6000); // Troca de banner a cada 6 segundos
+            }, 6000); 
         }
 
         function renderProducts() {
@@ -565,7 +554,6 @@
                 return;
             }
 
-            // ATUALIZADO: Card mais realista com imagem clicável, preço fictício e descrição automática
             grid.innerHTML = filtered.map(product => `
                 <div class="product-card">
                     <div class="product-image">
@@ -650,18 +638,58 @@
             return words.filter(w => w.length > 2 && !stopwords.includes(w)).join(', ');
         }
 
+        // NOVO: Função para extrair Título da URL
+        function extractTitleFromUrl(link) {
+            let title = "Produto " + (products.length + 1);
+            try {
+                let urlObj = new URL(link);
+                let pathSegments = decodeURIComponent(urlObj.pathname).split('/').filter(s => s.length > 4);
+                let nameSegment = pathSegments.sort((a,b) => b.length - a.length)[0];
+                
+                if (nameSegment) {
+                    nameSegment = nameSegment.replace(/MLB-\d+-/i, '')
+                                             .replace(/_JM/i, '')
+                                             .replace(/\.html/i, '')
+                                             .replace(/dp\//i, '')
+                                             .replace(/item\//i, '');
+                    
+                    title = nameSegment.replace(/[-_]/g, ' ')
+                                       .replace(/\b\w/g, c => c.toUpperCase())
+                                       .trim();
+                }
+            } catch(e) {
+                console.error("Link curto ou sem palavras lidas.");
+            }
+            return title;
+        }
+
+        // NOVO: Função para mostrar a dica de Título ao usuário no Painel
+        function previewTitle() {
+            const link = document.getElementById("productLink").value;
+            const hint = document.getElementById("autoTitleHint");
+            if (!link) {
+                hint.textContent = "O título será extraído automaticamente do link.";
+                hint.style.color = "var(--green)";
+                return;
+            }
+            hint.textContent = "Título detectado: " + extractTitleFromUrl(link);
+            hint.style.color = "var(--yellow)";
+        }
+
         function addProduct() {
-            const title = document.getElementById("productTitle").value;
             const link = document.getElementById("productLink").value;
             const image = document.getElementById("productImage").value || "https://via.placeholder.com/200";
             const category = document.getElementById("productCategory").value;
             const platform = document.getElementById("productPlatform").value;
             let tags = document.getElementById("productTags").value;
 
-            if (!title || !link) {
-                alert("Preencha todos os campos obrigatórios (Título e Link)!");
+            if (!link) {
+                alert("Preencha todos os campos obrigatórios (Link de Afiliado)!");
                 return;
             }
+
+            // Atribuindo o Título extraído do link
+            const title = extractTitleFromUrl(link);
 
             if (!tags.trim()) {
                 tags = generateAutoTags(title) + ", " + category.toLowerCase();
@@ -681,7 +709,7 @@
             saveData();
             renderFilters();
             renderProducts();
-            initBanners(); // Atualiza o banner para possivelmente incluir o novo
+            initBanners(); 
             updateProductsList();
 
             const autoTagsArray = title.toLowerCase().split(' ');
@@ -689,10 +717,11 @@
             localStorage.setItem('voltcalcpro_failed_searches', JSON.stringify(failedSearches));
             updateFailedSearchesList();
 
-            document.getElementById("productTitle").value = "";
+            // Limpa os campos
             document.getElementById("productLink").value = "";
             document.getElementById("productImage").value = "";
             document.getElementById("productTags").value = "";
+            previewTitle(); // Reseta a dica do título automático
 
             alert("Produto e tags adicionados com sucesso!");
         }
@@ -703,7 +732,7 @@
                 saveData();
                 renderFilters();
                 renderProducts();
-                initBanners(); // Remove possível produto deletado do banner
+                initBanners(); 
                 updateProductsList();
             }
         }
@@ -748,10 +777,9 @@
             document.getElementById(modalId).classList.remove('active');
         }
 
-        // Inicialização Principal
         loadData();
         renderFilters();
-        initBanners(); // Inicializa os banners promocionais no topo
+        initBanners(); 
         renderProducts();
     </script>
 </body>
