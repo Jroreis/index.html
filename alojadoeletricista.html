@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Script do Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5688863534851791" crossorigin="anonymous"></script>
     
     <meta name="description" content="VoltCalcPro - A Loja Do Eletricista. Encontre as melhores ferramentas e materiais elétricos das maiores plataformas com segurança e rapidez.">
@@ -64,14 +63,13 @@
         .admin-btn:hover { background: rgba(0, 255, 0, 0.1); box-shadow: 0 0 10px rgba(0, 255, 0, 0.3); }
 
         .hero {
-            padding: 4rem 0; text-align: center;
+            padding: 4rem 0 2rem 0; text-align: center;
             background: linear-gradient(135deg, rgba(0, 255, 0, 0.05) 0%, rgba(255, 215, 0, 0.05) 100%);
-            border-bottom: 1px solid rgba(0, 255, 0, 0.1);
         }
         .hero h1 { font-size: 3rem; margin-bottom: 1rem; color: var(--text-light); font-weight: 700; }
         .hero p { font-size: 1.125rem; color: var(--text-muted); margin-bottom: 2rem; }
 
-        .search-section { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem; }
+        .search-section { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 1rem; }
         .search-box input {
             width: 100%; max-width: 600px; margin: 0 auto; display: block;
             padding: 0.75rem 1rem; background: rgba(30, 41, 59, 0.8);
@@ -88,7 +86,37 @@
         }
         .filter-btn.active { background: var(--green); color: var(--bg-dark); border-color: var(--green); box-shadow: 0 0 15px rgba(0, 255, 0, 0.3); }
 
-        .products-section { padding: 3rem 0; }
+        /* ====== NOVO: BANNER POWERPOINT ====== */
+        .promo-slider-container {
+            max-width: 1200px; margin: 0 auto 3rem auto; padding: 0 1rem;
+            position: relative; height: 350px;
+        }
+        .promo-slide {
+            position: absolute; top: 0; left: 1rem; right: 1rem; height: 100%;
+            background: linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.95));
+            border: 1px solid rgba(0, 255, 0, 0.4); border-radius: 1rem;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 2rem 4rem; opacity: 0; visibility: hidden;
+            transition: opacity 1s ease-in-out, visibility 1s; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .promo-slide.active { opacity: 1; visibility: visible; z-index: 10; }
+        .promo-content { flex: 1; max-width: 60%; z-index: 2; }
+        .promo-badge-tag {
+            display: inline-block; background: var(--yellow); color: #000;
+            font-weight: bold; font-size: 0.8rem; padding: 0.4rem 1rem;
+            border-radius: 2rem; margin-bottom: 1rem; text-transform: uppercase;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .promo-content h2 { font-size: 2rem; color: var(--text-light); margin-bottom: 1rem; line-height: 1.2; }
+        .promo-content p { color: var(--text-muted); font-size: 1rem; margin-bottom: 1.5rem; line-height: 1.5; }
+        .promo-image { flex: 1; height: 100%; display: flex; justify-content: flex-end; align-items: center; position: relative; }
+        .promo-image img { max-height: 250px; max-width: 100%; object-fit: contain; filter: drop-shadow(0 0 15px rgba(255,255,255,0.1)); transition: transform 0.5s ease; }
+        .promo-slide.active .promo-image img { transform: scale(1.05); }
+
+        /* PRODUTOS */
+        .products-section { padding: 1rem 0 3rem 0; }
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; margin-bottom: 3rem; }
 
         .product-card {
@@ -99,12 +127,15 @@
         .product-card:hover { border-color: var(--green); box-shadow: 0 0 20px rgba(0, 255, 0, 0.2); transform: translateY(-5px); }
 
         .product-image {
-            width: 100%; height: 200px; background: #ffffff; display: flex;
+            width: 100%; height: 220px; background: #ffffff; display: flex;
             align-items: center; justify-content: center; overflow: hidden; position: relative;
         }
-        .product-image img { width: 100%; height: 100%; object-fit: contain; padding: 10px; }
+        /* Imagem como link para e-commerce realista */
+        .product-image a { display: block; width: 100%; height: 100%; cursor: pointer; }
+        .product-image img { width: 100%; height: 100%; object-fit: contain; padding: 15px; transition: transform 0.3s ease; }
+        .product-card:hover .product-image img { transform: scale(1.08); }
 
-        .product-badge { position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; }
+        .product-badge { position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; z-index: 5; pointer-events: none; }
         .product-badge.mercado-livre { background: var(--yellow); color: var(--bg-dark); }
         .product-badge.aliexpress { background: #E82828; color: white; }
         .product-badge.amazon { background: #FF9900; color: #111; }
@@ -114,14 +145,27 @@
         .product-badge.category { top: auto; bottom: 0.75rem; left: 0.75rem; background: var(--green); color: var(--bg-dark); }
 
         .product-info { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
-        .product-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-light); line-height: 1.4; min-height: 2.8em; }
+        .product-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-light); line-height: 1.3; }
+        
+        /* NOVO: Descrição Automática Realista */
+        .product-desc {
+            font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;
+            line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical; overflow: hidden; flex: 1;
+        }
+        
+        /* NOVO: Estilo visual de Preço para parecer e-commerce */
+        .ecommerce-price-hint {
+            font-size: 0.8rem; color: var(--green); font-weight: bold;
+            margin-bottom: 0.75rem; display: flex; align-items: center; gap: 5px;
+        }
 
         .product-link {
-            margin-top: auto; display: inline-block; background: linear-gradient(90deg, var(--green), var(--green-dark));
-            color: var(--bg-dark); padding: 0.75rem 1.5rem; border: none; border-radius: 0.25rem;
-            cursor: pointer; font-weight: 600; font-size: 0.875rem; transition: all 0.3s ease; text-decoration: none; text-align: center;
+            display: inline-block; background: linear-gradient(90deg, var(--green), var(--green-dark));
+            color: var(--bg-dark); padding: 0.8rem 1.5rem; border: none; border-radius: 0.25rem;
+            cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: all 0.3s ease; text-decoration: none; text-align: center; width: 100%;
         }
-        .product-link:hover { box-shadow: 0 0 15px rgba(0, 255, 0, 0.4); }
+        .product-link:hover { box-shadow: 0 0 15px rgba(0, 255, 0, 0.4); background: linear-gradient(90deg, var(--yellow), var(--green)); }
 
         .admin-panel { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); z-index: 1000; align-items: center; justify-content: center; }
         .admin-panel.active { display: flex; }
@@ -169,6 +213,12 @@
         @media (max-width: 768px) {
             .hero h1 { font-size: 2rem; }
             .products-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+            .promo-slide { padding: 1.5rem; flex-direction: column; text-align: center; justify-content: center; }
+            .promo-content { max-width: 100%; margin-bottom: 1rem; }
+            .promo-content h2 { font-size: 1.3rem; }
+            .promo-content p { display: none; /* Esconde texto longo no mobile no banner */ }
+            .promo-image img { max-height: 120px; }
+            .promo-slider-container { height: 320px; }
         }
     </style>
 </head>
@@ -197,6 +247,9 @@
                 </div>
             </div>
         </section>
+
+        <div class="promo-slider-container" id="promoSliderContainer">
+            </div>
 
         <section class="products-section">
             <div class="container">
@@ -393,6 +446,7 @@
         let searchTerm = "";
         let isLoggedIn = false;
         let searchTimeout = null;
+        let promoInterval = null;
 
         function getAdminPassword() {
             return localStorage.getItem('voltcalcpro_admin_pass') || SENHA_PERMANENTE;
@@ -441,6 +495,47 @@
             filtersDiv.innerHTML = html;
         }
 
+        // NOVO: Geração automática de descrição persuasiva
+        function generateAutoDescription(title, category) {
+            const cat = category || "Geral";
+            return `Equipamento de alta performance para a categoria de ${cat}. O modelo original que garante máxima eficiência, segurança e durabilidade para os seus trabalhos ou instalações do dia a dia. Adquira com garantia e envio seguro!`;
+        }
+
+        // NOVO: Lógica do Banner PowerPoint
+        function initBanners() {
+            const slider = document.getElementById('promoSliderContainer');
+            if(!slider || products.length === 0) return;
+            
+            clearInterval(promoInterval);
+            
+            // Pega 3 produtos aleatórios
+            const shuffled = [...products].sort(() => 0.5 - Math.random());
+            const promoItems = shuffled.slice(0, 3);
+            
+            slider.innerHTML = promoItems.map((p, index) => `
+                <div class="promo-slide ${index === 0 ? 'active' : ''}">
+                    <div class="promo-content">
+                        <span class="promo-badge-tag">🔥 OFERTA IMPERDÍVEL</span>
+                        <h2>${p.title.length > 50 ? p.title.substring(0, 50) + '...' : p.title}</h2>
+                        <p>${generateAutoDescription(p.title, p.category)}</p>
+                        <a href="${p.link}" target="_blank" class="product-link" style="width: auto; padding: 1rem 2rem;">Aproveitar Desconto</a>
+                    </div>
+                    <div class="promo-image">
+                        <a href="${p.link}" target="_blank"><img src="${p.image}" alt="${p.title}"></a>
+                    </div>
+                </div>
+            `).join('');
+
+            let currentSlide = 0;
+            promoInterval = setInterval(() => {
+                const slides = document.querySelectorAll('.promo-slide');
+                if(slides.length === 0) return;
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }, 6000); // Troca de banner a cada 6 segundos
+        }
+
         function renderProducts() {
             const grid = document.getElementById("productsGrid");
             const termLower = searchTerm.toLowerCase().trim();
@@ -470,10 +565,13 @@
                 return;
             }
 
+            // ATUALIZADO: Card mais realista com imagem clicável, preço fictício e descrição automática
             grid.innerHTML = filtered.map(product => `
                 <div class="product-card">
                     <div class="product-image">
-                        <img src="${product.image || 'https://via.placeholder.com/200'}" alt="${product.title}">
+                        <a href="${product.link}" target="_blank">
+                            <img src="${product.image || 'https://via.placeholder.com/200'}" alt="${product.title}">
+                        </a>
                         <span class="product-badge ${product.platform}">
                             ${platformNames[product.platform] || product.platform}
                         </span>
@@ -483,6 +581,8 @@
                     </div>
                     <div class="product-info">
                         <h3 class="product-title">${product.title}</h3>
+                        <p class="product-desc">${generateAutoDescription(product.title, product.category)}</p>
+                        <div class="ecommerce-price-hint">✅ Ver preço oficial no site</div>
                         <a href="${product.link}" target="_blank" class="product-link">
                             Comprar Agora
                         </a>
@@ -581,6 +681,7 @@
             saveData();
             renderFilters();
             renderProducts();
+            initBanners(); // Atualiza o banner para possivelmente incluir o novo
             updateProductsList();
 
             const autoTagsArray = title.toLowerCase().split(' ');
@@ -602,6 +703,7 @@
                 saveData();
                 renderFilters();
                 renderProducts();
+                initBanners(); // Remove possível produto deletado do banner
                 updateProductsList();
             }
         }
@@ -646,8 +748,10 @@
             document.getElementById(modalId).classList.remove('active');
         }
 
+        // Inicialização Principal
         loadData();
         renderFilters();
+        initBanners(); // Inicializa os banners promocionais no topo
         renderProducts();
     </script>
 </body>
