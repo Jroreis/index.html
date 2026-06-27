@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A Loja do Eletricista - Produtos de qualidade de diversas plataformas.">
+    <!-- As tags de SEO (keywords) serão inseridas automaticamente pelo JavaScript -->
+    <meta name="keywords" id="seoKeywords" content="eletricista, ferramentas, elétrica">
     <title>VoltCadPro - A Loja do Eletricista</title>
     <style>
         * {
@@ -148,6 +151,7 @@
             border-radius: 0.25rem;
             cursor: pointer;
             font-size: 0.875rem;
+            text-transform: capitalize;
             transition: all 0.3s ease;
         }
 
@@ -188,7 +192,7 @@
         .product-image {
             width: 100%;
             height: 200px;
-            background: #ffffff; /* Fundo branco para destacar imagens de produtos */
+            background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -199,7 +203,7 @@
         .product-image img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Mantém a proporção real do produto sem cortar */
+            object-fit: contain;
             padding: 10px;
         }
 
@@ -207,18 +211,19 @@
             position: absolute;
             top: 0.75rem;
             left: 0.75rem;
-            background: var(--yellow);
-            color: var(--bg-dark);
             padding: 0.25rem 0.75rem;
             border-radius: 0.25rem;
             font-size: 0.75rem;
             font-weight: 600;
         }
 
-        .product-badge.aliexpress {
-            background: #E82828;
-            color: white;
-        }
+        /* Cores dinâmicas para as plataformas */
+        .product-badge.mercado-livre { background: var(--yellow); color: var(--bg-dark); }
+        .product-badge.aliexpress { background: #E82828; color: white; }
+        .product-badge.amazon { background: #FF9900; color: #111; }
+        .product-badge.shopee { background: #EE4D2D; color: white; }
+        .product-badge.magalu { background: #0086FF; color: white; }
+        .product-badge.outros { background: #64748B; color: white; }
         
         .product-badge.category {
             top: auto;
@@ -286,7 +291,7 @@
             border: 1px solid rgba(0, 255, 0, 0.3);
             border-radius: 0.5rem;
             padding: 2rem;
-            max-width: 500px;
+            max-width: 600px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
@@ -349,6 +354,13 @@
             box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
         }
 
+        .form-group .hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+            display: block;
+        }
+
         .btn-group {
             display: flex;
             gap: 1rem;
@@ -385,15 +397,23 @@
             color: var(--green);
         }
 
-        .products-list {
+        .section-box {
             margin-top: 2rem;
-            max-height: 400px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .products-list, .failed-searches-list {
+            margin-top: 1rem;
+            max-height: 250px;
             overflow-y: auto;
         }
 
         .product-item {
             background: rgba(0, 0, 0, 0.2);
-            padding: 1rem;
+            padding: 0.75rem;
             margin-bottom: 0.5rem;
             border-radius: 0.25rem;
             display: flex;
@@ -420,6 +440,17 @@
 
         .btn-small:hover {
             background: rgba(232, 40, 40, 0.1);
+        }
+
+        .search-badge {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--yellow);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            margin: 0.25rem;
+            border: 1px solid rgba(255, 215, 0, 0.3);
         }
 
         footer {
@@ -461,17 +492,14 @@
         <section class="hero">
             <div class="container">
                 <h1>A Loja do Eletricista</h1>
-                <p>Produtos de qualidade do Mercado Livre e AliExpress</p>
+                <p>As melhores ferramentas e materiais das maiores plataformas</p>
                 
                 <div class="search-section">
                     <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Buscar produtos..." onkeyup="filterProducts()">
+                        <input type="text" id="searchInput" placeholder="Buscar ferramentas, materiais, marcas ou tags..." onkeyup="filterProducts()">
                     </div>
-                    <div class="filters">
-                        <button class="filter-btn active" onclick="setFilter(null, event)">Todos</button>
-                        <button class="filter-btn" onclick="setFilter('mercado-livre', event)">Mercado Livre</button>
-                        <button class="filter-btn" onclick="setFilter('aliexpress', event)">AliExpress</button>
-                    </div>
+                    <!-- Os botões de filtro agora serão gerados dinamicamente no JavaScript! -->
+                    <div class="filters" id="dynamicFilters"></div>
                 </div>
             </div>
         </section>
@@ -514,7 +542,12 @@
                     <input type="text" id="productTitle" placeholder="Nome do produto">
                 </div>
                 <div class="form-group">
-                    <label>Link de Afiliado (Mercado Livre/AliExpress)</label>
+                    <label>Tags (SEO e Busca)</label>
+                    <input type="text" id="productTags" placeholder="ferramenta, elétrica, voltagem...">
+                    <span class="hint">Deixe em branco para gerar tags automáticas com base no título.</span>
+                </div>
+                <div class="form-group">
+                    <label>Link de Afiliado</label>
                     <input type="url" id="productLink" placeholder="https://...">
                 </div>
                 <div class="form-group">
@@ -535,6 +568,10 @@
                     <select id="productPlatform">
                         <option value="mercado-livre">Mercado Livre</option>
                         <option value="aliexpress">AliExpress</option>
+                        <option value="amazon">Amazon</option>
+                        <option value="shopee">Shopee</option>
+                        <option value="magalu">Magalu</option>
+                        <option value="outros">Outra Plataforma</option>
                     </select>
                 </div>
                 <div class="btn-group">
@@ -542,7 +579,18 @@
                     <button class="btn btn-secondary" onclick="logoutAdmin()">Sair</button>
                 </div>
 
-                <div class="products-list" id="productsList"></div>
+                <!-- SEÇÃO DE BUSCAS FALHAS (O que os usuários não encontraram) -->
+                <div class="section-box">
+                    <h3 style="color: var(--yellow); font-size: 1rem; margin-bottom: 0.5rem;">Buscas sem Resultados (Adicione estes!)</h3>
+                    <p class="hint">Termos que os usuários buscaram e não acharam nada no site:</p>
+                    <div class="failed-searches-list" id="failedSearchesList"></div>
+                    <button class="btn-small" style="margin-top: 10px; width: 100%; border-color: var(--text-muted); color: var(--text-muted);" onclick="clearFailedSearches()">Limpar Buscas</button>
+                </div>
+
+                <div class="section-box">
+                    <h3 style="color: var(--green); margin-bottom: 1rem;">Produtos Cadastrados (<span id="countProducts">0</span>)</h3>
+                    <div class="products-list" id="productsList"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -554,43 +602,63 @@
     </footer>
 
     <script>
+        // ==========================================
+        // COMANDO DE DEFINIÇÃO DE SENHA PERMANENTE
+        // ==========================================
+        // Para que a senha funcione SEMPRE (mesmo na aba anônima), 
+        // altere este valor abaixo. O painel também aceita a senha que você alterar lá dentro, 
+        // mas a senha mestre abaixo nunca será apagada pelo navegador.
+        const SENHA_PERMANENTE = "admin123";
+        const ADMIN_EMAIL = "jroreis4582@gmail.com";
+
+        // Mapeamento de nomes de plataformas para exibição limpa
+        const platformNames = {
+            'mercado-livre': 'Mercado Livre',
+            'aliexpress': 'AliExpress',
+            'amazon': 'Amazon',
+            'shopee': 'Shopee',
+            'magalu': 'Magalu',
+            'outros': 'Outros'
+        };
+
+        // Produtos com máximo de TAGS incluídas para SEO e Buscas
         let products = [
-            { id: 1, title: "Fechadura Digital De Sobrepor Intelbras Fr 101 Preto", platform: "mercado-livre", category: "Smart Home", image: "https://m.media-amazon.com/images/I/51rRZYr6YGL._AC_SL1000_.jpg", link: "https://meli.la/1PXjNhV" },
-            { id: 2, title: "Alicate Desencapador De Fios Aço Carbono 8 Tramontina Pro", platform: "mercado-livre", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/51BqjU2VzML._AC_SL1000_.jpg", link: "https://meli.la/2ew9kNf" },
-            { id: 3, title: "Alicate Universal Eletricista 8 Sata Isolado 1000v Aço Cr-v", platform: "mercado-livre", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/51vB+Z+7y4L._AC_SL1000_.jpg", link: "https://meli.la/2HvToNV" },
-            { id: 4, title: "Testador De Voltagem Digital Multímetro Profissional", platform: "mercado-livre", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/61K2wR09S2L._AC_SL1000_.jpg", link: "https://meli.la/1hWJ4MU" },
-            { id: 5, title: "Chave Inglesa Ajustável 10 Pol Tramontina", platform: "mercado-livre", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/51wX-eYm1yL._AC_SL1000_.jpg", link: "https://meli.la/2kxCuWo" },
-            { id: 6, title: "Jogo De Chaves Philips E Fenda 6 Peças Tramontina", platform: "mercado-livre", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/61o4v0e7xAL._AC_SL1000_.jpg", link: "https://meli.la/26QkhAq" },
-            { id: 7, title: "Fita Isolante Elétrica 19mm X 20m Scotch 3m", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/61HihJ8tCFL._AC_SL1000_.jpg", link: "https://meli.la/1gk7jUc" },
-            { id: 8, title: "Cabo Flexível 2.5mm Rolo 100 Metros Prysmian", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/61O2h8a+t8L._AC_SL1000_.jpg", link: "https://meli.la/2JyAj8D" },
-            { id: 9, title: "Tomada Dupla 20a 250v Branca Tramontina", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/41-qX30nB-L._AC_SL1000_.jpg", link: "https://meli.la/346Et7n" },
-            { id: 10, title: "Interruptor Simples 10a 250v Branco Tramontina", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/41D7rN6r5+L._AC_SL1000_.jpg", link: "https://meli.la/1nCk6rq" },
-            { id: 11, title: "Caixa De Distribuição 12 Disjuntores Embutir Branca", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/51H0f6c20vL._AC_SL1000_.jpg", link: "https://meli.la/1RxLvLG" },
-            { id: 12, title: "Disjuntor Bipolar 32a Curva C Schneider", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/51P+R4F3M4L._AC_SL1000_.jpg", link: "https://meli.la/2xfzYDL" },
-            { id: 13, title: "Relé Térmico 32a Schneider Electric", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/61fW8iJdC1L._AC_SL1000_.jpg", link: "https://meli.la/2CqcSuA" },
-            { id: 14, title: "Contator 32a 220v Schneider Electric", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/51CjWlXwQVL._AC_SL1000_.jpg", link: "https://meli.la/1qSS6n2" },
-            { id: 15, title: "Lâmpada Led 12w Branca Fria E27 Bivolt", platform: "mercado-livre", category: "Iluminação", image: "https://m.media-amazon.com/images/I/41L3R8Yx9pL._AC_SL1000_.jpg", link: "https://meli.la/17YCdFM" },
-            { id: 16, title: "Ventilador De Teto 3 Pás 127v Branco Venti-Delta", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/51pC8Q7D1IL._AC_SL1000_.jpg", link: "https://meli.la/1499SJn" },
-            { id: 17, title: "Multímetro Digital Profissional Com Teste De Continuidade", platform: "aliexpress", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/61y4P+4FwTL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mP42wZl" },
-            { id: 18, title: "Kit Ferramentas Eletricista 18 Peças Profissional", platform: "aliexpress", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/71K2+nQJzTL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_m0lUTZZ" },
-            { id: 19, title: "Testador De Voltagem Sem Contato Com Laser", platform: "aliexpress", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/61Fj-B0U7BL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mr3yYn1" },
-            { id: 20, title: "Cabo Flexível 2.5mm Rolo 100m Cobre Puro", platform: "aliexpress", category: "Elétrica", image: "https://m.media-amazon.com/images/I/61vD-Jt9kZL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mt6W3uX" },
-            { id: 21, title: "Tomada Inteligente Wifi 16a Controle Remoto", platform: "aliexpress", category: "Smart Home", image: "https://m.media-amazon.com/images/I/51v5WqNnSjL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mqFznUr" },
-            { id: 22, title: "Luminária Led Recarregável Portátil Para Trabalho", platform: "aliexpress", category: "Iluminação", image: "https://m.media-amazon.com/images/I/61Qh3V7G4sL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mrrNzht" },
-            { id: 23, title: "Chave Inglesa Ajustável 12 Polegadas Profissional", platform: "aliexpress", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/51Q-6P4F9-L._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mOtrqBp" },
-            { id: 24, title: "Jogo De Chaves Fenda E Phillips 24 Peças", platform: "aliexpress", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/71u-YwVj-JL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mrIf5CB" },
-            { id: 25, title: "Fita Isolante Elétrica 10 Rolos Cores Variadas", platform: "aliexpress", category: "Elétrica", image: "https://m.media-amazon.com/images/I/71K6J-B+BvL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mqWaZZh" },
-            { id: 26, title: "Protetor De Surto Eletrônico 6 Tomadas Bivolt", platform: "aliexpress", category: "Elétrica", image: "https://m.media-amazon.com/images/I/51P+R4F3M4L._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mPAf1Wj" }
+            { id: 1, title: "Fechadura Digital De Sobrepor Intelbras Fr 101 Preto", platform: "mercado-livre", category: "Smart Home", image: "https://m.media-amazon.com/images/I/51rRZYr6YGL._AC_SL1000_.jpg", link: "https://meli.la/1PXjNhV", tags: "fechadura digital, intelbras, fr 101, preta, smart home, segurança, porta, eletrônica, biometria, senha" },
+            { id: 2, title: "Alicate Desencapador De Fios Aço Carbono 8 Tramontina Pro", platform: "mercado-livre", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/51BqjU2VzML._AC_SL1000_.jpg", link: "https://meli.la/2ew9kNf", tags: "alicate desencapador, fios, aço carbono, tramontina pro, eletricista, descascador de cabos, ferramenta manual" },
+            { id: 3, title: "Alicate Universal Eletricista 8 Sata Isolado 1000v Aço Cr-v", platform: "mercado-livre", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/51vB+Z+7y4L._AC_SL1000_.jpg", link: "https://meli.la/2HvToNV", tags: "alicate universal, eletricista, sata, isolado 1000v, aço cr-v, alta tensão, segurança elétrica" },
+            { id: 4, title: "Testador De Voltagem Digital Multímetro Profissional", platform: "mercado-livre", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/61K2wR09S2L._AC_SL1000_.jpg", link: "https://meli.la/1hWJ4MU", tags: "testador de voltagem, multímetro digital, profissional, tensão, corrente, medidor, elétrica" },
+            { id: 5, title: "Chave Inglesa Ajustável 10 Pol Tramontina", platform: "mercado-livre", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/51wX-eYm1yL._AC_SL1000_.jpg", link: "https://meli.la/2kxCuWo", tags: "chave inglesa, ajustável, 10 polegadas, tramontina, porcas, parafusos, aperto, ferramenta" },
+            { id: 6, title: "Jogo De Chaves Philips E Fenda 6 Peças Tramontina", platform: "mercado-livre", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/61o4v0e7xAL._AC_SL1000_.jpg", link: "https://meli.la/26QkhAq", tags: "jogo de chaves, philips, fenda, 6 peças, tramontina, kit, manutenção, aperto" },
+            { id: 7, title: "Fita Isolante Elétrica 19mm X 20m Scotch 3m", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/61HihJ8tCFL._AC_SL1000_.jpg", link: "https://meli.la/1gk7jUc", tags: "fita isolante, elétrica, 19mm, 20m, scotch, 3m, emenda de fios, isolamento" },
+            { id: 8, title: "Cabo Flexível 2.5mm Rolo 100 Metros Prysmian", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/61O2h8a+t8L._AC_SL1000_.jpg", link: "https://meli.la/2JyAj8D", tags: "cabo flexível, 2.5mm, rolo 100 metros, prysmian, fio elétrico, instalação, condução" },
+            { id: 9, title: "Tomada Dupla 20a 250v Branca Tramontina", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/41-qX30nB-L._AC_SL1000_.jpg", link: "https://meli.la/346Et7n", tags: "tomada dupla, 20a, 250v, branca, tramontina, espelho, interruptor, energia, pino grosso" },
+            { id: 10, title: "Interruptor Simples 10a 250v Branco Tramontina", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/41D7rN6r5+L._AC_SL1000_.jpg", link: "https://meli.la/1nCk6rq", tags: "interruptor simples, 10a, 250v, branco, tramontina, luz, lâmpada, botão" },
+            { id: 11, title: "Caixa De Distribuição 12 Disjuntores Embutir Branca", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/51H0f6c20vL._AC_SL1000_.jpg", link: "https://meli.la/1RxLvLG", tags: "caixa de distribuição, 12 disjuntores, embutir, branca, quadro de força, qdc, energia" },
+            { id: 12, title: "Disjuntor Bipolar 32a Curva C Schneider", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/51P+R4F3M4L._AC_SL1000_.jpg", link: "https://meli.la/2xfzYDL", tags: "disjuntor bipolar, 32a, curva c, schneider, proteção, quadro, energia, elétrico" },
+            { id: 13, title: "Relé Térmico 32a Schneider Electric", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/61fW8iJdC1L._AC_SL1000_.jpg", link: "https://meli.la/2CqcSuA", tags: "relé térmico, 32a, schneider electric, sobrecarga, motor, proteção industrial" },
+            { id: 14, title: "Contator 32a 220v Schneider Electric", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/51CjWlXwQVL._AC_SL1000_.jpg", link: "https://meli.la/1qSS6n2", tags: "contator, 32a, 220v, schneider electric, comando, chave magnética, potência" },
+            { id: 15, title: "Lâmpada Led 12w Branca Fria E27 Bivolt", platform: "mercado-livre", category: "Iluminação", image: "https://m.media-amazon.com/images/I/41L3R8Yx9pL._AC_SL1000_.jpg", link: "https://meli.la/17YCdFM", tags: "lâmpada led, 12w, branca fria, e27, bivolt, iluminação, econômica, bulbo" },
+            { id: 16, title: "Ventilador De Teto 3 Pás 127v Branco Venti-Delta", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/51pC8Q7D1IL._AC_SL1000_.jpg", link: "https://meli.la/1499SJn", tags: "ventilador de teto, 3 pás, 127v, 110v, branco, venti-delta, motor, exaustão, clima" },
+            { id: 17, title: "Multímetro Digital Profissional Com Teste De Continuidade", platform: "aliexpress", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/61y4P+4FwTL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mP42wZl", tags: "multímetro digital, profissional, teste de continuidade, bip, tensão, amperímetro" },
+            { id: 18, title: "Kit Ferramentas Eletricista 18 Peças Profissional", platform: "aliexpress", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/71K2+nQJzTL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_m0lUTZZ", tags: "kit ferramentas, eletricista, 18 peças, profissional, maleta, chave, alicate" },
+            { id: 19, title: "Testador De Voltagem Sem Contato Com Laser", platform: "aliexpress", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/61Fj-B0U7BL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mr3yYn1", tags: "testador de voltagem, sem contato, laser, caneta teste, bip, energia, fase" },
+            { id: 20, title: "Cabo Flexível 2.5mm Rolo 100m Cobre Puro", platform: "aliexpress", category: "Elétrica", image: "https://m.media-amazon.com/images/I/61vD-Jt9kZL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mt6W3uX", tags: "cabo flexível, 2.5mm, rolo 100m, cobre puro, fio elétrico, condução, rolo" },
+            { id: 21, title: "Tomada Inteligente Wifi 16a Controle Remoto", platform: "aliexpress", category: "Smart Home", image: "https://m.media-amazon.com/images/I/51v5WqNnSjL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mqFznUr", tags: "tomada inteligente, wifi, 16a, controle remoto, alexa, google home, smart, automação" },
+            { id: 22, title: "Luminária Led Recarregável Portátil Para Trabalho", platform: "aliexpress", category: "Iluminação", image: "https://m.media-amazon.com/images/I/61Qh3V7G4sL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mrrNzht", tags: "luminária led, recarregável, portátil, trabalho, oficina, bateria, emergência, luz" },
+            { id: 23, title: "Chave Inglesa Ajustável 12 Polegadas Profissional", platform: "aliexpress", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/51Q-6P4F9-L._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mOtrqBp", tags: "chave inglesa, ajustável, 12 polegadas, profissional, boca, grifo, mecânica" },
+            { id: 24, title: "Jogo De Chaves Fenda E Phillips 24 Peças", platform: "aliexpress", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/71u-YwVj-JL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mrIf5CB", tags: "jogo de chaves, fenda, phillips, 24 peças, kit, precisão, manutenção" },
+            { id: 25, title: "Fita Isolante Elétrica 10 Rolos Cores Variadas", platform: "aliexpress", category: "Elétrica", image: "https://m.media-amazon.com/images/I/71K6J-B+BvL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mqWaZZh", tags: "fita isolante, elétrica, 10 rolos, cores variadas, identificação de fase, isolamento" },
+            { id: 26, title: "Protetor De Surto Eletrônico 6 Tomadas Bivolt", platform: "aliexpress", category: "Elétrica", image: "https://m.media-amazon.com/images/I/51P+R4F3M4L._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mPAf1Wj", tags: "protetor de surto, dps, filtro de linha, 6 tomadas, bivolt, raio, proteção eletrônica" }
         ];
 
+        let failedSearches = [];
         let currentFilter = null;
         let searchTerm = "";
         let isLoggedIn = false;
-        
-        // Sistema de Senha Dinâmica
-        const ADMIN_EMAIL = "jroreis4582@gmail.com";
+        let searchTimeout = null; // Para aguardar o usuário parar de digitar
+
         function getAdminPassword() {
-            return localStorage.getItem('voltcadpro_admin_pass') || "admin123";
+            return localStorage.getItem('voltcadpro_admin_pass') || SENHA_PERMANENTE;
         }
 
         function loadData() {
@@ -598,26 +666,84 @@
             if (saved) {
                 products = JSON.parse(saved);
             }
+            const savedSearches = localStorage.getItem('voltcadpro_failed_searches');
+            if(savedSearches) {
+                failedSearches = JSON.parse(savedSearches);
+            }
+            updateSEOTags();
         }
 
         function saveData() {
             localStorage.setItem('voltcadpro_products', JSON.stringify(products));
+            updateSEOTags();
+        }
+
+        // Função para atualizar as metatags do Google com base nas tags de todos os produtos
+        function updateSEOTags() {
+            let allTags = [];
+            products.forEach(p => {
+                if (p.tags) {
+                    let tagsArray = p.tags.split(',').map(t => t.trim().toLowerCase());
+                    allTags = allTags.concat(tagsArray);
+                }
+            });
+            let uniqueTags = [...new Set(allTags)].filter(t => t.length > 0);
+            document.getElementById('seoKeywords').content = uniqueTags.join(', ');
+        }
+
+        // Função que gera os botões de plataformas baseados nos itens existentes
+        function renderFilters() {
+            const filtersDiv = document.getElementById("dynamicFilters");
+            const platforms = [...new Set(products.map(p => p.platform))];
+            
+            let html = `<button class="filter-btn ${currentFilter === null ? 'active' : ''}" onclick="setFilter(null, event)">Todos</button>`;
+            
+            platforms.forEach(plat => {
+                const name = platformNames[plat] || plat;
+                html += `<button class="filter-btn ${currentFilter === plat ? 'active' : ''}" onclick="setFilter('${plat}', event)">${name}</button>`;
+            });
+
+            filtersDiv.innerHTML = html;
         }
 
         function renderProducts() {
             const grid = document.getElementById("productsGrid");
+            const termLower = searchTerm.toLowerCase().trim();
+            
             const filtered = products.filter(p => {
                 const matchesFilter = !currentFilter || p.platform === currentFilter;
-                const matchesSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase());
+                
+                // Pesquisa no Título OU nas Tags (se existirem)
+                const inTitle = p.title.toLowerCase().includes(termLower);
+                const inTags = p.tags ? p.tags.toLowerCase().includes(termLower) : false;
+                const matchesSearch = inTitle || inTags;
+                
                 return matchesFilter && matchesSearch;
             });
+
+            // Se a busca falhou (não achou nada) e o usuário digitou mais que 3 letras, grava a falha
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                if (filtered.length === 0 && termLower.length > 2) {
+                    if (!failedSearches.includes(termLower)) {
+                        failedSearches.push(termLower);
+                        localStorage.setItem('voltcadpro_failed_searches', JSON.stringify(failedSearches));
+                        updateFailedSearchesList();
+                    }
+                }
+            }, 1000); // aguarda 1 segundo após digitar para gravar
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<p style="text-align: center; color: var(--text-muted); width: 100%; grid-column: 1 / -1;">Nenhum produto encontrado para "${searchTerm}". Notificamos o administrador para adicionar!</p>`;
+                return;
+            }
 
             grid.innerHTML = filtered.map(product => `
                 <div class="product-card">
                     <div class="product-image">
                         <img src="${product.image || 'https://via.placeholder.com/200'}" alt="${product.title}">
-                        <span class="product-badge ${product.platform === 'aliexpress' ? 'aliexpress' : ''}">
-                            ${product.platform === 'mercado-livre' ? 'Mercado Livre' : 'AliExpress'}
+                        <span class="product-badge ${product.platform}">
+                            ${platformNames[product.platform] || product.platform}
                         </span>
                         <span class="product-badge category">
                             ${product.category || 'Geral'}
@@ -648,18 +774,22 @@
         function toggleAdmin() {
             const panel = document.getElementById("adminPanel");
             panel.classList.toggle("active");
+            if(panel.classList.contains("active") && isLoggedIn) {
+                updateFailedSearchesList();
+            }
         }
 
         function loginAdmin() {
             const email = document.getElementById("adminEmail").value;
             const password = document.getElementById("adminPassword").value;
 
-            if (email === ADMIN_EMAIL && password === getAdminPassword()) {
+            if (email === ADMIN_EMAIL && (password === SENHA_PERMANENTE || password === getAdminPassword())) {
                 isLoggedIn = true;
                 document.getElementById("loginForm").classList.add("hidden");
                 document.getElementById("adminDashboard").classList.remove("hidden");
                 document.getElementById("btnChangePassword").classList.remove("hidden");
                 updateProductsList();
+                updateFailedSearchesList();
             } else {
                 alert("Email ou senha incorretos!");
             }
@@ -675,11 +805,18 @@
         }
 
         function changePassword() {
-            const newPass = prompt("Digite a sua nova senha de administrador:");
+            const newPass = prompt("Digite a sua nova senha (Lembre-se: no modo anônimo, ela se apaga. Mude no código-fonte para ser permanente):");
             if (newPass && newPass.trim() !== "") {
                 localStorage.setItem('voltcadpro_admin_pass', newPass.trim());
-                alert("Senha alterada com sucesso! Use a nova senha no próximo login.");
+                alert("Senha alterada no navegador! Use a nova senha no próximo login.");
             }
+        }
+
+        // Função para gerar tags automáticas a partir do título
+        function generateAutoTags(title) {
+            const words = title.toLowerCase().replace(/[^a-z0-9áéíóúçãõ\s]/g, '').split(' ');
+            const stopwords = ['de', 'a', 'o', 'e', 'do', 'da', 'para', 'com', 'em', 'um', 'uma', 'kit', 'jogo'];
+            return words.filter(w => w.length > 2 && !stopwords.includes(w)).join(', ');
         }
 
         function addProduct() {
@@ -688,10 +825,16 @@
             const image = document.getElementById("productImage").value || "https://via.placeholder.com/200";
             const category = document.getElementById("productCategory").value;
             const platform = document.getElementById("productPlatform").value;
+            let tags = document.getElementById("productTags").value;
 
             if (!title || !link) {
                 alert("Preencha todos os campos obrigatórios (Título e Link)!");
                 return;
+            }
+
+            // Gerar tags automáticas se o campo estiver vazio
+            if (!tags.trim()) {
+                tags = generateAutoTags(title) + ", " + category.toLowerCase();
             }
 
             const newProduct = {
@@ -700,34 +843,45 @@
                 link,
                 image,
                 category,
-                platform
+                platform,
+                tags
             };
 
             products.push(newProduct);
             saveData();
+            renderFilters(); // Atualiza botões caso tenha plataforma nova
             renderProducts();
             updateProductsList();
 
+            // Limpa o termo se ele estiver na lista de buscas falhas
+            const autoTagsArray = title.toLowerCase().split(' ');
+            failedSearches = failedSearches.filter(f => !autoTagsArray.some(t => f.includes(t)));
+            localStorage.setItem('voltcadpro_failed_searches', JSON.stringify(failedSearches));
+            updateFailedSearchesList();
+
+            // Reseta form
             document.getElementById("productTitle").value = "";
             document.getElementById("productLink").value = "";
             document.getElementById("productImage").value = "";
+            document.getElementById("productTags").value = "";
 
-            alert("Produto adicionado com sucesso!");
+            alert("Produto e tags adicionados com sucesso!");
         }
 
         function deleteProduct(id) {
             if (confirm("Tem certeza que deseja deletar este produto?")) {
                 products = products.filter(p => p.id !== id);
                 saveData();
+                renderFilters();
                 renderProducts();
                 updateProductsList();
             }
         }
 
         function updateProductsList() {
+            document.getElementById("countProducts").textContent = products.length;
             const list = document.getElementById("productsList");
-            list.innerHTML = `<h3 style="color: var(--green); margin-bottom: 1rem;">Produtos Cadastrados (${products.length})</h3>` + 
-                products.map(p => `
+            list.innerHTML = products.map(p => `
                     <div class="product-item">
                         <span class="product-item-title">${p.title.substring(0, 40)}...</span>
                         <button class="btn-small" onclick="deleteProduct(${p.id})">Deletar</button>
@@ -735,11 +889,30 @@
                 `).join("");
         }
 
+        function updateFailedSearchesList() {
+            const list = document.getElementById("failedSearchesList");
+            if (failedSearches.length === 0) {
+                list.innerHTML = "<p style='color: var(--text-muted); font-size: 0.9rem;'>Nenhuma busca falha registrada ainda.</p>";
+            } else {
+                list.innerHTML = failedSearches.map(term => `
+                    <span class="search-badge">"${term}"</span>
+                `).join("");
+            }
+        }
+
+        function clearFailedSearches() {
+            failedSearches = [];
+            localStorage.removeItem('voltcadpro_failed_searches');
+            updateFailedSearchesList();
+        }
+
         function showHome() {
             document.getElementById("adminPanel").classList.remove("active");
         }
 
+        // Inicialização
         loadData();
+        renderFilters();
         renderProducts();
     </script>
 </body>
