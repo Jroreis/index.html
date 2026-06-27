@@ -25,21 +25,23 @@
   
   <style>
     /* ========================================================================= */
-    /* NOVO TEMA VISUAL: BASEADO NO DASHBOARD GERENCIAL DA IMAGEM E RESPONSIVO   */
+    /* TEMA VISUAL FINTECH (DARK MODE, CORES VIBRANTES E DESIGN ROBUSTO)         */
     /* ========================================================================= */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     :root { 
-        --bg-color: #f4f7f6; 
-        --card-bg: #ffffff; 
-        --border-color: #e0e6ed; 
-        --text-dark: #2c3e50;
-        --text-light: #7f8c8d;
-        --sidebar-bg: #1c4b82; /* Azul corporativo da imagem */
-        --sidebar-hover: #153963;
-        --accent-teal: #17a2b8; /* Verde/Azul dos gráficos */
-        --accent-red: #e74c3c;  /* Vermelho das despesas na imagem */
-        --accent-blue: #007bff;
+        --bg-color: #020617; 
+        --card-bg: #0f172a; 
+        --border-color: #1e293b; 
+        --text-dark: #f8fafc;
+        --text-light: #94a3b8;
+        --sidebar-bg: #020617; 
+        --sidebar-hover: #1e293b;
+        --accent-teal: #39FF14; /* Verde Neon */
+        --accent-red: #ef4444;  
+        --accent-blue: #3b82f6;
+        --accent-purple: #8b5cf6; /* Cor do Plano Pro */
+        --accent-gold: #f59e0b;   /* Cor do Plano Master */
     }
     
     body { 
@@ -51,7 +53,7 @@
         overflow: hidden; 
     }
     
-    /* SIDEBAR corporativa */
+    /* SIDEBAR FINTECH */
     .sidebar { 
         width: 260px; 
         background: var(--sidebar-bg); 
@@ -59,76 +61,79 @@
         padding: 30px 20px; 
         display: flex; 
         flex-direction: column; 
-        border-right: 1px solid var(--sidebar-hover);
+        border-right: 1px solid var(--border-color);
         transition: 0.3s;
     }
-    .logo { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 30px; letter-spacing: 1px; }
+    .logo { font-size: 24px; font-weight: 800; color: var(--accent-teal); margin-bottom: 30px; letter-spacing: 1px; }
     .user-greet h2 { font-size: 16px; margin-bottom: 4px; }
-    .user-greet { margin-bottom: 30px; border-bottom: 1px solid var(--sidebar-hover); padding-bottom: 20px; }
+    .user-greet { margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
     
     .nav-links { list-style: none; }
     .nav-links a { 
-        display: block; padding: 12px 15px; color: #cbd5e1; cursor: pointer; 
-        border-radius: 6px; margin-bottom: 10px; text-decoration: none; font-weight: 600; 
+        display: block; padding: 12px 15px; color: var(--text-light); cursor: pointer; 
+        border-radius: 8px; margin-bottom: 10px; text-decoration: none; font-weight: 600; 
         transition: 0.2s;
     }
     .nav-links a:hover { background: var(--sidebar-hover); color: #fff; }
     .nav-links a.active-nav { 
-        background: #0f3057; color: #fff; border-left: 4px solid var(--accent-teal); 
+        background: var(--card-bg); color: #fff; border: 1px solid var(--border-color); border-left: 4px solid var(--accent-teal); 
     }
     
     .logout-btn { 
-        padding: 12px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); 
-        color: #fff; text-align: center; cursor: pointer; border-radius: 6px; 
+        padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); 
+        color: var(--accent-red); text-align: center; cursor: pointer; border-radius: 8px; 
         margin-top: auto; font-weight: bold; transition: 0.2s; 
     }
-    .logout-btn:hover { background: var(--accent-red); border-color: var(--accent-red); }
+    .logout-btn:hover { background: rgba(239, 68, 68, 0.2); }
 
     /* CONTEÚDO PRINCIPAL */
     .main-content { flex: 1; padding: 25px; overflow-y: auto; }
     .tab-content { display: none; } .tab-content.active { display: block; animation: fadeIn 0.3s; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     .page-title { 
-        font-size: 24px; color: var(--sidebar-bg); font-weight: 800; margin-bottom: 20px;
-        text-transform: uppercase; border-bottom: 2px solid var(--accent-teal); padding-bottom: 10px;
+        font-size: 24px; color: #fff; font-weight: 800; margin-bottom: 20px;
+        text-transform: uppercase; border-bottom: 2px solid var(--border-color); padding-bottom: 10px;
         display: flex; justify-content: space-between; align-items: center;
     }
 
-    /* CARDS DE KPI (Estilo do Topo da Imagem) */
+    /* CARDS DE KPI (Estilo Fintech) */
     .kpi-grid { 
         display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
         gap: 20px; margin-bottom: 25px; 
     }
     .kpi-card { 
-        background: var(--card-bg); border-radius: 8px; padding: 20px; 
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color);
-        display: flex; flex-direction: column; justify-content: center;
+        background: var(--card-bg); border-radius: 16px; padding: 24px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid var(--border-color);
+        display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden;
     }
-    .kpi-card .kpi-title { font-size: 14px; font-weight: 700; color: var(--text-light); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;}
-    .kpi-card .kpi-value { font-size: 28px; font-weight: 900; color: var(--sidebar-bg); }
+    .kpi-card::before {
+        content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent-teal);
+    }
+    .kpi-card .kpi-title { font-size: 13px; font-weight: 700; color: var(--text-light); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;}
+    .kpi-card .kpi-value { font-size: 32px; font-weight: 900; color: #fff; }
 
     /* GRÁFICOS */
     .multi-graphs-grid { 
         display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 10px; 
     }
     .graph-box { 
-        background: var(--card-bg); padding: 20px; border-radius: 8px; 
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid var(--border-color); 
+        background: var(--card-bg); padding: 24px; border-radius: 16px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 1px solid var(--border-color); 
     }
-    .graph-box h4 { margin-bottom: 15px; font-size: 15px; color: var(--sidebar-bg); font-weight: 700; text-align: center; }
+    .graph-box h4 { margin-bottom: 20px; font-size: 15px; color: var(--text-light); font-weight: 700; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
     .canvas-wrapper { position: relative; height: 220px; width: 100%; }
 
-    /* TABELAS E OUTROS CARDS PRESERVADOS COM ESTILO CLARO */
-    .chart-card { background: var(--card-bg); padding: 25px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow-x: auto; }
+    /* TABELAS E OUTROS CARDS PRESERVADOS COM ESTILO DARK */
+    .chart-card { background: var(--card-bg); padding: 25px; border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.3); overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; min-width: 600px; }
-    th { background: #f8fafc; padding: 14px 12px; border-bottom: 2px solid var(--border-color); text-align: left; font-size: 13px; color: var(--sidebar-bg); text-transform: uppercase; }
-    td { padding: 14px 12px; border-bottom: 1px solid var(--border-color); text-align: left; font-size: 14px; color: var(--text-dark); }
+    th { background: rgba(255,255,255,0.02); padding: 14px 12px; border-bottom: 2px solid var(--border-color); text-align: left; font-size: 13px; color: var(--text-light); text-transform: uppercase; }
+    td { padding: 14px 12px; border-bottom: 1px solid var(--border-color); text-align: left; font-size: 14px; color: #fff; }
     
-    .status-select { background: #fff; color: var(--text-dark); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; outline: none; }
+    .status-select { background: var(--bg-color); color: #fff; border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; outline: none; }
     
-    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
-    .modal-content { background: var(--card-bg); margin: 10% auto; padding: 25px; width: 90%; max-width: 480px; border-radius: 8px; border: 2px solid var(--accent-teal); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); }
+    .modal-content { background: var(--card-bg); margin: 10% auto; padding: 25px; width: 90%; max-width: 480px; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
 
     /* ========================================================================= */
     /* RESPONSIVIDADE PARA CELULAR (Design Fluido)                               */
@@ -136,10 +141,10 @@
     @media (max-width: 768px) {
         body { flex-direction: column; overflow-y: auto; height: auto; }
         .sidebar { 
-            width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--sidebar-hover); 
+            width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-color); 
             padding: 15px; align-items: center; text-align: center;
         }
-        .user-greet { display: none; } /* Oculta saudação no mobile para poupar espaço */
+        .user-greet { display: none; } 
         .logo { margin-bottom: 15px; }
         .nav-links { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; justify-content: center; }
         .nav-links li { flex: 1 1 45%; }
@@ -157,11 +162,11 @@
 <aside class="sidebar">
     <div class="logo">VoltCalc Pro</div>
     <div class="user-greet">
-        <h2>MILIONÁRIO JEFFERSON</h2>
-        <div style="color: #cbd5e1; font-size: 12px; margin-top: 4px;">jroreis4582@gmail.com</div>
+        <h2>ADMINISTRAÇÃO</h2>
+        <div style="color: var(--accent-teal); font-size: 12px; margin-top: 4px;">jroreis4582@gmail.com</div>
     </div>
     <ul class="nav-links">
-        <li><a onclick="mudarAba('tab-estatisticas', this)" class="active-nav">📊 Painel Gerencial</a></li>
+        <li><a onclick="mudarAba('tab-estatisticas', this)" class="active-nav">📊 Painel Financeiro</a></li>
         <li><a onclick="mudarAba('tab-chamados', this)">✉️ Chamados</a></li>
         <li><a onclick="mudarAba('tab-usuarios', this)">👥 Base 'users'</a></li>
         <li><a onclick="mudarAba('tab-pagamentos', this)">💳 Transações Asaas</a></li>
@@ -173,52 +178,48 @@
     
     <div id="tab-estatisticas" class="tab-content active">
         <div class="page-title">
-            DASHBOARD GERENCIAL
-            <span style="color:var(--text-light); font-size: 12px; font-weight: 500; text-transform: none;">
-                🔄 Ult. Atualização: Tempo Real (Firestore)
+            DASHBOARD FINANCEIRO
+            <span style="color:var(--accent-teal); font-size: 12px; font-weight: 600; text-transform: none; border: 1px solid var(--accent-teal); padding: 4px 10px; border-radius: 20px;">
+                ● Live Sync
             </span>
         </div>
 
         <div class="kpi-grid">
-            <div class="kpi-card">
-                <div class="kpi-title">👥 Usuários na Base</div>
+            <div class="kpi-card" style="border-left-color: var(--accent-blue);">
+                <div class="kpi-title">👥 Total de Usuários</div>
                 <div class="kpi-value" id="total-users">0</div>
             </div>
-            <div class="kpi-card">
-                <div class="kpi-title">💰 Receitas Totais (Asaas)</div>
-                <div class="kpi-value" id="total-receita">R$ 0,00</div>
+            <div class="kpi-card" style="border-left-color: var(--accent-teal);">
+                <div class="kpi-title">💰 Receita Aprovada</div>
+                <div class="kpi-value" id="total-receita" style="color: var(--accent-teal);">R$ 0,00</div>
             </div>
-            <div class="kpi-card">
+            <div class="kpi-card" style="border-left-color: var(--accent-gold);">
                 <div class="kpi-title">✉️ Chamados Pendentes</div>
                 <div class="kpi-value" id="total-chamados-pendentes">0</div>
             </div>
-            <div class="kpi-card">
-                <div class="kpi-title">🟢 Status Servidor</div>
-                <div class="kpi-value" style="color: var(--accent-teal); font-size: 22px;">ONLINE</div>
+            <div class="kpi-card" style="border-left-color: var(--accent-red);">
+                <div class="kpi-title">📉 Inadimplência</div>
+                <div class="kpi-value" id="total-inadimplencia" style="color: var(--accent-red);">R$ 0,00</div>
             </div>
         </div>
 
         <div class="multi-graphs-grid">
             
-            <div class="graph-box">
-                <h4>Divisão de Usuários (Base Live)</h4>
-                <div class="canvas-wrapper"><canvas id="barChart"></canvas></div>
+            <div class="graph-box" style="grid-column: 1 / -1; max-width: 500px; margin: 0 auto; background: transparent; border: none; box-shadow: none;">
+                <h4>Adesão aos Planos (Ao Vivo)</h4>
+                <div class="canvas-wrapper" style="height: 250px;"><canvas id="planosPieChart"></canvas></div>
             </div>
 
             <div class="graph-box">
-                <h4>Status Financeiro (Transações)</h4>
+                <h4>Status Financeiro (Asaas)</h4>
                 <div class="canvas-wrapper"><canvas id="payChart"></canvas></div>
             </div>
 
-            <div class="graph-box" style="grid-column: 1 / -1;">
-                <h4>Margem de Crescimento de Usuários</h4>
-                <div class="canvas-wrapper" style="height: 180px;"><canvas id="lineChart"></canvas></div>
+            <div class="graph-box">
+                <h4>Atividade na Plataforma</h4>
+                <div class="canvas-wrapper"><canvas id="barChart"></canvas></div>
             </div>
 
-            <div class="graph-box" style="grid-column: 1 / -1; max-width: 400px; margin: 0 auto; border:none; box-shadow:none; background:transparent;">
-                <h4>Origem das Plataformas</h4>
-                <div class="canvas-wrapper" style="height: 200px;"><canvas id="pieChart"></canvas></div>
-            </div>
         </div>
     </div>
 
@@ -235,31 +236,31 @@
     <div id="tab-usuarios" class="tab-content">
         <div class="page-title">Usuários Cadastrados & Central</div>
         
-        <div class="chart-card" style="border-left: 4px solid var(--accent-teal); background: #f8fafc;">
-           <h3 style="color: var(--sidebar-bg); margin-bottom: 10px;">📢 Central de Despacho de Mensagens</h3>
+        <div class="chart-card" style="border-left: 4px solid var(--accent-blue); background: rgba(59, 130, 246, 0.05);">
+           <h3 style="color: #fff; margin-bottom: 10px;">📢 Central de Despacho de Mensagens</h3>
            <p style="font-size: 13px; color: var(--text-light); margin-bottom: 15px;">Envie mensagens ou avisos de atualização direto para a caixa de entrada dos profissionais.</p>
            
            <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
               <div style="flex: 1; min-width: 200px;">
-                 <label style="display:block; font-size:13px; color:var(--text-dark); margin-bottom:4px; font-weight:bold;">Destinatário:</label>
-                 <select id="select-destinatario-msg" style="width:100%; padding:10px; background:#fff; color:var(--text-dark); border:1px solid var(--border-color); border-radius:4px; font-size:13px; outline:none;">
+                 <label style="display:block; font-size:13px; color:var(--text-light); margin-bottom:4px; font-weight:bold;">Destinatário:</label>
+                 <select id="select-destinatario-msg" style="width:100%; padding:10px; background:var(--bg-color); color:#fff; border:1px solid var(--border-color); border-radius:8px; font-size:13px; outline:none;">
                     <option value="TODOS">📢 ENVIAR PARA TODOS OS USUÁRIOS (Geral)</option>
                  </select>
               </div>
               <div style="flex: 2; min-width: 200px;">
-                 <label style="display:block; font-size:13px; color:var(--text-dark); margin-bottom:4px; font-weight:bold;">Título / Assunto:</label>
-                 <input type="text" id="assunto-broadcast" placeholder="Ex: Atualização da Tabela NBR 5410" value="Aviso da Administração" style="width:100%; padding:10px; background:#fff; color:var(--text-dark); border:1px solid var(--border-color); border-radius:4px; font-size:13px; outline:none;">
+                 <label style="display:block; font-size:13px; color:var(--text-light); margin-bottom:4px; font-weight:bold;">Título / Assunto:</label>
+                 <input type="text" id="assunto-broadcast" placeholder="Ex: Atualização da Tabela NBR 5410" value="Aviso da Administração" style="width:100%; padding:10px; background:var(--bg-color); color:#fff; border:1px solid var(--border-color); border-radius:8px; font-size:13px; outline:none;">
               </div>
            </div>
 
-           <textarea id="texto-broadcast" placeholder="Escreva a mensagem que os usuários receberão no painel deles..." style="width:100%; height:80px; padding:10px; background:#fff; color:var(--text-dark); border:1px solid var(--border-color); border-radius:4px; font-size:13px; outline:none; resize:none; margin-bottom:10px;"></textarea>
+           <textarea id="texto-broadcast" placeholder="Escreva a mensagem que os usuários receberão no painel deles..." style="width:100%; height:80px; padding:10px; background:var(--bg-color); color:#fff; border:1px solid var(--border-color); border-radius:8px; font-size:13px; outline:none; resize:none; margin-bottom:10px;"></textarea>
            
-           <button onclick="dispararMensagemDireta(event)" style="background:var(--accent-teal); color:#fff; font-weight:bold; border:none; padding:12px 24px; border-radius:4px; cursor:pointer; font-size:13px; transition:0.2s;">🚀 Despachar Mensagem Real</button>
+           <button onclick="dispararMensagemDireta(event)" style="background:var(--accent-blue); color:#fff; font-weight:bold; border:none; padding:12px 24px; border-radius:8px; cursor:pointer; font-size:13px; transition:0.2s;">🚀 Despachar Mensagem Real</button>
         </div>
 
         <div class="chart-card">
             <table>
-                <thead><tr><th>Nome</th><th>E-mail de Cadastro</th></tr></thead>
+                <thead><tr><th>Nome</th><th>E-mail de Cadastro</th><th>Plano Atual</th></tr></thead>
                 <tbody id="tabela-usuarios-body"></tbody>
             </table>
         </div>
@@ -287,19 +288,19 @@
 
 <div id="modal-reply" class="modal">
     <div class="modal-content">
-        <h3 style="color:var(--sidebar-bg); margin-bottom: 10px;">Responder Chamado Técnico</h3>
-        <p id="modal-email" style="color: var(--accent-teal); font-weight: bold; margin: 0 0 10px 0; font-size: 13px;"></p>
+        <h3 style="color:#fff; margin-bottom: 10px;">Responder Chamado Técnico</h3>
+        <p id="modal-email" style="color: var(--accent-blue); font-weight: bold; margin: 0 0 10px 0; font-size: 13px;"></p>
         
-        <div style="background: #f8fafc; border-left: 3px solid #f1c40f; padding: 12px; margin-bottom: 15px; border-radius: 4px;">
-            <span style="font-size: 11px; color: var(--text-dark); font-weight: bold; display: block; margin-bottom: 4px;">NECESSIDADE DO PROFISSIONAL:</span>
-            <div id="modal-msg-conteudo" style="font-size: 14px; color: var(--text-light); max-height: 85px; overflow-y: auto;">Carregando mensagem...</div>
+        <div style="background: rgba(245, 158, 11, 0.1); border-left: 3px solid var(--accent-gold); padding: 12px; margin-bottom: 15px; border-radius: 4px;">
+            <span style="font-size: 11px; color: var(--accent-gold); font-weight: bold; display: block; margin-bottom: 4px;">NECESSIDADE DO PROFISSIONAL:</span>
+            <div id="modal-msg-conteudo" style="font-size: 14px; color: #fff; max-height: 85px; overflow-y: auto;">Carregando mensagem...</div>
         </div>
 
-        <label style="font-size: 12px; color: var(--sidebar-bg); font-weight: bold;">ESCREVA A SUA RESPOSTA:</label>
-        <textarea id="reply-text" placeholder="Digite aqui a solução..." style="width:100%; height:100px; background:#fff; color:var(--text-dark); border:1px solid var(--border-color); padding:10px; border-radius:4px; outline:none; resize:none; margin-top: 6px;"></textarea>
+        <label style="font-size: 12px; color: var(--text-light); font-weight: bold;">ESCREVA A SUA RESPOSTA:</label>
+        <textarea id="reply-text" placeholder="Digite aqui a solução..." style="width:100%; height:100px; background:var(--bg-color); color:#fff; border:1px solid var(--border-color); padding:10px; border-radius:8px; outline:none; resize:none; margin-top: 6px;"></textarea>
         
-        <button style="background:var(--accent-teal); color:#fff; font-weight:bold; border:none; padding:12px; width:100%; margin-top:15px; border-radius:4px; cursor:pointer;" onclick="enviarResposta()">Despachar Resposta no Site</button>
-        <button style="background:transparent; border:1px solid var(--accent-red); color:var(--accent-red); font-weight:bold; padding:10px; width:100%; margin-top:10px; border-radius:4px; cursor:pointer;" onclick="fecharModal()">Cancelar</button>
+        <button style="background:var(--accent-blue); color:#fff; font-weight:bold; border:none; padding:12px; width:100%; margin-top:15px; border-radius:8px; cursor:pointer;" onclick="enviarResposta()">Despachar Resposta no Site</button>
+        <button style="background:transparent; border:1px solid var(--accent-red); color:var(--accent-red); font-weight:bold; padding:10px; width:100%; margin-top:10px; border-radius:8px; cursor:pointer;" onclick="fecharModal()">Cancelar</button>
     </div>
 </div>
 
@@ -314,6 +315,7 @@
     // Instâncias dos gráficos para atualização em tempo real
     let graficoBarrasInstancia = null;
     let graficoPagamentosInstancia = null;
+    let graficoPlanosInstancia = null;
 
     function mudarAba(id, el) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
@@ -323,7 +325,7 @@
     }
 
     function carregarDados() {
-        // 1. ESCUTA 'users' E ALIMENTA O GRÁFICO 
+        // 1. ESCUTA 'users' E ALIMENTA O GRÁFICO DE PLANOS 
         if(document.getElementById('tabela-usuarios-body')) {
             db.collection('users').onSnapshot(snap => {
                 document.getElementById('total-users').innerText = snap.size;
@@ -333,9 +335,10 @@
                 tbody.innerHTML = '';
                 if(selectDest) selectDest.innerHTML = '<option value="TODOS">📢 ENVIAR PARA TODOS OS USUÁRIOS (Geral)</option>';
 
-                let qtdAdmin = 0;
-                let qtdProf = 0;
-                let qtdNovos = 0;
+                // Contadores para o Gráfico de Planos Real
+                let qtdFree = 0;
+                let qtdPro = 0;
+                let qtdMaster = 0;
 
                 globalUsersList = [];
 
@@ -344,29 +347,38 @@
                     u.id = doc.id;
                     globalUsersList.push(u);
 
-                    tbody.innerHTML += `<tr><td style="font-weight:600;">${u.nome || 'Usuário Web'}</td><td>${u.email || 'Sem e-mail'}</td></tr>`;
+                    // Verifica o plano no banco
+                    let planoTag = '<span style="color:#94a3b8; font-weight:bold;">Free</span>';
+                    if (u.plano === 'master') {
+                        qtdMaster++;
+                        planoTag = '<span style="color:#f59e0b; font-weight:bold;">Master</span>';
+                    } else if (u.plano === 'pro') {
+                        qtdPro++;
+                        planoTag = '<span style="color:#8b5cf6; font-weight:bold;">Pro</span>';
+                    } else {
+                        qtdFree++;
+                    }
+
+                    tbody.innerHTML += `<tr>
+                        <td style="font-weight:600;">${u.nome || 'Usuário Web'}</td>
+                        <td style="color:var(--text-light);">${u.email || 'Sem e-mail'}</td>
+                        <td>${planoTag}</td>
+                    </tr>`;
 
                     if(selectDest && u.email) {
                         selectDest.innerHTML += `<option value="${u.id}">${u.nome || 'Profissional'} (${u.email})</option>`;
                     }
-
-                    if(u.email === 'jroreis4582@gmail.com' || u.role === 'admin') {
-                        qtdAdmin++;
-                    } else if(u.role === 'profissional' || u.role === 'profissional_aprovado') {
-                        qtdProf++;
-                    } else {
-                        qtdNovos++;
-                    }
                 });
 
-                if(qtdAdmin === 0) qtdAdmin = 1;
-                if(qtdProf === 0 && snap.size > 1) {
-                    qtdProf = Math.floor((snap.size - qtdAdmin) * 0.85);
-                    qtdNovos = (snap.size - qtdAdmin) - qtdProf;
+                // Atualiza o Gráfico Donut de Planos
+                if(graficoPlanosInstancia) {
+                    graficoPlanosInstancia.data.datasets[0].data = [qtdFree, qtdPro, qtdMaster];
+                    graficoPlanosInstancia.update();
                 }
 
+                // Atualiza Gráfico de Barras com uma métrica de atividade base (apenas visual para o dashboard)
                 if(graficoBarrasInstancia) {
-                    graficoBarrasInstancia.data.datasets[0].data = [qtdProf, qtdAdmin, qtdNovos];
+                    graficoBarrasInstancia.data.datasets[0].data = [qtdFree, qtdPro + qtdMaster, 1]; 
                     graficoBarrasInstancia.update();
                 }
             });
@@ -378,7 +390,7 @@
                 const tbody = document.getElementById('tabela-chamados-body');
                 tbody.innerHTML = '';
                 
-                let chamadosPendentes = 0; // Para o Card Topo
+                let chamadosPendentes = 0; 
                 
                 for (const doc of snap.docs) {
                     const c = doc.data();
@@ -398,7 +410,7 @@
 
                     const tituloNaTabela = c.assunto || "Chamado de Atendimento";
                     const statusAtual = c.status || 'Pendente';
-                    let corBorda = statusAtual === 'Resolvido' ? '#17a2b8' : statusAtual === 'Em Atendimento' ? '#f1c40f' : '#e74c3c';
+                    let corBorda = statusAtual === 'Resolvido' ? '#39FF14' : statusAtual === 'Em Atendimento' ? '#f59e0b' : '#ef4444';
                     const textoBlindado = encodeURIComponent(textoRealDuvida);
 
                     tbody.innerHTML += `<tr>
@@ -413,7 +425,7 @@
                                 <option value="Resolvido" ${statusAtual === 'Resolvido' ? 'selected' : ''}>🟢 Resolvido</option>
                             </select>
                         </td>
-                        <td><button onclick="db.collection('chamados').doc('${doc.id}').delete()" style="background:var(--accent-red); color:#fff; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:bold;">Apagar</button></td>
+                        <td><button onclick="db.collection('chamados').doc('${doc.id}').delete()" style="background:rgba(239,68,68,0.2); color:var(--accent-red); border:1px solid var(--accent-red); padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:bold;">Apagar</button></td>
                     </tr>`;
                 }
                 
@@ -429,13 +441,13 @@
                 tbody.innerHTML = '';
                 
                 let receitaTotal = 0;
+                let receitaPerdida = 0;
                 let qtdAprovado = 0;
                 let qtdPendente = 0;
                 let qtdInadimplente = 0;
                 
                 if(snap.empty) {
                     tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-light);">Aguardando o primeiro pagamento via Webhook...</td></tr>`;
-                    // Gráficos zerados se não houver dados ainda
                     if(graficoPagamentosInstancia) {
                          graficoPagamentosInstancia.data.datasets[0].data = [0, 0, 0];
                          graficoPagamentosInstancia.update();
@@ -445,17 +457,18 @@
 
                 snap.forEach(doc => {
                     const pag = doc.data();
-                    let corStatus = '#f1c40f'; 
+                    let corStatus = '#f59e0b'; 
                     let statusNome = 'Aguardando';
 
                     if(pag.status === 'RECEIVED' || pag.status === 'CONFIRMED') {
-                        corStatus = '#17a2b8'; 
+                        corStatus = '#39FF14'; 
                         statusNome = 'Aprovado';
                         receitaTotal += parseFloat(pag.valor) || 0;
                         qtdAprovado++;
                     } else if (pag.status === 'OVERDUE' || pag.status === 'CANCELED') {
-                        corStatus = '#e74c3c'; 
+                        corStatus = '#ef4444'; 
                         statusNome = pag.status === 'OVERDUE' ? 'Vencido' : 'Cancelado';
+                        receitaPerdida += parseFloat(pag.valor) || 0;
                         qtdInadimplente++;
                     } else {
                         qtdPendente++;
@@ -469,14 +482,15 @@
 
                     tbody.innerHTML += `<tr>
                         <td style="font-weight:500;">${pag.clienteId || 'ID Não Informado'}</td>
-                        <td style="color:var(--sidebar-bg); font-weight:800; font-size:15px;">R$ ${pag.valor ? parseFloat(pag.valor).toFixed(2) : '0.00'}</td>
+                        <td style="color:#fff; font-weight:800; font-size:15px;">R$ ${pag.valor ? parseFloat(pag.valor).toFixed(2) : '0.00'}</td>
                         <td style="color:${corStatus}; font-weight:800; text-transform: uppercase;">● ${statusNome}</td>
                         <td style="color:var(--text-light); font-size:12px;">${dataFormatada}</td>
                     </tr>`;
                 });
                 
-                // Atualiza o KPI de Receita Total
+                // Atualiza o KPI de Receita Total e Inadimplência
                 document.getElementById('total-receita').innerText = "R$ " + receitaTotal.toFixed(2).replace('.', ',');
+                document.getElementById('total-inadimplencia').innerText = "R$ " + receitaPerdida.toFixed(2).replace('.', ',');
                 
                 // Atualiza o novo Gráfico Financeiro
                 if(graficoPagamentosInstancia) {
@@ -572,99 +586,73 @@
     }
 
     // =========================================================================
-    // INICIALIZAÇÃO DOS GRÁFICOS (CORES CORPORATIVAS DA IMAGEM)
+    // INICIALIZAÇÃO DOS GRÁFICOS (DESIGN FINTECH: CORES VIBRANTES / DARK MODE)
     // =========================================================================
     window.onload = () => {
         carregarDados();
 
-        // 1. Gráfico de Barras: Divisão de Usuários (Corresponde ao Entradas/Saidas da Imagem)
-        const ctxBar = document.getElementById('barChart').getContext('2d');
-        graficoBarrasInstancia = new Chart(ctxBar, { 
-            type: 'bar', 
+        // 1. NOVO GRÁFICO DONUT: ADESÃO DE PLANOS (Lê os dados reais Free, Pro, Master)
+        const ctxPlanos = document.getElementById('planosPieChart').getContext('2d');
+        graficoPlanosInstancia = new Chart(ctxPlanos, { 
+            type: 'doughnut', 
             data: { 
-                labels: ['Profissionais', 'Administrador', 'Novos'], 
+                labels: ['Free / Essencial', 'Plano Pro', 'Plano Master'], 
                 datasets: [{ 
-                    label: 'Usuários Ativos', 
                     data: [0, 0, 0], 
-                    backgroundColor: ['#17a2b8', '#1c4b82', '#e74c3c'],
-                    borderRadius: 4
+                    backgroundColor: ['#3b82f6', '#8b5cf6', '#f59e0b'], 
+                    borderWidth: 0,
+                    cutout: '75%' 
                 }] 
             },
             options: { 
                 responsive: true, maintainAspectRatio: false, 
-                plugins: { legend: { display: false } },
-                scales: { 
-                    y: { beginAtZero: true, grid: { color: '#e0e6ed' } }, 
-                    x: { grid: { display: false } } 
-                }
+                plugins: { legend: { position: 'right', labels: { color: '#fff', font: { size: 13, weight: '600' }, padding: 20 } } } 
             }
         });
 
-        // 2. Novo Gráfico: Status Financeiro Asaas (Corresponde ao "Top 10 Despesas / Contas em Atraso")
+        // 2. Gráfico Financeiro Asaas (Aprovados, Pendentes, Cancelados)
         const ctxPay = document.getElementById('payChart').getContext('2d');
         graficoPagamentosInstancia = new Chart(ctxPay, {
             type: 'bar',
             data: {
-                labels: ['Aprovados', 'Pendentes', 'Cancelados'],
+                labels: ['Aprovados', 'Pendentes', 'Cancelados/Vencidos'],
                 datasets: [{
                     label: 'Transações',
                     data: [0, 0, 0],
-                    backgroundColor: ['#17a2b8', '#f1c40f', '#e74c3c'],
-                    borderRadius: 4
+                    backgroundColor: ['#39FF14', '#f59e0b', '#ef4444'],
+                    borderRadius: 6
                 }]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: { 
-                    y: { beginAtZero: true, grid: { color: '#e0e6ed' } },
-                    x: { grid: { display: false } } 
+                    y: { beginAtZero: true, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: 'bold' } } } 
                 }
             }
         });
 
-        // 3. Gráfico de Área: Crescimento (Corresponde à "Margem de Contribuição / Ponto de Equilíbrio")
-        new Chart(document.getElementById('lineChart'), { 
-            type: 'line', 
+        // 3. Gráfico de Barras Genérico: Atividade (Apenas visual decorativo para preencher o dash)
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        graficoBarrasInstancia = new Chart(ctxBar, { 
+            type: 'bar', 
             data: { 
-                labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'], 
+                labels: ['Novos Acessos', 'Assinaturas Ativas', 'Suporte'], 
                 datasets: [{ 
-                    label: 'Novos Cadastros', 
-                    data: [2, 5, 4, 11], 
-                    borderColor: '#17a2b8', 
-                    borderWidth: 3,
-                    tension: 0.3, 
-                    backgroundColor: 'rgba(23, 162, 184, 0.2)', // Preenchimento verde-água translúcido
-                    fill: true,
-                    pointBackgroundColor: '#1c4b82',
-                    pointRadius: 4
+                    label: 'Métricas', 
+                    data: [0, 0, 0], 
+                    backgroundColor: ['#3b82f6', '#8b5cf6', '#10b981'],
+                    borderRadius: 6
                 }] 
             },
             options: { 
                 responsive: true, maintainAspectRatio: false, 
-                plugins: { legend: { display: false } }, 
+                plugins: { legend: { display: false } },
                 scales: { 
-                    x: { grid: { display: false } }, 
-                    y: { grid: { color: '#e0e6ed' }, beginAtZero: true } 
-                } 
-            }
-        });
-        
-        // 4. Gráfico Donut: Plataformas (Corresponde ao "% Realizado")
-        new Chart(document.getElementById('pieChart'), { 
-            type: 'doughnut', 
-            data: { 
-                labels: ['Desktop', 'Mobile Web', 'App'], 
-                datasets: [{ 
-                    data: [65, 25, 10], 
-                    backgroundColor: ['#17a2b8', '#1c4b82', '#e74c3c'], 
-                    borderWidth: 0,
-                    cutout: '70%' // Deixa o furo maior, igual ao do PowerBI
-                }] 
-            },
-            options: { 
-                responsive: true, maintainAspectRatio: false, 
-                plugins: { legend: { position: 'right', labels: { font: { size: 12, weight: '600' } } } } 
+                    y: { beginAtZero: true, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }, 
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: 'bold' } } } 
+                }
             }
         });
     };
