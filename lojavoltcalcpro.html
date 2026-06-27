@@ -3,75 +3,698 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loja VoltCalc Pro | O Lugar da Promoção</title>
+    <title>VoltCadPro - A Loja do Eletricista</title>
     <style>
-        :root { 
-            --bg-body: #f4f4f4; 
-            --header-bg: #232f3e; 
-            --accent: #39FF14; 
-            --btn-buy: #ff9900; 
-            --text-dark: #333; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; }
-        
-        /* Cabeçalho Profissional */
-        .header-shop { background: var(--header-bg); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .search-bar { width: 60%; padding: 10px; border-radius: 4px; border: none; }
-        
-        /* Banner de Oferta */
-        .banner-destaque { width: 100%; height: 250px; background: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border-bottom: 4px solid var(--accent); font-size: 2rem; color: var(--header-bg); font-weight: 800; text-align: center; }
 
-        /* Vitrine em Grid */
-        .vitrine { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; padding: 15px; max-width: 1200px; margin: 0 auto; }
-        .produto-card { background: white; padding: 15px; border-radius: 4px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .produto-card img { width: 100%; height: 150px; object-fit: contain; }
-        .produto-card h3 { font-size: 0.9rem; height: 40px; overflow: hidden; margin: 10px 0; }
-        .preco-info { font-size: 1.2rem; font-weight: 700; color: #b12704; margin-bottom: 10px; }
-        .btn-compra { background: var(--btn-buy); color: black; border: none; width: 100%; padding: 10px; border-radius: 4px; cursor: pointer; font-weight: 700; }
-        .btn-compra:hover { background: #e78e00; }
-        
-        .cat-bar { background: #37475a; color: white; padding: 10px; display: flex; gap: 20px; justify-content: center; font-size: 0.9rem; }
+        :root {
+            --green: #00FF00;
+            --green-dark: #00CC00;
+            --yellow: #FFD700;
+            --bg-dark: #0F172A;
+            --bg-darker: #020617;
+            --text-light: #E2E8F0;
+            --text-muted: #94A3B8;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(to bottom, #0F172A, #1E293B, #0F172A);
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, var(--green), var(--yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+            color: var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .admin-btn {
+            background: transparent;
+            border: 1px solid var(--green);
+            color: var(--green);
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .admin-btn:hover {
+            background: rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .hero {
+            padding: 4rem 0;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0, 255, 0, 0.05) 0%, rgba(255, 215, 0, 0.05) 100%);
+            border-bottom: 1px solid rgba(0, 255, 0, 0.1);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .search-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-box input {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            display: block;
+            padding: 0.75rem 1rem;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 0.25rem;
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--green);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1.5rem;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            background: transparent;
+            color: var(--text-light);
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--green);
+            color: var(--bg-dark);
+            border-color: var(--green);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .products-section {
+            padding: 3rem 0;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .product-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            border-color: var(--green);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #1E293B, #0F172A);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            font-size: 3rem;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            background: var(--yellow);
+            color: var(--bg-dark);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .product-badge.aliexpress {
+            background: #E82828;
+            color: white;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+            line-height: 1.4;
+            min-height: 2.8em;
+        }
+
+        .product-link {
+            margin-top: auto;
+            display: inline-block;
+            background: linear-gradient(90deg, var(--green), var(--green-dark));
+            color: var(--bg-dark);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .product-link:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+        }
+
+        .admin-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .admin-panel.active {
+            display: flex;
+        }
+
+        .admin-content {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+        }
+
+        .admin-header h2 {
+            color: var(--green);
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 0.25rem;
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--green);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--green), var(--green-dark));
+            color: var(--bg-dark);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--text-muted);
+            color: var(--text-muted);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .products-list {
+            margin-top: 2rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .product-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-item-title {
+            flex: 1;
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .btn-small {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            background: transparent;
+            border: 1px solid #E82828;
+            color: #E82828;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-small:hover {
+            background: rgba(232, 40, 40, 0.1);
+        }
+
+        footer {
+            border-top: 1px solid rgba(0, 255, 0, 0.1);
+            padding: 2rem 0;
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 3rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
-
-    <header class="header-shop">
-        <div><strong>VoltCalc</strong>PRO</div>
-        <input type="text" class="search-bar" placeholder="Buscar ferramentas e infoprodutos...">
-        <div>Login / Carrinho</div>
+    <header>
+        <div class="container">
+            <div class="logo" onclick="showHome()">
+                <span class="logo-icon">⚡</span>
+                VoltCadPro
+            </div>
+            <button class="admin-btn" onclick="toggleAdmin()">Painel Admin</button>
+        </div>
     </header>
 
-    <nav class="cat-bar">
-        <span>Tabela de Preços</span> | <span>Ferramentas</span> | <span>Cursos</span> | <span>Ofertas</span>
-    </nav>
+    <div id="homePage">
+        <section class="hero">
+            <div class="container">
+                <h1>A Loja do Eletricista</h1>
+                <p>Produtos de qualidade do Mercado Livre e AliExpress</p>
+                
+                <div class="search-section">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Buscar produtos..." onkeyup="filterProducts()">
+                    </div>
+                    <div class="filters">
+                        <button class="filter-btn active" onclick="setFilter(null, event)">Todos</button>
+                        <button class="filter-btn" onclick="setFilter('mercado-livre', event)">Mercado Livre</button>
+                        <button class="filter-btn" onclick="setFilter('aliexpress', event)">AliExpress</button>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <div class="banner-destaque">
-        <div>OFERTAS EXCLUSIVAS<br><span style="font-size: 1rem; color: #666;">Para Eletricistas Profissionais</span></div>
+        <section class="products-section">
+            <div class="container">
+                <div class="products-grid" id="productsGrid"></div>
+            </div>
+        </section>
     </div>
 
-    <main class="vitrine" id="vitrineProdutos"></main>
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-content">
+            <div class="admin-header">
+                <h2>Painel Admin</h2>
+                <button class="close-btn" onclick="toggleAdmin()">✕</button>
+            </div>
+
+            <div id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="adminEmail" placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="adminPassword" placeholder="Digite sua senha">
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="loginAdmin()">Entrar</button>
+                    <button class="btn btn-secondary" onclick="toggleAdmin()">Cancelar</button>
+                </div>
+            </div>
+
+            <div id="adminDashboard" class="hidden">
+                <div class="form-group">
+                    <label>Título do Produto</label>
+                    <input type="text" id="productTitle" placeholder="Nome do produto">
+                </div>
+                <div class="form-group">
+                    <label>Link do Produto</label>
+                    <input type="url" id="productLink" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>Emoji/Ícone (opcional)</label>
+                    <input type="text" id="productEmoji" placeholder="⚡" maxlength="2">
+                </div>
+                <div class="form-group">
+                    <label>Plataforma</label>
+                    <select id="productPlatform">
+                        <option value="mercado-livre">Mercado Livre</option>
+                        <option value="aliexpress">AliExpress</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="addProduct()">Adicionar Produto</button>
+                    <button class="btn btn-secondary" onclick="logoutAdmin()">Sair</button>
+                </div>
+
+                <div class="products-list" id="productsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 VoltCadPro - A Loja do Eletricista. Todos os direitos reservados.</p>
+        </div>
+    </footer>
 
     <script>
-        const produtos = [
-            { nome: "Multímetro Profissional Digital True RMS", preco: "R$ 159,90", img: "22146.png", desc: "Precisão absoluta para medições de alta tensão." },
-            { nome: "Alicate Amperímetro Digital 600A", preco: "R$ 229,00", img: "22146.png", desc: "Ideal para painéis e manutenção industrial." },
-            { nome: "Kit Chaves Isoladas 1000V - 7 Peças", preco: "R$ 89,90", img: "22146.png", desc: "Segurança total contra descargas elétricas." },
-            { nome: "Furadeira de Impacto Industrial 750W", preco: "R$ 349,00", img: "22146.png", desc: "Potência extrema para concreto e alvenaria." }
+        const emojis = ['⚡', '🔧', '🔌', '💡', '🛠️', '⚙️', '🔩', '🪛', '🧰', '📦', '🎯', '✨', '🌟', '💪', '🚀', '🔋', '📡', '🎪', '🏆', '💎', '🌈', '🎨', '🔐', '🎁', '🎉', '🎊'];
+
+        let products = [
+            { id: 1, title: "Fechadura Digital De Sobrepor Intelbras Fr 101 Preto", platform: "mercado-livre", emoji: "🔐", link: "https://meli.la/1PXjNhV" },
+            { id: 2, title: "Alicate Desencapador De Fios Aço Carbono 8 Tramontina Pro", platform: "mercado-livre", emoji: "🔧", link: "https://meli.la/2ew9kNf" },
+            { id: 3, title: "Alicate Universal Eletricista 8 Sata Isolado 1000v Aço Cr-v Amarelo", platform: "mercado-livre", emoji: "🛠️", link: "https://meli.la/2HvToNV" },
+            { id: 4, title: "Testador De Voltagem Digital Multímetro Profissional", platform: "mercado-livre", emoji: "📡", link: "https://meli.la/1hWJ4MU" },
+            { id: 5, title: "Chave Inglesa Ajustável 10 Pol Tramontina", platform: "mercado-livre", emoji: "⚙️", link: "https://meli.la/2kxCuWo" },
+            { id: 6, title: "Jogo De Chaves Philips E Fenda 6 Peças Tramontina", platform: "mercado-livre", emoji: "🪛", link: "https://meli.la/26QkhAq" },
+            { id: 7, title: "Fita Isolante Elétrica 19mm X 20m Scotch 3m", platform: "mercado-livre", emoji: "📦", link: "https://meli.la/1gk7jUc" },
+            { id: 8, title: "Cabo Flexível 2.5mm Rolo 100 Metros Prysmian", platform: "mercado-livre", emoji: "🔌", link: "https://meli.la/2JyAj8D" },
+            { id: 9, title: "Tomada Dupla 20a 250v Branca Tramontina", platform: "mercado-livre", emoji: "🔌", link: "https://meli.la/346Et7n" },
+            { id: 10, title: "Interruptor Simples 10a 250v Branco Tramontina", platform: "mercado-livre", emoji: "⚡", link: "https://meli.la/1nCk6rq" },
+            { id: 11, title: "Caixa De Distribuição 12 Disjuntores Embutir Branca", platform: "mercado-livre", emoji: "📦", link: "https://meli.la/1RxLvLG" },
+            { id: 12, title: "Disjuntor Bipolar 32a Curva C Schneider", platform: "mercado-livre", emoji: "⚡", link: "https://meli.la/2xfzYDL" },
+            { id: 13, title: "Relé Térmico 32a Schneider Electric", platform: "mercado-livre", emoji: "🔩", link: "https://meli.la/2CqcSuA" },
+            { id: 14, title: "Contator 32a 220v Schneider Electric", platform: "mercado-livre", emoji: "🎯", link: "https://meli.la/1qSS6n2" },
+            { id: 15, title: "Lâmpada Led 12w Branca Fria E27 Bivolt", platform: "mercado-livre", emoji: "💡", link: "https://meli.la/17YCdFM" },
+            { id: 16, title: "Ventilador De Teto 3 Pás 127v Branco Venti-Delta", platform: "mercado-livre", emoji: "💨", link: "https://meli.la/1499SJn" },
+            { id: 17, title: "Multímetro Digital Profissional Com Teste De Continuidade", platform: "aliexpress", emoji: "📡", link: "https://s.click.aliexpress.com/e/_mP42wZl" },
+            { id: 18, title: "Kit Ferramentas Eletricista 18 Peças Profissional", platform: "aliexpress", emoji: "🧰", link: "https://s.click.aliexpress.com/e/_m0lUTZZ" },
+            { id: 19, title: "Testador De Voltagem Sem Contato Com Laser", platform: "aliexpress", emoji: "🎯", link: "https://s.click.aliexpress.com/e/_mr3yYn1" },
+            { id: 20, title: "Cabo Flexível 2.5mm Rolo 100m Cobre Puro", platform: "aliexpress", emoji: "🔌", link: "https://s.click.aliexpress.com/e/_mt6W3uX" },
+            { id: 21, title: "Tomada Inteligente Wifi 16a Controle Remoto", platform: "aliexpress", emoji: "📱", link: "https://s.click.aliexpress.com/e/_mqFznUr" },
+            { id: 22, title: "Luminária Led Recarregável Portátil Para Trabalho", platform: "aliexpress", emoji: "💡", link: "https://s.click.aliexpress.com/e/_mrrNzht" },
+            { id: 23, title: "Chave Inglesa Ajustável 12 Polegadas Profissional", platform: "aliexpress", emoji: "🔧", link: "https://s.click.aliexpress.com/e/_mOtrqBp" },
+            { id: 24, title: "Jogo De Chaves Fenda E Phillips 24 Peças", platform: "aliexpress", emoji: "🪛", link: "https://s.click.aliexpress.com/e/_mrIf5CB" },
+            { id: 25, title: "Fita Isolante Elétrica 10 Rolos Cores Variadas", platform: "aliexpress", emoji: "📦", link: "https://s.click.aliexpress.com/e/_mqWaZZh" },
+            { id: 26, title: "Protetor De Surto Eletrônico 6 Tomadas Bivolt", platform: "aliexpress", emoji: "⚡", link: "https://s.click.aliexpress.com/e/_mPAf1Wj" }
         ];
 
-        function renderizar() {
-            const container = document.getElementById('vitrineProdutos');
-            container.innerHTML = produtos.map(p => `
-                <div class="produto-card">
-                    <img src="${p.img}" alt="${p.nome}">
-                    <h3>${p.nome}</h3>
-                    <p style="font-size: 0.75rem; color: #777;">${p.desc}</p>
-                    <div class="preco-info">${p.preco}</div>
-                    <button class="btn-compra">ADICIONAR AO CARRINHO</button>
-                </div>
-            `).join('');
+        let currentFilter = null;
+        let searchTerm = "";
+        let isLoggedIn = false;
+
+        function loadData() {
+            const saved = localStorage.getItem('voltcadpro_products');
+            if (saved) {
+                products = JSON.parse(saved);
+            }
         }
-        renderizar();
+
+        function saveData() {
+            localStorage.setItem('voltcadpro_products', JSON.stringify(products));
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById("productsGrid");
+            const filtered = products.filter(p => {
+                const matchesFilter = !currentFilter || p.platform === currentFilter;
+                const matchesSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase());
+                return matchesFilter && matchesSearch;
+            });
+
+            grid.innerHTML = filtered.map(product => `
+                <div class="product-card">
+                    <div class="product-image">
+                        ${product.emoji || '⚡'}
+                        <span class="product-badge ${product.platform === 'aliexpress' ? 'aliexpress' : ''}">
+                            ${product.platform === 'mercado-livre' ? 'Mercado Livre' : 'AliExpress'}
+                        </span>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${product.title}</h3>
+                        <a href="${product.link}" target="_blank" class="product-link">
+                            Comprar Agora
+                        </a>
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function setFilter(filter, event) {
+            currentFilter = filter;
+            document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
+            event.target.classList.add("active");
+            renderProducts();
+        }
+
+        function filterProducts() {
+            searchTerm = document.getElementById("searchInput").value;
+            renderProducts();
+        }
+
+        function toggleAdmin() {
+            const panel = document.getElementById("adminPanel");
+            panel.classList.toggle("active");
+        }
+
+        function loginAdmin() {
+            const email = document.getElementById("adminEmail").value;
+            const password = document.getElementById("adminPassword").value;
+
+            if (email === "jroreis4582@gmail.com" && password === "admin123") {
+                isLoggedIn = true;
+                document.getElementById("loginForm").classList.add("hidden");
+                document.getElementById("adminDashboard").classList.remove("hidden");
+                updateProductsList();
+            } else {
+                alert("Email ou senha incorretos!");
+            }
+        }
+
+        function logoutAdmin() {
+            isLoggedIn = false;
+            document.getElementById("loginForm").classList.remove("hidden");
+            document.getElementById("adminDashboard").classList.add("hidden");
+            document.getElementById("adminEmail").value = "";
+            document.getElementById("adminPassword").value = "";
+        }
+
+        function addProduct() {
+            const title = document.getElementById("productTitle").value;
+            const link = document.getElementById("productLink").value;
+            const emoji = document.getElementById("productEmoji").value || "⚡";
+            const platform = document.getElementById("productPlatform").value;
+
+            if (!title || !link) {
+                alert("Preencha todos os campos obrigatórios!");
+                return;
+            }
+
+            const newProduct = {
+                id: Math.max(...products.map(p => p.id), 0) + 1,
+                title,
+                link,
+                emoji,
+                platform
+            };
+
+            products.push(newProduct);
+            saveData();
+            renderProducts();
+            updateProductsList();
+
+            document.getElementById("productTitle").value = "";
+            document.getElementById("productLink").value = "";
+            document.getElementById("productEmoji").value = "";
+
+            alert("Produto adicionado com sucesso!");
+        }
+
+        function deleteProduct(id) {
+            if (confirm("Tem certeza que deseja deletar este produto?")) {
+                products = products.filter(p => p.id !== id);
+                saveData();
+                renderProducts();
+                updateProductsList();
+            }
+        }
+
+        function updateProductsList() {
+            const list = document.getElementById("productsList");
+            list.innerHTML = `<h3 style="color: var(--green); margin-bottom: 1rem;">Produtos (${products.length})</h3>` + 
+                products.map(p => `
+                    <div class="product-item">
+                        <span class="product-item-title">${p.emoji} ${p.title.substring(0, 35)}...</span>
+                        <button class="btn-small" onclick="deleteProduct(${p.id})">Deletar</button>
+                    </div>
+                `).join("");
+        }
+
+        function showHome() {
+            document.getElementById("adminPanel").classList.remove("active");
+        }
+
+        loadData();
+        renderProducts();
     </script>
 </body>
 </html>
