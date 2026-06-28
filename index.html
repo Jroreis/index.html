@@ -387,6 +387,21 @@
     .playstore-banner-sidebar { background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(57, 255, 20, 0.05) 100%); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; margin-top: 24px; text-align: center; }
     .btn-playstore-small { background: var(--card-bg); color: var(--neon-green); border: 1px solid var(--neon-green); padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 13px; text-decoration: none; display: inline-block; transition: 0.2s; width: 100%; }
     .btn-playstore-small:hover { background: var(--neon-green); color: #000; }
+    
+    /* --- CÓDIGO DO ASSISTENTE VIRTUAL (ADICIONADO) --- */
+    .chatbot-container { position: fixed; bottom: 100px; right: 25px; width: 350px; max-width: 90vw; background: var(--card-bg); border: 2px solid var(--primary); border-radius: 16px; box-shadow: var(--shadow-lg); display: none; flex-direction: column; z-index: 10000; overflow: hidden; }
+    .chatbot-header { background: var(--primary); color: #fff; padding: 16px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; font-size: 15px; }
+    .chatbot-messages { flex: 1; padding: 16px; overflow-y: auto; max-height: 320px; display: flex; flex-direction: column; gap: 12px; font-size: 14px; }
+    .chat-msg { padding: 12px 16px; border-radius: 12px; max-width: 85%; line-height: 1.4; }
+    .chat-msg.bot { background: rgba(79, 70, 229, 0.15); border: 1px solid rgba(79, 70, 229, 0.4); color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px; }
+    .chat-msg.user { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .chatbot-input-area { display: flex; padding: 12px; border-top: 1px solid var(--border-color); background: var(--bg-color); }
+    .chatbot-input { flex: 1; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--card-bg); color: var(--text); outline: none; font-size: 14px; }
+    .chatbot-input:focus { border-color: var(--neon-green); }
+    .chatbot-btn { background: var(--primary); color: #fff; border: none; padding: 10px 16px; border-radius: 8px; margin-left: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .chatbot-btn:hover { background: var(--neon-green); color: #000; }
+    .chatbot-toggle { position: fixed; bottom: 100px; right: 25px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); z-index: 9999; font-size: 30px; cursor: pointer; border: 2px solid var(--neon-green); transition: 0.2s; }
+    .chatbot-toggle:hover { transform: scale(1.1); }
   </style>
 </head>
 <body>
@@ -1129,6 +1144,21 @@
   <div id="cookieConsent" style="display:none; position:fixed; bottom:0; left:0; width:100%; background:rgba(2, 6, 23, 0.95); color:#fff; padding:16px 24px; z-index:9999; text-align:center; font-size:14px; backdrop-filter:blur(10px); border-top: 1px solid var(--border-color);">
     Usamos cookies para melhorar sua experiência, personalizar anúncios e analisar tráfego. Ao continuar navegando, você concorda com a nossa <a href="privacidade.html" style="color: var(--neon-green); text-decoration: underline;">Política de Privacidade</a>.
     <button onclick="aceitarCookies()" style="background:var(--neon-green); color:#020617; border:none; padding:8px 16px; border-radius:8px; font-weight:bold; margin-left:16px; cursor:pointer; transition: 0.2s;">Entendi e Aceito</button>
+  </div>
+
+  <div class="chatbot-toggle print-hidden" onclick="toggleChatbot()">🤖</div>
+  <div class="chatbot-container print-hidden" id="voltBotContainer">
+      <div class="chatbot-header">
+          <span>🤖 Assistente VoltBot</span>
+          <button onclick="toggleChatbot()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer; margin-top:-4px;">&times;</button>
+      </div>
+      <div class="chatbot-messages" id="chatMessages">
+          <div class="chat-msg bot">Olá! Sou o seu Assistente Virtual VoltBot. Posso te ajudar a cadastrar clientes, calcular orçamentos ou gerar o PDF. O que deseja fazer?</div>
+      </div>
+      <div class="chatbot-input-area">
+          <input type="text" id="chatInput" class="chatbot-input" placeholder="Digite sua dúvida..." onkeypress="if(event.key === 'Enter') enviarMensagemChat()">
+          <button class="chatbot-btn" onclick="enviarMensagemChat()">Enviar</button>
+      </div>
   </div>
 
   <script>
@@ -2245,6 +2275,54 @@
       var texto = document.getElementById('novaMensagemSuporteTexto').value.trim();
       if(!texto) return;
       db.collection("chamados").add({ nome: currentUser.displayName || "Profissional", email: currentUser.email, mensagem: texto, status: "Pendente", data: new Date() }).then(() => { alert("Chamado aberto!"); document.getElementById('novaMensagemSuporteTexto').value = ''; });
+    }
+    
+    // --- CÓDIGO DO ASSISTENTE VIRTUAL (ADICIONADO) ---
+    function toggleChatbot() {
+        var bot = document.getElementById('voltBotContainer');
+        bot.style.display = bot.style.display === 'flex' ? 'none' : 'flex';
+    }
+    function enviarMensagemChat() {
+        var input = document.getElementById('chatInput');
+        var msg = input.value.trim().toLowerCase();
+        if(!msg) return;
+
+        var msgContainer = document.getElementById('chatMessages');
+        msgContainer.innerHTML += '<div class="chat-msg user">' + input.value + '</div>';
+        input.value = '';
+
+        setTimeout(function() {
+            var resposta = analisarComando(msg);
+            msgContainer.innerHTML += '<div class="chat-msg bot">' + resposta + '</div>';
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+        }, 500);
+    }
+
+    function analisarComando(msg) {
+        if(msg.includes('cliente') || msg.includes('cadastrar')) {
+            var abaClientes = document.querySelector('.tab[data-tab="clientes"]');
+            if(abaClientes) abaClientes.click();
+            return "Abri a aba de Clientes para você! É só preencher os dados do seu cliente e clicar em 'Salvar Novo Cliente'.";
+        }
+        if(msg.includes('pdf') || msg.includes('imprimir') || msg.includes('impressão')) {
+            return "Para gerar o PDF, navegue até a aba do Orçamento ou Dimensionamento e clique no botão '🖨️ Imprimir / Gerar PDF'. Fique tranquilo: o sistema oculta todos os botões e exibe apenas as informações técnicas para o seu cliente final!";
+        }
+        if(msg.includes('orçamento') || msg.includes('novo')) {
+            var abaOrc = document.querySelector('.tab[data-tab="orc"]');
+            if(abaOrc) abaOrc.click();
+            return "Pronto! Estamos na aba de Novo Orçamento. Adicione os itens e o sistema calcula tudo pra você.";
+        }
+        if(msg.includes('cálculo') || msg.includes('dimensionamento') || msg.includes('nbr')) {
+            var abaEng = document.querySelector('.tab[data-tab="eng"]');
+            if(abaEng) abaEng.click();
+            return "Aba de Dimensionamento NBR 5410 aberta! Insira as potências e distâncias, e eu faço o cálculo automático da bitola e disjuntor.";
+        }
+        if(msg.includes('plano') || msg.includes('assinar')) {
+            var abaPlanos = document.querySelector('.tab[data-tab="planos"]');
+            if(abaPlanos) abaPlanos.click();
+            return "Aqui estão os nossos planos! Escolha a melhor opção para assinar via Asaas.";
+        }
+        return "Entendi! Como sou um assistente focado em te guiar no painel, tente me enviar comandos como: 'cadastrar cliente', 'gerar pdf', 'fazer orçamento' ou 'dimensionamento'.";
     }
   </script>
 
