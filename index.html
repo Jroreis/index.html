@@ -132,7 +132,6 @@
 
     .section-padding { padding: 50px 24px; }
     
-    /* GALERIA DE TELAS - HOMEPAGE (ESTILO POWERPOINT) */
     .showcase-grid { 
       display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 24px; 
       padding: 20px 0 40px; max-width: 1000px; margin: 0 auto; scroll-behavior: smooth;
@@ -159,7 +158,6 @@
     .feature-card h3 { font-size: 20px; margin-bottom: 12px; color: var(--text); font-weight: 700; }
     .feature-card p { color: var(--text-light); font-size: 15px; }
 
-    /* ESTRUTURA PARA ANÚNCIOS RESPONSIVA */
     .ads-container { display: flex; justify-content: center; align-items: center; margin: 24px auto; width: 100%; max-width: 1200px; min-height: 90px; background: transparent; overflow: hidden; }
 
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(2, 6, 23, 0.85); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px); }
@@ -232,7 +230,7 @@
     .summary-box { background: var(--bg-color); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 16px; }
     .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 15px; color: var(--text-light); }
     .summary-row.total { border-top: 2px dashed var(--border-color); padding-top: 14px; margin-top: 14px; font-size: 24px; font-weight: 800; color: var(--neon-green); }
-    .btn-secondary-action { width: 100%; padding: 16px; background: transparent; border: 2px solid var(--border-color); color: var(--text); border-radius: 12px; font-weight: 700; font-size: 15px; cursor: margin-top: 12px; transition: 0.2s; }
+    .btn-secondary-action { width: 100%; padding: 16px; background: transparent; border: 2px solid var(--border-color); color: var(--text); border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 12px; transition: 0.2s; }
     .btn-secondary-action:hover { background: rgba(255, 255, 255, 0.05); border-color: #475569; }
 
     .ptable-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow); background: var(--card-bg); }
@@ -259,7 +257,8 @@
 
     .dimens-print-header { display: none; }
 
-    .dim-config-panel { background: var(--bg-color); border: 1px solid var(--primary); padding: 18px; border-radius: 14px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+    /* MUDANÇA PARA 4 COLUNAS EXATAS (Requisito 5) */
+    .dim-config-panel { background: var(--bg-color); border: 1px solid var(--primary); padding: 18px; border-radius: 14px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
     .dim-config-panel label { font-size: 12px; font-weight: 700; color: var(--neon-green); text-transform: uppercase; display: block; margin-bottom: 6px; }
 
     .dim-totais-box { background: rgba(79, 70, 229, 0.05); border: 2px solid var(--primary); padding: 20px; border-radius: 16px; margin-top: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; text-align: center; }
@@ -274,6 +273,10 @@
       .dashboard-sidebar { width: 100%; height: auto; position: relative; top: 0; }
       .orc-form-grid { grid-template-columns: 1fr; } 
       .orc-item-row { grid-template-columns: 1fr; gap: 8px; } 
+      .dim-config-panel { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 500px) {
+      .dim-config-panel { grid-template-columns: 1fr; }
     }
 
     .print-watermark-wrapper { display: none; }
@@ -333,12 +336,11 @@
 
       .dimens-print-header { display: block !important; margin-bottom: 15px; }
       
-      /* CONTROLE RÍGIDO DE COLUNAS PARA A IMPRESSÃO COM COMPRESSÃO DO CIRCUITO - DESIGN ENGENHARIA (SEM BORDAS LATERAIS) */
+      /* CONTROLE RÍGIDO DE COLUNAS PARA A IMPRESSÃO */
       .dimens-table { width: 100% !important; border-collapse: collapse !important; font-size: 7pt !important; border: none !important; border-top: 2px solid #000 !important; border-bottom: 2px solid #000 !important; table-layout: fixed !important; }
       .dimens-table th { background: transparent !important; color: #000 !important; font-weight: 800 !important; border: none !important; border-bottom: 2px solid #000 !important; padding: 6px 2px !important; text-align: center !important; font-size: 7pt !important; }
       .dimens-table td { border: none !important; border-bottom: 1px dashed #cbd5e1 !important; padding: 4px 2px !important; text-align: center !important; color: #000 !important; background: transparent !important; font-size: 7pt !important; overflow: hidden; }
       
-      /* Reduzido para 16% com corte automático e reticências (ellipsis) */
       .dimens-table th:nth-child(1), .dimens-table td:nth-child(1) { width: 16% !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; text-align: left !important; }
       .dimens-table th:nth-child(2), .dimens-table td:nth-child(2) { width: 8% !important; }
       .dimens-table th:nth-child(3), .dimens-table td:nth-child(3) { width: 8% !important; }
@@ -354,11 +356,9 @@
       .dimens-table select { text-align: center !important; text-align-last: center !important; }
       .dimens-table select::-ms-expand { display: none !important; }
       
-      /* Aplicação do ellipsis direto no input durante a impressão */
       .dim-nome { width: 100% !important; max-width: 100% !important; position: static !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
       .dimens-table td:first-child input { width: 100% !important; position: static !important; text-align: left !important; font-weight: 800 !important; font-size: 6.5pt !important; }
 
-      /* Ajuste da Caixa de Totais do Dimensionamento (Sem bordas fechadas laterais) */
       .dim-totais-box { display: grid !important; grid-template-columns: repeat(7, 1fr) !important; gap: 6px !important; border: none !important; border-top: 2px solid #000 !important; border-bottom: 2px solid #000 !important; background: transparent !important; padding: 10px 0 !important; border-radius: 0 !important; margin-top: 15px !important; page-break-inside: avoid !important; }
       .dim-totais-box div { background: transparent !important; border: none !important; border-right: 1px solid #cbd5e1 !important; padding: 4px !important; border-radius: 0 !important; }
       .dim-totais-box div:last-child { border-right: none !important; }
@@ -371,82 +371,22 @@
     }
     .print-header { display: none; }
 
-    /* ================================================== */
-    /* ESTILOS DOS BANNERS DA PLAY STORE (NOVOS)         */
-    /* ================================================== */
+    /* BANNERS DA PLAY STORE */
     .playstore-banner-hero {
-        background: rgba(79, 70, 229, 0.1);
-        border: 1px dashed var(--primary);
-        padding: 16px 24px;
-        border-radius: 16px;
-        display: inline-flex;
-        align-items: center;
-        gap: 20px;
-        margin-top: 20px;
-        flex-wrap: wrap;
-        justify-content: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        background: rgba(79, 70, 229, 0.1); border: 1px dashed var(--primary); padding: 16px 24px; border-radius: 16px; display: inline-flex; align-items: center; gap: 20px; margin-top: 20px; flex-wrap: wrap; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
-    .playstore-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        text-align: left;
-    }
+    .playstore-info { display: flex; align-items: center; gap: 12px; text-align: left; }
     .btn-playstore {
-        background: #020617;
-        color: #fff;
-        border: 1px solid #333;
-        padding: 12px 24px;
-        border-radius: 10px;
-        font-weight: 700;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: 0.2s;
+        background: #020617; color: #fff; border: 1px solid #333; padding: 12px 24px; border-radius: 10px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: 0.2s;
     }
-    .btn-playstore:hover {
-        background: #111;
-        border-color: var(--neon-green);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(57, 255, 20, 0.2);
-    }
+    .btn-playstore:hover { background: #111; border-color: var(--neon-green); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(57, 255, 20, 0.2); }
     .btn-playstore::before {
-        content: '';
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23fff" d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>');
-        background-size: contain;
-        background-repeat: no-repeat;
+        content: ''; display: inline-block; width: 20px; height: 20px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23fff" d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>'); background-size: contain; background-repeat: no-repeat;
     }
 
-    .playstore-banner-sidebar {
-        background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(57, 255, 20, 0.05) 100%);
-        border: 1px solid var(--border-color);
-        padding: 16px;
-        border-radius: 12px;
-        margin-top: 24px;
-        text-align: center;
-    }
-    .btn-playstore-small {
-        background: var(--card-bg);
-        color: var(--neon-green);
-        border: 1px solid var(--neon-green);
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 13px;
-        text-decoration: none;
-        display: inline-block;
-        transition: 0.2s;
-        width: 100%;
-    }
-    .btn-playstore-small:hover {
-        background: var(--neon-green);
-        color: #000;
-    }
+    .playstore-banner-sidebar { background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(57, 255, 20, 0.05) 100%); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; margin-top: 24px; text-align: center; }
+    .btn-playstore-small { background: var(--card-bg); color: var(--neon-green); border: 1px solid var(--neon-green); padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 13px; text-decoration: none; display: inline-block; transition: 0.2s; width: 100%; }
+    .btn-playstore-small:hover { background: var(--neon-green); color: #000; }
   </style>
 </head>
 <body>
@@ -632,7 +572,7 @@
               <li style="margin-bottom: 12px;">✅ Inserir Logo da sua Empresa</li>
               <li style="margin-bottom: 12px; color: #ef4444;">❌ Dimensionamento NBR 5410</li>
             </ul>
-            <button class="btn-primary" onclick="openModal('modalCadastro')">Testar Agora</button>
+            <button class="btn-primary" onclick="assinarPlano('pro')">Testar Agora</button>
           </div>
 
           <div style="background: var(--card-bg); border: 1px solid var(--secondary); border-radius: 16px; padding: 24px; display: flex; flex-direction: column;">
@@ -647,7 +587,7 @@
               <li style="margin-bottom: 12px;">✅ Specification de DR e DPS Automática</li>
               <li style="margin-bottom: 12px;">✅ Suporte Técnico Prioritário VIP</li>
             </ul>
-            <button class="btn-primary" style="background: var(--secondary); color: #020617;" onclick="openModal('modalCadastro')">Testar Master Grátis</button>
+            <button class="btn-primary" style="background: var(--secondary); color: #020617;" onclick="assinarPlano('master')">Testar Master Grátis</button>
           </div>
         </div>
       </div>
@@ -836,10 +776,10 @@
                     <div class="form-group"><label>Telefone</label><input id="orcCliTel"></div>
                     <div class="form-group"><label>Data de Validade</label><input type="date" id="orcValidDate"></div>
                     
+                    <div class="form-group"><label>CEP</label><input id="orcCep" placeholder="Ex: 01310-100"></div>
                     <div class="form-group"><label>Rua / Logradouro</label><input id="orcRua" placeholder="Ex: Av. Paulista"></div>
                     <div class="form-group"><label>Número</label><input id="orcNum" placeholder="Ex: 1000"></div>
                     <div class="form-group"><label>Bairro</label><input id="orcBairro" placeholder="Ex: Centro"></div>
-                    <div class="form-group"><label>CEP</label><input id="orcCep" placeholder="Ex: 01310-100"></div>
                     <div class="form-group"><label>Cidade</label><input id="orcCidade" placeholder="Ex: São Paulo"></div>
                     <div class="form-group"><label>Estado (UF)</label><input id="orcEstado" placeholder="Ex: SP"></div>
                     <input type="hidden" id="orcCliEnd">
@@ -971,17 +911,15 @@
                     </select>
                   </div>
                   <div>
-                    <label>Método de Instalação (NBR 5410 - Tab. 33)</label>
+                    <label>Método de Instalação (Tab. 33)</label>
                     <select id="cfgMetodo" onchange="atualizarMetodoGlobal()">
                       <option value="A1">A1 - Embutido em parede isolante</option>
                       <option value="A2">A2 - Cabo multipolar em parede isolante</option>
-                      <option value="B1" selected>B1 - Embutido em alvenaria (Eletroduto)</option>
+                      <option value="B1" selected>B1 - Embutido em alvenaria</option>
                       <option value="B2">B2 - Cabo multipolar em alvenaria</option>
                       <option value="C">C - Aparente / Fixado sobre parede</option>
                       <option value="D">D - Enterrado no solo (Eletroduto)</option>
-                      <option value="E">E - Ao ar livre / Leito ou Bandeja</option>
-                      <option value="F">F - Cabos unipolares justapostos ao ar livre</option>
-                      <option value="G">G - Cabos unipolares espaçados ao ar livre</option>
+                      <option value="E">E/F/G - Ao ar livre / Leito</option>
                     </select>
                   </div>
                   <div>
@@ -1057,10 +995,10 @@
                     <div><strong>Método de Referência (Tab. 33):</strong> <span id="ptMet">--</span></div>
                     <div><strong>Condutores Carregados:</strong> <span id="ptCar">--</span></div>
                     <div><strong>Queda de Tensão Limite:</strong> 4.0%</div>
-                    <div><strong>Fator de Correção Aplicado:</strong> Inerente ao Método Embutido Padrão</div>
+                    <div><strong>Fator de Correção Aplicado:</strong> Inerente ao Método Configurável</div>
                   </div>
                   <p style="margin-top: 6px; font-size: 7pt; color: #333; font-style: italic; line-height: 1.2;">
-                    Nota Técnica de Validação: Dimensionamento de condutores estritamente baseado no critério de Capacidade de Condução de Corrente (Iz) comparada à Corrente de Projeto (Ib), alinhado às Tabelas 36 a 39 da norma ABNT NBR 5410. A seção final também é submetida ao teste da Queda de Tensão admissível (ΔU%), superdimensionando a bitola sempre que o percurso ultrapassar o limite de queda de 4%. Proteções termomagnéticas (Disjuntores) selecionadas para coordenar a proteção do cabo sob a condição técnica (Ib ≤ In ≤ Iz).
+                    Nota Técnica de Validação: Dimensionamento de condutores baseado no critério de Capacidade de Condução de Corrente (Iz) comparada à Corrente de Projeto (Ib), alinhado às Tabelas 36, 37 e 38 da norma ABNT NBR 5410, e verificação rigorosa da Queda de Tensão admissível (ΔU%). Proteções termomagnéticas (Disjuntores) selecionadas para coordenar a proteção do cabo sob a condição técnica Ib ≤ In ≤ Iz.
                   </p>
                 </div>
                 <div class="print-hidden" style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
@@ -1157,7 +1095,7 @@
                     <li style="margin-bottom: 12px;">✅ Inserir Logo da Empresa</li>
                     <li style="margin-bottom: 12px; color: #ef4444;">❌ Dimensionamento NBR 5410</li>
                   </ul>
-                  <button class="btn-primary" onclick="window.open('https://www.asaas.com/c/6ab28cjqoacc1cdw', '_blank')">Assinar Plano Pro</button>
+                  <button class="btn-primary" onclick="assinarPlano('pro')">Assinar Plano Pro</button>
                 </div>
 
                 <div style="background: var(--bg-color); border: 1px solid var(--secondary); border-radius: 16px; padding: 24px; display: flex; flex-direction: column;">
@@ -1172,7 +1110,7 @@
                     <li style="margin-bottom: 12px;">✅ Especificação de DR e DPS Automática</li>
                     <li style="margin-bottom: 12px;">✅ Suporte Técnico Prioritário VIP</li>
                   </ul>
-                  <button class="btn-primary" style="background: var(--secondary); color: #020617;" onclick="window.open('https://www.asaas.com/c/3331mpivr46kcqs0', '_blank')">Assinar Plano Master</button>
+                  <button class="btn-primary" style="background: var(--secondary); color: #020617;" onclick="assinarPlano('master')">Assinar Plano Master</button>
                 </div>
 
               </div>
@@ -1250,19 +1188,18 @@
       auth.onAuthStateChanged(function(user) {
         currentUser = user;
         if (user) {
-          db.collection('users').doc(user.uid).get().then(async function(doc) {
+          // ATUALIZAÇÃO 2: .onSnapshot GARANTE ATUALIZAÇÃO IMEDIATA E INSTANTÂNEA QUANDO O WEBHOOK PROCESSAR O PAGAMENTO
+          db.collection('users').doc(user.uid).onSnapshot(async function(doc) {
             let data = doc.exists ? doc.data() : {};
             let updates = {};
             let needsUpdate = false;
 
-            // AUTOMAÇÃO 1: Se o usuário não tem plano, cadastra ele automaticamente como 'free'
             if (!data.plano) {
                 data.plano = 'free';
                 updates.plano = 'free';
                 needsUpdate = true;
             }
 
-            // AUTOMAÇÃO 2: Verificação do vencimento de qualquer Premium/Master (Trial ou Promoção)
             if ((data.plano === 'premium' || data.plano === 'master') && data.premiumExpireDate) {
                 let expireDate = data.premiumExpireDate.toDate ? data.premiumExpireDate.toDate() : new Date(data.premiumExpireDate);
                 if (new Date() > expireDate) {
@@ -1281,15 +1218,65 @@
             var nameToDisplay = user.displayName || user.email;
             if(data.nome) { nameToDisplay = data.nome; }
 
+            // ATUALIZAÇÃO 3: BANNER NO PAINEL EMPRESA EM TEMPO REAL
+            var bannerPerfil = document.getElementById('perfilBannerPlano');
+            if(bannerPerfil) {
+                var txtPlano = userPlan === 'master' ? 'MASTER 🏆' : (userPlan === 'premium' || userPlan === 'pro' ? 'PRO ⭐' : 'FREE / ESSENCIAL 🚀');
+                bannerPerfil.innerHTML = 'Plano Atual Ativo: <strong>' + txtPlano + '</strong>';
+            }
+
             showApp('profissional', nameToDisplay);
-          }).catch(function() {
-            showApp('profissional', user.displayName || user.email);
+            checkPremiumTransition(); // Revalida a UI e esconde o PIX se assinante
           });
         } else { showLanding(); }
       });
     });
 
-    // SISTEMA DE CONTROLE DE IMPRESSÃO / LIMITE DO PLANO FREE
+    // ATUALIZAÇÃO 1: FUNÇÃO RESPONSÁVEL POR GERAR A COBRANÇA DO PLANO COM O E-MAIL DO CLIENTE
+    window.assinarPlano = async function(plano) {
+      if(!currentUser) { openModal('modalLogin'); return; }
+      
+      var valor = plano === 'pro' ? 9.90 : 19.90;
+      var btn = event.target;
+      var textoOriginal = btn.textContent;
+      btn.textContent = "⏳ Gerando cobrança...";
+      btn.disabled = true;
+
+      try {
+          // Comunica com seu Cloud Run e anexa o email para o externalReference
+          var response = await fetch('https://app-pagamento-411208955318.us-central1.run.app/criar-cobranca', { 
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                  customerId: currentUser.uid,
+                  valor: valor,
+                  formaPagamento: 'PIX', 
+                  emailUsuario: currentUser.email // E-mail garantido aqui!
+              })
+          });
+
+          if(response.ok) {
+              var data = await response.json();
+              if(data.invoiceUrl) {
+                  window.open(data.invoiceUrl, '_blank');
+              } else {
+                  throw new Error("Link não recebido");
+              }
+          } else {
+              throw new Error("Erro na API do Cloud Run");
+          }
+      } catch (error) {
+          console.warn("Falha de rede ou API não implementada totalmente. Direcionando para o fallback seguro do Asaas.", error);
+          alert("Ocorreu uma falha ao gerar a cobrança automática. Redirecionando para a página de checkout seguro do Asaas...");
+          
+          if(plano === 'pro') window.open('https://www.asaas.com/c/6ab28cjqoacc1cdw', '_blank');
+          else window.open('https://www.asaas.com/c/3331mpivr46kcqs0', '_blank');
+      }
+
+      btn.textContent = textoOriginal;
+      btn.disabled = false;
+    };
+
     window.checkPdfLimit = async function() {
         if (!currentUser) return false;
         if (userPlan === 'premium' || userPlan === 'master' || userPlan === 'pro') return true;
@@ -1373,7 +1360,6 @@
       }
     };
 
-    // FUNÇÃO AUXILIAR PARA O TRIAL
     function calcularDataExpiracao(dias) {
         let data = new Date();
         data.setDate(data.getDate() + dias);
@@ -1398,8 +1384,8 @@
               nome: n, 
               email: e, 
               role: 'free', 
-              plano: 'master', // Dá o acesso total imediato
-              premiumExpireDate: calcularDataExpiracao(15), // Trial de 15 dias
+              plano: 'master', 
+              premiumExpireDate: calcularDataExpiracao(15), 
               createdAt: new Date() 
           });
         });
@@ -1424,8 +1410,8 @@
               nome: u.displayName || "Profissional", 
               email: u.email, 
               role: 'free', 
-              plano: 'master', // Dá o acesso total imediato
-              premiumExpireDate: calcularDataExpiracao(15), // Trial de 15 dias
+              plano: 'master', 
+              premiumExpireDate: calcularDataExpiracao(15), 
               createdAt: new Date() 
             });
           }
@@ -1473,9 +1459,8 @@
       renderPrecosTable();
       renderProfileForm('tab-perfil');
       loadHistory('profHistContainer');
-      carregarClientes(); // Carrega clientes na aba nova e atualiza o seletor do orçamento
+      carregarClientes();
       escutarNotificacoesSuporte(); 
-      checkPremiumTransition(); 
 
       var tbodyDim = document.getElementById('dimensTbody');
       if(tbodyDim && tbodyDim.children.length === 0) {
@@ -1540,7 +1525,6 @@
       });
     }
 
-    // REQUISITO 2: ABA TOTALMENTE VISÍVEL PARA TODOS OS PLANOS (TRAVA DO BOTÃO DE CLIQUE REMOVIDA)
     function setupTabs() {
       document.querySelectorAll('.tab').forEach(function(t) {
         t.onclick = function() {
@@ -1556,7 +1540,6 @@
       });
     }
 
-    // GESTÃO DE CLIENTES + REQUISITO 1: PREENCHIMENTO LINK ADICIONADO
     function carregarClientes() {
         var container = document.getElementById('listaClientesContainer');
         if(!container || !currentUser) return;
@@ -1573,7 +1556,6 @@
             var listDocs = []; qs.forEach(function(doc) { var d = doc.data(); d.id = doc.id; listDocs.push(d); });
             listDocs.sort(function(a, b) { return b.dataCadastro.toDate().getTime() - a.dataCadastro.toDate().getTime(); });
 
-            // Alimenta o Select do Novo Orçamento vinculando os 3 elementos
             if(selectOrcCli) {
                listDocs.forEach(function(cli) {
                   var opt = document.createElement('option');
@@ -1600,7 +1582,6 @@
         }).catch(e => console.log(e));
     }
 
-    // REQUISITO 1: FUNÇÃO EXCLUSIVA DE AUTOCOMPLETAR CAMPO ORÇAMENTO
     window.preencherCamposClienteSelecionado = function() {
         var sel = document.getElementById('orcSelectCliente');
         if(!sel) return;
@@ -1611,7 +1592,6 @@
         document.getElementById('orcCliTel').value = opt.getAttribute('data-tel') || '';
         document.getElementById('orcRua').value = opt.getAttribute('data-end') || '';
         
-        // Deixa os campos complementares prontos para o profissional ajustar o número/bairro se desejar
         document.getElementById('orcNum').value = '';
         document.getElementById('orcBairro').value = '';
         document.getElementById('orcCep').value = '';
@@ -1839,7 +1819,6 @@
       document.querySelectorAll('#conteudo-orc input, #conteudo-orc textarea').forEach(i => i.value = '');
       document.getElementById('orcDiscount').value = "0";
       document.getElementById('orcItemsContainer').innerHTML = "";
-      // Reseta o select de cliente também
       var sel = document.getElementById('orcSelectCliente');
       if(sel) sel.selectedIndex = 0;
       updateOrcTotals();
@@ -1924,6 +1903,11 @@
             <h3 style="margin:0; font-size: 22px;">🏢 Gestão de Perfil e Empresa</h3>
             <button class="btn-header print-hidden" onclick="alternarRecolhimento('conteudo-perfil', this)" style="padding: 4px 10px; font-size: 12px;">▼ Recolher</button>
           </div>
+          
+          <div id="perfilBannerPlano" style="background: rgba(57, 255, 20, 0.1); border: 1px solid var(--neon-green); padding: 12px; border-radius: 10px; margin-bottom: 24px; text-align: center; font-weight: bold; color: var(--neon-green);">
+             Plano Atual Ativo: CARREGANDO...
+          </div>
+
           <div id="conteudo-perfil">
             <form id="formPerfilProfissional" onsubmit="event.preventDefault(); salvarPerfilRobusto();">
                 <div style="display:flex; gap:24px; margin-bottom:32px; align-items: flex-start; flex-wrap: wrap; background: var(--bg-color); padding: 20px; border-radius: 16px; border: 1px dashed var(--border-color);">
@@ -1937,7 +1921,8 @@
                   </div>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                <h4 style="color: var(--text); margin-bottom: 16px;">Dados Principais</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px;">
                     <div class="form-group full" style="margin-bottom: 0;">
                         <label>Nome do Profissional ou Empresa <span style="color:#ef4444;">*</span></label>
                         <input id="pNom" required minlength="3" placeholder="Ex: VoltTech Instalações Elétricas" style="border-left: 3px solid var(--primary);">
@@ -1950,13 +1935,33 @@
                         <label>CNPJ ou CPF</label>
                         <input id="pDoc" pattern="[0-9\\.\\-\\/]{11,18}" placeholder="Ex: 00.000.000/0001-00" title="Insira o documento com ou sem pontuação">
                     </div>
-                    <div class="form-group" style="margin-bottom: 0;">
+                    <div class="form-group full" style="margin-bottom: 0;">
                         <label>Chave PIX (Recebimentos)</label>
                         <input id="pPix" placeholder="E-mail, CPF, Telefone ou Aleatória">
                     </div>
-                    <div class="form-group full" style="margin-bottom: 0;">
-                        <label>Endereço / Sede (Opcional)</label>
-                        <input id="pEnd" placeholder="Ex: Rua das Flores, 123 - Centro, São Paulo/SP">
+                </div>
+
+                <h4 style="color: var(--text); margin-bottom: 16px;">Endereço de Sede / Faturamento</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>CEP</label>
+                        <input id="pCep" placeholder="00000-000">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Rua / Logradouro</label>
+                        <input id="pRua" placeholder="Ex: Av. Paulista">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Número</label>
+                        <input id="pNum" placeholder="Ex: 1000">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Cidade</label>
+                        <input id="pCidade" placeholder="Ex: São Paulo">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Estado (UF)</label>
+                        <input id="pEstado" placeholder="Ex: SP">
                     </div>
                 </div>
                 
@@ -1976,7 +1981,11 @@
                 if(data.tel) document.getElementById('pTel').value = data.tel;
                 if(data.doc) document.getElementById('pDoc').value = data.doc;
                 if(data.pix) document.getElementById('pPix').value = data.pix;
-                if(data.endereco) document.getElementById('pEnd').value = data.endereco;
+                if(data.cep) document.getElementById('pCep').value = data.cep;
+                if(data.rua) document.getElementById('pRua').value = data.rua;
+                if(data.num) document.getElementById('pNum').value = data.num;
+                if(data.cidade) document.getElementById('pCidade').value = data.cidade;
+                if(data.estado) document.getElementById('pEstado').value = data.estado;
                 if(data.logoBase64) {
                     base64LogoToSave = data.logoBase64;
                     document.getElementById('logoPreviewContainer').innerHTML = '<img src="'+base64LogoToSave+'" style="width:100%; height:100%; object-fit:contain;">';
@@ -2006,12 +2015,16 @@
             tel: pTel, 
             doc: document.getElementById('pDoc').value.trim(), 
             pix: document.getElementById('pPix').value.trim(), 
-            endereco: document.getElementById('pEnd').value.trim(),
+            cep: document.getElementById('pCep').value.trim(),
+            rua: document.getElementById('pRua').value.trim(),
+            num: document.getElementById('pNum').value.trim(),
+            cidade: document.getElementById('pCidade').value.trim(),
+            estado: document.getElementById('pEstado').value.trim(),
             logoBase64: base64LogoToSave 
         };
         
         db.collection('users').doc(currentUser.uid).set(upd, { merge: true }).then(function(){
-          alert('Perfil updated com sucesso!'); 
+          alert('Perfil atualizado com sucesso!'); 
           document.getElementById('printProfName').textContent = upd.nome;
           document.getElementById('profNameTitleInput').value = upd.nome;
           if(upd.logoBase64) { 
@@ -2055,7 +2068,6 @@
 
     function removeDimensRow(id) { document.getElementById('dimrow-' + id)?.remove(); calcularPlanilhaDimens(); }
 
-    // REQUISITO 2: INTERCEPTAÇÃO CIRÚRGICA DE SEGURANÇA BASEADA NO PLANO FREE NO DISPARO DO CÁLCULO
     function calcularPlanilhaDimens() {
       if (userPlan === 'free') {
           openModal('modalUpgradeMsg');
@@ -2089,6 +2101,7 @@
         var k_fases = v === 380 ? 1.732 : 1;
         var ib = w / (k_fases * v * fp);
 
+        // ATUALIZAÇÃO 4: CORREÇÕES PROFUNDAS DA NBR 5410 - TABELA 36
         var tabelaIz = [
           { s: 1.5, Cu_PVC_2: 17.5, Cu_PVC_3: 15.5, Cu_XLPE_2: 23, Cu_XLPE_3: 20, Al_PVC_2: 13.5 },
           { s: 2.5, Cu_PVC_2: 24, Cu_PVC_3: 21, Cu_XLPE_2: 31, Cu_XLPE_3: 28, Al_PVC_2: 18.5 },
@@ -2105,7 +2118,17 @@
         ];
 
         var chaveBusca = `${mat}_${iso}_${car===3?3:2}`;
-        var fatorMetodo = met.includes('A') ? 0.85 : (met.includes('E') || met.includes('F') ? 1.15 : 1.0);
+        
+        // CORREÇÃO DOS FATORES DE ACORDO COM O MÉTODO - NBR 5410 TABELA 33
+        var fatorMetodo = 1.0;
+        if(met === 'A1') fatorMetodo = 0.82;
+        else if(met === 'A2') fatorMetodo = 0.80;
+        else if(met === 'B1') fatorMetodo = 1.00;
+        else if(met === 'B2') fatorMetodo = 0.95;
+        else if(met === 'C') fatorMetodo = 1.10;
+        else if(met === 'D') fatorMetodo = 1.25;
+        else if(met === 'E') fatorMetodo = 1.15;
+
         var bitolaMinimaMecanica = mat === 'Al' ? 16.0 : (row.querySelector('.dim-nome').value.toLowerCase().includes('luz') ? 1.5 : 2.5);
 
         var escolhido = tabelaIz[tabelaIz.length - 1];
