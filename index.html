@@ -257,7 +257,6 @@
 
     .dimens-print-header { display: none; }
 
-    /* MUDANÇA PARA 4 COLUNAS EXATAS (Requisito 5) */
     .dim-config-panel { background: var(--bg-color); border: 1px solid var(--primary); padding: 18px; border-radius: 14px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
     .dim-config-panel label { font-size: 12px; font-weight: 700; color: var(--neon-green); text-transform: uppercase; display: block; margin-bottom: 6px; }
 
@@ -377,11 +376,11 @@
     }
     .playstore-info { display: flex; align-items: center; gap: 12px; text-align: left; }
     .btn-playstore {
-        background: #020617; color: #fff; border: 1px solid #333; padding: 12px 24px; border-radius: 10px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: 0.2s;
+        background: #020617; color: #fff; border: 1px solid #333; padding: 10px 20px; border-radius: 10px; font-weight: 700; font-size: 14px; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: 0.2s;
     }
     .btn-playstore:hover { background: #111; border-color: var(--neon-green); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(57, 255, 20, 0.2); }
     .btn-playstore::before {
-        content: ''; display: inline-block; width: 20px; height: 20px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23fff" d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>'); background-size: contain; background-repeat: no-repeat;
+        content: ''; display: inline-block; width: 16px; height: 16px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%23fff" d="M325.3 234.3L104.6 13l280.8 161.2-60.1 60.1zM47 0C34 6.8 25.3 19.2 25.3 35.3v441.3c0 16.1 8.7 28.5 21.7 35.3l256.6-256L47 0zm425.2 225.6l-58.9-34.1-65.7 64.5 65.7 64.5 60.1-34.1c18-14.3 18-46.5-1.2-60.8zM104.6 499l280.8-161.2-60.1-60.1L104.6 499z"/></svg>'); background-size: contain; background-repeat: no-repeat;
     }
 
     .playstore-banner-sidebar { background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(57, 255, 20, 0.05) 100%); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; margin-top: 24px; text-align: center; }
@@ -725,10 +724,6 @@
       </div>
     </div>
 
-    <div id="premiumBanner" style="display:none; background: linear-gradient(90deg, #3730a3 0%, #4f46e5 100%); color: #fff; padding: 14px 24px; text-align: center; font-weight: 600; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; border-radius: 12px; border: 1px solid #818cf8; justify-content: space-between; align-items: center;">
-      <span>🚀 <strong>Plano Premium Ativado:</strong> Aproveite suas funções exclusivas!</span>
-    </div>
-
     <div class="ads-container print-hidden">
       <ins class="adsbygoogle"
            style="display:block; width: 100%; max-height: 100px;"
@@ -903,6 +898,7 @@
                 </div>
                 <div style="display: flex; gap: 12px; align-items: center;">
                   <button class="btn-header filled" onclick="addDimensRow('', 1200, 127, 15)">+ Novo Circuito</button>
+                  <button class="btn-header print-hidden" onclick="exportarCSV()" style="color: var(--text); border-color: #10b981;"><span style="color:#10b981;">📊 Exportar CSV</span></button>
                   <button class="btn-header" onclick="prepararImpressaoDimens()" style="color: var(--text); border-color: var(--border-color);">🖨️ Imprimir Projeto</button>
                   <button class="btn-header print-hidden" onclick="alternarRecolhimento('conteudo-dimens', this)" style="padding: 4px 10px; font-size: 12px;">▼ Recolher</button>
                 </div>
@@ -1168,6 +1164,7 @@
     var userPlan = 'free'; 
     var base64LogoToSave = ""; 
     var globalSavedBudgets = []; 
+    var priceMultiplier = 1.0; 
 
     document.addEventListener('DOMContentLoaded', function() {
       if(!localStorage.getItem('cookiesAceitos')) {
@@ -1218,7 +1215,6 @@
       auth.onAuthStateChanged(function(user) {
         currentUser = user;
         if (user) {
-          // ATUALIZAÇÃO 2: .onSnapshot GARANTE ATUALIZAÇÃO IMEDIATA E INSTANTÂNEA QUANDO O WEBHOOK PROCESSAR O PAGAMENTO
           db.collection('users').doc(user.uid).onSnapshot(async function(doc) {
             let data = doc.exists ? doc.data() : {};
             let updates = {};
@@ -1248,7 +1244,6 @@
             var nameToDisplay = user.displayName || user.email;
             if(data.nome) { nameToDisplay = data.nome; }
 
-            // ATUALIZAÇÃO 3: BANNER NO PAINEL EMPRESA EM TEMPO REAL
             var bannerPerfil = document.getElementById('perfilBannerPlano');
             if(bannerPerfil) {
                 var txtPlano = userPlan === 'master' ? 'MASTER 🏆' : (userPlan === 'premium' || userPlan === 'pro' ? 'PRO ⭐' : 'FREE / ESSENCIAL 🚀');
@@ -1256,13 +1251,39 @@
             }
 
             showApp('profissional', nameToDisplay);
-            checkPremiumTransition(); // Revalida a UI e esconde o PIX se assinante
+            checkPremiumTransition(); 
           });
         } else { showLanding(); }
       });
     });
 
-    // ATUALIZAÇÃO 1: FUNÇÃO RESPONSÁVEL POR GERAR A COBRANÇA DO PLANO COM O E-MAIL DO CLIENTE
+    window.exportarCSV = function() {
+        let csv = "Circuito;Carga (W);Tensão;F.P.;Dist (m);Corrente (Ib);Bitola Mín.;Disjuntor;Queda %;Diagnóstico\n";
+        document.querySelectorAll('#dimensTbody tr').forEach(row => {
+            let cols = row.querySelectorAll('td');
+            if(cols.length > 0) {
+                let nome = cols[0].querySelector('input').value;
+                let w = cols[1].querySelector('input').value;
+                let v = cols[2].querySelector('select').value;
+                let fp = cols[3].querySelector('select').value;
+                let dist = cols[4].querySelector('input').value;
+                let ib = cols[5].innerText;
+                let bitola = cols[6].innerText;
+                let disj = cols[7].innerText;
+                let queda = cols[8].innerText;
+                let diag = cols[9].innerText;
+                csv += `${nome};${w};${v};${fp};${dist};${ib};${bitola};${disj};${queda};${diag}\n`;
+            }
+        });
+        
+        let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement("a");
+        a.href = url; 
+        a.download = "Dimensionamento_VoltCalc_NBR5410.csv"; 
+        a.click();
+    };
+
     window.assinarPlano = async function(plano) {
       if(!currentUser) { openModal('modalLogin'); return; }
       
@@ -1273,7 +1294,6 @@
       btn.disabled = true;
 
       try {
-          // Comunica com seu Cloud Run e anexa o email para o externalReference
           var response = await fetch('https://app-pagamento-411208955318.us-central1.run.app/criar-cobranca', { 
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -1281,7 +1301,7 @@
                   customerId: currentUser.uid,
                   valor: valor,
                   formaPagamento: 'PIX', 
-                  emailUsuario: currentUser.email // E-mail garantido aqui!
+                  emailUsuario: currentUser.email 
               })
           });
 
@@ -1349,21 +1369,6 @@
           if(!localStorage.getItem('premiumModalShown_' + currentUser.uid)) {
               setTimeout(function() { openModal('modalPremium'); }, 1000);
               localStorage.setItem('premiumModalShown_' + currentUser.uid, 'true');
-          }
-      }
-      
-      var banner = document.getElementById('premiumBanner');
-      if(banner) {
-          if (userPlan === 'premium' || userPlan === 'pro') {
-             banner.innerHTML = '<span>🚀 <strong>Plano Premium Ativado:</strong> Aproveite suas funções exclusivas!</span>';
-             banner.style.display = 'flex';
-             banner.style.background = 'linear-gradient(90deg, #3730a3 0%, #4f46e5 100%)';
-          } else if (userPlan === 'master') {
-             banner.innerHTML = '<span>🏆 <strong>Plano Master Ativado:</strong> Bem-vindo à elite! Todas as funções liberadas.</span>';
-             banner.style.background = 'linear-gradient(90deg, #b45309 0%, #f59e0b 100%)';
-             banner.style.display = 'flex';
-          } else {
-             banner.style.display = 'none';
           }
       }
     }
@@ -1491,6 +1496,7 @@
       loadHistory('profHistContainer');
       carregarClientes();
       escutarNotificacoesSuporte(); 
+      escutarNotificacoesPix(); 
 
       var tbodyDim = document.getElementById('dimensTbody');
       if(tbodyDim && tbodyDim.children.length === 0) {
@@ -1510,17 +1516,29 @@
 
     function abrirModalNotificacoes() { openModal('modalNotificacoes'); }
 
+    // NOTIFICAÇÕES ASAAS E SUPORTE CONJUNTAS
+    function escutarNotificacoesPix() {
+      if(!currentUser) return;
+      // Assume que o Node.js gravará um doc em 'notificacoesPix' vinculada ao UID do usuário
+      db.collection('users').doc(currentUser.uid).collection('notificacoesPix')
+        .where('lida', '==', false)
+        .onSnapshot(function(snap) {
+          atualizarBolinhaVermelha();
+      });
+    }
+
+    var msgsSuporteNaoLidas = 0;
     function escutarNotificacoesSuporte() {
       if(!currentUser || !currentUser.email) return;
       const notifBody = document.getElementById('notifListBody');
-      const badge = document.getElementById('badgeNotif');
 
       db.collection('chamados').where('email', '==', currentUser.email).onSnapshot(function(snap) {
         let totalRespostas = 0; let html = '';
+        msgsSuporteNaoLidas = 0;
 
         if(snap.empty) {
-          if(notifBody) notifBody.innerHTML = '<p style="color:var(--text-light); font-size:14px;">Você ainda não abriu nenhum chamado de suporte.</p>';
-          if(badge) badge.style.display = 'none';
+          if(notifBody) notifBody.innerHTML = '<p style="color:var(--text-light); font-size:14px;">Você ainda não abriu nenhum chamado de suporte e não há notificações de pagamento.</p>';
+          atualizarBolinhaVermelha();
           return;
         }
 
@@ -1541,6 +1559,7 @@
             } else {
               msgSnap.forEach(function(mDoc) {
                 const m = mDoc.data(); totalRespostas++;
+                if (!m.lida) msgsSuporteNaoLidas++;
                 html += `<div style="background:var(--card-bg); border-left:3px solid var(--neon-green); padding:10px 12px; margin-top:8px; border-radius:6px;">
                   <span style="font-size:11px; color:var(--neon-green); font-weight:700;">Resposta do Suporte:</span>
                   <p style="font-size:14px; color:#fff; margin-top:4px;">${m.texto}</p>
@@ -1548,11 +1567,35 @@
               });
             }
             html += `</div>`;
-            if(notifBody) notifBody.innerHTML = html;
-            if(badge) { badge.textContent = totalRespostas; badge.style.display = totalRespostas > 0 ? 'inline-block' : 'none'; }
+            
+            // Adiciona as notificações do PIX no HTML também
+            db.collection('users').doc(currentUser.uid).collection('notificacoesPix').get().then(pixSnap => {
+                let pixHtml = '';
+                pixSnap.forEach(p => {
+                    const pd = p.data();
+                    pixHtml += `<div style="background:rgba(57, 255, 20, 0.1); border:1px solid var(--neon-green); padding:10px 12px; margin-bottom:8px; border-radius:6px;">
+                      <span style="font-size:12px; color:var(--neon-green); font-weight:700;">💸 Fatura Compensada!</span>
+                      <p style="font-size:14px; color:#fff; margin-top:4px;">${pd.mensagem || 'Um cliente acabou de pagar a fatura via PIX Asaas!'}</p>
+                    </div>`;
+                });
+                if(notifBody) notifBody.innerHTML = pixHtml + html;
+                atualizarBolinhaVermelha();
+            });
           });
         });
       });
+    }
+
+    function atualizarBolinhaVermelha() {
+        if(!currentUser) return;
+        let badge = document.getElementById('badgeNotif');
+        db.collection('users').doc(currentUser.uid).collection('notificacoesPix').where('lida', '==', false).get().then(snap => {
+            let totalNotifs = snap.size + msgsSuporteNaoLidas;
+            if (badge) {
+                badge.textContent = totalNotifs;
+                badge.style.display = totalNotifs > 0 ? 'inline-block' : 'none';
+            }
+        });
     }
 
     function setupTabs() {
@@ -1727,12 +1770,40 @@
       ]}
     ];
 
+    window.updatePriceMultiplier = function(val) {
+        priceMultiplier = 1 + (parseFloat(val) / 100);
+        renderPrecosTable();
+    };
+
     function renderPrecosTable() {
-      var h = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;"><h2 style="margin:0;">💰 Tabela Mão de Obra (Referência Nacional)</h2><button class="btn-header print-hidden" onclick="alternarRecolhimento(\'conteudo-precos\', this)" style="padding: 4px 10px; font-size: 12px;">▼ Recolher</button></div><div id="conteudo-precos"><div class="ptable-wrap"><table class="ptable"><thead><tr><th>Serviço</th><th>Mín</th><th>Máx</th><th>Méd</th></tr></thead><tbody>';
+      var h = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+            <h2 style="margin:0;">💰 Tabela Mão de Obra (Referência Nacional)</h2>
+            <button class="btn-header print-hidden" onclick="alternarRecolhimento('conteudo-precos', this)" style="padding: 4px 10px; font-size: 12px;">▼ Recolher</button>
+        </div>
+        <div id="conteudo-precos">
+            <div class="print-hidden" style="background: var(--bg-color); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; margin-bottom: 20px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                <label style="font-weight: 700; color: var(--neon-green);">⚙️ Ajuste Personalizado da Sua Hora Técnica:</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <span style="font-size: 14px;">Acréscimo / Desconto:</span>
+                    <input type="number" id="percAjusteHora" value="${((priceMultiplier - 1) * 100).toFixed(0)}" onchange="updatePriceMultiplier(this.value)" style="width: 80px; padding: 6px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text); text-align: center;"> %
+                </div>
+                <p style="font-size: 12px; color: var(--text-light); margin: 0;">(Isso recalcula todos os valores da tabela abaixo instantaneamente)</p>
+            </div>
+            <div class="ptable-wrap">
+                <table class="ptable">
+                    <thead><tr><th>Serviço</th><th>Mín</th><th>Máx</th><th>Méd</th></tr></thead>
+                    <tbody>`;
+      
       priceData.forEach(function(c) {
         h += '<tr class="cat-row"><td colspan="4">'+c.cat+'</td></tr>';
         c.items.forEach(function(i) {
-          h += '<tr><td>'+i.d+'</td><td class="mn">R$ '+i.mn.toFixed(2)+'</td><td class="mx">R$ '+i.mx.toFixed(2)+'</td><td class="md">R$ '+i.md.toFixed(2)+'</td></tr>';
+          h += `<tr>
+                  <td>${i.d}</td>
+                  <td class="mn">R$ ${(i.mn * priceMultiplier).toFixed(2)}</td>
+                  <td class="mx">R$ ${(i.mx * priceMultiplier).toFixed(2)}</td>
+                  <td class="md">R$ ${(i.md * priceMultiplier).toFixed(2)}</td>
+                </tr>`;
         });
       });
       h += '</tbody></table></div></div>';
@@ -1748,8 +1819,9 @@
       if(isSuggested) {
         descHtml = '<select class="orc-sel-suggest"><option value="">Selecione o serviço...</option>';
         priceData.forEach(function(c) { c.items.forEach(function(i) { 
+          var adjustedPrice = (i.md * priceMultiplier).toFixed(2);
           var sel = (presetDesc && presetDesc.includes(i.d)) ? 'selected' : '';
-          descHtml += '<option value="'+i.md+'" '+sel+'>'+i.d+'</option>'; 
+          descHtml += '<option value="'+adjustedPrice+'" '+sel+'>'+i.d+'</option>'; 
         }); });
         descHtml += '</select>';
       } else {
@@ -2131,7 +2203,6 @@
         var k_fases = v === 380 ? 1.732 : 1;
         var ib = w / (k_fases * v * fp);
 
-        // ATUALIZAÇÃO 4: CORREÇÕES PROFUNDAS DA NBR 5410 - TABELA 36
         var tabelaIz = [
           { s: 1.5, Cu_PVC_2: 17.5, Cu_PVC_3: 15.5, Cu_XLPE_2: 23, Cu_XLPE_3: 20, Al_PVC_2: 13.5 },
           { s: 2.5, Cu_PVC_2: 24, Cu_PVC_3: 21, Cu_XLPE_2: 31, Cu_XLPE_3: 28, Al_PVC_2: 18.5 },
@@ -2149,7 +2220,6 @@
 
         var chaveBusca = `${mat}_${iso}_${car===3?3:2}`;
         
-        // CORREÇÃO DOS FATORES DE ACORDO COM O MÉTODO - NBR 5410 TABELA 33
         var fatorMetodo = 1.0;
         if(met === 'A1') fatorMetodo = 0.82;
         else if(met === 'A2') fatorMetodo = 0.80;
@@ -2277,7 +2347,6 @@
       db.collection("chamados").add({ nome: currentUser.displayName || "Profissional", email: currentUser.email, mensagem: texto, status: "Pendente", data: new Date() }).then(() => { alert("Chamado aberto!"); document.getElementById('novaMensagemSuporteTexto').value = ''; });
     }
     
-    // --- CÓDIGO DO ASSISTENTE VIRTUAL (ADICIONADO) ---
     function toggleChatbot() {
         var bot = document.getElementById('voltBotContainer');
         bot.style.display = bot.style.display === 'flex' ? 'none' : 'flex';
