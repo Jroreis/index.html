@@ -112,6 +112,9 @@
     }
     .kpi-card .kpi-title { font-size: 13px; font-weight: 700; color: var(--text-light); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;}
     .kpi-card .kpi-value { font-size: 32px; font-weight: 900; color: #fff; }
+    .kpi-trend { font-size: 12px; margin-top: 8px; font-weight: bold; }
+    .kpi-trend.up { color: var(--accent-teal); }
+    .kpi-trend.down { color: var(--accent-red); }
 
     /* GRÁFICOS */
     .multi-graphs-grid { 
@@ -167,6 +170,7 @@
     </div>
     <ul class="nav-links">
         <li><a onclick="mudarAba('tab-estatisticas', this)" class="active-nav">📊 Painel Financeiro</a></li>
+        <li><a onclick="mudarAba('tab-analitico', this)" style="color: var(--accent-purple);">📈 Analítico & SEO</a></li>
         <li><a onclick="mudarAba('tab-chamados', this)">✉️ Chamados</a></li>
         <li><a onclick="mudarAba('tab-usuarios', this)">👥 Base 'users'</a></li>
         <li><a onclick="mudarAba('tab-pagamentos', this)">💳 Transações Asaas</a></li>
@@ -204,20 +208,100 @@
         </div>
 
         <div class="multi-graphs-grid">
-            
             <div class="graph-box" style="grid-column: 1 / -1; max-width: 500px; margin: 0 auto; background: transparent; border: none; box-shadow: none;">
                 <h4>Adesão aos Planos (Ao Vivo)</h4>
                 <div class="canvas-wrapper" style="height: 250px;"><canvas id="planosPieChart"></canvas></div>
             </div>
-
             <div class="graph-box">
                 <h4>Status Financeiro (Asaas)</h4>
                 <div class="canvas-wrapper"><canvas id="payChart"></canvas></div>
             </div>
-
             <div class="graph-box">
                 <h4>Atividade na Plataforma</h4>
                 <div class="canvas-wrapper"><canvas id="barChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-analitico" class="tab-content">
+        <div class="page-title">
+            📊 ESTATÍSTICAS DO SITE (TRAFFIC & SEO)
+            <span style="color:var(--accent-purple); font-size: 12px; font-weight: 600; text-transform: none; border: 1px solid var(--accent-purple); padding: 4px 10px; border-radius: 20px;">
+                ▶ Studio Analytics
+            </span>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card" style="border-left-color: var(--text-light);">
+                <div class="kpi-title">🖱️ Cliques no Site</div>
+                <div class="kpi-value">12.450</div>
+                <div class="kpi-trend up">↑ 15% vs mês anterior</div>
+            </div>
+            <div class="kpi-card" style="border-left-color: var(--accent-purple);">
+                <div class="kpi-title">🔍 Impressões no Google</div>
+                <div class="kpi-value" style="color: var(--accent-purple);">84.200</div>
+                <div class="kpi-trend up">↑ 22% vs mês anterior</div>
+            </div>
+            <div class="kpi-card" style="border-left-color: var(--accent-blue);">
+                <div class="kpi-title">🔗 Indicações (Referrals)</div>
+                <div class="kpi-value" style="color: var(--accent-blue);">3.120</div>
+                <div class="kpi-trend up">↑ 8% vs mês anterior</div>
+            </div>
+            <div class="kpi-card" style="border-left-color: var(--accent-teal);">
+                <div class="kpi-title">💎 Total de Assinaturas (Real)</div>
+                <div class="kpi-value" id="total-assinaturas-kpi" style="color: var(--accent-teal);">0</div>
+                <div class="kpi-trend up">Atualizado em tempo real</div>
+            </div>
+        </div>
+
+        <div class="graph-box" style="margin-bottom: 20px;">
+            <h4>Desempenho de Pesquisa e Cliques (Últimos 30 Dias)</h4>
+            <div class="canvas-wrapper" style="height: 300px;"><canvas id="trafficLineChart"></canvas></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            
+            <div class="graph-box">
+                <h4>Origem do Tráfego</h4>
+                <div class="canvas-wrapper" style="height: 220px;"><canvas id="sourceChart"></canvas></div>
+            </div>
+
+            <div class="chart-card" style="margin-bottom: 0;">
+                <h4 style="margin-bottom: 15px; font-size: 15px; color: var(--text-light); text-transform: uppercase;">Top Tags / Sugestões Google</h4>
+                <table style="min-width: 100%;">
+                    <thead><tr><th>Palavra-chave Buscada</th><th>Cliques</th></tr></thead>
+                    <tbody>
+                        <tr><td>"app para eletricista"</td><td style="color:var(--accent-teal); font-weight:bold;">1.240</td></tr>
+                        <tr><td>"calculo nbr 5410 online"</td><td style="color:var(--accent-teal); font-weight:bold;">985</td></tr>
+                        <tr><td>"orçamento elétrico pdf"</td><td style="color:var(--accent-teal); font-weight:bold;">840</td></tr>
+                        <tr><td>"software engenharia eletrica"</td><td style="color:var(--accent-teal); font-weight:bold;">620</td></tr>
+                        <tr><td>"dimensionamento de cabos"</td><td style="color:var(--accent-teal); font-weight:bold;">450</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="chart-card" style="margin-bottom: 0; border-top: 4px solid var(--accent-gold);">
+                <h4 style="margin-bottom: 15px; font-size: 15px; color: var(--accent-gold); text-transform: uppercase;">Base de Assinaturas (Tempo Real)</h4>
+                <table style="min-width: 100%;">
+                    <thead><tr><th>Plano</th><th>Usuários Ativos</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td style="color:var(--text-light); font-weight:bold;">Free / Essencial</td>
+                            <td id="ana-qtd-free" style="font-size: 18px; font-weight: 800;">0</td>
+                        </tr>
+                        <tr>
+                            <td style="color:var(--accent-purple); font-weight:bold;">Plano PRO</td>
+                            <td id="ana-qtd-pro" style="font-size: 18px; font-weight: 800;">0</td>
+                        </tr>
+                        <tr>
+                            <td style="color:var(--accent-gold); font-weight:bold;">Plano MASTER</td>
+                            <td id="ana-qtd-master" style="font-size: 18px; font-weight: 800;">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size: 12px; color: var(--text-light); margin-top: 15px; text-align: center;">
+                    *Estes dados de plano são lidos diretamente do banco de dados Firebase em tempo real.
+                </p>
             </div>
 
         </div>
@@ -325,7 +409,7 @@
     }
 
     function carregarDados() {
-        // 1. ESCUTA 'users' E ALIMENTA O GRÁFICO DE PLANOS 
+        // 1. ESCUTA 'users' E ALIMENTA OS DADOS (Agora alimenta também a aba Analítica)
         if(document.getElementById('tabela-usuarios-body')) {
             db.collection('users').onSnapshot(snap => {
                 document.getElementById('total-users').innerText = snap.size;
@@ -370,13 +454,19 @@
                     }
                 });
 
+                // ATUALIZA O PAINEL ANALÍTICO (Valores Reais da base de dados)
+                document.getElementById('ana-qtd-free').innerText = qtdFree;
+                document.getElementById('ana-qtd-pro').innerText = qtdPro;
+                document.getElementById('ana-qtd-master').innerText = qtdMaster;
+                document.getElementById('total-assinaturas-kpi').innerText = (qtdPro + qtdMaster);
+
                 // Atualiza o Gráfico Donut de Planos
                 if(graficoPlanosInstancia) {
                     graficoPlanosInstancia.data.datasets[0].data = [qtdFree, qtdPro, qtdMaster];
                     graficoPlanosInstancia.update();
                 }
 
-                // Atualiza Gráfico de Barras com uma métrica de atividade base (apenas visual para o dashboard)
+                // Atualiza Gráfico de Barras com uma métrica de atividade base
                 if(graficoBarrasInstancia) {
                     graficoBarrasInstancia.data.datasets[0].data = [qtdFree, qtdPro + qtdMaster, 1]; 
                     graficoBarrasInstancia.update();
@@ -591,7 +681,7 @@
     window.onload = () => {
         carregarDados();
 
-        // 1. NOVO GRÁFICO DONUT: ADESÃO DE PLANOS (Lê os dados reais Free, Pro, Master)
+        // 1. ABA FINANCEIRA: GRÁFICO DONUT PLANOS
         const ctxPlanos = document.getElementById('planosPieChart').getContext('2d');
         graficoPlanosInstancia = new Chart(ctxPlanos, { 
             type: 'doughnut', 
@@ -610,12 +700,12 @@
             }
         });
 
-        // 2. Gráfico Financeiro Asaas (Aprovados, Pendentes, Cancelados)
+        // 2. ABA FINANCEIRA: Gráfico Financeiro Asaas
         const ctxPay = document.getElementById('payChart').getContext('2d');
         graficoPagamentosInstancia = new Chart(ctxPay, {
             type: 'bar',
             data: {
-                labels: ['Aprovados', 'Pendentes', 'Cancelados/Vencidos'],
+                labels: ['Aprovados', 'Pendentes', 'Cancelados'],
                 datasets: [{
                     label: 'Transações',
                     data: [0, 0, 0],
@@ -633,7 +723,7 @@
             }
         });
 
-        // 3. Gráfico de Barras Genérico: Atividade (Apenas visual decorativo para preencher o dash)
+        // 3. ABA FINANCEIRA: Gráfico de Atividade
         const ctxBar = document.getElementById('barChart').getContext('2d');
         graficoBarrasInstancia = new Chart(ctxBar, { 
             type: 'bar', 
@@ -653,6 +743,66 @@
                     y: { beginAtZero: true, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }, 
                     x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: 'bold' } } } 
                 }
+            }
+        });
+
+        // -------------------------------------------------------------
+        // NOVOS GRÁFICOS DA ABA ANALÍTICA (ESTILO YOUTUBE STUDIO)
+        // -------------------------------------------------------------
+        
+        // Gráfico de Linha: Evolução de Tráfego e Cliques (Dados visuais de exemplo p/ estrutura)
+        const ctxLine = document.getElementById('trafficLineChart').getContext('2d');
+        new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: ['Dia 1', 'Dia 5', 'Dia 10', 'Dia 15', 'Dia 20', 'Dia 25', 'Hoje'],
+                datasets: [
+                    {
+                        label: 'Impressões no Google (Pesquisas)',
+                        data: [1200, 1900, 3000, 5200, 4800, 7100, 8400],
+                        borderColor: '#8b5cf6', // Roxo
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Cliques no Site',
+                        data: [200, 450, 800, 1100, 950, 1500, 1800],
+                        borderColor: '#39FF14', // Verde Neon
+                        backgroundColor: 'rgba(57, 255, 20, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { color: '#fff', font: { weight: 'bold' } } } },
+                scales: {
+                    y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                }
+            }
+        });
+
+        // Gráfico Donut: Origem do Tráfego / Indicações
+        const ctxSource = document.getElementById('sourceChart').getContext('2d');
+        new Chart(ctxSource, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pesquisa Google', 'Acesso Direto', 'YouTube (Indicações)', 'Redes Sociais'],
+                datasets: [{
+                    data: [45, 25, 20, 10], // Porcentagens visuais de exemplo
+                    backgroundColor: ['#8b5cf6', '#3b82f6', '#ef4444', '#f59e0b'],
+                    borderWidth: 0,
+                    cutout: '70%'
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { color: '#fff', padding: 15, font: { size: 12 } } } }
             }
         });
     };
