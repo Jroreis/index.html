@@ -240,7 +240,7 @@
     .cat-row { background: var(--bg-color) !important; color: #fff; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
     .mn { color: #10b981; font-weight: 600; } .mx { color: #f43f5e; font-weight: 600; } .md { color: #818cf8; font-weight: 800; }
 
-    .btn-action-icon { background: transparent; border: 1px solid var(--border-color); color: var(--text); border-radius: 8px; padding: 8px 12px; cursor: pointer; margin-right: 6px; font-size: 16px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-action-icon { background: transparent; border: 1px solid var(--border-color); color: var(--text); border-radius: 8px; padding: 8px 12px; cursor: margin-right: 6px; font-size: 16px; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; }
     .btn-action-icon:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.05); }
 
     .btn-pix-donation { background: #10b981; color: #020617; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 14px; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; }
@@ -1381,7 +1381,7 @@
       btn.disabled = true;
 
       try {
-          var response = await fetch('https://app-pagamento-411208955318.us-central1.run.app/criar-cobranca', { 
+          var response = await fetch('https://asaaswebhook-411208955318.us-central1.run.app', { 
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
