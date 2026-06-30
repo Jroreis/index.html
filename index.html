@@ -1100,7 +1100,7 @@
                     <li style="margin-bottom: 12px;">✅ <strong>Tudo do plano Free</strong></li>
                     <li style="margin-bottom: 12px;">✅ Geração de PDF de Orçamentos Ilimitada</li>
                     <li style="margin-bottom: 12px;">✅ 10 PDFs de Dimensionamento/mês</li>
-                    <li style="margin-bottom: 12px;">✅ Inserir Logo da sua Empresa</li>
+                    <li style="margin-bottom: 12px;">✅ Inserir Logo da Empresa</li>
                     <li style="margin-bottom: 12px;">✅ Sem avisos de doação</li>
                   </ul>
                   <button id="btnPlanProTab" class="btn-primary" onclick="assinarPlano('pro')">Assinar Plano Pro</button>
@@ -1385,6 +1385,8 @@
               body: JSON.stringify({
                   customerId: currentUser.uid,
                   valor: valor,
+                  formaPagamento: 'UNDEFINED',
+                  plano: plano,
                   emailUsuario: currentUser.email || `usuario-${currentUser.uid}@voltcalc.com`
               })
           });
@@ -1410,59 +1412,59 @@
 
     window.checkPdfLimit = async function(type = 'orc') {
         if (!currentUser) return false;
-        if (userPlan === 'premium' || userPlan === 'master') return true;
+        
+        const docRef = db.collection('users').doc(currentUser.uid);
+        const doc = await docRef.get();
+        let data = doc.data() || {};
+        let pAtivo = data.plano || 'free';
+
+        if (pAtivo === 'master' || pAtivo === 'premium') return true;
 
         const currentMonth = new Date().getMonth() + "-" + new Date().getFullYear();
-        try {
-            const docRef = db.collection('users').doc(currentUser.uid);
-            const doc = await docRef.get();
-            let data = doc.data() || {};
 
-            if (type === 'dimens') {
-                if (userPlan === 'free' || userPlan === 'no-cost') {
-                    alert("⚠️ O plano Free permite apenas a visualização do Dimensionamento.\nAssine o plano Pro (10 PDFs/mês) ou Master (Ilimitado) para imprimir relatórios de engenharia.");
-                    return false;
-                }
-                if (userPlan === 'pro') {
-                    let dMonth = data.dimensMonth || "";
-                    let dCount = data.dimensCount || 0;
+        if (type === 'dimens') {
+            if (pAtivo === 'free' || pAtivo === 'no-cost') {
+                alert("⚠️ O plano Free permite apenas a visualização do Dimensionamento.\nAssine o plano Pro (10 PDFs/mês) ou Master (Ilimitado) para imprimir relatórios de engenharia.");
+                return false;
+            }
+            if (pAtivo === 'pro') {
+                let dMonth = data.dimensMonth || "";
+                let dCount = data.dimensCount || 0;
 
-                    if (dMonth !== currentMonth) {
-                        dMonth = currentMonth;
-                        dCount = 0;
-                    }
-
-                    if (dCount >= 10) {
-                        alert("⚠️ Limite Atingido: O plano Pro permite 10 emissões de PDF de dimensionamento por mês.\nFaça o upgrade para o plano Master para obter acesso ilimitado!");
-                        return false;
-                    }
-
-                    await docRef.set({ dimensMonth: dMonth, dimensCount: dCount + 1 }, { merge: true });
-                    return true;
-                }
-            } else if (type === 'orc') {
-                if (userPlan === 'pro') return true;
-                
-                let pMonth = data.pdfMonth || "";
-                let pCount = data.pdfCount || 0;
-
-                if (pMonth !== currentMonth) {
-                    pMonth = currentMonth;
-                    pCount = 0;
+                if (dMonth !== currentMonth) {
+                    dMonth = currentMonth;
+                    dCount = 0;
                 }
 
-                if (pCount >= 10) {
-                    alert("⚠️ Limite Atingido: O plano Free permite apenas 10 impressões ou geração de PDFs de orçamentos por mês.\nAssine o plano Pro ou Master na aba 'Planos e Assinaturas' para gerar orçamentos ilimitados.");
+                if (dCount >= 10) {
+                    alert("⚠️ Limite Atingido: O plano Pro permite 10 emissões de PDF de dimensionamento por mês.\nFaça o upgrade para o plano Master para obter acesso ilimitado!");
                     return false;
                 }
 
-                await docRef.set({ pdfMonth: pMonth, pdfCount: pCount + 1 }, { merge: true });
+                await docRef.set({ dimensMonth: dMonth, dimensCount: dCount + 1 }, { merge: true });
                 return true;
             }
-        } catch (e) {
-            console.error("Erro ao validar limite de PDF:", e);
+        } else if (type === 'orc') {
+            if (pAtivo === 'pro') return true;
+            
+            let pMonth = data.pdfMonth || "";
+            let pCount = data.pdfCount || 0;
+
+            if (pMonth !== currentMonth) {
+                pMonth = currentMonth;
+                pCount = 0;
+            }
+
+            if (pCount >= 10) {
+                alert("⚠️ Limite Atingido: O plano Free permite apenas 10 impressões ou geração de PDFs de orçamentos por mês.\nAssine o plano Pro ou Master na aba 'Planos e Assinaturas' para gerar orçamentos ilimitados.");
+                return false;
+            }
+
+            await docRef.set({ pdfMonth: pMonth, pdfCount: pCount + 1 }, { merge: true });
             return true;
         }
+        
+        return false;
     };
 
     function checkPremiumTransition() {
@@ -1485,7 +1487,7 @@
       var today = new Date();
       var deadline = new Date('2026-06-25T23:59:59');
       if(today > deadline) {
-         alert("Infelizmente o prazo promocional encerrou.");
+         alert("Infelizmente o prazo promocional para ativar os 60 dias gratuitos encerrou em 25/06/2026.");
          return;
       }
       if(currentUser) {
@@ -1496,7 +1498,7 @@
             plano: 'premium',
             premiumExpireDate: expireDate
         }, { merge: true }).then(function() {
-           alert("Plano Premium ativado com sucesso!");
+           alert("Plano Premium ativado com sucesso! Você tem 60 dias de acesso.");
            userPlan = 'premium';
            checkPremiumTransition();
         });
