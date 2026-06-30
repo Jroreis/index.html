@@ -1290,7 +1290,7 @@
           db.collection('users').doc(user.uid).onSnapshot(async function(doc) {
             let data = doc.exists ? doc.data() : {};
 
-            if ((data.plano === 'premium' || data.plano === 'master') && data.premiumExpireDate) {
+            if (data.plano === 'premium' && data.premiumExpireDate) {
                 let expireDate = data.premiumExpireDate.toDate ? data.premiumExpireDate.toDate() : new Date(data.premiumExpireDate);
                 if (new Date() > expireDate) {
                     data.plano = 'no-cost';
@@ -1312,7 +1312,7 @@
                 bannerPerfil.innerHTML = 'Plano Atual Ativo: <strong>' + txtPlano + '</strong>';
             }
 
-            const pAtivo = userPlan || 'free';
+            const pAtivo = (userPlan || 'free').toLowerCase();
             const btnFreeL = document.getElementById('btnPlanFreeLanding');
             const btnProL = document.getElementById('btnPlanProLanding');
             const btnMasterL = document.getElementById('btnPlanMasterLanding');
@@ -1320,20 +1320,22 @@
             const btnProT = document.getElementById('btnPlanProTab');
             const btnMasterT = document.getElementById('btnPlanMasterTab');
 
+            // Reset Default Status
             if(btnFreeL) { btnFreeL.textContent = "Cadastrar Grátis"; btnFreeL.disabled = false; btnFreeL.style.opacity = "1"; btnFreeL.style.cursor = "pointer"; }
             if(btnProL) { btnProL.textContent = "Testar Agora"; btnProL.disabled = false; btnProL.style.opacity = "1"; btnProL.style.cursor = "pointer"; btnProL.style.background = "var(--neon-green)"; btnProL.style.color = "#020617"; }
             if(btnMasterL) { btnMasterL.textContent = "Testar Master Grátis"; btnMasterL.disabled = false; btnMasterL.style.opacity = "1"; btnMasterL.style.cursor = "pointer"; btnMasterL.style.background = "var(--secondary)"; btnMasterL.style.color = "#020617"; }
-            if(btnFreeT) { btnFreeT.textContent = "Seu Plano Base"; btnFreeT.disabled = true; btnFreeT.style.opacity = "0.5"; btnFreeT.style.cursor = "not-allowed"; }
+            if(btnFreeT) { btnFreeT.textContent = "Seu Plano Base"; btnFreeT.disabled = false; btnFreeT.style.opacity = "1"; btnFreeT.style.cursor = "pointer"; }
             if(btnProT) { btnProT.textContent = "Assinar Plano Pro"; btnProT.disabled = false; btnProT.style.opacity = "1"; btnProT.style.cursor = "pointer"; btnProT.style.background = "var(--primary)"; btnProT.style.color = "#fff"; }
             if(btnMasterT) { btnMasterT.textContent = "Assinar Plano Master"; btnMasterT.disabled = false; btnMasterT.style.opacity = "1"; btnMasterT.style.cursor = "pointer"; btnMasterT.style.background = "var(--secondary)"; btnMasterT.style.color = "#020617"; }
 
+            // Apply specific plan blocking
             if (pAtivo === 'free' || pAtivo === 'no-cost') {
                 if(btnFreeL) { btnFreeL.textContent = "Plano Atual"; btnFreeL.disabled = true; btnFreeL.style.opacity = "0.7"; btnFreeL.style.cursor = "default"; }
                 if(btnFreeT) { btnFreeT.textContent = "Plano Atual"; btnFreeT.disabled = true; btnFreeT.style.opacity = "0.7"; btnFreeT.style.cursor = "default"; }
-            } else if (pAtivo === 'pro' || pAtivo === 'premium') {
+            } else if (pAtivo === 'pro') {
                 if(btnProL) { btnProL.textContent = "Plano Atual"; btnProL.disabled = true; btnProL.style.opacity = "0.7"; btnProL.style.cursor = "default"; btnProL.style.background = "var(--border-color)"; btnProL.style.color = "var(--text-light)"; }
                 if(btnProT) { btnProT.textContent = "Plano Atual"; btnProT.disabled = true; btnProT.style.opacity = "0.7"; btnProT.style.cursor = "default"; btnProT.style.background = "var(--border-color)"; btnProT.style.color = "var(--text-light)"; }
-            } else if (pAtivo === 'master') {
+            } else if (pAtivo === 'master' || pAtivo === 'premium') {
                 if(btnMasterL) { btnMasterL.textContent = "Plano Atual"; btnMasterL.disabled = true; btnMasterL.style.opacity = "0.7"; btnMasterL.style.cursor = "default"; btnMasterL.style.background = "var(--border-color)"; btnMasterL.style.color = "var(--text-light)"; }
                 if(btnMasterT) { btnMasterT.textContent = "Plano Atual"; btnMasterT.disabled = true; btnMasterT.style.opacity = "0.7"; btnMasterT.style.cursor = "default"; btnMasterT.style.background = "var(--border-color)"; btnMasterT.style.color = "var(--text-light)"; }
             }
@@ -1385,8 +1387,6 @@
               body: JSON.stringify({
                   customerId: currentUser.uid,
                   valor: valor,
-                  formaPagamento: 'UNDEFINED',
-                  plano: plano,
                   emailUsuario: currentUser.email || `usuario-${currentUser.uid}@voltcalc.com`
               })
           });
@@ -1416,7 +1416,7 @@
         const docRef = db.collection('users').doc(currentUser.uid);
         const doc = await docRef.get();
         let data = doc.data() || {};
-        let pAtivo = data.plano || 'free';
+        let pAtivo = (data.plano || 'free').toLowerCase();
 
         if (pAtivo === 'master' || pAtivo === 'premium') return true;
 
