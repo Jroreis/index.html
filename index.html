@@ -307,7 +307,7 @@
       .form-group.full { flex: 1 1 100% !important; }
       .form-group label { color: #000 !important; font-size: 9pt !important; margin-bottom: 2px !important; text-transform: uppercase; font-weight: 800 !important; }
       
-      .form-group input, .form-group textarea, .form-group select, .orc-item input, .orc-item select { background: transparent !important; border: none !important; border-bottom: 1px solid #000 !important; padding: 2px 0 !important; font-size: 10pt !important; color: #000 !important; font-weight: 600 !important; border-radius: 0 !important; box-shadow: none !important; height: auto !important; outline: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; }
+      .form-group input, .form-group textarea, .form-group select, .orc-item input, .orc-item select { background: transparent !important; border: none !important; border-bottom: 1px solid #000 !important; padding: 2px 0 !important; font-size: 10pt !important; color: #000 !important; font-weight: 600 !important; border-radius: 0 !important; box-shadow: none !important; height: auto !important; outline: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; border-radius: 0 !important; box-shadow: none !important; height: auto !important; outline: none !important; }
       .form-group select::-ms-expand, .orc-item select::-ms-expand { display: none !important; }
 
       .print-only { display: grid !important; }
@@ -351,7 +351,7 @@
       .dimens-table th:nth-child(9), .dimens-table td:nth-child(9) { width: 9% !important; }
       .dimens-table th:nth-child(10), .dimens-table td:nth-child(10) { width: 15% !important; }
 
-      .dimens-table select, .dimens-table input { font-size: 7pt !important; background: transparent !important; border: none !important; padding: 0 !important; color: #000 !important; font-weight: 600 !important; width: 100% !important; outline: none !important; -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; word-wrap: break-word !important; white-space: normal !important; position: static !important; }
+      .dimens-table select, .dimens-table input { font-size: 7pt !important; background: transparent !important; border: none !important; padding: 0 !important; color: #000 !important; font-weight: 600 !important; width: 100% !important; outline: none !important; word-wrap: break-word !important; white-space: normal !important; position: static !important; }
       .dimens-table select { text-align: center !important; text-align-last: center !important; }
       .dimens-table select::-ms-expand { display: none !important; }
       
@@ -542,7 +542,7 @@
         </div>
         <div class="feature-card">
           <div class="feature-icon">🔒</div>
-          <h3>Segurança em Nuvem</h3>
+          <h3>Security em Nuvem</h3>
           <p>Mantenha o cadastro de sua empresa, sua logomarca, gestão de clientes e o histórico de todas as propostas emitidas salvos com segurança na nuvem do Google.</p>
         </div>
       </div>
@@ -1117,7 +1117,7 @@
                     <li style="margin-bottom: 12px;">✅ <strong>Tudo do plano Pro</strong></li>
                     <li style="margin-bottom: 12px;">✅ Dimensionamento Completo NBR 5410</li>
                     <li style="margin-bottom: 12px;">✅ Cálculo de Demanda Dinâmico</li>
-                    <li style="margin-bottom: 12px;">✅ Especificação de DR e DPS Automática</li>
+                    <li style="margin-bottom: 12px;">✅ Specification de DR e DPS Automática</li>
                     <li style="margin-bottom: 12px;">✅ Suporte Técnico Prioritário VIP</li>
                   </ul>
                   <button class="btn-primary" style="background: var(--secondary); color: #020617;" onclick="assinarPlano('master')">Assinar Plano Master</button>
@@ -1257,9 +1257,11 @@
             let updates = {};
             let needsUpdate = false;
 
-            if (!data.plano) {
-                data.plano = 'free';
-                updates.plano = 'free';
+            /* EXPURGO DE PERMISSÃO ANÔMALA E PADRONIZAÇÃO DO PLANO */
+            if (!data.plano || data.role === 'profissional') {
+                data.plano = data.plano || 'free';
+                updates.plano = data.plano;
+                updates.role = firebase.firestore.FieldValue.delete();
                 needsUpdate = true;
             }
 
@@ -1281,14 +1283,15 @@
             var nameToDisplay = user.displayName || user.email;
             if(data.nome) { nameToDisplay = data.nome; }
 
+            /* CORREÇÃO DO TIMING DE RENDERIZAÇÃO */
+            showApp('profissional', nameToDisplay);
+            checkPremiumTransition(); 
+
             var bannerPerfil = document.getElementById('perfilBannerPlano');
             if(bannerPerfil) {
                 var txtPlano = userPlan === 'master' ? 'MASTER 🏆' : (userPlan === 'premium' || userPlan === 'pro' ? 'PRO ⭐' : 'FREE / ESSENCIAL 🚀');
                 bannerPerfil.innerHTML = 'Plano Atual Ativo: <strong>' + txtPlano + '</strong>';
             }
-
-            showApp('profissional', nameToDisplay);
-            checkPremiumTransition(); 
           });
         } else { showLanding(); }
       });
@@ -1338,7 +1341,7 @@
                   customerId: currentUser.uid,
                   valor: valor,
                   formaPagamento: 'PIX', 
-                  emailUsuario: currentUser.email 
+                  emailUsuario: currentUser.email || `usuario-${currentUser.uid}@voltcalc.com`
               })
           });
 
@@ -1476,7 +1479,6 @@
           return db.collection('users').doc(cred.user.uid).set({ 
               nome: n, 
               email: e, 
-              role: 'profissional', 
               plano: 'master', 
               premiumExpireDate: calcularDataExpiracao(15), 
               createdAt: new Date() 
@@ -1502,7 +1504,6 @@
             return db.collection('users').doc(u.uid).set({ 
               nome: u.displayName || "Profissional", 
               email: u.email, 
-              role: 'profissional', 
               plano: 'master', 
               premiumExpireDate: calcularDataExpiracao(15), 
               createdAt: new Date() 
@@ -2313,7 +2314,8 @@
         if (dV_perc > 4.0) { statusText = "⚠️ Queda > 4%"; statusColor = "#ef4444"; }
 
         var disjComerciais = [6, 10, 16, 20, 25, 32, 40, 50, 63, 70, 80, 100, 125, 160, 200, 250];
-        var disj = disjComerciais.find(dj => dj >= ib * 1.1) || "Especial";
+        /* CORREÇÃO DA REGRA DE COORDENAÇÃO DE PROTEÇÃO DA NBR 5410 */
+        var disj = disjComerciais.find(dj => dj >= ib) || "Especial";
 
         var nomeCirc = row.querySelector('.dim-nome').value.toLowerCase();
         var curva = nomeCirc.match(/(chuveiro|aquecedor|torneira|resist)/) ? 'Curva B' : 'Curva C';
