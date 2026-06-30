@@ -20,7 +20,7 @@
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="VoltCalc Pro - Software para Eletricistas Autônomos">
-  <meta name="twitter:description" content="Crie orçamentos em 2 minutos, dimensione pela NBR 5410 de forma automática e gere relatórios técnicos impecáveis.">
+  <meta name="twitter:description" content="Crie orçamentos em 2 minutos, diamante pela NBR 5410 de forma automática e gere relatórios técnicos impecáveis.">
   <meta name="twitter:image" content="https://i.postimg.cc/gj7VxGHL/file-000000001c9c720ea77ce48405b163db.png">
 
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -569,7 +569,7 @@
               <li style="margin-bottom: 12px; color: #ef4444;">❌ Logo no PDF (Limite 10/mês)</li>
               <li style="margin-bottom: 12px; color: #ef4444;">❌ Dimensionamento NBR 5410</li>
             </ul>
-            <button class="btn-secondary-action" onclick="openModal('modalCadastro')">Cadastrar Grátis</button>
+            <button id="btnPlanFreeLanding" class="btn-secondary-action" onclick="openModal('modalCadastro')">Cadastrar Grátis</button>
           </div>
 
           <div style="background: var(--bg-color); border: 2px solid var(--primary); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; transform: scale(1.02); box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3); position: relative;">
@@ -585,7 +585,7 @@
               <li style="margin-bottom: 12px;">✅ Inserir Logo da sua Empresa</li>
               <li style="margin-bottom: 12px;">✅ Dimensionamento NBR 5410 (Limite 10 PDFs/mês)</li>
             </ul>
-            <button class="btn-primary" onclick="assinarPlano('pro')">Testar Agora</button>
+            <button id="btnPlanProLanding" class="btn-primary" onclick="assinarPlano('pro')">Testar Agora</button>
           </div>
 
           <div style="background: var(--card-bg); border: 1px solid var(--secondary); border-radius: 16px; padding: 24px; display: flex; flex-direction: column;">
@@ -600,7 +600,7 @@
               <li style="margin-bottom: 12px;">✅ Especificação de DR e DPS Automática</li>
               <li style="margin-bottom: 12px;">✅ Suporte Técnico Prioritário VIP</li>
             </ul>
-            <button class="btn-primary" style="background: var(--secondary); color: #020617;" onclick="assinarPlano('master')">Testar Master Grátis</button>
+            <button id="btnPlanMasterLanding" class="btn-primary" style="background: var(--secondary); color: #020617;" onclick="assinarPlano('master')">Testar Master Grátis</button>
           </div>
         </div>
       </div>
@@ -1089,7 +1089,7 @@
                     <li style="margin-bottom: 12px; color: #ef4444;">❌ Logo no PDF (Limite 10/mês)</li>
                     <li style="margin-bottom: 12px; color: #ef4444;">❌ Dimensionamento NBR 5410</li>
                   </ul>
-                  <button class="btn-secondary-action" disabled style="cursor: not-allowed; opacity: 0.5;">Seu Plano Base</button>
+                  <button id="btnPlanFreeTab" class="btn-secondary-action" disabled style="cursor: not-allowed; opacity: 0.5;">Seu Plano Base</button>
                 </div>
 
                 <div style="background: var(--card-bg); border: 2px solid var(--primary); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; transform: scale(1.02); box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);">
@@ -1105,7 +1105,7 @@
                     <li style="margin-bottom: 12px;">✅ Inserir Logo da Empresa</li>
                     <li style="margin-bottom: 12px;">✅ Dimensionamento NBR 5410 (Limite 10 PDFs/mês)</li>
                   </ul>
-                  <button class="btn-primary" onclick="assinarPlano('pro')">Assinar Plano Pro</button>
+                  <button id="btnPlanProTab" class="btn-primary" onclick="assinarPlano('pro')">Assinar Plano Pro</button>
                 </div>
 
                 <div style="background: var(--bg-color); border: 1px solid var(--secondary); border-radius: 16px; padding: 24px; display: flex; flex-direction: column;">
@@ -1120,7 +1120,7 @@
                     <li style="margin-bottom: 12px;">✅ Specification de DR e DPS Automática</li>
                     <li style="margin-bottom: 12px;">✅ Suporte Técnico Prioritário VIP</li>
                   </ul>
-                  <button class="btn-primary" style="background: var(--secondary); color: #020617;" onclick="assinarPlano('master')">Assinar Plano Master</button>
+                  <button id="btnPlanMasterTab" class="btn-primary" style="background: var(--secondary); color: #020617;" onclick="assinarPlano('master')">Assinar Plano Master</button>
                 </div>
 
               </div>
@@ -1319,6 +1319,33 @@
                 var txtPlano = userPlan === 'master' ? 'MASTER 🏆' : (userPlan === 'premium' || userPlan === 'pro' ? 'PRO ⭐' : 'FREE / ESSENCIAL 🚀');
                 bannerPerfil.innerHTML = 'Plano Atual Ativo: <strong>' + txtPlano + '</strong>';
             }
+
+            // --- SINCRONIZAÇÃO EM TEMPO REAL DOS BOTÕES DOS PLANOS ---
+            const pAtivo = userPlan || 'free';
+            const btnFreeL = document.getElementById('btnPlanFreeLanding');
+            const btnProL = document.getElementById('btnPlanProLanding');
+            const btnMasterL = document.getElementById('btnPlanMasterLanding');
+            const btnFreeT = document.getElementById('btnPlanFreeTab');
+            const btnProT = document.getElementById('btnPlanProTab');
+            const btnMasterT = document.getElementById('btnPlanMasterTab');
+
+            if(btnFreeL) { btnFreeL.textContent = "Cadastrar Grátis"; btnFreeL.disabled = false; btnFreeL.style.opacity = "1"; btnFreeL.style.cursor = "pointer"; }
+            if(btnProL) { btnProL.textContent = "Testar Agora"; btnProL.disabled = false; btnProL.style.opacity = "1"; btnProL.style.cursor = "pointer"; btnProL.style.background = "var(--neon-green)"; btnProL.style.color = "#020617"; }
+            if(btnMasterL) { btnMasterL.textContent = "Testar Master Grátis"; btnMasterL.disabled = false; btnMasterL.style.opacity = "1"; btnMasterL.style.cursor = "pointer"; btnMasterL.style.background = "var(--secondary)"; btnMasterL.style.color = "#020617"; }
+            if(btnFreeT) { btnFreeT.textContent = "Seu Plano Base"; btnFreeT.disabled = true; btnFreeT.style.opacity = "0.5"; btnFreeT.style.cursor = "not-allowed"; }
+            if(btnProT) { btnProT.textContent = "Assinar Plano Pro"; btnProT.disabled = false; btnProT.style.opacity = "1"; btnProT.style.cursor = "pointer"; btnProT.style.background = "var(--primary)"; btnProT.style.color = "#fff"; }
+            if(btnMasterT) { btnMasterT.textContent = "Assinar Plano Master"; btnMasterT.disabled = false; btnMasterT.style.opacity = "1"; btnMasterT.style.cursor = "pointer"; btnMasterT.style.background = "var(--secondary)"; btnMasterT.style.color = "#020617"; }
+
+            if (pAtivo === 'free' || pAtivo === 'no-cost') {
+                if(btnFreeL) { btnFreeL.textContent = "Plano Atual"; btnFreeL.disabled = true; btnFreeL.style.opacity = "0.7"; btnFreeL.style.cursor = "default"; }
+                if(btnFreeT) { btnFreeT.textContent = "Plano Atual"; btnFreeT.disabled = true; btnFreeT.style.opacity = "0.7"; btnFreeT.style.cursor = "default"; }
+            } else if (pAtivo === 'pro' || pAtivo === 'premium') {
+                if(btnProL) { btnProL.textContent = "Plano Atual"; btnProL.disabled = true; btnProL.style.opacity = "0.7"; btnProL.style.cursor = "default"; btnProL.style.background = "var(--border-color)"; btnProL.style.color = "var(--text-light)"; }
+                if(btnProT) { btnProT.textContent = "Plano Atual"; btnProT.disabled = true; btnProT.style.opacity = "0.7"; btnProT.style.cursor = "default"; btnProT.style.background = "var(--border-color)"; btnProT.style.color = "var(--text-light)"; }
+            } else if (pAtivo === 'master') {
+                if(btnMasterL) { btnMasterL.textContent = "Plano Atual"; btnMasterL.disabled = true; btnMasterL.style.opacity = "0.7"; btnMasterL.style.cursor = "default"; btnMasterL.style.background = "var(--border-color)"; btnMasterL.style.color = "var(--text-light)"; }
+                if(btnMasterT) { btnMasterT.textContent = "Plano Atual"; btnMasterT.disabled = true; btnMasterT.style.opacity = "0.7"; btnMasterT.style.cursor = "default"; btnMasterT.style.background = "var(--border-color)"; btnMasterT.style.color = "var(--text-light)"; }
+            }
           });
         } else { showLanding(); }
       });
@@ -1367,7 +1394,6 @@
               body: JSON.stringify({
                   customerId: currentUser.uid,
                   valor: valor,
-                  formaPagamento: 'PIX', 
                   emailUsuario: currentUser.email || `usuario-${currentUser.uid}@voltcalc.com`
               })
           });
@@ -2071,7 +2097,7 @@
     };
 
     window.actionDelete = function(docId) {
-      if(confirm('Tem certeza que deseja excluir?')) {
+      if(confirm('Tem certeza que deseja abraçar a exclusão?')) {
         db.collection('budgets').doc(docId).delete().then(function() { alert('Excluído!'); loadHistory('profHistContainer'); });
       }
     };
