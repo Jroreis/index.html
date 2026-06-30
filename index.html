@@ -581,9 +581,9 @@
             <ul style="list-style: none; padding: 0; margin-bottom: 24px; flex: 1; color: var(--text-light); font-size: 14px;">
               <li style="margin-bottom: 12px;">✅ <strong>Sem doação PIX na tela</strong></li>
               <li style="margin-bottom: 12px;">✅ Histórico ilimitado em Nuvem</li>
-              <li style="margin-bottom: 12px;">✅ Geração de PDF Ilimitada</li>
+              <li style="margin-bottom: 12px;">✅ Geração de PDF de Orçamentos Ilimitada</li>
               <li style="margin-bottom: 12px;">✅ Inserir Logo da sua Empresa</li>
-              <li style="margin-bottom: 12px; color: #ef4444;">❌ Dimensionamento NBR 5410</li>
+              <li style="margin-bottom: 12px;">✅ Dimensionamento NBR 5410 (Limite 10 PDFs/mês)</li>
             </ul>
             <button class="btn-primary" onclick="assinarPlano('pro')">Testar Agora</button>
           </div>
@@ -597,7 +597,7 @@
               <li style="margin-bottom: 12px;">✅ <strong>Tudo do plano Pro</strong></li>
               <li style="margin-bottom: 12px;">✅ Dimensionamento Completo NBR 5410</li>
               <li style="margin-bottom: 12px;">✅ Cálculo de Demanda Dinâmico</li>
-              <li style="margin-bottom: 12px;">✅ Specification de DR e DPS Automática</li>
+              <li style="margin-bottom: 12px;">✅ Especificação de DR e DPS Automática</li>
               <li style="margin-bottom: 12px;">✅ Suporte Técnico Prioritário VIP</li>
             </ul>
             <button class="btn-primary" style="background: var(--secondary); color: #020617;" onclick="assinarPlano('master')">Testar Master Grátis</button>
@@ -898,7 +898,7 @@
                 <div style="display: flex; gap: 12px; align-items: center;">
                   <button class="btn-header filled" onclick="addDimensRow('', 1200, 127, 15)">+ Novo Circuito</button>
                   <button class="btn-header print-hidden" onclick="exportarCSV()" style="color: var(--text); border-color: #10b981;"><span style="color:#10b981;">📊 Exportar CSV</span></button>
-                  <button class="btn-header" onclick="prepararImpressaoDimens()" style="color: var(--text); border-color: var(--border-color);">🖨️ Imprimir Projeto</button>
+                  <button class="btn-header" onclick="prepararImpressaoDimens()">🖨️ Imprimir Projeto</button>
                   <button class="btn-header print-hidden" onclick="alternarRecolhimento('conteudo-dimens', this)" style="padding: 4px 10px; font-size: 12px;">▼ Recolher</button>
                 </div>
               </div>
@@ -1008,7 +1008,7 @@
                     <div><strong>Fator de Correção Aplicado:</strong> Inerente ao Método Configurável</div>
                   </div>
                   <p style="margin-top: 6px; font-size: 7pt; color: #333; font-style: italic; line-height: 1.2;">
-                    Nota Técnica de Validação: Dimensionamento de condutores baseado no critério de Capacidade de Condução de Corrente (Iz) comparada à Corrente de Projeto (Ib), alinhado às Tabelas 36, 37 e 38 da norma ABNT NBR 5410, e verificação rigorosa da Queda de Tensão admissível (ΔU%). Proteções termomagnéticas (Disjuntores) selecionadas para coordenar a proteção do cabo sob a condição técnica Ib ≤ In ≤ Iz.
+                    Nota Técnica de Validação: Dimensionamento de condutores baseado no critério de Capacidade de Condução de Corrente (Iz) comparada à Corrente de Projeto (Ib), alinhado às Tabelas 36, 37 e 38 da norma ABNT NBR 5410, e verificação rigorosa da Queda de Tensão admissível (ΔU%). Proteções termomagnéticas (Disjuntores) selecionadas para coordenar a proteção do cabo sob a condition técnica Ib ≤ In ≤ Iz.
                   </p>
                 </div>
                 <div class="print-hidden" style="margin-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
@@ -1101,9 +1101,9 @@
                   <ul style="list-style: none; padding: 0; margin-bottom: 24px; flex: 1; color: var(--text-light); font-size: 14px;">
                     <li style="margin-bottom: 12px;">✅ <strong>Sem doação PIX na tela</strong></li>
                     <li style="margin-bottom: 12px;">✅ Histórico ilimitado em Nuvem</li>
-                    <li style="margin-bottom: 12px;">✅ Geração de PDF Ilimitada</li>
+                    <li style="margin-bottom: 12px;">✅ Geração de PDF de Orçamentos Ilimitada</li>
                     <li style="margin-bottom: 12px;">✅ Inserir Logo da Empresa</li>
-                    <li style="margin-bottom: 12px; color: #ef4444;">❌ Dimensionamento NBR 5410</li>
+                    <li style="margin-bottom: 12px;">✅ Dimensionamento NBR 5410 (Limite 10 PDFs/mês)</li>
                   </ul>
                   <button class="btn-primary" onclick="assinarPlano('pro')">Assinar Plano Pro</button>
                 </div>
@@ -1353,41 +1353,62 @@
               throw new Error("Erro na API do Cloud Run");
           }
       } catch (error) {
-          console.warn("Falha de rede ou API não implementada totalmente. Direcionando para o fallback seguro do Asaas.", error);
-          alert("Ocorreu uma falha ao gerar a cobrança automática. Redirecionando para a página de checkout seguro do Asaas...");
-          
-          if(plano === 'pro') window.open('https://www.asaas.com/c/6ab28cjqoacc1cdw', '_blank');
-          else window.open('https://www.asaas.com/c/3331mpivr46kcqs0', '_blank');
+          console.error("Erro ao processar checkout automático:", error);
+          alert("Ocorreu um erro técnico ao gerar a sua fatura Pix. Por favor, tente novamente mais tarde.");
       }
 
       btn.textContent = textoOriginal;
       btn.disabled = false;
     };
 
-    window.checkPdfLimit = async function() {
+    window.checkPdfLimit = async function(type = 'orc') {
         if (!currentUser) return false;
-        if (userPlan === 'premium' || userPlan === 'master' || userPlan === 'pro') return true;
+        if (userPlan === 'premium' || userPlan === 'master') return true;
+        if (userPlan === 'pro' && type === 'orc') return true;
 
         const currentMonth = new Date().getMonth() + "-" + new Date().getFullYear();
         try {
             const docRef = db.collection('users').doc(currentUser.uid);
             const doc = await docRef.get();
             let data = doc.data() || {};
-            let pMonth = data.pdfMonth || "";
-            let pCount = data.pdfCount || 0;
 
-            if (pMonth !== currentMonth) {
-                pMonth = currentMonth;
-                pCount = 0;
+            if (type === 'dimens') {
+                if (userPlan === 'free') {
+                    alert("⚠️ O plano Free não possui acesso ao Relatório de Dimensionamento. Adquira o plano Pro ou Master.");
+                    return false;
+                }
+                let dMonth = data.dimensMonth || "";
+                let dCount = data.dimensCount || 0;
+
+                if (dMonth !== currentMonth) {
+                    dMonth = currentMonth;
+                    dCount = 0;
+                }
+
+                if (dCount >= 10) {
+                    alert("⚠️ Limite Atingido: O plano Pro permite apenas 10 emissões de PDF da planilha de dimensionamento por mês.\nFaça o upgrade para o plano Master para obter acesso ilimitado!");
+                    return false;
+                }
+
+                await docRef.set({ dimensMonth: dMonth, dimensCount: dCount + 1 }, { merge: true });
+                return true;
+            } else {
+                let pMonth = data.pdfMonth || "";
+                let pCount = data.pdfCount || 0;
+
+                if (pMonth !== currentMonth) {
+                    pMonth = currentMonth;
+                    pCount = 0;
+                }
+
+                if (pCount >= 10) {
+                    alert("⚠️ Limite Atingido: O plano Free permite apenas 10 impressões ou geração de PDFs por mês.\nAssine o plano Pro ou Master na aba 'Planos e Assinaturas' para gerar orçamentos ilimitados.");
+                    return false;
+                }
+
+                await docRef.set({ pdfMonth: pMonth, pdfCount: pCount + 1 }, { merge: true });
+                return true;
             }
-
-            if (pCount >= 10) {
-                alert("⚠️ Limite Atingido: O plano Free permite apenas 10 impressões ou geração de PDFs por mês.\nAssine o plano Pro ou Master na aba 'Planos e Assinaturas' para gerar orçamentos ilimitados.");
-                return false;
-            }
-
-            await docRef.set({ pdfMonth: pMonth, pdfCount: pCount + 1 }, { merge: true });
-            return true;
         } catch (e) {
             console.error("Erro ao validar limite de PDF:", e);
             return true;
@@ -1455,7 +1476,7 @@
           return db.collection('users').doc(cred.user.uid).set({ 
               nome: n, 
               email: e, 
-              role: 'free', 
+              role: 'profissional', 
               plano: 'master', 
               premiumExpireDate: calcularDataExpiracao(15), 
               createdAt: new Date() 
@@ -1481,7 +1502,7 @@
             return db.collection('users').doc(u.uid).set({ 
               nome: u.displayName || "Profissional", 
               email: u.email, 
-              role: 'free', 
+              role: 'profissional', 
               plano: 'master', 
               premiumExpireDate: calcularDataExpiracao(15), 
               createdAt: new Date() 
@@ -1556,7 +1577,6 @@
     // NOTIFICAÇÕES ASAAS E SUPORTE CONJUNTAS
     function escutarNotificacoesPix() {
       if(!currentUser) return;
-      // Assume que o Node.js gravará um doc em 'notificacoesPix' vinculada ao UID do usuário
       db.collection('users').doc(currentUser.uid).collection('notificacoesPix')
         .where('lida', '==', false)
         .onSnapshot(function(snap) {
@@ -1605,7 +1625,6 @@
             }
             html += `</div>`;
             
-            // Adiciona as notificações do PIX no HTML também
             db.collection('users').doc(currentUser.uid).collection('notificacoesPix').get().then(pixSnap => {
                 let pixHtml = '';
                 pixSnap.forEach(p => {
@@ -1773,7 +1792,7 @@
         { d: 'Ligação de contatora e relé térmico', mn: 150, mx: 250, md: 200 }
       ]},
       { cat: '⚡ QUADROS E INFRAESTRUTURA', items: [
-        { d: 'Montagem de QDC (até 12 disjuntores)', mn: 350, mx: 600, md: 450 },
+        { d: 'Montagem de QDC (hasta 12 disjuntores)', mn: 350, mx: 600, md: 450 },
         { d: 'Montagem de QDC (13 a 24 disjuntores)', mn: 600, mx: 1100, md: 850 },
         { d: 'Montagem de QDC (25 a 40 disjuntores)', mn: 1100, mx: 1800, md: 1400 },
         { d: 'Instalação de DPS / IDR Residual (por dispositivo)', mn: 80, mx: 160, md: 120 },
@@ -2002,7 +2021,7 @@
     };
 
     window.actionReprint = async function(index) {
-      if (!(await checkPdfLimit())) return;
+      if (!(await checkPdfLimit('orc'))) return;
       
       if (userPlan === 'free') { document.getElementById('printLogoContainer').style.display = 'none'; }
       else if (base64LogoToSave) { document.getElementById('printLogoContainer').style.display = 'block'; }
@@ -2011,7 +2030,7 @@
     };
 
     window.imprimirOrcamento = async function() {
-        if (await checkPdfLimit()) {
+        if (await checkPdfLimit('orc')) {
             if (userPlan === 'free') { document.getElementById('printLogoContainer').style.display = 'none'; }
             else if (base64LogoToSave) { document.getElementById('printLogoContainer').style.display = 'block'; }
             window.print();
@@ -2163,7 +2182,7 @@
         };
         
         db.collection('users').doc(currentUser.uid).set(upd, { merge: true }).then(function(){
-          alert('Perfil atualizado com sucesso!'); 
+          alert('Perfil updated com sucesso!'); 
           document.getElementById('printProfName').textContent = upd.nome;
           document.getElementById('profNameTitleInput').value = upd.nome;
           if(upd.logoBase64) { 
@@ -2355,7 +2374,7 @@
     }
 
     window.prepararImpressaoDimens = async function() {
-      if (!(await checkPdfLimit())) return;
+      if (!(await checkPdfLimit('dimens'))) return;
 
       if (userPlan === 'free') { document.getElementById('printLogoContainer').style.display = 'none'; }
       else if (base64LogoToSave) { document.getElementById('printLogoContainer').style.display = 'block'; }
@@ -2452,7 +2471,6 @@
   </a>
 
   <script>
-    // Código de suporte removido do SW para não duplicar, mantido aqui apenas o enviarSuporte original
     function enviarSuporte() {
         const nome = document.getElementById('sup-nome').value.trim(), email = document.getElementById('sup-email').value.trim(), msg = document.getElementById('sup-msg').value.trim();
         if (nome && email && msg) { db.collection("chamados").add({ nome: nome, email: email, mensagem: msg, status: "Pendente", data: new Date() }).then(() => { alert("Chamado enviado!"); }); } else { alert("Preencha Nome, E-mail e Mensagem."); }
