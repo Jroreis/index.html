@@ -1319,17 +1319,27 @@
 
           db.collection('users').doc(user.uid).onSnapshot(async function(doc) {
             let data = doc.exists ? doc.data() : {};
+            let currentPlan = (data.plano || 'free').toLowerCase();
+            let today = new Date();
 
-            if (data.plano === 'premium' && data.premiumExpireDate) {
+            // Lógica de Expiração para Plano Premium (Teste de 60 dias) e Master (Teste de 15 dias)
+            if ((currentPlan === 'premium' || currentPlan === 'master') && data.premiumExpireDate) {
                 let expireDate = data.premiumExpireDate.toDate ? data.premiumExpireDate.toDate() : new Date(data.premiumExpireDate);
-                if (new Date() > expireDate) {
-                    data.plano = 'free';
+                if (today > expireDate) {
+                    currentPlan = 'free';
                     await db.collection('users').doc(user.uid).set({ plano: 'free' }, { merge: true });
                     alert("Atenção: O seu período de teste expirou. Você foi migrado para o plano Free.");
                 }
             }
 
-            userPlan = data.plano; 
+            // Força usuários novos (pós 25/06) que não ativaram o teste ou não pagaram a voltar para o Free se estiverem em limbo
+            // Nota: Isso não afeta quem está no período de teste de 15 dias pois a lógica acima já cobre.
+            if (!data.premiumExpireDate && currentPlan !== 'free' && currentPlan !== 'pro' && currentPlan !== 'master') {
+                 currentPlan = 'free';
+                 await db.collection('users').doc(user.uid).set({ plano: 'free' }, { merge: true });
+            }
+
+            userPlan = currentPlan; 
             var nameToDisplay = user.displayName || user.email;
             if(data.nome) { nameToDisplay = data.nome; }
 
@@ -1687,8 +1697,8 @@
         } else if (pAtivo === 'master' || pAtivo === 'premium') {
             if(btns.proL) { btns.proL.textContent = "Upgrade Concluído"; btns.proL.disabled = true; btns.proL.style.opacity = "0.5"; }
             if(btns.proT) { btns.proT.textContent = "Upgrade Concluído"; btns.proT.disabled = true; btns.proT.style.opacity = "0.5"; }
-            if(btns.masterL) { btns.masterL.textContent = "Plano Atual"; btns.masterL.disabled = true; btns.masterL.style.opacity = "0.7"; btns.masterL.style.background = "var(--border-color)"; }
-            if(btns.masterT) { btns.masterT.textContent = "Plano Atual"; btns.masterT.disabled = true; btns.masterT.style.opacity = "0.7"; btns.masterT.style.background = "var(--border-color)"; }
+            if(btns.masterL) { btns.masterL.textContent = "Plano Master Ativo"; btns.masterL.disabled = true; btns.masterL.style.opacity = "0.7"; btns.masterL.style.background = "var(--border-color)"; }
+            if(btns.masterT) { btns.masterT.textContent = "Plano Master Ativo"; btns.masterT.disabled = true; btns.masterT.style.opacity = "0.7"; btns.masterT.style.background = "var(--border-color)"; }
         }
     };
 
