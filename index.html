@@ -1335,40 +1335,7 @@
 
             showApp('profissional', nameToDisplay);
             checkPremiumTransition(); 
-
-            var bannerPerfil = document.getElementById('perfilBannerPlano');
-            if(bannerPerfil) {
-                var txtPlano = userPlan === 'master' ? 'MASTER 🏆' : (userPlan === 'premium' || userPlan === 'pro' ? 'PRO ⭐' : 'FREE / ESSENCIAL 🚀');
-                bannerPerfil.innerHTML = 'Plano Atual Ativo: <strong>' + txtPlano + '</strong>';
-            }
-
-            const pAtivo = (userPlan || 'free').toLowerCase();
-            const btnFreeL = document.getElementById('btnPlanFreeLanding');
-            const btnProL = document.getElementById('btnPlanProLanding');
-            const btnMasterL = document.getElementById('btnPlanMasterLanding');
-            const btnFreeT = document.getElementById('btnPlanFreeTab');
-            const btnProT = document.getElementById('btnPlanProTab');
-            const btnMasterT = document.getElementById('btnPlanMasterTab');
-
-            // Reset Default Status
-            if(btnFreeL) { btnFreeL.textContent = "Cadastrar Grátis"; btnFreeL.disabled = false; btnFreeL.style.opacity = "1"; btnFreeL.style.cursor = "pointer"; }
-            if(btnProL) { btnProL.textContent = "Testar Agora"; btnProL.disabled = false; btnProL.style.opacity = "1"; btnProL.style.cursor = "pointer"; btnProL.style.background = "var(--neon-green)"; btnProL.style.color = "#020617"; }
-            if(btnMasterL) { btnMasterL.textContent = "Testar Master Grátis"; btnMasterL.disabled = false; btnMasterL.style.opacity = "1"; btnMasterL.style.cursor = "pointer"; btnMasterL.style.background = "var(--secondary)"; btnMasterL.style.color = "#020617"; }
-            if(btnFreeT) { btnFreeT.textContent = "Seu Plano Base"; btnFreeT.disabled = false; btnFreeT.style.opacity = "1"; btnFreeT.style.cursor = "pointer"; }
-            if(btnProT) { btnProT.textContent = "Assinar Plano Pro"; btnProT.disabled = false; btnProT.style.opacity = "1"; btnProT.style.cursor = "pointer"; btnProT.style.background = "var(--primary)"; btnProT.style.color = "#fff"; }
-            if(btnMasterT) { btnMasterT.textContent = "Assinar Plano Master"; btnMasterT.disabled = false; btnMasterT.style.opacity = "1"; btnMasterT.style.cursor = "pointer"; btnMasterT.style.background = "var(--secondary)"; btnMasterT.style.color = "#020617"; }
-
-            // Apply specific plan blocking
-            if (pAtivo === 'free') {
-                if(btnFreeL) { btnFreeL.textContent = "Plano Atual"; btnFreeL.disabled = true; btnFreeL.style.opacity = "0.7"; btnFreeL.style.cursor = "default"; }
-                if(btnFreeT) { btnFreeT.textContent = "Plano Atual"; btnFreeT.disabled = true; btnFreeT.style.opacity = "0.7"; btnFreeT.style.cursor = "default"; }
-            } else if (pAtivo === 'pro') {
-                if(btnProL) { btnProL.textContent = "Plano Atual"; btnProL.disabled = true; btnProL.style.opacity = "0.7"; btnProL.style.cursor = "default"; btnProL.style.background = "var(--border-color)"; btnProL.style.color = "var(--text-light)"; }
-                if(btnProT) { btnProT.textContent = "Plano Atual"; btnProT.disabled = true; btnProT.style.opacity = "0.7"; btnProT.style.cursor = "default"; btnProT.style.background = "var(--border-color)"; btnProT.style.color = "var(--text-light)"; }
-            } else if (pAtivo === 'master' || pAtivo === 'premium') {
-                if(btnMasterL) { btnMasterL.textContent = "Plano Atual"; btnMasterL.disabled = true; btnMasterL.style.opacity = "0.7"; btnMasterL.style.cursor = "default"; btnMasterL.style.background = "var(--border-color)"; btnMasterL.style.color = "var(--text-light)"; }
-                if(btnMasterT) { btnMasterT.textContent = "Plano Atual"; btnMasterT.disabled = true; btnMasterT.style.opacity = "0.7"; btnMasterT.style.cursor = "default"; btnMasterT.style.background = "var(--border-color)"; btnMasterT.style.color = "var(--text-light)"; }
-            }
+            atualizarInterfacePlanos();
           });
         } else { showLanding(); }
       });
@@ -1645,6 +1612,9 @@
       carregarClientes();
       escutarNotificacoesSuporte(); 
       escutarNotificacoesPix(); 
+      
+      // Atualiza a interface de planos IMEDIATAMENTE após renderizar o perfil
+      atualizarInterfacePlanos();
 
       var tbodyDim = document.getElementById('dimensTbody');
       if(tbodyDim && tbodyDim.children.length === 0) {
@@ -1654,6 +1624,49 @@
         addDimensRow('Ar Condicionado Split Suíte (12.000 BTU)', 1100, 220, 22);
       }
     }
+
+    window.atualizarInterfacePlanos = function() {
+        const pAtivo = (userPlan || 'free').toLowerCase();
+        
+        // 1. Atualiza o Banner de Status no Perfil
+        const bannerPerfil = document.getElementById('perfilBannerPlano');
+        if(bannerPerfil) {
+            const txtPlano = pAtivo === 'master' ? 'MASTER 🏆' : (pAtivo === 'premium' || pAtivo === 'pro' ? 'PRO ⭐' : 'FREE / ESSENCIAL 🚀');
+            bannerPerfil.innerHTML = 'Plano Atual Ativo: <strong>' + txtPlano + '</strong>';
+        }
+
+        // 2. Atualiza os Botões das Abas de Planos e Landing
+        const btns = {
+            freeL: document.getElementById('btnPlanFreeLanding'),
+            proL: document.getElementById('btnPlanProLanding'),
+            masterL: document.getElementById('btnPlanMasterLanding'),
+            freeT: document.getElementById('btnPlanFreeTab'),
+            proT: document.getElementById('btnPlanProTab'),
+            masterT: document.getElementById('btnPlanMasterTab')
+        };
+
+        // Reset geral
+        if(btns.freeL) { btns.freeL.textContent = "Cadastrar Grátis"; btns.freeL.disabled = false; btns.freeL.style.opacity = "1"; }
+        if(btns.proL) { btns.proL.textContent = "Assinar Plano Pro"; btns.proL.disabled = false; btns.proL.style.opacity = "1"; btns.proL.style.background = "var(--primary)"; }
+        if(btns.masterL) { btns.masterL.textContent = "Assinar Plano Master"; btns.masterL.disabled = false; btns.masterL.style.opacity = "1"; btns.masterL.style.background = "var(--secondary)"; }
+        if(btns.freeT) { btns.freeT.textContent = "Seu Plano Base"; btns.freeT.disabled = false; btns.freeT.style.opacity = "1"; }
+        if(btns.proT) { btns.proT.textContent = "Assinar Plano Pro"; btns.proT.disabled = false; btns.proT.style.opacity = "1"; btns.proT.style.background = "var(--primary)"; }
+        if(btns.masterT) { btns.masterT.textContent = "Assinar Plano Master"; btns.masterT.disabled = false; btns.masterT.style.opacity = "1"; btns.masterT.style.background = "var(--secondary)"; }
+
+        // Aplica o status do plano ativo
+        if (pAtivo === 'free') {
+            if(btns.freeL) { btns.freeL.textContent = "Plano Atual"; btns.freeL.disabled = true; btns.freeL.style.opacity = "0.7"; }
+            if(btns.freeT) { btns.freeT.textContent = "Plano Atual"; btns.freeT.disabled = true; btns.freeT.style.opacity = "0.7"; }
+        } else if (pAtivo === 'pro') {
+            if(btns.proL) { btns.proL.textContent = "Plano Ativo"; btns.proL.disabled = true; btns.proL.style.opacity = "0.7"; btns.proL.style.background = "var(--border-color)"; }
+            if(btns.proT) { btns.proT.textContent = "Plano Ativo"; btns.proT.disabled = true; btns.proT.style.opacity = "0.7"; btns.proT.style.background = "var(--border-color)"; }
+        } else if (pAtivo === 'master' || pAtivo === 'premium') {
+            if(btns.proL) { btns.proL.textContent = "Upgrade Concluído"; btns.proL.disabled = true; btns.proL.style.opacity = "0.5"; }
+            if(btns.proT) { btns.proT.textContent = "Upgrade Concluído"; btns.proT.disabled = true; btns.proT.style.opacity = "0.5"; }
+            if(btns.masterL) { btns.masterL.textContent = "Plano Atual"; btns.masterL.disabled = true; btns.masterL.style.opacity = "0.7"; btns.masterL.style.background = "var(--border-color)"; }
+            if(btns.masterT) { btns.masterT.textContent = "Plano Atual"; btns.masterT.disabled = true; btns.masterT.style.opacity = "0.7"; btns.masterT.style.background = "var(--border-color)"; }
+        }
+    };
 
     function abrirPerfilTopo() {
       document.querySelectorAll('#profScreen .tab-content').forEach(c => c.classList.remove('active'));
