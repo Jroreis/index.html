@@ -1471,12 +1471,21 @@
           el.style.display = (userPlan === 'premium' || userPlan === 'master' || userPlan === 'pro') ? 'none' : 'block';
       });
 
-       if (today <= deadline && (userPlan === 'free')) {
-          if(!localStorage.getItem('premiumModalShown_' + currentUser.uid)) {
-              setTimeout(function() { openModal('modalPremium'); }, 1000);
-              localStorage.setItem('premiumModalShown_' + currentUser.uid, 'true');
+      // Só exibe a promoção de 60 dias para usuários que se cadastraram antes de 25/06/2026
+      db.collection('users').doc(currentUser.uid).get().then(function(doc) {
+          if (doc.exists) {
+              var data = doc.data();
+              var dataCadastro = data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt)) : new Date();
+              var limiteCadastroPromocao = new Date('2026-06-25T23:59:59');
+
+              if (today <= deadline && (userPlan === 'free') && (dataCadastro <= limiteCadastroPromocao)) {
+                  if(!localStorage.getItem('premiumModalShown_' + currentUser.uid)) {
+                      setTimeout(function() { openModal('modalPremium'); }, 1000);
+                      localStorage.setItem('premiumModalShown_' + currentUser.uid, 'true');
+                  }
+              }
           }
-      }
+      });
     }
 
     window.ativarPremium = function() {
@@ -1487,16 +1496,31 @@
          return;
       }
       if(currentUser) {
-        var expireDate = new Date();
-        expireDate.setDate(expireDate.getDate() + 60);
+        db.collection('users').doc(currentUser.uid).get().then(function(doc) {
+            if (doc.exists) {
+                var data = doc.data();
+                var dataCadastro = data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt)) : new Date();
+                var limiteCadastroPromocao = new Date('2026-06-25T23:59:59');
 
-        db.collection('users').doc(currentUser.uid).set({ 
-            plano: 'premium',
-            premiumExpireDate: expireDate
-        }, { merge: true }).then(function() {
-           alert("Plano Premium ativado com sucesso! Você tem 60 dias de acesso.");
-           userPlan = 'premium';
-           checkPremiumTransition();
+                if (dataCadastro > limiteCadastroPromocao) {
+                    alert("Esta promoção de 60 dias é exclusiva para usuários cadastrados antes de 25/06/2026. Novos usuários recebem 15 dias de teste Master no cadastro.");
+                    closeModal();
+                    return;
+                }
+
+                var expireDate = new Date();
+                expireDate.setDate(expireDate.getDate() + 60);
+
+                db.collection('users').doc(currentUser.uid).set({ 
+                    plano: 'premium',
+                    premiumExpireDate: expireDate
+                }, { merge: true }).then(function() {
+                   alert("Plano Premium ativado com sucesso! Você tem 60 dias de acesso.");
+                   userPlan = 'premium';
+                   checkPremiumTransition();
+                   closeModal();
+                });
+            }
         });
       }
     };
