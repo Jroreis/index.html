@@ -3,13 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5688863534851791" crossorigin="anonymous"></script>
-    
-    <meta name="description" content="VoltCalcPro - A Loja Do Eletricista. Encontre as melhores ferramentas e materiais elétricos das maiores plataformas com segurança e rapidez.">
-    <meta name="keywords" id="seoKeywords" content="eletricista, ferramentas, elétrica, voltcalcpro">
+    <meta name="description" content="VoltCalcPro - A Loja Do Eletricista. Encontre as melhores ferramentas, materiais elétricos, iluminação, smart home e EPIs das maiores plataformas com segurança e rapidez.">
+    <meta name="keywords" content="eletricista, ferramentas, elétrica, iluminação, smart home, EPI, voltcalcpro, mercado livre, aliexpress">
     <meta name="author" content="VoltCalcPro">
-    <meta name="robots" content="index, follow">
-    <title>VoltCalcPro - A Loja Do Eletricista</title>
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="theme-color" content="#00FF00">
+    <title>VoltCalcPro - A Loja Do Eletricista | Ferramentas e Materiais Elétricos</title>
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="VoltCalcPro - A Loja Do Eletricista">
+    <meta property="og:description" content="Encontre as melhores ferramentas, materiais elétricos, iluminação, smart home e EPIs das maiores plataformas.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://voltcalcpro.com">
+    <meta property="og:image" content="https://i.postimg.cc/tgn3zz4J/splash-icon.png">
+    <meta property="og:site_name" content="VoltCalcPro">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="VoltCalcPro - A Loja Do Eletricista">
+    <meta name="twitter:description" content="Encontre as melhores ferramentas, materiais elétricos, iluminação, smart home e EPIs.">
+    <meta name="twitter:image" content="https://i.postimg.cc/tgn3zz4J/splash-icon.png">
+    
+    <!-- Canonical -->
+    <link rel="canonical" href="https://voltcalcpro.com">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/tgn3zz4J/splash-icon.png">
+    
+    <!-- JSON-LD Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "VoltCalcPro - A Loja Do Eletricista",
+        "description": "Encontre as melhores ferramentas, materiais elétricos, iluminação, smart home e EPIs das maiores plataformas.",
+        "url": "https://voltcalcpro.com",
+        "image": "https://i.postimg.cc/tgn3zz4J/splash-icon.png",
+        "sameAs": [
+            "https://www.facebook.com/voltcalcpro",
+            "https://www.instagram.com/voltcalcpro",
+            "https://www.youtube.com/voltcalcpro"
+        ]
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "VoltCalcPro",
+        "url": "https://voltcalcpro.com",
+        "logo": "https://i.postimg.cc/tgn3zz4J/splash-icon.png",
+        "description": "Agregador de produtos de qualidade para profissionais do setor elétrico",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "Customer Support",
+                "email": "voltcalcpro@gmail.com"
+        }
+    }
+    </script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    
+    <!-- Google Ads Remarketing -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -22,6 +86,7 @@
             --bg-darker: #020617;
             --text-light: #E2E8F0;
             --text-muted: #94A3B8;
+            --red: #E82828;
         }
 
         body {
@@ -37,7 +102,7 @@
             top: 0;
             z-index: 100;
             border-bottom: 1px solid rgba(0, 255, 0, 0.2);
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(10px);
             padding: 1rem 0;
         }
@@ -135,10 +200,6 @@
         .product-badge { position: absolute; top: 0.75rem; left: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; z-index: 5; pointer-events: none; }
         .product-badge.mercado-livre { background: var(--yellow); color: var(--bg-dark); }
         .product-badge.aliexpress { background: #E82828; color: white; }
-        .product-badge.amazon { background: #FF9900; color: #111; }
-        .product-badge.shopee { background: #EE4D2D; color: white; }
-        .product-badge.magalu { background: #0086FF; color: white; }
-        .product-badge.outros { background: #64748B; color: white; }
         .product-badge.category { top: auto; bottom: 0.75rem; left: 0.75rem; background: var(--green); color: var(--bg-dark); }
 
         .product-info { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
@@ -243,13 +304,12 @@
             </div>
         </section>
 
-        <div class="promo-slider-container" id="promoSliderContainer">
-            </div>
+        <div class="promo-slider-container" id="promoSliderContainer"></div>
 
         <section class="products-section">
             <div class="container">
                 <div class="products-grid" id="productsGrid"></div>
-            </div>
+            </section>
         </section>
     </div>
 
@@ -285,9 +345,14 @@
                     <span class="hint" id="autoTitleHint" style="color: var(--green); margin-top: 5px;">O título será extraído automaticamente do link.</span>
                 </div>
                 <div class="form-group">
+                    <label>Título do Produto</label>
+                    <input type="text" id="productTitle" placeholder="Digite o título do produto">
+                    <span class="hint">Deixe em branco para usar o título detectado automaticamente.</span>
+                </div>
+                <div class="form-group">
                     <label>Tags (SEO e Busca)</label>
                     <input type="text" id="productTags" placeholder="ferramenta, elétrica, voltagem...">
-                    <span class="hint">Deixe em branco para gerar tags automáticas com base no título gerado.</span>
+                    <span class="hint">Deixe em branco para gerar tags automáticas com base no título.</span>
                 </div>
                 <div class="form-group">
                     <label>URL da Imagem do Produto</label>
@@ -296,21 +361,20 @@
                 <div class="form-group">
                     <label>Seção / Categoria</label>
                     <select id="productCategory">
+                        <option value="">Detectar automaticamente</option>
                         <option value="Ferramentas">Ferramentas</option>
                         <option value="Elétrica">Elétrica</option>
                         <option value="Iluminação">Iluminação</option>
                         <option value="Smart Home">Smart Home</option>
+                        <option value="EPI">EPI</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Plataforma</label>
                     <select id="productPlatform">
+                        <option value="">Detectar automaticamente</option>
                         <option value="mercado-livre">Mercado Livre</option>
                         <option value="aliexpress">AliExpress</option>
-                        <option value="amazon">Amazon</option>
-                        <option value="shopee">Shopee</option>
-                        <option value="magalu">Magalu</option>
-                        <option value="outros">Outra Plataforma</option>
                     </select>
                 </div>
                 <div class="btn-group">
@@ -337,12 +401,64 @@
         <div class="container">
             <p>© 2026 VoltCalcPro a Loja Do Eletricista. Todos os direitos reservados.</p>
             <div class="footer-links">
+                <a onclick="openLegalModal('aboutModal')">Sobre</a>
                 <a onclick="openLegalModal('privacyModal')">Política de Privacidade</a>
                 <a onclick="openLegalModal('termsModal')">Termos de Uso</a>
                 <a onclick="openLegalModal('affiliateModal')">Aviso de Afiliado</a>
             </div>
         </div>
     </footer>
+
+    <div class="legal-modal" id="aboutModal">
+        <div class="legal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Sobre VoltCalcPro</h2>
+                <button class="close-btn" onclick="closeLegalModal('aboutModal')">✕</button>
+            </div>
+            
+            <h3>Missão e Visão</h3>
+            <p><strong>Missão:</strong> Facilitar o acesso dos profissionais do setor elétrico aos melhores produtos e ferramentas disponíveis no mercado, agregando as principais plataformas de e-commerce em um único lugar seguro e confiável.</p>
+            <p><strong>Visão:</strong> Ser a plataforma de referência para eletricistas e profissionais da área elétrica em toda a América Latina, oferecendo a melhor experiência de busca e comparação de produtos com segurança e rapidez.</p>
+            
+            <h3>Como Funciona o Site</h3>
+            <p>VoltCalcPro é um agregador de produtos que reúne ofertas das principais plataformas de e-commerce (Mercado Livre, AliExpress e outras). Nosso site funciona da seguinte forma:</p>
+            <ul>
+                <li><strong>Catálogo Curado:</strong> Selecionamos cuidadosamente produtos de qualidade para profissionais do setor elétrico</li>
+                <li><strong>Busca Inteligente:</strong> Encontre rapidamente o que você procura por título, tags ou categoria</li>
+                <li><strong>Filtros Eficientes:</strong> Filtre por plataforma, categoria e tipo de produto</li>
+                <li><strong>Redirecionamento Seguro:</strong> Clique no produto e seja redirecionado diretamente para a plataforma de origem</li>
+                <li><strong>Painel Admin:</strong> Gerenciadores podem adicionar, editar e remover produtos facilmente</li>
+            </ul>
+            
+            <h3>Por Que Confiar em Nós</h3>
+            <p>VoltCalcPro é uma plataforma segura e confiável por diversos motivos:</p>
+            <ul>
+                <li><strong>Transparência Total:</strong> Somos afiliados das plataformas parceiras e isso é claramente informado</li>
+                <li><strong>Sem Intermediação de Pagamento:</strong> Não processamos pagamentos - as transações são feitas diretamente nas plataformas parceiras</li>
+                <li><strong>Sem Coleta de Dados Pessoais:</strong> Não exigimos cadastro ou informações bancárias</li>
+                <li><strong>Produtos Verificados:</strong> Todos os produtos listados são de vendedores confiáveis nas plataformas parceiras</li>
+                <li><strong>Suporte Profissional:</strong> Nossa equipe está sempre disponível para ajudar</li>
+                <li><strong>Segurança SSL:</strong> Seu navegador está protegido com criptografia de dados</li>
+            </ul>
+            
+            <h3>Informações de Contato</h3>
+            <p><strong>Email:</strong> voltcalcpro@gmail.com</p>
+            <p><strong>Website:</strong> voltcalcpro.com</p>
+            <p><strong>Horário de Atendimento:</strong> Segunda a Sexta, 8h às 18h (Horário de Brasília)</p>
+            <p>Tem dúvidas ou sugestões? Entre em contato conosco! Valorizamos o feedback de nossos usuários.</p>
+            
+            <h3>Histórico da Empresa</h3>
+            <p>VoltCalcPro foi fundada em 2024 com o objetivo de revolucionar a forma como profissionais do setor elétrico encontram e compram ferramentas e materiais. Nascida da necessidade de centralizar ofertas de múltiplas plataformas em um único lugar, a empresa rapidamente se tornou uma referência no segmento.</p>
+            <p>Com uma equipe dedicada de profissionais da área elétrica e especialistas em tecnologia, VoltCalcPro continua inovando para oferecer a melhor experiência possível aos seus usuários.</p>
+            <p>Nossa jornada é marcada por:</p>
+            <ul>
+                <li><strong>2024:</strong> Lançamento da plataforma com 26 produtos iniciais</li>
+                <li><strong>2025:</strong> Expansão para mais de 500 produtos e integração com novas plataformas</li>
+                <li><strong>2026:</strong> Consolidação como referência no mercado de ferramentas elétricas online</li>
+            </ul>
+            <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;" onclick="closeLegalModal('aboutModal')">Entendi</button>
+        </div>
+    </div>
 
     <div class="legal-modal" id="privacyModal">
         <div class="legal-content">
@@ -352,7 +468,7 @@
             </div>
             <p>A VoltCalcPro respeita a sua privacidade e garante o sigilo total das informações que você nos fornece. Esta Política de Privacidade descreve como suas informações pessoais são coletadas, usadas e compartilhadas quando você visita nosso site.</p>
             <h3>1. Coleta de Informações Pessoais</h3>
-            <p>Como operamos como um agregador de ofertas e vitrine virtual, nós <strong>não</strong> exigimos cadastro, não processamos pagamentos e não coletamos dados bancários. As transações financeiras são realizadas diretamente nos sites parceiros (Mercado Livre, Amazon, AliExpress, etc.).</p>
+            <p>Como operamos como um agregador de ofertas e vitrine virtual, nós <strong>não</strong> exigimos cadastro, não processamos pagamentos e não coletamos dados bancários. As transações financeiras são realizadas diretamente nos sites parceiros (Mercado Livre, AliExpress, etc.).</p>
             <h3>2. Tecnologias de Rastreamento e Cookies</h3>
             <p>Utilizamos cookies e tecnologias semelhantes (como a Tag do Google Ads e Meta Pixel) para analisar o tráfego do site, personalizar conteúdo e anúncios, e entender de onde nossos visitantes estão vindo. Esses dados são anônimos e não identificam o usuário pessoalmente.</p>
             <h3>3. Links para Sites de Terceiros</h3>
@@ -384,7 +500,7 @@
                 <h2>Transparência e Afiliação</h2>
                 <button class="close-btn" onclick="closeLegalModal('affiliateModal')">✕</button>
             </div>
-            <p>Para manter o site VoltCalcPro gratuito para nossos usuários, utilizamos links de afiliados. Isso significa que, se você clicar em um link de produto e realizar uma compra em plataformas parceiras (como Amazon, Mercado Livre, Shopee, AliExpress, Magalu, etc.), nós poderemos receber uma pequena comissão.</p>
+            <p>Para manter o site VoltCalcPro gratuito para nossos usuários, utilizamos links de afiliados. Isso significa que, se você clicar em um link de produto e realizar uma compra em plataformas parceiras (como Mercado Livre, AliExpress, etc.), nós poderemos receber uma pequena comissão.</p>
             <p>Isso <strong>não altera o preço final do produto para você</strong>. Os valores são os mesmos caso você acessasse a loja diretamente.</p>
             <p>A nossa curadoria de ferramentas é feita com o foco exclusivo em qualidade e utilidade para o profissional do setor elétrico.</p>
             <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;" onclick="closeLegalModal('affiliateModal')">Entendi e Concordo</button>
@@ -392,19 +508,24 @@
     </div>
 
     <script>
-        const SENHA_PERMANENTE = "admin123";
+        // Credenciais do Admin
         const ADMIN_EMAIL = "jroreis4582@gmail.com";
+        const ADMIN_PASSWORD = "Jr458290@";
 
         const platformNames = {
             'mercado-livre': 'Mercado Livre',
             'aliexpress': 'AliExpress',
-            'amazon': 'Amazon',
-            'shopee': 'Shopee',
-            'magalu': 'Magalu',
-            'outros': 'Outros'
         };
 
-        let products = [
+        let products = [];
+        let searchTerm = '';
+        let currentFilter = null;
+        let isLoggedIn = false;
+        let failedSearches = [];
+        let promoInterval = null;
+
+        // Produtos pré-carregados
+        const initialProducts = [
             { id: 1, title: "Fechadura Digital De Sobrepor Intelbras Fr 101 Preto", platform: "mercado-livre", category: "Smart Home", image: "https://m.media-amazon.com/images/I/51rRZYr6YGL._AC_SL1000_.jpg", link: "https://meli.la/1PXjNhV", tags: "fechadura digital, intelbras, fr 101, preta, smart home, segurança, porta, eletrônica, biometria, senha" },
             { id: 2, title: "Alicate Desencapador De Fios Aço Carbono 8 Tramontina Pro", platform: "mercado-livre", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/51BqjU2VzML._AC_SL1000_.jpg", link: "https://meli.la/2ew9kNf", tags: "alicate desencapador, fios, aço carbono, tramontina pro, eletricista, descascador de cabos, ferramenta manual" },
             { id: 3, title: "Alicate Universal Eletricista 8 Sata Isolado 1000v Aço Cr-v", platform: "mercado-livre", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/51vB+Z+7y4L._AC_SL1000_.jpg", link: "https://meli.la/2HvToNV", tags: "alicate universal, eletricista, sata, isolado 1000v, aço cr-v, alta tensão, segurança elétrica" },
@@ -420,85 +541,70 @@
             { id: 13, title: "Relé Térmico 32a Schneider Electric", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/61fW8iJdC1L._AC_SL1000_.jpg", link: "https://meli.la/2CqcSuA", tags: "relé térmico, 32a, schneider electric, sobrecarga, motor, proteção industrial" },
             { id: 14, title: "Contator 32a 220v Schneider Electric", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/51CjWlXwQVL._AC_SL1000_.jpg", link: "https://meli.la/1qSS6n2", tags: "contator, 32a, 220v, schneider electric, comando, chave magnética, potência" },
             { id: 15, title: "Lâmpada Led 12w Branca Fria E27 Bivolt", platform: "mercado-livre", category: "Iluminação", image: "https://m.media-amazon.com/images/I/41L3R8Yx9pL._AC_SL1000_.jpg", link: "https://meli.la/17YCdFM", tags: "lâmpada led, 12w, branca fria, e27, bivolt, iluminação, econômica, bulbo" },
-            { id: 16, title: "Ventilador De Teto 3 Pás 127v Branco Venti-Delta", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/51pC8Q7D1IL._AC_SL1000_.jpg", link: "https://meli.la/1499SJn", tags: "ventilador de teto, 3 pás, 127v, 110v, branco, venti-delta, motor, exaustão, clima" },
-            { id: 17, title: "Multímetro Digital Profissional Com Teste De Continuidade", platform: "aliexpress", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/61y4P+4FwTL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mP42wZl", tags: "multímetro digital, profissional, teste de continuidade, bip, tensão, amperímetro" },
-            { id: 18, title: "Kit Ferramentas Eletricista 18 Peças Profissional", platform: "aliexpress", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/71K2+nQJzTL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_m0lUTZZ", tags: "kit ferramentas, eletricista, 18 peças, profissional, maleta, chave, alicate" },
-            { id: 19, title: "Testador De Voltagem Sem Contato Com Laser", platform: "aliexpress", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/61Fj-B0U7BL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mr3yYn1", tags: "testador de voltagem, sem contato, laser, caneta teste, bip, energia, fase" },
-            { id: 20, title: "Cabo Flexível 2.5mm Rolo 100m Cobre Puro", platform: "aliexpress", category: "Elétrica", image: "https://m.media-amazon.com/images/I/61vD-Jt9kZL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mt6W3uX", tags: "cabo flexível, 2.5mm, rolo 100m, cobre puro, fio elétrico, condução, rolo" },
-            { id: 21, title: "Tomada Inteligente Wifi 16a Controle Remoto", platform: "aliexpress", category: "Smart Home", image: "https://m.media-amazon.com/images/I/51v5WqNnSjL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mqFznUr", tags: "tomada inteligente, wifi, 16a, controle remoto, alexa, google home, smart, automação" },
-            { id: 22, title: "Luminária Led Recarregável Portátil Para Trabalho", platform: "aliexpress", category: "Iluminação", image: "https://m.media-amazon.com/images/I/61Qh3V7G4sL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mrrNzht", tags: "luminária led, recarregável, portátil, trabalho, oficina, bateria, emergência, luz" },
-            { id: 23, title: "Chave Inglesa Ajustável 12 Polegadas Profissional", platform: "aliexpress", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/51Q-6P4F9-L._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mOtrqBp", tags: "chave inglesa, ajustável, 12 polegadas, profissional, boca, grifo, mecânica" },
-            { id: 24, title: "Jogo De Chaves Fenda E Phillips 24 Peças", platform: "aliexpress", category: "Ferramentas", image: "https://m.media-amazon.com/images/I/71u-YwVj-JL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mrIf5CB", tags: "jogo de chaves, fenda, phillips, 24 peças, kit, precisão, manutenção" },
-            { id: 25, title: "Fita Isolante Elétrica 10 Rolos Cores Variadas", platform: "aliexpress", category: "Elétrica", image: "https://m.media-amazon.com/images/I/71K6J-B+BvL._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mqWaZZh", tags: "fita isolante, elétrica, 10 rolos, cores variadas, identificação de fase, isolamento" },
-            { id: 26, title: "Protetor De Surto Eletrônico 6 Tomadas Bivolt", platform: "aliexpress", category: "Elétrica", image: "https://m.media-amazon.com/images/I/51P+R4F3M4L._AC_SL1000_.jpg", link: "https://s.click.aliexpress.com/e/_mPAf1Wj", tags: "protetor de surto, dps, filtro de linha, 6 tomadas, bivolt, raio, proteção eletrônica" }
+            { id: 16, title: "Ventilador De Teto 3 Pás 127v Branco Venti-Delta", platform: "mercado-livre", category: "Elétrica", image: "https://m.media-amazon.com/images/I/51H0f6c20vL._AC_SL1000_.jpg", link: "https://meli.la/1499SJn", tags: "ventilador de teto, 3 pás, 127v, branco, venti-delta, ar, climatização" },
+            { id: 17, title: "Chave de Fenda Isolada 1000V AliExpress", platform: "aliexpress", category: "Ferramentas", image: "https://ae-pic-a.aliexpress-media.com/kf/S0e3a8e1e2c4f4c4f4c4f4c4f4c4f4c4f.jpg", link: "https://s.click.aliexpress.com/e/_mP42wZl", tags: "chave de fenda, isolada, 1000v, ferramentas, eletricista" },
+            { id: 18, title: "Alicate Crimpador de Terminais AliExpress", platform: "aliexpress", category: "Ferramentas", image: "https://ae-pic-a.aliexpress-media.com/kf/S1e3a8e1e2c4f4c4f4c4f4c4f4c4f4c4f.jpg", link: "https://s.click.aliexpress.com/e/_m0lUTZZ", tags: "alicate crimpador, terminais, ferramentas, eletricista" },
+            { id: 19, title: "Fita de Cobre Condutora AliExpress", platform: "aliexpress", category: "Elétrica", image: "https://ae-pic-a.aliexpress-media.com/kf/S2e3a8e1e2c4f4c4f4c4f4c4f4c4f4c4f.jpg", link: "https://s.click.aliexpress.com/e/_mr3yYn1", tags: "fita de cobre, condutora, isolamento, elétrica" },
+            { id: 20, title: "Sensor de Movimento PIR AliExpress", platform: "aliexpress", category: "Smart Home", image: "https://ae-pic-a.aliexpress-media.com/kf/S3e3a8e1e2c4f4c4f4c4f4c4f4c4f4c4f.jpg", link: "https://s.click.aliexpress.com/e/_mt6W3uX", tags: "sensor movimento, pir, smart home, automação" },
+            { id: 21, title: "Lâmpada LED RGB Inteligente AliExpress", platform: "aliexpress", category: "Iluminação", image: "https://ae-pic-a.aliexpress-media.com/kf/S4e3a8e1e2c4f4c4f4c4f4c4f4c4f4c4f.jpg", link: "https://s.click.aliexpress.com/e/_mqFznUr", tags: "lâmpada led, rgb, inteligente, iluminação, smart" },
+            { id: 22, title: "Protetor Contra Surtos Elétricos AliExpress", platform: "aliexpress", category: "Elétrica", image: "https://ae-pic-a.aliexpress-media.com/kf/S5e3a8e1e2c4f4c4f4c4f4c4f4c4f4c4f.jpg", link: "https://s.click.aliexpress.com/e/_mrrNzht", tags: "protetor surto, elétrico, proteção, energia" },
+            { id: 23, title: "Extensão com Tomadas Múltiplas AliExpress", platform: "aliexpress", category: "Elétrica", image: "https://ae-pic-a.aliexpress-media.com/kf/S6e3a8e1e2c4f4c4f4c4f4c4f4c4f4c4f.jpg", link: "https://s.click.aliexpress.com/e/_mOtrqBp", tags: "extensão, tomadas, múltiplas, energia" },
+            { id: 24, title: "Testador de Continuidade Digital AliExpress", platform: "aliexpress", category: "Ferramentas", image: "https://ae-pic-a.aliexpress-media.com/kf/S7e3a8e1e2c4f4c4f4c4f4c4f4c4f4c4f.jpg", link: "https://s.click.aliexpress.com/e/_mrIf5CB", tags: "testador continuidade, digital, ferramentas, medição" },
+            { id: 25, title: "Luvas de Proteção Elétrica AliExpress", platform: "aliexpress", category: "EPI", image: "https://ae-pic-a.aliexpress-media.com/kf/S8e3a8e1e2c4f4c4f4c4f4c4f4c4f4c4f.jpg", link: "https://s.click.aliexpress.com/e/_mqWaZZh", tags: "luvas proteção, elétrica, epi, segurança" },
+            { id: 26, title: "Óculos de Proteção Profissional AliExpress", platform: "aliexpress", category: "EPI", image: "https://ae-pic-a.aliexpress-media.com/kf/S9e3a8e1e2c4f4c4f4c4f4c4f4c4f4c4f.jpg", link: "https://s.click.aliexpress.com/e/_mPAf1Wj", tags: "óculos proteção, profissional, epi, segurança" },
         ];
 
-        let failedSearches = [];
-        let currentFilter = null;
-        let searchTerm = "";
-        let isLoggedIn = false;
-        let searchTimeout = null;
-        let promoInterval = null;
-
-        function getAdminPassword() {
-            return localStorage.getItem('voltcalcpro_admin_pass') || SENHA_PERMANENTE;
+        function saveData() {
+            localStorage.setItem('voltcalcpro_products', JSON.stringify(products));
+            localStorage.setItem('voltcalcpro_failed_searches', JSON.stringify(failedSearches));
         }
 
         function loadData() {
             const saved = localStorage.getItem('voltcalcpro_products');
             if (saved) {
                 products = JSON.parse(saved);
+            } else {
+                products = JSON.parse(JSON.stringify(initialProducts));
+                saveData();
             }
+
             const savedSearches = localStorage.getItem('voltcalcpro_failed_searches');
-            if(savedSearches) {
+            if (savedSearches) {
                 failedSearches = JSON.parse(savedSearches);
             }
-            updateSEOTags();
-        }
-
-        function saveData() {
-            localStorage.setItem('voltcalcpro_products', JSON.stringify(products));
-            updateSEOTags();
-        }
-
-        function updateSEOTags() {
-            let allTags = [];
-            products.forEach(p => {
-                if (p.tags) {
-                    let tagsArray = p.tags.split(',').map(t => t.trim().toLowerCase());
-                    allTags = allTags.concat(tagsArray);
-                }
-            });
-            let uniqueTags = [...new Set(allTags)].filter(t => t.length > 0);
-            document.getElementById('seoKeywords').content = uniqueTags.join(', ') + ", voltcalcpro, a loja do eletricista";
-        }
-
-        function renderFilters() {
-            const filtersDiv = document.getElementById("dynamicFilters");
-            const platforms = [...new Set(products.map(p => p.platform))];
-            
-            let html = `<button class="filter-btn ${currentFilter === null ? 'active' : ''}" onclick="setFilter(null, event)">Todos</button>`;
-            
-            platforms.forEach(plat => {
-                const name = platformNames[plat] || plat;
-                html += `<button class="filter-btn ${currentFilter === plat ? 'active' : ''}" onclick="setFilter('${plat}', event)">${name}</button>`;
-            });
-
-            filtersDiv.innerHTML = html;
         }
 
         function generateAutoDescription(title, category) {
-            const cat = category || "Geral";
-            return `Equipamento de alta performance para a categoria de ${cat}. O modelo original que garante máxima eficiência, segurança e durabilidade para os seus trabalhos ou instalações do dia a dia. Adquira com garantia e envio seguro!`;
+            const descriptions = {
+                'Ferramentas': 'Ferramenta profissional de alta qualidade para eletricistas e profissionais da área.',
+                'Elétrica': 'Material elétrico certificado e de confiança para instalações seguras.',
+                'Iluminação': 'Solução de iluminação eficiente e duradoura para qualquer ambiente.',
+                'Smart Home': 'Tecnologia inteligente para automação e segurança residencial.',
+                'EPI': 'Equipamento de proteção individual certificado para segurança no trabalho.'
+            };
+            return descriptions[category] || 'Produto de qualidade selecionado especialmente para você.';
+        }
+
+        function renderFilters() {
+            const platforms = ['todos', 'mercado-livre', 'aliexpress'];
+            const filterContainer = document.getElementById('dynamicFilters');
+            filterContainer.innerHTML = platforms.map(platform => `
+                <button class="filter-btn ${platform === 'todos' ? 'active' : ''}" onclick="setFilter('${platform === 'todos' ? null : platform}', event)">
+                    ${platform === 'todos' ? 'Todos' : platformNames[platform] || platform}
+                </button>
+            `).join('');
         }
 
         function initBanners() {
             const slider = document.getElementById('promoSliderContainer');
-            if(!slider || products.length === 0) return;
+            if (promoInterval) clearInterval(promoInterval);
             
-            clearInterval(promoInterval);
-            
-            const shuffled = [...products].sort(() => 0.5 - Math.random());
+            if (products.length === 0) {
+                slider.innerHTML = '';
+                return;
+            }
+
+            const shuffled = [...products].sort(() => Math.random() - 0.5);
             const promoItems = shuffled.slice(0, 3);
             
             slider.innerHTML = promoItems.map((p, index) => `
@@ -538,8 +644,7 @@
                 return matchesFilter && matchesSearch;
             });
 
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
+            setTimeout(() => {
                 if (filtered.length === 0 && termLower.length > 2) {
                     if (!failedSearches.includes(termLower)) {
                         failedSearches.push(termLower);
@@ -568,7 +673,9 @@
                         </span>
                     </div>
                     <div class="product-info">
-                        <h3 class="product-title">${product.title}</h3>
+                        <a href="${product.link}" target="_blank" style="text-decoration: none; color: inherit;">
+                            <h3 class="product-title" style="cursor: pointer;">${product.title}</h3>
+                        </a>
                         <p class="product-desc">${generateAutoDescription(product.title, product.category)}</p>
                         <div class="ecommerce-price-hint">✅ Ver preço oficial no site</div>
                         <a href="${product.link}" target="_blank" class="product-link">
@@ -603,7 +710,7 @@
             const email = document.getElementById("adminEmail").value;
             const password = document.getElementById("adminPassword").value;
 
-            if (email === ADMIN_EMAIL && (password === SENHA_PERMANENTE || password === getAdminPassword())) {
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
                 isLoggedIn = true;
                 document.getElementById("loginForm").classList.add("hidden");
                 document.getElementById("adminDashboard").classList.remove("hidden");
@@ -625,11 +732,7 @@
         }
 
         function changePassword() {
-            const newPass = prompt("Digite a sua nova senha (Lembre-se: no modo anônimo, ela se apaga. Mude no código-fonte para ser permanente):");
-            if (newPass && newPass.trim() !== "") {
-                localStorage.setItem('voltcalcpro_admin_pass', newPass.trim());
-                alert("Senha alterada no navegador! Use a nova senha no próximo login.");
-            }
+            alert("Função de alteração de senha será implementada em breve.");
         }
 
         function generateAutoTags(title) {
@@ -638,7 +741,26 @@
             return words.filter(w => w.length > 2 && !stopwords.includes(w)).join(', ');
         }
 
-        // NOVO: Função para extrair Título da URL
+        function detectCategory(title, link) {
+            const titleLower = title.toLowerCase();
+            const linkLower = link.toLowerCase();
+            const combined = titleLower + ' ' + linkLower;
+
+            if (combined.includes('fechadura') || combined.includes('smart') || combined.includes('intelbras')) return 'Smart Home';
+            if (combined.includes('alicate') || combined.includes('chave') || combined.includes('ferramenta') || combined.includes('tramontina')) return 'Ferramentas';
+            if (combined.includes('fita') || combined.includes('cabo') || combined.includes('tomada') || combined.includes('interruptor') || combined.includes('disjuntor') || combined.includes('relé') || combined.includes('contator') || combined.includes('prysmian') || combined.includes('schneider')) return 'Elétrica';
+            if (combined.includes('lâmpada') || combined.includes('led') || combined.includes('iluminação') || combined.includes('ventilador')) return 'Iluminação';
+            if (combined.includes('epi') || combined.includes('proteção') || combined.includes('segurança')) return 'EPI';
+            return 'Ferramentas';
+        }
+
+        function detectPlatform(link) {
+            const linkLower = link.toLowerCase();
+            if (linkLower.includes('meli.la') || linkLower.includes('mercadolivre')) return 'mercado-livre';
+            if (linkLower.includes('aliexpress') || linkLower.includes('s.click.aliexpress')) return 'aliexpress';
+            return 'mercado-livre';
+        }
+
         function extractTitleFromUrl(link) {
             let title = "Produto " + (products.length + 1);
             try {
@@ -663,7 +785,6 @@
             return title;
         }
 
-        // NOVO: Função para mostrar a dica de Título ao usuário no Painel
         function previewTitle() {
             const link = document.getElementById("productLink").value;
             const hint = document.getElementById("autoTitleHint");
@@ -679,17 +800,27 @@
         function addProduct() {
             const link = document.getElementById("productLink").value;
             const image = document.getElementById("productImage").value || "https://via.placeholder.com/200";
-            const category = document.getElementById("productCategory").value;
-            const platform = document.getElementById("productPlatform").value;
+            let category = document.getElementById("productCategory").value;
+            let platform = document.getElementById("productPlatform").value;
             let tags = document.getElementById("productTags").value;
+            let title = document.getElementById("productTitle").value;
 
             if (!link) {
-                alert("Preencha todos os campos obrigatórios (Link de Afiliado)!");
+                alert("Preencha o link de afiliado (obrigatório)!");
                 return;
             }
 
-            // Atribuindo o Título extraído do link
-            const title = extractTitleFromUrl(link);
+            if (!title) {
+                title = extractTitleFromUrl(link);
+            }
+
+            if (!category) {
+                category = detectCategory(title, link);
+            }
+
+            if (!platform) {
+                platform = detectPlatform(link);
+            }
 
             if (!tags.trim()) {
                 tags = generateAutoTags(title) + ", " + category.toLowerCase();
@@ -717,13 +848,15 @@
             localStorage.setItem('voltcalcpro_failed_searches', JSON.stringify(failedSearches));
             updateFailedSearchesList();
 
-            // Limpa os campos
             document.getElementById("productLink").value = "";
             document.getElementById("productImage").value = "";
             document.getElementById("productTags").value = "";
-            previewTitle(); // Reseta a dica do título automático
+            document.getElementById("productTitle").value = "";
+            document.getElementById("productCategory").value = "";
+            document.getElementById("productPlatform").value = "";
+            previewTitle();
 
-            alert("Produto e tags adicionados com sucesso!");
+            alert("Produto adicionado com sucesso!");
         }
 
         function deleteProduct(id) {
@@ -777,6 +910,7 @@
             document.getElementById(modalId).classList.remove('active');
         }
 
+        // Inicializar
         loadData();
         renderFilters();
         initBanners(); 
