@@ -360,6 +360,7 @@
                 <div class="form-group">
                     <label>URL da Imagem do Produto</label>
                     <input type="url" id="productImage" placeholder="https://link-da-imagem.com/foto.jpg">
+                    <span class="hint">Se for Mercado Livre, deixe em branco e use o link não encurtado para buscar automaticamente.</span>
                 </div>
                 <div class="form-group">
                     <label>Seção / Categoria</label>
@@ -516,7 +517,6 @@
     <script>
         // -------------------------------------------------------------------
         // SEGURANÇA: Hash da senha (Substitua "SEU_HASH_AQUI" pelo hash SHA-256 da sua senha "Jr458290@")
-        // Gere o hash em: https://emn178.github.io/online-tools/sha256.html
         // -------------------------------------------------------------------
         const ADMIN_EMAIL = "jroreis4582@gmail.com";
         const ADMIN_PASSWORD_HASH = "SEU_HASH_AQUI"; // <-- COLOQUE O HASH AQUI
@@ -532,36 +532,36 @@
         let isLoggedIn = false;
         let failedSearches = [];
         let promoInterval = null;
-        let editingId = null; // Controle para edição
+        let editingId = null;
 
-        // Produtos pré-carregados com imagens únicas (picsum.photos/seed)
+        // Produtos iniciais com imagens placeholder (serão substituídas pela API se houver link real)
         const initialProducts = [
-            { id: 1, title: "Fechadura Digital De Sobrepor Intelbras Fr 101 Preto", platform: "mercado-livre", category: "Smart Home", image: "https://picsum.photos/seed/1/300/300", link: "https://meli.la/1PXjNhV", tags: "fechadura digital, intelbras, fr 101, preta, smart home, segurança, porta, eletrônica, biometria, senha" },
-            { id: 2, title: "Alicate Desencapador De Fios Aço Carbono 8 Tramontina Pro", platform: "mercado-livre", category: "Ferramentas", image: "https://picsum.photos/seed/2/300/300", link: "https://meli.la/2ew9kNf", tags: "alicate desencapador, fios, aço carbono, tramontina pro, eletricista, descascador de cabos, ferramenta manual" },
-            { id: 3, title: "Alicate Universal Eletricista 8 Sata Isolado 1000v Aço Cr-v", platform: "mercado-livre", category: "Ferramentas", image: "https://picsum.photos/seed/3/300/300", link: "https://meli.la/2HvToNV", tags: "alicate universal, eletricista, sata, isolado 1000v, aço cr-v, alta tensão, segurança elétrica" },
-            { id: 4, title: "Testador De Voltagem Digital Multímetro Profissional", platform: "mercado-livre", category: "Ferramentas", image: "https://picsum.photos/seed/4/300/300", link: "https://meli.la/1hWJ4MU", tags: "testador de voltagem, multímetro digital, profissional, tensão, corrente, medidor, elétrica" },
-            { id: 5, title: "Chave Inglesa Ajustável 10 Pol Tramontina", platform: "mercado-livre", category: "Ferramentas", image: "https://picsum.photos/seed/5/300/300", link: "https://meli.la/2kxCuWo", tags: "chave inglesa, ajustável, 10 polegadas, tramontina, porcas, parafusos, aperto, ferramenta" },
-            { id: 6, title: "Jogo De Chaves Philips E Fenda 6 Peças Tramontina", platform: "mercado-livre", category: "Ferramentas", image: "https://picsum.photos/seed/6/300/300", link: "https://meli.la/26QkhAq", tags: "jogo de chaves, philips, fenda, 6 peças, tramontina, kit, manutenção, aperto" },
-            { id: 7, title: "Fita Isolante Elétrica 19mm X 20m Scotch 3m", platform: "mercado-livre", category: "Elétrica", image: "https://picsum.photos/seed/7/300/300", link: "https://meli.la/1gk7jUc", tags: "fita isolante, elétrica, 19mm, 20m, scotch, 3m, emenda de fios, isolamento" },
-            { id: 8, title: "Cabo Flexível 2.5mm Rolo 100 Metros Prysmian", platform: "mercado-livre", category: "Elétrica", image: "https://picsum.photos/seed/8/300/300", link: "https://meli.la/2JyAj8D", tags: "cabo flexível, 2.5mm, rolo 100 metros, prysmian, fio elétrico, instalação, condução" },
-            { id: 9, title: "Tomada Dupla 20a 250v Branca Tramontina", platform: "mercado-livre", category: "Elétrica", image: "https://picsum.photos/seed/9/300/300", link: "https://meli.la/346Et7n", tags: "tomada dupla, 20a, 250v, branca, tramontina, espelho, interruptor, energia, pino grosso" },
-            { id: 10, title: "Interruptor Simples 10a 250v Branco Tramontina", platform: "mercado-livre", category: "Elétrica", image: "https://picsum.photos/seed/10/300/300", link: "https://meli.la/1nCk6rq", tags: "interruptor simples, 10a, 250v, branco, tramontina, luz, lâmpada, botão" },
-            { id: 11, title: "Caixa De Distribuição 12 Disjuntores Embutir Branca", platform: "mercado-livre", category: "Elétrica", image: "https://picsum.photos/seed/11/300/300", link: "https://meli.la/1RxLvLG", tags: "caixa de distribuição, 12 disjuntores, embutir, branca, quadro de força, qdc, energia" },
-            { id: 12, title: "Disjuntor Bipolar 32a Curva C Schneider", platform: "mercado-livre", category: "Elétrica", image: "https://picsum.photos/seed/12/300/300", link: "https://meli.la/2xfzYDL", tags: "disjuntor bipolar, 32a, curva c, schneider, proteção, quadro, energia, elétrico" },
-            { id: 13, title: "Relé Térmico 32a Schneider Electric", platform: "mercado-livre", category: "Elétrica", image: "https://picsum.photos/seed/13/300/300", link: "https://meli.la/2CqcSuA", tags: "relé térmico, 32a, schneider electric, sobrecarga, motor, proteção industrial" },
-            { id: 14, title: "Contator 32a 220v Schneider Electric", platform: "mercado-livre", category: "Elétrica", image: "https://picsum.photos/seed/14/300/300", link: "https://meli.la/1qSS6n2", tags: "contator, 32a, 220v, schneider electric, comando, chave magnética, potência" },
-            { id: 15, title: "Lâmpada Led 12w Branca Fria E27 Bivolt", platform: "mercado-livre", category: "Iluminação", image: "https://picsum.photos/seed/15/300/300", link: "https://meli.la/17YCdFM", tags: "lâmpada led, 12w, branca fria, e27, bivolt, iluminação, econômica, bulbo" },
-            { id: 16, title: "Ventilador De Teto 3 Pás 127v Branco Venti-Delta", platform: "mercado-livre", category: "Elétrica", image: "https://picsum.photos/seed/16/300/300", link: "https://meli.la/1499SJn", tags: "ventilador de teto, 3 pás, 127v, branco, venti-delta, ar, climatização" },
-            { id: 17, title: "Chave de Fenda Isolada 1000V AliExpress", platform: "aliexpress", category: "Ferramentas", image: "https://picsum.photos/seed/17/300/300", link: "https://s.click.aliexpress.com/e/_mP42wZl", tags: "chave de fenda, isolada, 1000v, ferramentas, eletricista" },
-            { id: 18, title: "Alicate Crimpador de Terminais AliExpress", platform: "aliexpress", category: "Ferramentas", image: "https://picsum.photos/seed/18/300/300", link: "https://s.click.aliexpress.com/e/_m0lUTZZ", tags: "alicate crimpador, terminais, ferramentas, eletricista" },
-            { id: 19, title: "Fita de Cobre Condutora AliExpress", platform: "aliexpress", category: "Elétrica", image: "https://picsum.photos/seed/19/300/300", link: "https://s.click.aliexpress.com/e/_mr3yYn1", tags: "fita de cobre, condutora, isolamento, elétrica" },
-            { id: 20, title: "Sensor de Movimento PIR AliExpress", platform: "aliexpress", category: "Smart Home", image: "https://picsum.photos/seed/20/300/300", link: "https://s.click.aliexpress.com/e/_mt6W3uX", tags: "sensor movimento, pir, smart home, automação" },
-            { id: 21, title: "Lâmpada LED RGB Inteligente AliExpress", platform: "aliexpress", category: "Iluminação", image: "https://picsum.photos/seed/21/300/300", link: "https://s.click.aliexpress.com/e/_mqFznUr", tags: "lâmpada led, rgb, inteligente, iluminação, smart" },
-            { id: 22, title: "Protetor Contra Surtos Elétricos AliExpress", platform: "aliexpress", category: "Elétrica", image: "https://picsum.photos/seed/22/300/300", link: "https://s.click.aliexpress.com/e/_mrrNzht", tags: "protetor surto, elétrico, proteção, energia" },
-            { id: 23, title: "Extensão com Tomadas Múltiplas AliExpress", platform: "aliexpress", category: "Elétrica", image: "https://picsum.photos/seed/23/300/300", link: "https://s.click.aliexpress.com/e/_mOtrqBp", tags: "extensão, tomadas, múltiplas, energia" },
-            { id: 24, title: "Testador de Continuidade Digital AliExpress", platform: "aliexpress", category: "Ferramentas", image: "https://picsum.photos/seed/24/300/300", link: "https://s.click.aliexpress.com/e/_mrIf5CB", tags: "testador continuidade, digital, ferramentas, medição" },
-            { id: 25, title: "Luvas de Proteção Elétrica AliExpress", platform: "aliexpress", category: "EPI", image: "https://picsum.photos/seed/25/300/300", link: "https://s.click.aliexpress.com/e/_mqWaZZh", tags: "luvas proteção, elétrica, epi, segurança" },
-            { id: 26, title: "Óculos de Proteção Profissional AliExpress", platform: "aliexpress", category: "EPI", image: "https://picsum.photos/seed/26/300/300", link: "https://s.click.aliexpress.com/e/_mPAf1Wj", tags: "óculos proteção, profissional, epi, segurança" },
+            { id: 1, title: "Fechadura Digital De Sobrepor Intelbras Fr 101 Preto", platform: "mercado-livre", category: "Smart Home", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/1PXjNhV", tags: "fechadura digital, intelbras, fr 101, preta, smart home, segurança, porta, eletrônica, biometria, senha" },
+            { id: 2, title: "Alicate Desencapador De Fios Aço Carbono 8 Tramontina Pro", platform: "mercado-livre", category: "Ferramentas", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/2ew9kNf", tags: "alicate desencapador, fios, aço carbono, tramontina pro, eletricista, descascador de cabos, ferramenta manual" },
+            { id: 3, title: "Alicate Universal Eletricista 8 Sata Isolado 1000v Aço Cr-v", platform: "mercado-livre", category: "Ferramentas", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/2HvToNV", tags: "alicate universal, eletricista, sata, isolado 1000v, aço cr-v, alta tensão, segurança elétrica" },
+            { id: 4, title: "Testador De Voltagem Digital Multímetro Profissional", platform: "mercado-livre", category: "Ferramentas", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/1hWJ4MU", tags: "testador de voltagem, multímetro digital, profissional, tensão, corrente, medidor, elétrica" },
+            { id: 5, title: "Chave Inglesa Ajustável 10 Pol Tramontina", platform: "mercado-livre", category: "Ferramentas", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/2kxCuWo", tags: "chave inglesa, ajustável, 10 polegadas, tramontina, porcas, parafusos, aperto, ferramenta" },
+            { id: 6, title: "Jogo De Chaves Philips E Fenda 6 Peças Tramontina", platform: "mercado-livre", category: "Ferramentas", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/26QkhAq", tags: "jogo de chaves, philips, fenda, 6 peças, tramontina, kit, manutenção, aperto" },
+            { id: 7, title: "Fita Isolante Elétrica 19mm X 20m Scotch 3m", platform: "mercado-livre", category: "Elétrica", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/1gk7jUc", tags: "fita isolante, elétrica, 19mm, 20m, scotch, 3m, emenda de fios, isolamento" },
+            { id: 8, title: "Cabo Flexível 2.5mm Rolo 100 Metros Prysmian", platform: "mercado-livre", category: "Elétrica", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/2JyAj8D", tags: "cabo flexível, 2.5mm, rolo 100 metros, prysmian, fio elétrico, instalação, condução" },
+            { id: 9, title: "Tomada Dupla 20a 250v Branca Tramontina", platform: "mercado-livre", category: "Elétrica", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/346Et7n", tags: "tomada dupla, 20a, 250v, branca, tramontina, espelho, interruptor, energia, pino grosso" },
+            { id: 10, title: "Interruptor Simples 10a 250v Branco Tramontina", platform: "mercado-livre", category: "Elétrica", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/1nCk6rq", tags: "interruptor simples, 10a, 250v, branco, tramontina, luz, lâmpada, botão" },
+            { id: 11, title: "Caixa De Distribuição 12 Disjuntores Embutir Branca", platform: "mercado-livre", category: "Elétrica", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/1RxLvLG", tags: "caixa de distribuição, 12 disjuntores, embutir, branca, quadro de força, qdc, energia" },
+            { id: 12, title: "Disjuntor Bipolar 32a Curva C Schneider", platform: "mercado-livre", category: "Elétrica", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/2xfzYDL", tags: "disjuntor bipolar, 32a, curva c, schneider, proteção, quadro, energia, elétrico" },
+            { id: 13, title: "Relé Térmico 32a Schneider Electric", platform: "mercado-livre", category: "Elétrica", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/2CqcSuA", tags: "relé térmico, 32a, schneider electric, sobrecarga, motor, proteção industrial" },
+            { id: 14, title: "Contator 32a 220v Schneider Electric", platform: "mercado-livre", category: "Elétrica", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/1qSS6n2", tags: "contator, 32a, 220v, schneider electric, comando, chave magnética, potência" },
+            { id: 15, title: "Lâmpada Led 12w Branca Fria E27 Bivolt", platform: "mercado-livre", category: "Iluminação", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/17YCdFM", tags: "lâmpada led, 12w, branca fria, e27, bivolt, iluminação, econômica, bulbo" },
+            { id: 16, title: "Ventilador De Teto 3 Pás 127v Branco Venti-Delta", platform: "mercado-livre", category: "Elétrica", image: "https://via.placeholder.com/300?text=Carregando...", link: "https://meli.la/1499SJn", tags: "ventilador de teto, 3 pás, 127v, branco, venti-delta, ar, climatização" },
+            { id: 17, title: "Chave de Fenda Isolada 1000V AliExpress", platform: "aliexpress", category: "Ferramentas", image: "https://via.placeholder.com/300?text=AliExpress", link: "https://s.click.aliexpress.com/e/_mP42wZl", tags: "chave de fenda, isolada, 1000v, ferramentas, eletricista" },
+            { id: 18, title: "Alicate Crimpador de Terminais AliExpress", platform: "aliexpress", category: "Ferramentas", image: "https://via.placeholder.com/300?text=AliExpress", link: "https://s.click.aliexpress.com/e/_m0lUTZZ", tags: "alicate crimpador, terminais, ferramentas, eletricista" },
+            { id: 19, title: "Fita de Cobre Condutora AliExpress", platform: "aliexpress", category: "Elétrica", image: "https://via.placeholder.com/300?text=AliExpress", link: "https://s.click.aliexpress.com/e/_mr3yYn1", tags: "fita de cobre, condutora, isolamento, elétrica" },
+            { id: 20, title: "Sensor de Movimento PIR AliExpress", platform: "aliexpress", category: "Smart Home", image: "https://via.placeholder.com/300?text=AliExpress", link: "https://s.click.aliexpress.com/e/_mt6W3uX", tags: "sensor movimento, pir, smart home, automação" },
+            { id: 21, title: "Lâmpada LED RGB Inteligente AliExpress", platform: "aliexpress", category: "Iluminação", image: "https://via.placeholder.com/300?text=AliExpress", link: "https://s.click.aliexpress.com/e/_mqFznUr", tags: "lâmpada led, rgb, inteligente, iluminação, smart" },
+            { id: 22, title: "Protetor Contra Surtos Elétricos AliExpress", platform: "aliexpress", category: "Elétrica", image: "https://via.placeholder.com/300?text=AliExpress", link: "https://s.click.aliexpress.com/e/_mrrNzht", tags: "protetor surto, elétrico, proteção, energia" },
+            { id: 23, title: "Extensão com Tomadas Múltiplas AliExpress", platform: "aliexpress", category: "Elétrica", image: "https://via.placeholder.com/300?text=AliExpress", link: "https://s.click.aliexpress.com/e/_mOtrqBp", tags: "extensão, tomadas, múltiplas, energia" },
+            { id: 24, title: "Testador de Continuidade Digital AliExpress", platform: "aliexpress", category: "Ferramentas", image: "https://via.placeholder.com/300?text=AliExpress", link: "https://s.click.aliexpress.com/e/_mrIf5CB", tags: "testador continuidade, digital, ferramentas, medição" },
+            { id: 25, title: "Luvas de Proteção Elétrica AliExpress", platform: "aliexpress", category: "EPI", image: "https://via.placeholder.com/300?text=AliExpress", link: "https://s.click.aliexpress.com/e/_mqWaZZh", tags: "luvas proteção, elétrica, epi, segurança" },
+            { id: 26, title: "Óculos de Proteção Profissional AliExpress", platform: "aliexpress", category: "EPI", image: "https://via.placeholder.com/300?text=AliExpress", link: "https://s.click.aliexpress.com/e/_mPAf1Wj", tags: "óculos proteção, profissional, epi, segurança" },
         ];
 
         function saveData() {
@@ -582,8 +582,52 @@
             if (savedSearches) {
                 failedSearches = JSON.parse(savedSearches);
             }
+            
+            // Tenta buscar imagens reais via API para produtos do Mercado Livre
+            products.forEach(p => {
+                if (p.platform === 'mercado-livre' && p.image.includes('placeholder')) {
+                    tryFetchRealImage(p);
+                }
+            });
         }
 
+        // -------------------------------------------------------------------
+        // FUNÇÃO PARA BUSCAR IMAGEM REAL VIA API DO MERCADO LIVRE
+        // -------------------------------------------------------------------
+        async function tryFetchRealImage(product) {
+            // Extrai o ID do produto do link (ex: MLB-1234567890)
+            let itemId = null;
+            let link = product.link;
+            
+            // Tenta pegar ID se for link completo (não encurtado)
+            const mlbMatch = link.match(/MLB[-\w]+/gi);
+            if (mlbMatch) {
+                itemId = mlbMatch[0];
+            } else {
+                // Se for encurtado (meli.la), não conseguimos resolver via front-end. Avisa o usuário.
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://api.mercadolibre.com/items/${itemId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.pictures && data.pictures.length > 0) {
+                        const realImage = data.pictures[0].url;
+                        product.image = realImage;
+                        saveData(); // Salva a imagem real no localStorage
+                        renderProducts(); // Atualiza a tela
+                        initBanners();
+                    }
+                }
+            } catch (error) {
+                console.error("Erro ao buscar imagem do ML:", error);
+            }
+        }
+
+        // -------------------------------------------------------------------
+        // RESTANTE DAS FUNÇÕES (mantidas e otimizadas)
+        // -------------------------------------------------------------------
         function generateAutoDescription(title, category) {
             const descriptions = {
                 'Ferramentas': 'Ferramenta profissional de alta qualidade para eletricistas e profissionais da área.',
@@ -608,15 +652,10 @@
         function initBanners() {
             const slider = document.getElementById('promoSliderContainer');
             if (promoInterval) clearInterval(promoInterval);
-            
-            if (products.length === 0) {
-                slider.innerHTML = '';
-                return;
-            }
+            if (products.length === 0) { slider.innerHTML = ''; return; }
 
             const shuffled = [...products].sort(() => Math.random() - 0.5);
             const promoItems = shuffled.slice(0, 3);
-            
             slider.innerHTML = promoItems.map((p, index) => `
                 <div class="promo-slide ${index === 0 ? 'active' : ''}">
                     <div class="promo-content">
@@ -649,12 +688,9 @@
                 const matchesFilter = !currentFilter || p.platform === currentFilter;
                 const inTitle = p.title.toLowerCase().includes(termLower);
                 const inTags = p.tags ? p.tags.toLowerCase().includes(termLower) : false;
-                const matchesSearch = inTitle || inTags;
-                
-                return matchesFilter && matchesSearch;
+                return matchesFilter && (inTitle || inTags);
             });
 
-            // Registro de buscas falhas (sem delay)
             if (filtered.length === 0 && termLower.length > 2) {
                 if (!failedSearches.includes(termLower)) {
                     failedSearches.push(termLower);
@@ -664,7 +700,7 @@
             }
 
             if (filtered.length === 0) {
-                grid.innerHTML = `<p style="text-align: center; color: var(--text-muted); width: 100%; grid-column: 1 / -1;">Nenhum produto encontrado para "${searchTerm}". Notificamos o administrador para adicionar!</p>`;
+                grid.innerHTML = `<p style="text-align: center; color: var(--text-muted); width: 100%; grid-column: 1 / -1;">Nenhum produto encontrado para "${searchTerm}".</p>`;
                 return;
             }
 
@@ -695,7 +731,6 @@
             `).join("");
         }
 
-        // DEBOUNCE na busca
         let searchTimeout = null;
         function filterProducts() {
             clearTimeout(searchTimeout);
@@ -744,7 +779,7 @@
 
         function logoutAdmin() {
             isLoggedIn = false;
-            cancelEdit(); // Limpa edição ao sair
+            cancelEdit();
             document.getElementById("loginForm").classList.remove("hidden");
             document.getElementById("adminDashboard").classList.add("hidden");
             document.getElementById("btnChangePassword").classList.add("hidden");
@@ -795,14 +830,11 @@
                                              .replace(/\.html/i, '')
                                              .replace(/dp\//i, '')
                                              .replace(/item\//i, '');
-                    
                     title = nameSegment.replace(/[-_]/g, ' ')
                                        .replace(/\b\w/g, c => c.toUpperCase())
                                        .trim();
                 }
-            } catch(e) {
-                console.error("Link curto ou sem palavras lidas.");
-            }
+            } catch(e) { console.error("Erro ao extrair título"); }
             return title;
         }
 
@@ -818,62 +850,42 @@
             hint.style.color = "var(--yellow)";
         }
 
-        // ------------------ FUNÇÕES DE ADIÇÃO E EDIÇÃO ------------------
-
+        // ------------------ ADIÇÃO E EDIÇÃO ------------------
         function addProduct() {
             const link = document.getElementById("productLink").value;
-            const image = document.getElementById("productImage").value || "https://via.placeholder.com/200";
+            const image = document.getElementById("productImage").value || "https://via.placeholder.com/300?text=Sem+Imagem";
             let category = document.getElementById("productCategory").value;
             let platform = document.getElementById("productPlatform").value;
             let tags = document.getElementById("productTags").value;
             let title = document.getElementById("productTitle").value;
 
-            if (!link) {
-                alert("Preencha o link de afiliado (obrigatório)!");
-                return;
-            }
-
-            if (!title) {
-                title = extractTitleFromUrl(link);
-            }
-
-            if (!category) {
-                category = detectCategory(title, link);
-            }
-
-            if (!platform) {
-                platform = detectPlatform(link);
-            }
-
-            if (!tags.trim()) {
-                tags = generateAutoTags(title) + ", " + category.toLowerCase();
-            }
+            if (!link) { alert("Preencha o link de afiliado (obrigatório)!"); return; }
+            if (!title) title = extractTitleFromUrl(link);
+            if (!category) category = detectCategory(title, link);
+            if (!platform) platform = detectPlatform(link);
+            if (!tags.trim()) tags = generateAutoTags(title) + ", " + category.toLowerCase();
 
             const newProduct = {
                 id: Math.max(...products.map(p => p.id), 0) + 1,
-                title,
-                link,
-                image,
-                category,
-                platform,
-                tags
+                title, link, image, category, platform, tags
             };
 
             products.push(newProduct);
             saveData();
-            renderFilters();
-            renderProducts();
-            initBanners(); 
-            updateProductsList();
+            
+            // Tenta buscar imagem real se for Mercado Livre
+            if (platform === 'mercado-livre' && !document.getElementById("productImage").value) {
+                tryFetchRealImage(newProduct);
+            }
 
-            // Limpa termos que agora existem
+            renderFilters(); renderProducts(); initBanners(); updateProductsList();
+
             const autoTagsArray = title.toLowerCase().split(' ');
             failedSearches = failedSearches.filter(f => !autoTagsArray.some(t => f.includes(t)));
-            saveData();
-            updateFailedSearchesList();
+            saveData(); updateFailedSearchesList();
 
-            cancelEdit(); // Limpa formulário
-            alert("Produto adicionado com sucesso!");
+            cancelEdit();
+            alert("Produto adicionado com sucesso! Se for Mercado Livre, a imagem será carregada automaticamente.");
         }
 
         function editProduct(id) {
@@ -892,7 +904,6 @@
             document.getElementById("addProductBtn").onclick = function() { updateProduct(); };
             document.getElementById("cancelEditBtn").style.display = "block";
             previewTitle();
-            
             document.querySelector('.admin-content').scrollTop = 0;
         }
 
@@ -902,7 +913,7 @@
             if(!product) return;
 
             const link = document.getElementById("productLink").value;
-            const image = document.getElementById("productImage").value || product.image;
+            let image = document.getElementById("productImage").value || product.image;
             let category = document.getElementById("productCategory").value;
             let platform = document.getElementById("productPlatform").value;
             let tags = document.getElementById("productTags").value;
@@ -914,19 +925,15 @@
             if (!platform) platform = detectPlatform(link);
             if (!tags.trim()) tags = generateAutoTags(title) + ", " + category.toLowerCase();
 
-            product.title = title;
-            product.link = link;
-            product.image = image;
-            product.category = category;
-            product.platform = platform;
-            product.tags = tags;
+            product.title = title; product.link = link; product.image = image;
+            product.category = category; product.platform = platform; product.tags = tags;
 
             saveData();
-            renderFilters();
-            renderProducts();
-            initBanners();
-            updateProductsList();
+            if (platform === 'mercado-livre' && !document.getElementById("productImage").value) {
+                tryFetchRealImage(product);
+            }
 
+            renderFilters(); renderProducts(); initBanners(); updateProductsList();
             cancelEdit();
             alert("Produto atualizado com sucesso!");
         }
@@ -950,10 +957,7 @@
                 products = products.filter(p => p.id !== id);
                 if (editingId === id) cancelEdit();
                 saveData();
-                renderFilters();
-                renderProducts();
-                initBanners(); 
-                updateProductsList();
+                renderFilters(); renderProducts(); initBanners(); updateProductsList();
             }
         }
 
