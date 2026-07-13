@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farm & Defend - Movimento</title>
+    <title>Farm & Defend - Movimento e Mapa</title>
     <style>
         body { margin: 0; background: #111; color: white; text-align: center; overflow: hidden; touch-action: none; }
         canvas { background: #7ba849; display: block; margin: 0 auto; border: 2px solid #333; }
         .ui-container { position: absolute; top: 10px; width: 100%; display: flex; justify-content: center; }
         .inventory { padding: 10px 20px; border-radius: 8px; background: rgba(0,0,0,0.8); display: none; }
         .inventory.active { display: block; border: 3px solid #ffd700; }
-
-        /* Estilo dos Botões de Controle */
         .controls { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 10px; }
         .btn-move { width: 60px; height: 60px; background: rgba(255,255,255,0.3); border-radius: 50%; border: none; color: white; font-size: 20px; }
     </style>
@@ -25,7 +23,6 @@
 
     <canvas id="gameCanvas" width="360" height="500"></canvas>
 
-    <!-- Controles na tela -->
     <div class="controls">
         <button class="btn-move" onpointerdown="move('left')" onpointerup="stop()">◀️</button>
         <button class="btn-move" onpointerdown="move('up')" onpointerup="stop()">🔼</button>
@@ -37,11 +34,16 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        // Dados do Jogador
         let player = { x: 160, y: 250, size: 40, speed: 4, dx: 0, dy: 0 };
         let isDaytime = true;
 
-        // Movimentação
+        // O SEU MAPA: Aqui você define onde ficam as barreiras
+        const obstacles = [
+            { x: 50, y: 100, w: 80, h: 40, color: '#555' }, // Pedra cinza
+            { x: 200, y: 350, w: 120, h: 20, color: '#8B4513' }, // Cerca de madeira
+            { x: 280, y: 150, w: 60, h: 60, color: '#228B22' } // Árvore verde escura
+        ];
+
         function move(dir) {
             if(dir === 'left') player.dx = -player.speed;
             if(dir === 'right') player.dx = player.speed;
@@ -50,7 +52,6 @@
         }
         function stop() { player.dx = 0; player.dy = 0; }
 
-        // Suporte a Teclado (para PC)
         window.addEventListener('keydown', (e) => {
             if(e.key === 'ArrowLeft') move('left');
             if(e.key === 'ArrowRight') move('right');
@@ -59,16 +60,47 @@
         });
         window.addEventListener('keyup', stop);
 
-        function drawGame() {
-            // Atualiza posição
-            player.x += player.dx;
-            player.y += player.dy;
+        // LÓGICA DE COLISÃO
+        function checkCollision(nextX, nextY) {
+            // 1. Impede o personagem de sair pelas bordas da tela
+            if (nextX < 0 || nextX + player.size > canvas.width || nextY < 0 || nextY + player.size > canvas.height) {
+                return true; 
+            }
+            
+            // 2. Impede o personagem de atravessar os objetos do mapa
+            for (let obs of obstacles) {
+                if (nextX < obs.x + obs.w && 
+                    nextX + player.size > obs.x && 
+                    nextY < obs.y + obs.h && 
+                    nextY + player.size > obs.y) {
+                    return true; // Bateu em algo!
+                }
+            }
+            return false; // Caminho livre
+        }
 
-            // Limpa tela e desenha fundo
+        function drawGame() {
+            // Tenta mover para a próxima posição
+            let nextX = player.x + player.dx;
+            let nextY = player.y + player.dy;
+
+            // Só aplica o movimento se o caminho estiver livre
+            if (!checkCollision(nextX, player.y)) {
+                player.x = nextX;
+            }
+            if (!checkCollision(player.x, nextY)) {
+                player.y = nextY;
+            }
+
             ctx.fillStyle = isDaytime ? '#7ba849' : '#1a1c23';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Desenha jogador
+            // DESENHA O MAPA NA TELA
+            for (let obs of obstacles) {
+                ctx.fillStyle = obs.color;
+                ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+            }
+
             ctx.fillStyle = '#ffcc00';
             ctx.fillRect(player.x, player.y, player.size, player.size);
 
