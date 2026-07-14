@@ -3,27 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Farm & Defend - Tela Cheia e Fases</title>
+    <title>Farm & Defend - A Lenda da Fazenda</title>
     <style>
-        /* O fundo principal agora garante que tudo o que sobrar seja verde */
         body { margin: 0; padding: 0; background: #7ba849; color: white; text-align: center; overflow: hidden; touch-action: none; font-family: sans-serif; }
-        
-        /* NOVIDADE: O Canvas agora ocupa 100% do celular e fica no fundo (z-index: 1) */
         canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
         
-        /* NOVIDADE: A Interface flutua por cima do jogo (z-index: 10) */
-        .ui-container { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 10; }
+        .ui-container { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); width: 95%; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 10; }
         .inventory { padding: 5px 10px; border-radius: 8px; background: rgba(0,0,0,0.7); display: none; }
         .inventory.active { display: block; border: 3px solid #ffd700; }
         
         .inventory-title { font-size: 14px; margin-bottom: 5px; color: #ccc; font-weight: bold; text-shadow: 1px 1px 2px black;}
-        .inventory-grid { display: flex; gap: 8px; justify-content: center; }
+        .inventory-grid { display: flex; gap: 6px; justify-content: center; }
         .slot { width: 45px; height: 45px; background: rgba(255,255,255,0.2); border: 2px solid #777; border-radius: 5px; font-size: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .slot.selected { border-color: #ffd700; background: rgba(255, 215, 0, 0.4); transform: scale(1.1); transition: 0.1s; }
 
         #btn-time { padding: 10px 20px; font-weight: bold; border-radius: 8px; border: none; background: #eee; cursor: pointer; font-size: 16px; box-shadow: 0px 4px 6px rgba(0,0,0,0.3); }
+        
+        /* NOVIDADE: Botão da Loja */
+        #btn-shop { padding: 8px 16px; font-weight: bold; border-radius: 8px; border: none; background: #2e8b57; color: white; cursor: pointer; font-size: 14px; box-shadow: 0px 4px 6px rgba(0,0,0,0.3); display: block; }
 
-        /* NOVIDADE: Controles redimensionados para celular e transparentes */
         .controls { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; z-index: 10; }
         .btn-move { width: 60px; height: 60px; background: rgba(0,0,0,0.4); border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); color: white; font-size: 24px; display: flex; justify-content: center; align-items: center; }
         .btn-action { width: 75px; height: 75px; background: rgba(255, 50, 50, 0.7); border-radius: 50%; border: 3px solid rgba(255,255,255,0.8); color: white; font-size: 30px; margin-left: 15px; display: flex; justify-content: center; align-items: center; }
@@ -36,15 +34,20 @@
 <body>
 
     <div class="ui-container">
-        <div id="lives-display" style="font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px black;">❤️❤️❤️</div>
+        <!-- NOVIDADE: As moedas aparecem ao lado da vida -->
+        <div id="stats-display" style="font-size: 22px; font-weight: bold; text-shadow: 2px 2px 4px black;">❤️❤️❤️ | 🪙 0</div>
+        
         <button id="btn-time">☀️ Dia 1: 15s</button>
+        <button id="btn-shop" onclick="buyLife()">🛒 Loja: +1❤️ (50🪙)</button>
         
         <div id="inv-farm" class="inventory active">
-            <div class="inventory-title">🌱 Ferramentas</div>
+            <div class="inventory-title">🌱 Ferramentas da Fazenda</div>
             <div class="inventory-grid">
                 <div class="slot selected" onpointerdown="selectTool('farm', 0)">⛏️</div>
                 <div class="slot" onpointerdown="selectTool('farm', 1)">💧</div>
                 <div class="slot" onpointerdown="selectTool('farm', 2)">🌾</div>
+                <!-- NOVIDADE: Martelo de construção de barricadas -->
+                <div class="slot" onpointerdown="selectTool('farm', 3)">🔨</div> 
             </div>
         </div>
 
@@ -60,8 +63,7 @@
 
     <div id="game-over-screen">
         <h1 id="game-over-title">Fim da Linha</h1>
-        <p id="game-over-stats" style="font-size: 20px;">Você sobreviveu até o Dia X</p>
-        <br>
+        <p id="game-over-stats" style="font-size: 20px;">Você sobreviveu até o Dia X</p><br>
         <button id="btn-restart" onclick="restartGame()">Tentar Novamente</button>
     </div>
 
@@ -79,13 +81,12 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        // NOVIDADE: Função que ajusta o tamanho do Canvas para a tela inteira do celular
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
         window.addEventListener('resize', resizeCanvas);
-        resizeCanvas(); // Chama a primeira vez ao abrir o jogo
+        resizeCanvas(); 
         
         let player = { x: window.innerWidth/2, y: window.innerHeight/2, size: 40, speed: 4, dx: 0, dy: 0, isAttacking: false, attackRange: 20, facing: 'down' };
         let isDaytime = true;
@@ -93,13 +94,14 @@
         
         let lives = 3;
         let isInvincible = false; 
-
-        // NOVIDADE: A Variável da Fase
         let diaAtual = 1;
+        
+        // NOVIDADE: Variáveis de Economia e Construção
+        let coins = 0;
+        let barricades = []; // Arrays que guarda as cercas
 
         let zombies = []; 
         let spawnTimer; 
-
         let timeRemaining = 15; 
         let gameTimer; 
 
@@ -108,7 +110,16 @@
         let projectiles = [];
         let traps = [];
 
-        // Os obstáculos fixos (mantidos como cenário base)
+        const paths = [
+            { x: 0, y: window.innerHeight / 2 - 25, w: window.innerWidth, h: 50 },
+            { x: window.innerWidth / 2 - 25, y: 0, w: 50, h: window.innerHeight } 
+        ];
+
+        const gardenBeds = [
+            { x: window.innerWidth / 2 - 160, y: window.innerHeight / 2 - 180, w: 120, h: 140 },
+            { x: window.innerWidth / 2 + 40, y: window.innerHeight / 2 - 180, w: 120, h: 140 }  
+        ];
+
         const obstacles = [
             { x: 50, y: 100, w: 80, h: 40, color: '#555' }, 
             { x: window.innerWidth - 150, y: 350, w: 120, h: 20, color: '#8B4513' }, 
@@ -125,7 +136,24 @@
             });
         }
 
-        // NOVIDADE: O texto do botão agora exibe o Dia Atual
+        // NOVIDADE: A função visual agora atualiza as vidas e as moedas ao mesmo tempo
+        function updateStatsDisplay() {
+            let hearts = "";
+            for (let i = 0; i < lives; i++) hearts += "❤️";
+            document.getElementById('stats-display').innerText = `${hearts || "💀"} | 🪙 ${coins}`;
+        }
+
+        // NOVIDADE: Função da Loja
+        function buyLife() {
+            if (coins >= 50) {
+                coins -= 50;
+                lives++;
+                updateStatsDisplay();
+            } else {
+                alert("Moedas insuficientes! Plante e colha mais vegetais.");
+            }
+        }
+
         function updateTimeDisplay() {
             const btn = document.getElementById('btn-time');
             if (isDaytime) btn.innerText = `☀️ Dia ${diaAtual}: ${timeRemaining}s (Pular)`;
@@ -134,19 +162,18 @@
 
         function toggleDayNight() {
             if (isGameOver) return; 
-            
             isDaytime = !isDaytime;
             timeRemaining = isDaytime ? 15 : 20; 
             
             const invFarm = document.getElementById('inv-farm');
             const invDef = document.getElementById('inv-def');
+            const btnShop = document.getElementById('btn-shop');
             
             if (isDaytime) {
-                // NOVIDADE: Sobreviveu à noite? Avança de fase!
                 diaAtual++; 
-                
                 invFarm.classList.add('active');
                 invDef.classList.remove('active');
+                btnShop.style.display = 'block'; // Mostra a loja
                 zombies = []; 
                 projectiles = []; 
                 clearTimeout(spawnTimer);
@@ -160,6 +187,7 @@
             } else {
                 invFarm.classList.remove('active');
                 invDef.classList.add('active');
+                btnShop.style.display = 'none'; // Esconde a loja
                 spawnZombie(); 
             }
             updateTimeDisplay();
@@ -181,18 +209,20 @@
 
         function spawnZombie() {
             if (!isDaytime && !isGameOver) {
-                // NOVIDADE: A dificuldade escala com a Fase (Dia Atual)
-                let velocidadeZumbi = 1.0 + (diaAtual * 0.3); // Ficam mais rápidos
+                let velocidadeZumbi = 1.0 + (diaAtual * 0.3); 
                 
+                // NOVIDADE: Chance de nascer um Vampiro a partir do Dia 3
+                let isVampire = (diaAtual >= 3 && Math.random() < 0.3);
+
                 zombies.push({ 
                     x: Math.random() * (canvas.width - 30), 
                     y: -30, 
                     size: 30, 
-                    speed: velocidadeZumbi, 
-                    color: '#006400' 
+                    speed: isVampire ? velocidadeZumbi * 1.5 : velocidadeZumbi, // Vampiro corre 50% mais rápido
+                    color: isVampire ? '#4B0082' : '#006400', // Roxo (Vampiro) ou Verde (Zumbi)
+                    flying: isVampire // Flag de voar
                 });
                 
-                // Nascem mais rápido conforme a fase sobe
                 let tempoNascimento = Math.max(500, 3000 - (diaAtual * 300));
                 spawnTimer = setTimeout(spawnZombie, tempoNascimento); 
             }
@@ -201,10 +231,35 @@
         function updateZombies() {
             for (let i = zombies.length - 1; i >= 0; i--) {
                 let z = zombies[i];
-                if (z.x < player.x) z.x += z.speed;
-                if (z.x > player.x) z.x -= z.speed;
-                if (z.y < player.y) z.y += z.speed;
-                if (z.y > player.y) z.y -= z.speed;
+                
+                // NOVIDADE: Verifica colisão com Barricadas (Só se não estiver voando!)
+                let nextZX = z.x;
+                let nextZY = z.y;
+
+                if (z.x < player.x) nextZX += z.speed;
+                if (z.x > player.x) nextZX -= z.speed;
+                if (z.y < player.y) nextZY += z.speed;
+                if (z.y > player.y) nextZY -= z.speed;
+
+                let bateuNaCerca = false;
+
+                if (!z.flying) { // Vampiros ignoram as cercas
+                    for (let j = barricades.length - 1; j >= 0; j--) {
+                        let b = barricades[j];
+                        if (nextZX < b.x + b.size && nextZX + z.size > b.x && nextZY < b.y + b.size && nextZY + z.size > b.y) {
+                            bateuNaCerca = true;
+                            b.hp -= 1; // Zumbi arranha a cerca
+                            if (b.hp <= 0) barricades.splice(j, 1); // Cerca é destruída
+                            break;
+                        }
+                    }
+                }
+
+                // Só anda se não bateu na cerca
+                if (!bateuNaCerca) {
+                    z.x = nextZX;
+                    z.y = nextZY;
+                }
 
                 if (!isInvincible && z.x < player.x + player.size && z.x + z.size > player.x && z.y < player.y + player.size && z.y + z.size > player.y) {
                     takeDamage();
@@ -214,18 +269,12 @@
 
         function takeDamage() {
             lives--;
-            updateLivesDisplay();
+            updateStatsDisplay();
             if (lives <= 0) triggerGameOver();
             else {
                 isInvincible = true;
                 setTimeout(() => { isInvincible = false; }, 1500);
             }
-        }
-
-        function updateLivesDisplay() {
-            let hearts = "";
-            for (let i = 0; i < lives; i++) hearts += "❤️";
-            document.getElementById('lives-display').innerText = hearts || "💀";
         }
 
         function triggerGameOver() {
@@ -238,18 +287,21 @@
         function restartGame() {
             isGameOver = false;
             lives = 3;
+            coins = 0; // Reseta as moedas
+            diaAtual = 1; 
             isDaytime = true;
             timeRemaining = 15; 
-            diaAtual = 1; // Reseta a fase
             zombies = [];
             projectiles = [];
             traps = [];
+            barricades = []; // Limpa o mapa
             player.x = canvas.width/2; player.y = canvas.height/2; 
-            updateLivesDisplay();
+            updateStatsDisplay();
             updateTimeDisplay();
             document.getElementById('game-over-screen').style.display = 'none';
             document.getElementById('inv-farm').classList.add('active');
             document.getElementById('inv-def').classList.remove('active');
+            document.getElementById('btn-shop').style.display = 'block';
         }
 
         function move(dir) {
@@ -279,16 +331,12 @@
                 }
                 else if (currentTool.def === 1) {
                     let pdx = 0, pdy = 0;
-                    if (player.facing === 'left') pdx = -8; // Aumentei a velocidade da flecha
+                    if (player.facing === 'left') pdx = -8; 
                     if (player.facing === 'right') pdx = 8;
                     if (player.facing === 'up') pdy = -8;
                     if (player.facing === 'down') pdy = 8;
                     
-                    projectiles.push({ 
-                        x: player.x + player.size/2, 
-                        y: player.y + player.size/2, 
-                        dx: pdx, dy: pdy, size: 8, color: 'white' 
-                    });
+                    projectiles.push({ x: player.x + player.size/2, y: player.y + player.size/2, dx: pdx, dy: pdy, size: 8, color: 'white' });
                 }
                 else if (currentTool.def === 2) {
                     traps.push({ x: player.x, y: player.y, size: 40, color: '#a0522d' });
@@ -302,12 +350,13 @@
                         if (c.state === 'pronto' && Math.abs(c.x - player.x) < 20 && Math.abs(c.y - player.y) < 20) {
                             crops.splice(i, 1); 
                             harvested = true;
+                            // NOVIDADE: Ganhou dinheiro pela colheita!
+                            coins += 20; 
+                            updateStatsDisplay();
                             break;
                         }
                     }
-                    if (!harvested) {
-                        crops.push({ x: player.x, y: player.y, size: 40, state: 'arado', color: '#4a3219' });
-                    }
+                    if (!harvested) crops.push({ x: player.x, y: player.y, size: 40, state: 'arado', color: '#4a3219' });
                 } 
                 else if (currentTool.farm === 1) {
                     for (let c of crops) {
@@ -325,6 +374,18 @@
                             c.color = '#9acd32'; 
                             break; 
                         }
+                    }
+                }
+                // NOVIDADE: Martelo construtor (Custa 10 moedas)
+                else if (currentTool.farm === 3) {
+                    if (coins >= 10) {
+                        coins -= 10;
+                        updateStatsDisplay();
+                        barricades.push({ x: player.x, y: player.y, size: 40, hp: 150 }); // Cerca tem vida!
+                    } else {
+                        // Não tem dinheiro
+                        document.getElementById('stats-display').style.color = "red";
+                        setTimeout(() => document.getElementById('stats-display').style.color = "white", 500);
                     }
                 }
             }
@@ -372,7 +433,8 @@
                 let triggered = false;
                 for (let j = zombies.length - 1; j >= 0; j--) {
                     let z = zombies[j];
-                    if (Math.abs(z.x - t.x) < 30 && Math.abs(z.y - t.y) < 30) {
+                    // NOVIDADE: Armadilhas de chão não afetam quem voa (Vampiros)
+                    if (Math.abs(z.x - t.x) < 30 && Math.abs(z.y - t.y) < 30 && !z.flying) {
                         zombies.splice(j, 1); 
                         triggered = true;
                         break;
@@ -399,19 +461,42 @@
             ctx.fillStyle = isDaytime ? '#7ba849' : '#1a1c23';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            ctx.fillStyle = isDaytime ? '#d2b48c' : '#5c4a3d'; 
+            for (let p of paths) ctx.fillRect(p.x, p.y, p.w, p.h);
+
+            for (let g of gardenBeds) {
+                ctx.fillStyle = isDaytime ? '#654321' : '#3b2f2f'; 
+                ctx.fillRect(g.x, g.y, g.w, g.h);
+                ctx.strokeStyle = isDaytime ? '#3e2723' : '#1a100e';
+                ctx.lineWidth = 6;
+                ctx.strokeRect(g.x, g.y, g.w, g.h);
+            }
+
             for (let c of crops) {
                 ctx.fillStyle = c.color;
                 ctx.fillRect(c.x, c.y, c.size, c.size);
             }
+
             for (let t of traps) {
                 ctx.fillStyle = t.color;
                 ctx.fillRect(t.x + 5, t.y + 5, t.size - 10, t.size - 10);
                 ctx.fillStyle = '#fff';
                 ctx.fillRect(t.x + 15, t.y + 15, 10, 10);
             }
+
             for (let obs of obstacles) {
                 ctx.fillStyle = obs.color;
                 ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+            }
+
+            // NOVIDADE: Desenha as Cercas do Jogador (Barricadas)
+            for (let b of barricades) {
+                ctx.fillStyle = '#cda177'; // Cor de tábua clara
+                ctx.fillRect(b.x, b.y, b.size, b.size);
+                // Desenha linhas pra parecer madeira
+                ctx.fillStyle = '#8b5a2b';
+                ctx.fillRect(b.x, b.y + 10, b.size, 5);
+                ctx.fillRect(b.x, b.y + 25, b.size, 5);
             }
 
             for (let z of zombies) {
@@ -439,6 +524,7 @@
             requestAnimationFrame(drawGame);
         }
 
+        updateStatsDisplay(); // Inicializa mostrando 0 moedas
         updateTimeDisplay();
         startClock();
         drawGame();
