@@ -2,40 +2,45 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farm & Defend - Jogo Completo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Farm & Defend - Tela Cheia e Fases</title>
     <style>
-        body { margin: 0; background: #111; color: white; text-align: center; overflow: hidden; touch-action: none; font-family: sans-serif;}
-        canvas { background: #7ba849; display: block; margin: 0 auto; border: 2px solid #333; }
+        /* O fundo principal agora garante que tudo o que sobrar seja verde */
+        body { margin: 0; padding: 0; background: #7ba849; color: white; text-align: center; overflow: hidden; touch-action: none; font-family: sans-serif; }
         
-        .ui-container { position: absolute; top: 10px; width: 100%; display: flex; justify-content: center; flex-direction: column; align-items: center; gap: 5px; }
-        .inventory { padding: 5px 10px; border-radius: 8px; background: rgba(0,0,0,0.8); display: none; }
+        /* NOVIDADE: O Canvas agora ocupa 100% do celular e fica no fundo (z-index: 1) */
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
+        
+        /* NOVIDADE: A Interface flutua por cima do jogo (z-index: 10) */
+        .ui-container { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 10; }
+        .inventory { padding: 5px 10px; border-radius: 8px; background: rgba(0,0,0,0.7); display: none; }
         .inventory.active { display: block; border: 3px solid #ffd700; }
         
-        .inventory-title { font-size: 12px; margin-bottom: 5px; color: #ccc; }
-        .inventory-grid { display: flex; gap: 5px; justify-content: center; }
-        .slot { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border: 2px solid #777; border-radius: 5px; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .slot.selected { border-color: #ffd700; background: rgba(255, 215, 0, 0.3); transform: scale(1.1); transition: 0.1s; }
+        .inventory-title { font-size: 14px; margin-bottom: 5px; color: #ccc; font-weight: bold; text-shadow: 1px 1px 2px black;}
+        .inventory-grid { display: flex; gap: 8px; justify-content: center; }
+        .slot { width: 45px; height: 45px; background: rgba(255,255,255,0.2); border: 2px solid #777; border-radius: 5px; font-size: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .slot.selected { border-color: #ffd700; background: rgba(255, 215, 0, 0.4); transform: scale(1.1); transition: 0.1s; }
 
-        #btn-time { padding: 8px 16px; font-weight: bold; border-radius: 8px; border: none; background: #eee; cursor: pointer; }
+        #btn-time { padding: 10px 20px; font-weight: bold; border-radius: 8px; border: none; background: #eee; cursor: pointer; font-size: 16px; box-shadow: 0px 4px 6px rgba(0,0,0,0.3); }
 
-        .controls { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 5px; }
-        .btn-move { width: 50px; height: 50px; background: rgba(255,255,255,0.3); border-radius: 50%; border: none; color: white; font-size: 18px; }
-        .btn-action { width: 60px; height: 60px; background: rgba(255, 50, 50, 0.6); border-radius: 50%; border: 2px solid white; color: white; font-size: 24px; margin-left: 10px; }
+        /* NOVIDADE: Controles redimensionados para celular e transparentes */
+        .controls { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; z-index: 10; }
+        .btn-move { width: 60px; height: 60px; background: rgba(0,0,0,0.4); border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); color: white; font-size: 24px; display: flex; justify-content: center; align-items: center; }
+        .btn-action { width: 75px; height: 75px; background: rgba(255, 50, 50, 0.7); border-radius: 50%; border: 3px solid rgba(255,255,255,0.8); color: white; font-size: 30px; margin-left: 15px; display: flex; justify-content: center; align-items: center; }
 
-        #game-over-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(150, 0, 0, 0.8); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
-        #game-over-screen h1 { font-size: 40px; margin-bottom: 10px; }
-        #btn-restart { padding: 10px 20px; font-size: 20px; font-weight: bold; cursor: pointer; }
+        #game-over-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(150, 0, 0, 0.9); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
+        #game-over-screen h1 { font-size: 40px; margin-bottom: 10px; text-shadow: 2px 2px 4px black; }
+        #btn-restart { padding: 15px 30px; font-size: 22px; font-weight: bold; cursor: pointer; border-radius: 10px; border: none; }
     </style>
 </head>
 <body>
 
     <div class="ui-container">
-        <div id="lives-display" style="font-size: 20px; font-weight: bold; text-shadow: 2px 2px black;">❤️❤️❤️</div>
-        <button id="btn-time">☀️ Dia: 15s</button>
+        <div id="lives-display" style="font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px black;">❤️❤️❤️</div>
+        <button id="btn-time">☀️ Dia 1: 15s</button>
         
         <div id="inv-farm" class="inventory active">
-            <div class="inventory-title">🌱 Ferramentas da Fazenda</div>
+            <div class="inventory-title">🌱 Ferramentas</div>
             <div class="inventory-grid">
                 <div class="slot selected" onpointerdown="selectTool('farm', 0)">⛏️</div>
                 <div class="slot" onpointerdown="selectTool('farm', 1)">💧</div>
@@ -44,7 +49,7 @@
         </div>
 
         <div id="inv-def" class="inventory">
-            <div class="inventory-title">⚔️ Equipamentos Noturnos</div>
+            <div class="inventory-title">⚔️ Defesas</div>
             <div class="inventory-grid">
                 <div class="slot selected" onpointerdown="selectTool('def', 0)">🗡️</div>
                 <div class="slot" onpointerdown="selectTool('def', 1)">🏹</div>
@@ -54,12 +59,13 @@
     </div>
 
     <div id="game-over-screen">
-        <h1>Fim da Noite</h1>
-        <p>Os zumbis invadiram a fazenda!</p>
+        <h1 id="game-over-title">Fim da Linha</h1>
+        <p id="game-over-stats" style="font-size: 20px;">Você sobreviveu até o Dia X</p>
+        <br>
         <button id="btn-restart" onclick="restartGame()">Tentar Novamente</button>
     </div>
 
-    <canvas id="gameCanvas" width="360" height="500"></canvas>
+    <canvas id="gameCanvas"></canvas>
 
     <div class="controls">
         <button class="btn-move" onpointerdown="move('left')" onpointerup="stop()">◀️</button>
@@ -73,13 +79,23 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        // NOVIDADE NO JOGADOR: Adicionado o "facing" para saber pra onde atirar a flecha
-        let player = { x: 160, y: 250, size: 40, speed: 4, dx: 0, dy: 0, isAttacking: false, attackRange: 20, facing: 'down' };
+        // NOVIDADE: Função que ajusta o tamanho do Canvas para a tela inteira do celular
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas(); // Chama a primeira vez ao abrir o jogo
+        
+        let player = { x: window.innerWidth/2, y: window.innerHeight/2, size: 40, speed: 4, dx: 0, dy: 0, isAttacking: false, attackRange: 20, facing: 'down' };
         let isDaytime = true;
         let isGameOver = false;
         
         let lives = 3;
         let isInvincible = false; 
+
+        // NOVIDADE: A Variável da Fase
+        let diaAtual = 1;
 
         let zombies = []; 
         let spawnTimer; 
@@ -89,15 +105,14 @@
 
         let currentTool = { farm: 0, def: 0 }; 
         let crops = [];
-        
-        // NOVIDADE: Arrays para guardar as novas armas no mapa
         let projectiles = [];
         let traps = [];
 
+        // Os obstáculos fixos (mantidos como cenário base)
         const obstacles = [
             { x: 50, y: 100, w: 80, h: 40, color: '#555' }, 
-            { x: 200, y: 350, w: 120, h: 20, color: '#8B4513' }, 
-            { x: 280, y: 150, w: 60, h: 60, color: '#228B22' } 
+            { x: window.innerWidth - 150, y: 350, w: 120, h: 20, color: '#8B4513' }, 
+            { x: window.innerWidth/2 + 50, y: 150, w: 60, h: 60, color: '#228B22' } 
         ];
 
         function selectTool(type, index) {
@@ -110,10 +125,11 @@
             });
         }
 
+        // NOVIDADE: O texto do botão agora exibe o Dia Atual
         function updateTimeDisplay() {
             const btn = document.getElementById('btn-time');
-            if (isDaytime) btn.innerText = `☀️ Fim do dia em: ${timeRemaining}s (Pular)`;
-            else btn.innerText = `🌙 Sobreviva por: ${timeRemaining}s`;
+            if (isDaytime) btn.innerText = `☀️ Dia ${diaAtual}: ${timeRemaining}s (Pular)`;
+            else btn.innerText = `🌙 Noite ${diaAtual}: ${timeRemaining}s`;
         }
 
         function toggleDayNight() {
@@ -126,17 +142,19 @@
             const invDef = document.getElementById('inv-def');
             
             if (isDaytime) {
+                // NOVIDADE: Sobreviveu à noite? Avança de fase!
+                diaAtual++; 
+                
                 invFarm.classList.add('active');
                 invDef.classList.remove('active');
                 zombies = []; 
-                projectiles = []; // Limpa flechas no ar
+                projectiles = []; 
                 clearTimeout(spawnTimer);
                 
-                // NOVIDADE (CRESCIMENTO): O sol nasceu! As sementes regadas viram vegetais
                 for (let c of crops) {
                     if (c.state === 'regado') {
                         c.state = 'pronto';
-                        c.color = '#ff4500'; // Cor de tomate/abóbora
+                        c.color = '#ff4500'; 
                     }
                 }
             } else {
@@ -163,8 +181,20 @@
 
         function spawnZombie() {
             if (!isDaytime && !isGameOver) {
-                zombies.push({ x: Math.random() * (canvas.width - 30), y: -30, size: 30, speed: 1.5, color: '#006400' });
-                spawnTimer = setTimeout(spawnZombie, 3000); 
+                // NOVIDADE: A dificuldade escala com a Fase (Dia Atual)
+                let velocidadeZumbi = 1.0 + (diaAtual * 0.3); // Ficam mais rápidos
+                
+                zombies.push({ 
+                    x: Math.random() * (canvas.width - 30), 
+                    y: -30, 
+                    size: 30, 
+                    speed: velocidadeZumbi, 
+                    color: '#006400' 
+                });
+                
+                // Nascem mais rápido conforme a fase sobe
+                let tempoNascimento = Math.max(500, 3000 - (diaAtual * 300));
+                spawnTimer = setTimeout(spawnZombie, tempoNascimento); 
             }
         }
 
@@ -201,6 +231,7 @@
         function triggerGameOver() {
             isGameOver = true;
             stop(); 
+            document.getElementById('game-over-stats').innerText = `Você sobreviveu até o Dia ${diaAtual}`;
             document.getElementById('game-over-screen').style.display = 'flex';
         }
 
@@ -209,10 +240,11 @@
             lives = 3;
             isDaytime = true;
             timeRemaining = 15; 
+            diaAtual = 1; // Reseta a fase
             zombies = [];
             projectiles = [];
             traps = [];
-            player.x = 160; player.y = 250; 
+            player.x = canvas.width/2; player.y = canvas.height/2; 
             updateLivesDisplay();
             updateTimeDisplay();
             document.getElementById('game-over-screen').style.display = 'none';
@@ -222,7 +254,7 @@
 
         function move(dir) {
             if (isGameOver) return;
-            player.facing = dir; // Lembra pra onde o jogador virou
+            player.facing = dir; 
             if(dir === 'left') player.dx = -player.speed;
             if(dir === 'right') player.dx = player.speed;
             if(dir === 'up') player.dy = -player.speed;
@@ -234,7 +266,6 @@
             if (isGameOver) return;
 
             if (!isDaytime) {
-                // ATAQUE 1: ESPADA (Igual ao que já fizemos)
                 if (currentTool.def === 0) { 
                     if (player.isAttacking) return;
                     player.isAttacking = true;
@@ -246,56 +277,47 @@
                     }
                     setTimeout(() => { player.isAttacking = false; }, 200);
                 }
-                // ATAQUE 2: BESTA/ARCO
                 else if (currentTool.def === 1) {
                     let pdx = 0, pdy = 0;
-                    if (player.facing === 'left') pdx = -6;
-                    if (player.facing === 'right') pdx = 6;
-                    if (player.facing === 'up') pdy = -6;
-                    if (player.facing === 'down') pdy = 6;
+                    if (player.facing === 'left') pdx = -8; // Aumentei a velocidade da flecha
+                    if (player.facing === 'right') pdx = 8;
+                    if (player.facing === 'up') pdy = -8;
+                    if (player.facing === 'down') pdy = 8;
                     
-                    // Dispara flecha a partir do meio do jogador
                     projectiles.push({ 
                         x: player.x + player.size/2, 
                         y: player.y + player.size/2, 
-                        dx: pdx, dy: pdy, size: 6, color: 'white' 
+                        dx: pdx, dy: pdy, size: 8, color: 'white' 
                     });
                 }
-                // ATAQUE 3: ARMADILHA
                 else if (currentTool.def === 2) {
-                    // Coloca uma armadilha cravada no chão onde o jogador está
                     traps.push({ x: player.x, y: player.y, size: 40, color: '#a0522d' });
                 }
             } 
             else {
-                // FAZENDA 1: ENXADA
                 if (currentTool.farm === 0) { 
                     let harvested = false;
-                    // Tenta colher um vegetal pronto primeiro
                     for (let i = crops.length - 1; i >= 0; i--) {
                         let c = crops[i];
                         if (c.state === 'pronto' && Math.abs(c.x - player.x) < 20 && Math.abs(c.y - player.y) < 20) {
-                            crops.splice(i, 1); // Colhe e limpa a terra! (AQUI PODE DAR PONTOS FUTURAMENTE)
+                            crops.splice(i, 1); 
                             harvested = true;
                             break;
                         }
                     }
-                    // Se não colheu nada, ara a terra normal
                     if (!harvested) {
                         crops.push({ x: player.x, y: player.y, size: 40, state: 'arado', color: '#4a3219' });
                     }
                 } 
-                // FAZENDA 2: REGADOR
                 else if (currentTool.farm === 1) {
                     for (let c of crops) {
                         if (c.state === 'plantado' && Math.abs(c.x - player.x) < 20 && Math.abs(c.y - player.y) < 20) {
                             c.state = 'regado';
-                            c.color = '#005f00'; // Fica verde mais molhado
+                            c.color = '#005f00'; 
                             break; 
                         }
                     }
                 }
-                // FAZENDA 3: SEMENTE (Igual ao que já fizemos)
                 else if (currentTool.farm === 2) { 
                     for (let c of crops) {
                         if (c.state === 'arado' && Math.abs(c.x - player.x) < 20 && Math.abs(c.y - player.y) < 20) {
@@ -325,9 +347,7 @@
             return false; 
         }
 
-        // NOVIDADE: Calcula se a flecha bateu ou se o zumbi pisou na armadilha
         function updateWeapons() {
-            // Atualiza flechas
             for (let i = projectiles.length - 1; i >= 0; i--) {
                 let p = projectiles[i];
                 p.x += p.dx;
@@ -337,30 +357,27 @@
                 for (let j = zombies.length - 1; j >= 0; j--) {
                     let z = zombies[j];
                     if (p.x > z.x && p.x < z.x + z.size && p.y > z.y && p.y < z.y + z.size) {
-                        zombies.splice(j, 1); // Zumbi morre
+                        zombies.splice(j, 1); 
                         hit = true;
                         break;
                     }
                 }
-                // Apaga a flecha se bater em alguém ou sair da tela
                 if (hit || p.x < 0 || p.x > canvas.width || p.y < 0 || p.y > canvas.height) {
                     projectiles.splice(i, 1);
                 }
             }
 
-            // Atualiza armadilhas
             for (let i = traps.length - 1; i >= 0; i--) {
                 let t = traps[i];
                 let triggered = false;
                 for (let j = zombies.length - 1; j >= 0; j--) {
                     let z = zombies[j];
                     if (Math.abs(z.x - t.x) < 30 && Math.abs(z.y - t.y) < 30) {
-                        zombies.splice(j, 1); // Zumbi morre
+                        zombies.splice(j, 1); 
                         triggered = true;
                         break;
                     }
                 }
-                // Se ativou a armadilha, ela quebra
                 if (triggered) traps.splice(i, 1);
             }
         }
@@ -382,32 +399,26 @@
             ctx.fillStyle = isDaytime ? '#7ba849' : '#1a1c23';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Desenha o mapa (Plantações)
             for (let c of crops) {
                 ctx.fillStyle = c.color;
                 ctx.fillRect(c.x, c.y, c.size, c.size);
             }
-            // Desenha as Armadilhas no chão
             for (let t of traps) {
                 ctx.fillStyle = t.color;
                 ctx.fillRect(t.x + 5, t.y + 5, t.size - 10, t.size - 10);
-                // Xinho em cima da armadilha pra ficar bonitinho
                 ctx.fillStyle = '#fff';
                 ctx.fillRect(t.x + 15, t.y + 15, 10, 10);
             }
-            // Desenha Pedras e Cercas
             for (let obs of obstacles) {
                 ctx.fillStyle = obs.color;
                 ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
             }
 
-            // Desenha Zumbis
             for (let z of zombies) {
                 ctx.fillStyle = z.color;
                 ctx.fillRect(z.x, z.y, z.size, z.size);
             }
 
-            // Desenha Flechas no ar
             for (let p of projectiles) {
                 ctx.fillStyle = p.color;
                 ctx.fillRect(p.x, p.y, p.size, p.size);
