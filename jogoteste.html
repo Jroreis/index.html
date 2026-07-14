@@ -3,28 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farm & Defend - Game Over</title>
+    <title>Farm & Defend - Jogo Completo</title>
     <style>
         body { margin: 0; background: #111; color: white; text-align: center; overflow: hidden; touch-action: none; font-family: sans-serif;}
         canvas { background: #7ba849; display: block; margin: 0 auto; border: 2px solid #333; }
         
         .ui-container { position: absolute; top: 10px; width: 100%; display: flex; justify-content: center; flex-direction: column; align-items: center; gap: 5px; }
-        .inventory { padding: 10px 20px; border-radius: 8px; background: rgba(0,0,0,0.8); display: none; }
+        .inventory { padding: 5px 10px; border-radius: 8px; background: rgba(0,0,0,0.8); display: none; }
         .inventory.active { display: block; border: 3px solid #ffd700; }
         
+        .inventory-title { font-size: 12px; margin-bottom: 5px; color: #ccc; }
+        .inventory-grid { display: flex; gap: 5px; justify-content: center; }
+        .slot { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border: 2px solid #777; border-radius: 5px; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .slot.selected { border-color: #ffd700; background: rgba(255, 215, 0, 0.3); transform: scale(1.1); transition: 0.1s; }
+
         #btn-time { padding: 8px 16px; font-weight: bold; border-radius: 8px; border: none; background: #eee; cursor: pointer; }
 
         .controls { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 5px; }
         .btn-move { width: 50px; height: 50px; background: rgba(255,255,255,0.3); border-radius: 50%; border: none; color: white; font-size: 18px; }
         .btn-action { width: 60px; height: 60px; background: rgba(255, 50, 50, 0.6); border-radius: 50%; border: 2px solid white; color: white; font-size: 24px; margin-left: 10px; }
 
-        /* NOVO: Estilo da tela de Game Over */
-        #game-over-screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(150, 0, 0, 0.8); display: none;
-            flex-direction: column; justify-content: center; align-items: center;
-            z-index: 100;
-        }
+        #game-over-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(150, 0, 0, 0.8); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
         #game-over-screen h1 { font-size: 40px; margin-bottom: 10px; }
         #btn-restart { padding: 10px 20px; font-size: 20px; font-weight: bold; cursor: pointer; }
     </style>
@@ -32,15 +31,28 @@
 <body>
 
     <div class="ui-container">
-        <!-- NOVO: Mostrar vidas na tela -->
         <div id="lives-display" style="font-size: 20px; font-weight: bold; text-shadow: 2px 2px black;">❤️❤️❤️</div>
+        <button id="btn-time">☀️ Dia: 15s</button>
         
-        <button id="btn-time">Anoitecer</button>
-        <div id="inv-farm" class="inventory active">🌱 Plantação</div>
-        <div id="inv-def" class="inventory">⚔️ Defesa</div>
+        <div id="inv-farm" class="inventory active">
+            <div class="inventory-title">🌱 Ferramentas da Fazenda</div>
+            <div class="inventory-grid">
+                <div class="slot selected" onpointerdown="selectTool('farm', 0)">⛏️</div>
+                <div class="slot" onpointerdown="selectTool('farm', 1)">💧</div>
+                <div class="slot" onpointerdown="selectTool('farm', 2)">🌾</div>
+            </div>
+        </div>
+
+        <div id="inv-def" class="inventory">
+            <div class="inventory-title">⚔️ Equipamentos Noturnos</div>
+            <div class="inventory-grid">
+                <div class="slot selected" onpointerdown="selectTool('def', 0)">🗡️</div>
+                <div class="slot" onpointerdown="selectTool('def', 1)">🏹</div>
+                <div class="slot" onpointerdown="selectTool('def', 2)">🪵</div>
+            </div>
+        </div>
     </div>
 
-    <!-- NOVO: Tela de Game Over que aparece por cima do Canvas -->
     <div id="game-over-screen">
         <h1>Fim da Noite</h1>
         <p>Os zumbis invadiram a fazenda!</p>
@@ -54,23 +66,33 @@
         <button class="btn-move" onpointerdown="move('up')" onpointerup="stop()">🔼</button>
         <button class="btn-move" onpointerdown="move('down')" onpointerup="stop()">🔽</button>
         <button class="btn-move" onpointerdown="move('right')" onpointerup="stop()">▶️</button>
-        <button class="btn-action" onpointerdown="attack()">⚔️</button>
+        <button class="btn-action" onpointerdown="action()">🎯</button>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        // NOVIDADE: Adicionado vidas e controle de invencibilidade (para não perder 3 vidas em 1 segundo)
-        let player = { x: 160, y: 250, size: 40, speed: 4, dx: 0, dy: 0, isAttacking: false, attackRange: 20 };
+        // NOVIDADE NO JOGADOR: Adicionado o "facing" para saber pra onde atirar a flecha
+        let player = { x: 160, y: 250, size: 40, speed: 4, dx: 0, dy: 0, isAttacking: false, attackRange: 20, facing: 'down' };
         let isDaytime = true;
         let isGameOver = false;
         
         let lives = 3;
-        let isInvincible = false; // Pisca vermelho quando toma dano
+        let isInvincible = false; 
 
         let zombies = []; 
-        let spawnTimer; // Para podermos pausar o nascimento de zumbis
+        let spawnTimer; 
+
+        let timeRemaining = 15; 
+        let gameTimer; 
+
+        let currentTool = { farm: 0, def: 0 }; 
+        let crops = [];
+        
+        // NOVIDADE: Arrays para guardar as novas armas no mapa
+        let projectiles = [];
+        let traps = [];
 
         const obstacles = [
             { x: 50, y: 100, w: 80, h: 40, color: '#555' }, 
@@ -78,74 +100,93 @@
             { x: 280, y: 150, w: 60, h: 60, color: '#228B22' } 
         ];
 
-        document.getElementById('btn-time').addEventListener('click', () => {
-            if (isGameOver) return; // Trava o botão se o jogo acabou
+        function selectTool(type, index) {
+            currentTool[type] = index; 
+            const inventoryDiv = document.getElementById(type === 'farm' ? 'inv-farm' : 'inv-def');
+            const slots = inventoryDiv.querySelectorAll('.slot');
+            slots.forEach((slot, i) => {
+                if (i === index) slot.classList.add('selected');
+                else slot.classList.remove('selected');
+            });
+        }
+
+        function updateTimeDisplay() {
+            const btn = document.getElementById('btn-time');
+            if (isDaytime) btn.innerText = `☀️ Fim do dia em: ${timeRemaining}s (Pular)`;
+            else btn.innerText = `🌙 Sobreviva por: ${timeRemaining}s`;
+        }
+
+        function toggleDayNight() {
+            if (isGameOver) return; 
             
             isDaytime = !isDaytime;
+            timeRemaining = isDaytime ? 15 : 20; 
             
-            const btn = document.getElementById('btn-time');
             const invFarm = document.getElementById('inv-farm');
             const invDef = document.getElementById('inv-def');
             
             if (isDaytime) {
-                btn.innerText = "Anoitecer";
                 invFarm.classList.add('active');
                 invDef.classList.remove('active');
                 zombies = []; 
+                projectiles = []; // Limpa flechas no ar
                 clearTimeout(spawnTimer);
+                
+                // NOVIDADE (CRESCIMENTO): O sol nasceu! As sementes regadas viram vegetais
+                for (let c of crops) {
+                    if (c.state === 'regado') {
+                        c.state = 'pronto';
+                        c.color = '#ff4500'; // Cor de tomate/abóbora
+                    }
+                }
             } else {
-                btn.innerText = "Amanhecer";
                 invFarm.classList.remove('active');
                 invDef.classList.add('active');
                 spawnZombie(); 
             }
+            updateTimeDisplay();
+        }
+
+        function startClock() {
+            gameTimer = setInterval(() => {
+                if (!isGameOver) {
+                    timeRemaining--;
+                    if (timeRemaining <= 0) toggleDayNight(); 
+                    else updateTimeDisplay();
+                }
+            }, 1000);
+        }
+
+        document.getElementById('btn-time').addEventListener('click', () => {
+            if (!isGameOver && isDaytime) toggleDayNight(); 
         });
 
         function spawnZombie() {
             if (!isDaytime && !isGameOver) {
-                zombies.push({
-                    x: Math.random() * (canvas.width - 30), 
-                    y: -30, 
-                    size: 30,
-                    speed: 1.5,
-                    color: '#006400' 
-                });
+                zombies.push({ x: Math.random() * (canvas.width - 30), y: -30, size: 30, speed: 1.5, color: '#006400' });
                 spawnTimer = setTimeout(spawnZombie, 3000); 
             }
         }
 
-        // NOVIDADE: Checa se o zumbi mordeu o jogador
         function updateZombies() {
             for (let i = zombies.length - 1; i >= 0; i--) {
                 let z = zombies[i];
-                
-                // Zumbi persegue
                 if (z.x < player.x) z.x += z.speed;
                 if (z.x > player.x) z.x -= z.speed;
                 if (z.y < player.y) z.y += z.speed;
                 if (z.y > player.y) z.y -= z.speed;
 
-                // Colisão do zumbi com o jogador
-                if (!isInvincible && 
-                    z.x < player.x + player.size && 
-                    z.x + z.size > player.x && 
-                    z.y < player.y + player.size && 
-                    z.y + z.size > player.y) {
-                    
+                if (!isInvincible && z.x < player.x + player.size && z.x + z.size > player.x && z.y < player.y + player.size && z.y + z.size > player.y) {
                     takeDamage();
                 }
             }
         }
 
-        // NOVIDADE: Lógica de sofrer dano
         function takeDamage() {
             lives--;
             updateLivesDisplay();
-            
-            if (lives <= 0) {
-                triggerGameOver();
-            } else {
-                // Fica invencível por 1.5 segundos após tomar dano
+            if (lives <= 0) triggerGameOver();
+            else {
                 isInvincible = true;
                 setTimeout(() => { isInvincible = false; }, 1500);
             }
@@ -157,31 +198,31 @@
             document.getElementById('lives-display').innerText = hearts || "💀";
         }
 
-        // NOVIDADE: Função que congela o jogo e mostra a tela vermelha
         function triggerGameOver() {
             isGameOver = true;
-            stop(); // Para o jogador
+            stop(); 
             document.getElementById('game-over-screen').style.display = 'flex';
         }
 
-        // NOVIDADE: Reseta as variáveis e volta ao dia
         function restartGame() {
             isGameOver = false;
             lives = 3;
             isDaytime = true;
+            timeRemaining = 15; 
             zombies = [];
-            player.x = 160; player.y = 250; // Volta pro meio
+            projectiles = [];
+            traps = [];
+            player.x = 160; player.y = 250; 
             updateLivesDisplay();
+            updateTimeDisplay();
             document.getElementById('game-over-screen').style.display = 'none';
-            
-            // Reseta a interface pro botão do Dia
-            document.getElementById('btn-time').innerText = "Anoitecer";
             document.getElementById('inv-farm').classList.add('active');
             document.getElementById('inv-def').classList.remove('active');
         }
 
         function move(dir) {
             if (isGameOver) return;
+            player.facing = dir; // Lembra pra onde o jogador virou
             if(dir === 'left') player.dx = -player.speed;
             if(dir === 'right') player.dx = player.speed;
             if(dir === 'up') player.dy = -player.speed;
@@ -189,22 +230,82 @@
         }
         function stop() { player.dx = 0; player.dy = 0; }
 
-        function attack() {
-            if (isDaytime || player.isAttacking || isGameOver) return; 
-            
-            player.isAttacking = true;
+        function action() {
+            if (isGameOver) return;
 
-            for (let i = zombies.length - 1; i >= 0; i--) {
-                let z = zombies[i];
-                let distX = Math.abs(z.x - player.x);
-                let distY = Math.abs(z.y - player.y);
-                
-                if (distX < player.size + player.attackRange && distY < player.size + player.attackRange) {
-                    zombies.splice(i, 1); 
+            if (!isDaytime) {
+                // ATAQUE 1: ESPADA (Igual ao que já fizemos)
+                if (currentTool.def === 0) { 
+                    if (player.isAttacking) return;
+                    player.isAttacking = true;
+                    for (let i = zombies.length - 1; i >= 0; i--) {
+                        let z = zombies[i];
+                        if (Math.abs(z.x - player.x) < player.size + player.attackRange && Math.abs(z.y - player.y) < player.size + player.attackRange) {
+                            zombies.splice(i, 1); 
+                        }
+                    }
+                    setTimeout(() => { player.isAttacking = false; }, 200);
+                }
+                // ATAQUE 2: BESTA/ARCO
+                else if (currentTool.def === 1) {
+                    let pdx = 0, pdy = 0;
+                    if (player.facing === 'left') pdx = -6;
+                    if (player.facing === 'right') pdx = 6;
+                    if (player.facing === 'up') pdy = -6;
+                    if (player.facing === 'down') pdy = 6;
+                    
+                    // Dispara flecha a partir do meio do jogador
+                    projectiles.push({ 
+                        x: player.x + player.size/2, 
+                        y: player.y + player.size/2, 
+                        dx: pdx, dy: pdy, size: 6, color: 'white' 
+                    });
+                }
+                // ATAQUE 3: ARMADILHA
+                else if (currentTool.def === 2) {
+                    // Coloca uma armadilha cravada no chão onde o jogador está
+                    traps.push({ x: player.x, y: player.y, size: 40, color: '#a0522d' });
+                }
+            } 
+            else {
+                // FAZENDA 1: ENXADA
+                if (currentTool.farm === 0) { 
+                    let harvested = false;
+                    // Tenta colher um vegetal pronto primeiro
+                    for (let i = crops.length - 1; i >= 0; i--) {
+                        let c = crops[i];
+                        if (c.state === 'pronto' && Math.abs(c.x - player.x) < 20 && Math.abs(c.y - player.y) < 20) {
+                            crops.splice(i, 1); // Colhe e limpa a terra! (AQUI PODE DAR PONTOS FUTURAMENTE)
+                            harvested = true;
+                            break;
+                        }
+                    }
+                    // Se não colheu nada, ara a terra normal
+                    if (!harvested) {
+                        crops.push({ x: player.x, y: player.y, size: 40, state: 'arado', color: '#4a3219' });
+                    }
+                } 
+                // FAZENDA 2: REGADOR
+                else if (currentTool.farm === 1) {
+                    for (let c of crops) {
+                        if (c.state === 'plantado' && Math.abs(c.x - player.x) < 20 && Math.abs(c.y - player.y) < 20) {
+                            c.state = 'regado';
+                            c.color = '#005f00'; // Fica verde mais molhado
+                            break; 
+                        }
+                    }
+                }
+                // FAZENDA 3: SEMENTE (Igual ao que já fizemos)
+                else if (currentTool.farm === 2) { 
+                    for (let c of crops) {
+                        if (c.state === 'arado' && Math.abs(c.x - player.x) < 20 && Math.abs(c.y - player.y) < 20) {
+                            c.state = 'plantado';
+                            c.color = '#9acd32'; 
+                            break; 
+                        }
+                    }
                 }
             }
-
-            setTimeout(() => { player.isAttacking = false; }, 200);
         }
 
         window.addEventListener('keydown', (e) => {
@@ -212,7 +313,7 @@
             if(e.key === 'ArrowRight') move('right');
             if(e.key === 'ArrowUp') move('up');
             if(e.key === 'ArrowDown') move('down');
-            if(e.key === ' ') attack(); 
+            if(e.key === ' ') action(); 
         });
         window.addEventListener('keyup', stop);
 
@@ -224,6 +325,46 @@
             return false; 
         }
 
+        // NOVIDADE: Calcula se a flecha bateu ou se o zumbi pisou na armadilha
+        function updateWeapons() {
+            // Atualiza flechas
+            for (let i = projectiles.length - 1; i >= 0; i--) {
+                let p = projectiles[i];
+                p.x += p.dx;
+                p.y += p.dy;
+                
+                let hit = false;
+                for (let j = zombies.length - 1; j >= 0; j--) {
+                    let z = zombies[j];
+                    if (p.x > z.x && p.x < z.x + z.size && p.y > z.y && p.y < z.y + z.size) {
+                        zombies.splice(j, 1); // Zumbi morre
+                        hit = true;
+                        break;
+                    }
+                }
+                // Apaga a flecha se bater em alguém ou sair da tela
+                if (hit || p.x < 0 || p.x > canvas.width || p.y < 0 || p.y > canvas.height) {
+                    projectiles.splice(i, 1);
+                }
+            }
+
+            // Atualiza armadilhas
+            for (let i = traps.length - 1; i >= 0; i--) {
+                let t = traps[i];
+                let triggered = false;
+                for (let j = zombies.length - 1; j >= 0; j--) {
+                    let z = zombies[j];
+                    if (Math.abs(z.x - t.x) < 30 && Math.abs(z.y - t.y) < 30) {
+                        zombies.splice(j, 1); // Zumbi morre
+                        triggered = true;
+                        break;
+                    }
+                }
+                // Se ativou a armadilha, ela quebra
+                if (triggered) traps.splice(i, 1);
+            }
+        }
+
         function drawGame() {
             if (!isGameOver) {
                 let nextX = player.x + player.dx;
@@ -232,20 +373,44 @@
                 if (!checkCollision(nextX, player.y)) player.x = nextX;
                 if (!checkCollision(player.x, nextY)) player.y = nextY;
 
-                if (!isDaytime) updateZombies();
+                if (!isDaytime) {
+                    updateZombies();
+                    updateWeapons();
+                }
             }
 
             ctx.fillStyle = isDaytime ? '#7ba849' : '#1a1c23';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // Desenha o mapa (Plantações)
+            for (let c of crops) {
+                ctx.fillStyle = c.color;
+                ctx.fillRect(c.x, c.y, c.size, c.size);
+            }
+            // Desenha as Armadilhas no chão
+            for (let t of traps) {
+                ctx.fillStyle = t.color;
+                ctx.fillRect(t.x + 5, t.y + 5, t.size - 10, t.size - 10);
+                // Xinho em cima da armadilha pra ficar bonitinho
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(t.x + 15, t.y + 15, 10, 10);
+            }
+            // Desenha Pedras e Cercas
             for (let obs of obstacles) {
                 ctx.fillStyle = obs.color;
                 ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
             }
 
+            // Desenha Zumbis
             for (let z of zombies) {
                 ctx.fillStyle = z.color;
                 ctx.fillRect(z.x, z.y, z.size, z.size);
+            }
+
+            // Desenha Flechas no ar
+            for (let p of projectiles) {
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.size, p.size);
             }
 
             if (player.isAttacking) {
@@ -253,16 +418,18 @@
                 ctx.fillRect(player.x - 15, player.y - 15, player.size + 30, player.size + 30);
             }
 
-            // O jogador fica "piscando" vermelho quando toma dano (invencibilidade temporária)
             if (isInvincible && Math.floor(Date.now() / 150) % 2 === 0) {
-                ctx.fillStyle = '#ff0000'; // Pisca vermelho
+                ctx.fillStyle = '#ff0000'; 
             } else {
-                ctx.fillStyle = '#ffcc00'; // Cor normal amarelo
+                ctx.fillStyle = '#ffcc00'; 
             }
             ctx.fillRect(player.x, player.y, player.size, player.size);
 
             requestAnimationFrame(drawGame);
         }
+
+        updateTimeDisplay();
+        startClock();
         drawGame();
     </script>
 </body>
