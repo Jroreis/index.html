@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResumeTech Pro | Mega Brian HR</title>
     <style>
-        /* CSS: Estilização Moderna e Limpa */
+        /* CSS: Estilização Moderna e Limpa (100% PRESERVADA) */
         :root {
             --primary-color: #1e3a8a;
             --secondary-color: #3b82f6;
@@ -132,6 +132,57 @@
         @media(max-width: 768px){
             .container.active { grid-template-columns: 1fr; }
         }
+
+        /* --- ADIÇÕES DO RODAPÉ (Preservando o layout anterior) --- */
+        footer {
+            background-color: #1f2937;
+            color: white;
+            margin-top: 50px;
+            box-shadow: 0 -4px 6px rgba(0,0,0,0.1);
+        }
+
+        .footer-tabs {
+            display: flex;
+            justify-content: center;
+            background-color: #111827;
+        }
+
+        .footer-tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            border-top: 3px solid transparent;
+        }
+
+        .footer-tab-btn:hover, .footer-tab-btn.active {
+            color: white;
+            border-top: 3px solid var(--secondary-color);
+            background-color: #1f2937;
+        }
+
+        .footer-content {
+            display: none;
+            padding: 30px 20px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            color: #d1d5db;
+        }
+
+        .footer-content h3 {
+            color: white;
+            margin-top: 0;
+        }
+
+        .footer-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -204,10 +255,34 @@
         </div>
     </div>
 
-    <script>
-        // JAVASCRIPT: Motor Lógico e Interatividade
+    <!-- MÓDULO 3: RODAPÉ COM ABAS (Código Novo Inserido de Forma Segura) -->
+    <footer>
+        <div class="footer-tabs">
+            <button class="footer-tab-btn active" onclick="switchFooterTab('ft-sobre', this)">Sobre o Mega Brian</button>
+            <button class="footer-tab-btn" onclick="switchFooterTab('ft-privacidade', this)">Privacidade e LGPD</button>
+            <button class="footer-tab-btn" onclick="switchFooterTab('ft-suporte', this)">Suporte Técnico</button>
+        </div>
+        
+        <div id="ft-sobre" class="footer-content active">
+            <h3>Sobre a Inteligência Mega Brian</h3>
+            <p>Este sistema foi desenvolvido para hackear a lógica dos algoritmos ATS (Applicant Tracking Systems) das gigantes do mercado corporativo. Nossa missão é impedir que profissionais altamente qualificados sejam descartados na triagem por robôs, moldando currículos para a conversão perfeita.</p>
+        </div>
+        
+        <div id="ft-privacidade" class="footer-content">
+            <h3>Diretrizes de Privacidade e LGPD</h3>
+            <p>A segurança é inegociável. Todo o processamento de texto, varredura de palavras-chave e geração do seu currículo acontece exclusivamente do lado do cliente (no seu navegador web). Não armazenamos, enviamos ou compartilhamos seus dados em nenhum banco de dados em nuvem.</p>
+        </div>
+        
+        <div id="ft-suporte" class="footer-content">
+            <h3>Central de Suporte</h3>
+            <p>O algoritmo penalizou uma métrica incorretamente? Precisa de ajuda com a extração de dados do seu PDF atual? Nossa equipe técnica está pronta para analisar os *logs* e refinar o motor de busca. A inovação é um processo contínuo.</p>
+        </div>
+    </footer>
 
-        // Sistema de Abas
+    <script>
+        // JAVASCRIPT: Lógica Original 100% Preservada
+
+        // Sistema de Abas Superiores
         function switchTab(tabId) {
             document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -245,7 +320,7 @@
             let score = 100;
             let feedbacks = [];
 
-            // Regra 1: Verificação de Dados Pessoais Obsoletos (Penalização Forte)
+            // Regra 1: Verificação de Dados Pessoais Obsoletos
             const badWords = ['casado', 'solteiro', 'nascimento', 'cpf', 'rg', 'idade'];
             const foundBadWords = badWords.filter(word => text.includes(word));
             if(foundBadWords.length > 0) {
@@ -263,7 +338,7 @@
                 feedbacks.push(`<strong>✅ Dinamismo Aprovado:</strong> Excelente uso de verbos de ação. Isso mostra postura de liderança técnica.`);
             }
 
-            // Regra 3: Métricas e Resultados (O "Teste de Fogo" do Mega Brian)
+            // Regra 3: Métricas e Resultados
             const hasNumbers = /\d+%|\d+ %/g.test(text) || text.includes('resultados');
             if(!hasNumbers) {
                 score -= 20;
@@ -278,10 +353,8 @@
                 feedbacks.push(`<strong>🥱 Clichês Detectados:</strong> Você usou termos genéricos (${foundCliches.join(', ')}). Qualquer candidato diz que é "proativo". Prove isso nas descrições de suas experiências em vez de apenas listar o adjetivo.`);
             }
 
-            // Garante que o score não fique negativo
             if(score < 0) score = 0;
 
-            // Renderiza Nota Visual
             scoreBox.className = 'score-box';
             if(score >= 80) scoreBox.classList.add('score-high');
             else if(score >= 50) scoreBox.classList.add('score-med');
@@ -289,7 +362,6 @@
             
             scoreBox.innerText = `Pontuação ATS: ${score}/100`;
 
-            // Renderiza Feedback
             if(score === 100) {
                 feedbacks.push(`<strong>🏆 Padrão Executivo:</strong> Este é um currículo impecável. Totalmente blindado contra reprovações automáticas. Pronto para o envio!`);
             }
@@ -300,6 +372,18 @@
                 div.innerHTML = msg;
                 feedbackContainer.appendChild(div);
             });
+        }
+
+        // --- NOVA LÓGICA: Abas do Rodapé Adicionadas Aqui ---
+        function switchFooterTab(tabId, btnElement) {
+            // Oculta todos os conteúdos do rodapé
+            document.querySelectorAll('.footer-content').forEach(c => c.classList.remove('active'));
+            // Remove a classe active de todos os botões do rodapé
+            document.querySelectorAll('.footer-tab-btn').forEach(b => b.classList.remove('active'));
+            
+            // Ativa o conteúdo e o botão clicado
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
         }
     </script>
 </body>
