@@ -5,31 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResumeTech Pro | Mega Brian HR</title>
     <!-- Fonte Premium -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           CSS PREMIUM: UI/UX DE ALTO PADRÃO
-           A estrutura lógica HTML foi 100% mantida
+           CSS SUPER PREMIUM: Estilo SaaS Moderno
            ========================================= */
         :root {
-            --primary-color: #0f172a; /* Slate 900 - Tom escuro muito elegante */
-            --secondary-color: #2563eb; /* Blue 600 - Azul vibrante para botões */
-            --secondary-hover: #1d4ed8;
-            --bg-color: #f8fafc; /* Fundo cinza super claro */
+            --primary-color: #0f172a; 
+            --secondary-color: #0ea5e9; /* Azul ciano moderno */
+            --secondary-hover: #0284c7;
+            --bg-color: #f1f5f9; /* Fundo mais sofisticado */
             --text-color: #334155;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --premium-gradient: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
-            --premium-color: #8b5cf6;
+            --premium-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            --premium-color: #a855f7;
             --gold: #fbbf24;
-            --panel-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
-            --paper-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --panel-bg: rgba(255, 255, 255, 0.95);
+            --panel-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
+            --paper-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+            --border-radius: 16px;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 20px 20px; /* Padrão de pontilhados sutil ao fundo */
             color: var(--text-color);
             margin: 0;
             padding: 0;
@@ -40,106 +43,107 @@
 
         .main-content { flex: 1; }
 
-        /* Header de Luxo */
+        /* Header de Luxo - Glassmorphism */
         header {
-            background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
             color: white;
-            padding: 30px 20px;
+            padding: 25px 20px;
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            position: relative;
-            z-index: 10;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
-        header h1 { margin: 0 0 10px 0; font-size: 32px; font-weight: 700; letter-spacing: -0.5px; }
-        header p { margin: 0; color: #94a3b8; font-size: 15px; font-weight: 400; }
+        header h1 { margin: 0 0 5px 0; font-size: 30px; font-weight: 800; letter-spacing: -1px; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
+        header p { margin: 0; color: #94a3b8; font-size: 14px; font-weight: 400; letter-spacing: 0.5px;}
 
-        /* Anúncios */
         .ad-banner {
             background: linear-gradient(90deg, #fef08a 0%, #fde047 100%);
             color: #854d0e;
             text-align: center;
-            padding: 12px;
+            padding: 10px;
             font-weight: 600;
-            font-size: 14px;
-            border-bottom: 1px solid #eab308;
+            font-size: 13px;
             letter-spacing: 0.3px;
         }
 
-        /* Abas de Navegação Premium */
+        /* Abas Flutuantes */
         .tabs {
             display: flex;
             justify-content: center;
-            background-color: white;
-            padding: 0 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            gap: 15px;
+            padding: 25px 20px 0 20px;
             flex-wrap: wrap;
-            gap: 10px;
-            padding-top: 15px;
         }
 
         .tab-btn {
-            padding: 15px 25px;
+            padding: 14px 28px;
             cursor: pointer;
-            border: none;
-            background: none;
-            font-size: 15px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            border-radius: 30px;
+            font-size: 14px;
             font-weight: 600;
             color: #64748b;
-            transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
-            font-family: 'Inter', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
 
-        .tab-btn:hover { color: var(--primary-color); }
-        .tab-btn.active { color: var(--secondary-color); border-bottom: 3px solid var(--secondary-color); }
+        .tab-btn:hover { border-color: var(--secondary-color); color: var(--secondary-color); transform: translateY(-2px); }
+        .tab-btn.active { background: var(--secondary-color); color: white; border-color: var(--secondary-color); box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); }
         
-        .tab-btn.premium-tab { color: #8b5cf6; }
-        .tab-btn.premium-tab:hover { color: #7c3aed; }
-        .tab-btn.premium-tab.active { border-bottom: 3px solid #8b5cf6; }
+        .tab-btn.premium-tab { border-color: var(--premium-color); color: var(--premium-color); }
+        .tab-btn.premium-tab:hover { background: var(--premium-gradient); color: white; border-color: transparent; }
+        .tab-btn.premium-tab.active { background: var(--premium-gradient); color: white; border-color: transparent; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4); }
 
         .container {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 40px auto;
             padding: 0 20px;
             display: none;
+            animation: fadeIn 0.4s ease-in-out;
         }
-        .container.active { display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px; } /* Proporção melhor para o papel */
-
-        /* Painéis Redesenhados */
-        .panel {
-            background: white;
-            padding: 35px;
-            border-radius: 16px;
-            box-shadow: var(--panel-shadow);
-            border: 1px solid #f1f5f9;
-        }
-
-        h2 { margin-top: 0; color: var(--primary-color); font-weight: 700; font-size: 22px; letter-spacing: -0.5px;}
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Inputs Estilo SaaS */
-        label { display: block; font-weight: 600; color: #475569; margin-top: 20px; margin-bottom: 8px; font-size: 14px;}
+        .container.active { display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px; }
+
+        /* Painéis Ultra Limpos */
+        .panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--panel-shadow);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        h2 { margin-top: 0; color: var(--primary-color); font-weight: 800; font-size: 24px; letter-spacing: -0.5px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px;}
+        
+        label { display: block; font-weight: 600; color: #475569; margin-top: 25px; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;}
+        
         input[type="text"], textarea {
             width: 100%;
-            padding: 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
+            padding: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
             font-family: inherit;
             font-size: 15px;
             background-color: #f8fafc;
             transition: all 0.2s ease;
             box-sizing: border-box;
+            color: #1e293b;
         }
         input[type="text"]:focus, textarea:focus {
             outline: none;
             border-color: var(--secondary-color);
             background-color: white;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); /* Anel de foco azul */
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
         }
-        textarea { height: 130px; resize: vertical; line-height: 1.5; }
+        textarea { height: 100px; resize: vertical; line-height: 1.6; }
 
-        /* Upload Premium */
         .file-upload-wrapper {
-            border: 2px dashed #cbd5e1;
+            border: 2px dashed #94a3b8;
             border-radius: 12px;
             padding: 50px 20px;
             text-align: center;
@@ -149,79 +153,56 @@
             transition: all 0.3s ease;
             display: block;
         }
-        .file-upload-wrapper:hover { 
-            border-color: var(--secondary-color); 
-            background-color: #eff6ff; 
-            transform: translateY(-2px);
-        }
+        .file-upload-wrapper:hover { border-color: var(--secondary-color); background-color: #f0f9ff; transform: translateY(-2px); }
         .file-upload-wrapper input[type="file"] { display: none; }
-        .file-upload-label { font-size: 17px; font-weight: 600; color: var(--secondary-color); cursor: pointer; display: block; margin-bottom: 8px;}
+        .file-upload-label { font-size: 16px; font-weight: 600; color: var(--secondary-color); display: block; margin-bottom: 8px;}
 
-        /* Botões com Interação */
         button.btn-primary {
             background-color: var(--secondary-color);
             color: white;
             border: none;
-            padding: 16px 24px;
+            padding: 18px 24px;
             font-size: 16px;
-            font-weight: 600;
-            border-radius: 8px;
+            font-weight: 700;
+            border-radius: 10px;
             cursor: pointer;
-            margin-top: 25px;
+            margin-top: 30px;
             width: 100%;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
-            font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.2);
+            letter-spacing: 0.5px;
         }
-        button.btn-primary:hover { 
-            background-color: var(--secondary-hover); 
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
-        }
+        button.btn-primary:hover { background-color: var(--secondary-hover); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3); }
 
-        button.btn-premium { background: var(--premium-gradient); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); margin-top: 35px; }
-        button.btn-premium:hover { background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4); }
+        button.btn-premium { background: var(--premium-gradient); box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3); }
+        button.btn-premium:hover { background: linear-gradient(135deg, #4f46e5 0%, #9333ea 50%, #db2777 100%); box-shadow: 0 10px 25px rgba(168, 85, 247, 0.5); }
 
-        /* EFEITO PAPEL A4 (O Grande Diferencial Visual) */
+        /* Preview A4 Premium */
         .cv-preview { 
             background: white; 
-            min-height: 800px; 
-            padding: 50px;
-            border-radius: 2px; /* Papel não tem muita borda arredondada */
+            min-height: 842px; /* Proporção A4 real */
+            padding: 60px 50px;
+            border-radius: 4px; 
             box-shadow: var(--paper-shadow);
             border: 1px solid #e2e8f0;
             position: relative;
         }
-        /* Detalhe de linha de margem simulada */
-        .cv-preview::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background-color: var(--primary-color); border-radius: 2px 2px 0 0;
-        }
+        .cv-preview::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 8px; background: var(--secondary-color); border-radius: 4px 4px 0 0; }
 
-        .cv-name { font-size: 26px; font-weight: 700; text-transform: uppercase; color: var(--primary-color); text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 12px; letter-spacing: 1px;}
+        .cv-name { font-size: 28px; font-weight: 800; text-transform: uppercase; color: var(--primary-color); text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 10px; letter-spacing: 1.5px;}
         .cv-contact { text-align: center; font-size: 13px; color: #64748b; margin-bottom: 30px; font-weight: 500;}
-        .cv-section-title { font-size: 16px; font-weight: 700; color: var(--primary-color); border-bottom: 1px solid #cbd5e1; margin-top: 25px; margin-bottom: 12px; padding-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .cv-section-title { font-size: 15px; font-weight: 800; color: var(--primary-color); border-bottom: 2px solid #e2e8f0; margin-top: 25px; margin-bottom: 15px; padding-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;}
+        .cv-text { color: #334155; line-height: 1.7; font-size: 14px; white-space: pre-wrap;}
 
-        /* Scanner Results & Feedbacks */
-        .score-box { text-align: center; padding: 25px; border-radius: 12px; margin-bottom: 25px; font-size: 28px; font-weight: 700; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);}
-        .score-high { background-color: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0;}
-        .score-med { background-color: #fffbeb; color: var(--warning); border: 1px solid #fde68a;}
-        .score-low { background-color: #fef2f2; color: var(--danger); border: 1px solid #fecaca;}
+        /* Scanner Feedbacks */
+        .score-box { text-align: center; padding: 30px; border-radius: 16px; margin-bottom: 25px; font-size: 32px; font-weight: 800; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
+        .score-high { background-color: #ecfdf5; color: var(--success); border: 2px solid #34d399;}
+        .score-med { background-color: #fffbeb; color: var(--warning); border: 2px solid #fbbf24;}
+        .score-low { background-color: #fef2f2; color: var(--danger); border: 2px solid #f87171;}
         
-        .feedback-item { margin-bottom: 15px; padding: 18px; border-radius: 8px; border-left: 5px solid var(--secondary-color); background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.02); border-right: 1px solid #f1f5f9; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; line-height: 1.6;}
+        .feedback-item { margin-bottom: 15px; padding: 20px; border-radius: 12px; border-left: 6px solid var(--secondary-color); background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; border-left-width: 6px; line-height: 1.6;}
 
-        /* Tela de Bloqueio Premium (Efeito Frosted Glass) */
-        .locked-screen {
-            text-align: center;
-            padding: 60px 20px;
-            background: linear-gradient(to bottom, #f8fafc, #f5f3ff);
-            border: 2px dashed #a78bfa;
-            border-radius: 16px;
-            grid-column: span 2;
-            position: relative;
-            overflow: hidden;
-        }
-        .locked-screen h2 { color: var(--premium-color); font-size: 28px;}
-        .locked-screen p { color: #475569; font-size: 16px; max-width: 500px; margin: 15px auto 30px auto; line-height: 1.6;}
+        .locked-screen { text-align: center; padding: 80px 20px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border: 2px dashed var(--premium-color); border-radius: var(--border-radius); grid-column: span 2; box-shadow: var(--panel-shadow); }
 
         @media(max-width: 768px){
             .container.active { grid-template-columns: 1fr; }
@@ -229,15 +210,7 @@
             .cv-preview { min-height: 500px; padding: 30px;}
         }
 
-        /* Rodapé Minimalista Elegante */
-        footer {
-            background-color: transparent;
-            color: #94a3b8;
-            padding: 25px 0;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 500;
-        }
+        footer { background-color: transparent; color: #94a3b8; padding: 30px 0; text-align: center; font-size: 14px; font-weight: 500; }
         .footer-links { display: flex; justify-content: center; gap: 30px; }
         .footer-links span { cursor: pointer; transition: 0.3s; }
         .footer-links span:hover { color: var(--primary-color); }
@@ -245,73 +218,142 @@
 </head>
 <body>
 
-    <!-- Simulador de Anúncio -->
     <div id="adBanner" class="ad-banner">
-        📢 PUBLICIDADE: Transforme sua carreira. Conheça as melhores ferramentas de produtividade para engenharia. Clique aqui!
+        📢 PUBLICIDADE: Acelere sua contratação na Engenharia com nossas ferramentas parceiras. Clique aqui!
     </div>
 
     <header>
         <h1>ResumeTech Pro</h1>
-        <p>Motor de Análise Avançada e Criação Otimizada para Algoritmos ATS</p>
+        <p>Motor de Análise e Criação Estratégica para Algoritmos de RH</p>
     </header>
 
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('builder')">Construtor Otimizado</button>
-        <button class="tab-btn" onclick="switchTab('scanner')">Mega Analisador</button>
-        <button class="tab-btn premium-tab" onclick="switchTab('premium')">Premium 💎</button>
+        <button class="tab-btn active" onclick="switchTab('profile')">👤 Meu Perfil</button>
+        <button class="tab-btn" onclick="switchTab('builder')">📝 Construtor de CV</button>
+        <button class="tab-btn" onclick="switchTab('scanner')">🔍 Mega Analisador</button>
+        <button class="tab-btn premium-tab" onclick="switchTab('premium')">💎 Premium</button>
     </div>
 
     <div class="main-content">
-        <!-- MÓDULO 1: CONSTRUTOR -->
-        <div id="builder" class="container active">
-            <div class="panel">
-                <h2>Preencha seus Dados</h2>
-                <label>Nome Completo</label>
-                <input type="text" id="inpName" placeholder="Ex: Jefferson Oliveira" onkeyup="updatePreview()">
-                <label>Contatos</label>
-                <input type="text" id="inpContact" placeholder="Ex: Campinas - SP | (19) 90000-0000" onkeyup="updatePreview()">
-                <label>Resumo Profissional</label>
-                <textarea id="inpSummary" onkeyup="updatePreview()"></textarea>
-                <label>Competências</label>
-                <textarea id="inpSkills" onkeyup="updatePreview()"></textarea>
-                <label>Experiência</label>
-                <textarea id="inpExp" onkeyup="updatePreview()"></textarea>
-            </div>
-            
-            <div class="cv-preview" id="cvPreview">
-                <div class="cv-name" id="outName">SEU NOME</div>
-                <div class="cv-contact" id="outContact">Sua Cidade | Seu Telefone</div>
-                <div class="cv-section-title">RESUMO PROFISSIONAL</div>
-                <div id="outSummary" style="color: #334155; line-height: 1.6; font-size: 14px;">Seu resumo aparecerá aqui...</div>
-                <div class="cv-section-title">COMPETÊNCIAS E PALAVRAS-CHAVE</div>
-                <div id="outSkills" style="color: #334155; line-height: 1.6; font-size: 14px;">Suas competências aparecerão aqui...</div>
-                <div class="cv-section-title">EXPERIÊNCIA PROFISSIONAL</div>
-                <div style="white-space: pre-wrap; color: #334155; line-height: 1.6; font-size: 14px;" id="outExp">Suas experiências aparecerão aqui...</div>
+        <!-- NOVO MÓDULO: MEU PERFIL (Base de Dados do Usuário) -->
+        <div id="profile" class="container active">
+            <div class="panel" style="grid-column: span 2; max-width: 800px; margin: 0 auto;">
+                <h2>Configuração de Perfil Mestre</h2>
+                <p style="color: #64748b; margin-bottom: 30px;">Os dados preenchidos aqui alimentarão automaticamente o cabeçalho do seu currículo.</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <label>Nome Completo</label>
+                        <input type="text" id="profName" placeholder="Ex: Jefferson Oliveira" onkeyup="syncProfileToBuilder()">
+                    </div>
+                    <div>
+                        <label>E-mail Profissional</label>
+                        <input type="text" id="profEmail" placeholder="Ex: email@email.com" onkeyup="syncProfileToBuilder()">
+                    </div>
+                    <div>
+                        <label>Telefone / WhatsApp</label>
+                        <input type="text" id="profPhone" placeholder="(00) 00000-0000" onkeyup="syncProfileToBuilder()">
+                    </div>
+                    <div>
+                        <label>Cidade e Estado</label>
+                        <input type="text" id="profCity" placeholder="Ex: Campinas - SP" onkeyup="syncProfileToBuilder()">
+                    </div>
+                    <div>
+                        <label>URL do LinkedIn</label>
+                        <input type="text" id="profLinkedin" placeholder="linkedin.com/in/seu-perfil" onkeyup="syncProfileToBuilder()">
+                    </div>
+                    <div>
+                        <label>URL do GitHub / Portfólio</label>
+                        <input type="text" id="profGithub" placeholder="github.com/seu-usuario" onkeyup="syncProfileToBuilder()">
+                    </div>
+                </div>
+                <button class="btn-primary" style="width: auto; float: right; margin-top: 30px;" onclick="switchTab('builder')">Salvar e Ir para o Construtor ➔</button>
+                <div style="clear: both;"></div>
             </div>
         </div>
 
-        <!-- MÓDULO 2: MEGA ANALISADOR -->
+        <!-- MÓDULO 1: CONSTRUTOR OTIMIZADO (Preservado e Expandido) -->
+        <div id="builder" class="container">
+            <div class="panel">
+                <h2>Conteúdo do Currículo</h2>
+                
+                <!-- Campos ocultos que recebem dados do Perfil -->
+                <input type="hidden" id="inpName">
+                <input type="hidden" id="inpContact">
+
+                <label>Resumo Profissional</label>
+                <textarea id="inpSummary" placeholder="Estudante de Engenharia..." onkeyup="updatePreview()"></textarea>
+                
+                <label>Competências Técnicas e Comportamentais</label>
+                <textarea id="inpSkills" placeholder="Ex: NBR 5410, HTML, CSS, Liderança..." onkeyup="updatePreview()"></textarea>
+                
+                <label>Experiência Profissional</label>
+                <textarea id="inpExp" placeholder="Empresa - Cargo&#10;• Otimizei resultados em X%..." onkeyup="updatePreview()"></textarea>
+
+                <!-- NOVOS CAMPOS ADICIONADOS -->
+                <label>Formação Acadêmica</label>
+                <textarea id="inpEducation" style="height: 70px;" placeholder="Ex: Bacharelado em Engenharia Elétrica - Unifatecie" onkeyup="updatePreview()"></textarea>
+
+                <label>Cursos e Certificações</label>
+                <textarea id="inpCerts" style="height: 70px;" placeholder="Ex: NR-10 (40 horas)" onkeyup="updatePreview()"></textarea>
+
+                <label>Idiomas</label>
+                <input type="text" id="inpLangs" placeholder="Ex: Inglês Básico (Conversação)" onkeyup="updatePreview()">
+            </div>
+            
+            <!-- PREVIEW EXPANDIDO -->
+            <div class="cv-preview" id="cvPreview">
+                <div class="cv-name" id="outName">SEU NOME</div>
+                <div class="cv-contact" id="outContact">Sua Cidade | Seu Telefone | Email</div>
+                
+                <div class="cv-section-title">RESUMO PROFISSIONAL</div>
+                <div class="cv-text" id="outSummary">Seu resumo aparecerá aqui...</div>
+                
+                <div class="cv-section-title">COMPETÊNCIAS</div>
+                <div class="cv-text" id="outSkills">Suas competências...</div>
+                
+                <div class="cv-section-title">EXPERIÊNCIA PROFISSIONAL</div>
+                <div class="cv-text" id="outExp">Suas experiências...</div>
+
+                <!-- Áreas Novas no Preview -->
+                <div id="sectionEdu" style="display: none;">
+                    <div class="cv-section-title">FORMAÇÃO ACADÊMICA</div>
+                    <div class="cv-text" id="outEducation"></div>
+                </div>
+
+                <div id="sectionCerts" style="display: none;">
+                    <div class="cv-section-title">CURSOS E CERTIFICAÇÕES</div>
+                    <div class="cv-text" id="outCerts"></div>
+                </div>
+
+                <div id="sectionLangs" style="display: none;">
+                    <div class="cv-section-title">IDIOMAS</div>
+                    <div class="cv-text" id="outLangs"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MÓDULO 2: MEGA ANALISADOR (Bug Corrigido) -->
         <div id="scanner" class="container">
-            <!-- Tela de Bloqueio -->
             <div id="scannerLocked" class="locked-screen">
-                <h2>🔒 Recurso Exclusivo Premium</h2>
-                <p>O Mega Analisador com Inteligência de RH processa arquivos PDF, DOCX e TXT validando suas chances contra robôs de triagem.</p>
-                <button class="btn-primary" style="width: auto; padding: 14px 30px;" onclick="switchTab('premium')">Desbloquear Funcionalidade</button>
+                <h2 style="color: var(--premium-color); border: none;">🔒 Recurso Exclusivo Premium</h2>
+                <p style="color: #475569; font-size: 16px; margin: 15px auto 30px; max-width: 500px; line-height: 1.6;">O Mega Analisador com Inteligência de RH exige o pacote Premium para cruzar seus dados com os requisitos dos robôs de triagem.</p>
+                <button class="btn-primary" style="width: auto; padding: 16px 35px;" onclick="switchTab('premium')">Desbloquear Funcionalidade</button>
             </div>
 
-            <!-- Tela Liberada -->
-            <div id="scannerUnlocked" style="display:none; grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <div id="scannerUnlocked" style="display:none; grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
                 <div class="panel">
-                    <h2>Upload do Currículo</h2>
-                    <p style="color: #64748b; font-size: 15px; margin-bottom: 25px;">O algoritmo extrairá o texto do seu arquivo e buscará verbos de ação e métricas de resultado.</p>
+                    <h2>Auditoria de Documento</h2>
+                    <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Faça upload do seu .TXT ou cole o texto do seu PDF abaixo.</p>
                     
                     <label class="file-upload-wrapper" for="cvUpload">
-                        <span class="file-upload-label">📎 Arraste ou clique para anexar</span>
-                        <p style="font-size: 13px; color: #94a3b8; margin-top: 5px;">Formatos aceitos: .PDF, .DOCX, .TXT</p>
-                        <input type="file" id="cvUpload" accept=".pdf,.doc,.docx,.txt" onchange="handleFileUpload(event)">
+                        <span class="file-upload-label">📎 Anexar Arquivo de Texto (.txt)</span>
+                        <input type="file" id="cvUpload" accept=".txt,.pdf,.docx" onchange="handleFileUpload(event)">
                     </label>
 
-                    <textarea id="cvInputScanner" style="display:none;"></textarea>
+                    <!-- A Caixa de Texto agora fica visível para o usuário colar o PDF manualmente -->
+                    <textarea id="cvInputScanner" style="display:none; margin-top: 20px; height: 200px;" placeholder="Cole o texto do seu currículo aqui..."></textarea>
+                    
                     <button class="btn-primary" onclick="analyzeCV()">Executar Auditoria de RH</button>
                 </div>
 
@@ -321,8 +363,8 @@
                         <div id="scoreBox" class="score-box">Pontuação: 0/100</div>
                         <div id="feedbackContainer"></div>
                     </div>
-                    <div id="emptyScannerState" style="color: #94a3b8; text-align: center; margin-top: 60px; font-weight: 500;">
-                        Aguardando envio do documento...
+                    <div id="emptyScannerState" style="color: #94a3b8; text-align: center; margin-top: 60px; font-weight: 500; font-size: 15px;">
+                        Aguardando envio ou colagem do documento...
                     </div>
                 </div>
             </div>
@@ -330,16 +372,16 @@
 
         <!-- MÓDULO 3: PREMIUM -->
         <div id="premium" class="container">
-            <div class="panel" style="grid-column: span 2; text-align: center; padding: 60px 40px; border: 2px solid #ede9fe; background: linear-gradient(to bottom, #ffffff, #faf5ff);">
-                <h2 style="font-size: 38px; color: var(--premium-color); margin-bottom: 10px;">ResumeTech Pro <span style="color: var(--gold);">Premium</span></h2>
+            <div class="panel" style="grid-column: span 2; text-align: center; padding: 80px 40px; border: 2px solid #ede9fe; background: linear-gradient(to bottom, #ffffff, #faf5ff);">
+                <h2 style="font-size: 42px; color: var(--premium-color); margin-bottom: 10px; border: none;">ResumeTech Pro <span style="color: var(--gold);">Premium</span></h2>
                 <p style="font-size: 18px; color: #475569; max-width: 600px; margin: 0 auto;">Eleve sua carreira ao próximo nível hackeando os algoritmos de recrutamento das maiores empresas do mundo.</p>
                 
-                <ul style="list-style: none; padding: 0; font-size: 16px; margin: 40px auto; max-width: 400px; text-align: left; color: #334155; line-height: 2.5;">
-                    <li style="border-bottom: 1px solid #f1f5f9;"><span style="color: var(--success); font-weight: bold; margin-right: 10px;">✓</span> <strong>Acesso ao Mega Analisador</strong> (Leitura avançada)</li>
-                    <li style="border-bottom: 1px solid #f1f5f9;"><span style="color: var(--success); font-weight: bold; margin-right: 10px;">✓</span> <strong>Remoção total de Anúncios</strong> na plataforma</li>
-                    <li><span style="color: var(--success); font-weight: bold; margin-right: 10px;">✓</span> <strong>Auditoria contra vieses de contratação</strong></li>
+                <ul style="list-style: none; padding: 0; font-size: 17px; margin: 40px auto; max-width: 450px; text-align: left; color: #334155; line-height: 2.5;">
+                    <li style="border-bottom: 1px solid #f1f5f9;"><span style="color: var(--success); font-weight: bold; margin-right: 15px;">✓</span> <strong>Acesso ao Mega Analisador</strong></li>
+                    <li style="border-bottom: 1px solid #f1f5f9;"><span style="color: var(--success); font-weight: bold; margin-right: 15px;">✓</span> <strong>Remoção total de Anúncios</strong> na plataforma</li>
+                    <li><span style="color: var(--success); font-weight: bold; margin-right: 15px;">✓</span> <strong>Auditoria contra vieses de contratação</strong></li>
                 </ul>
-                <button class="btn-primary btn-premium" style="width: auto; padding: 18px 50px; font-size: 18px;" onclick="activatePremium()">Desbloquear Premium Agora</button>
+                <button class="btn-primary btn-premium" style="width: auto; padding: 20px 60px; font-size: 18px;" onclick="activatePremium()">Desbloquear Premium Agora</button>
             </div>
         </div>
     </div>
@@ -347,15 +389,13 @@
     <footer>
         <div class="footer-links">
             <span onclick="alert('Sistema focado em hackear ATS.')">Sobre a Plataforma</span>
-            <span>&middot;</span>
             <span onclick="alert('Seus dados não são enviados para nenhum servidor.')">Privacidade e LGPD</span>
-            <span>&middot;</span>
             <span onclick="alert('Contato: suporte@resumetech.com')">Suporte Técnico</span>
         </div>
     </footer>
 
     <script>
-        // JAVASCRIPT: Lógica Central Preservada Exatamente Como Solicitado
+        // LÓGICA PRESERVADA E EXPANDIDA
         let isPremium = false;
 
         function switchTab(tabId) {
@@ -376,7 +416,7 @@
             
             const btns = document.querySelectorAll('.tab-btn');
             btns.forEach(btn => {
-                if(btn.innerText.toLowerCase().includes(tabId) || (tabId==='scanner' && btn.innerText.includes('Analisador'))) {
+                if(btn.innerText.toLowerCase().includes(tabId) || (tabId==='scanner' && btn.innerText.includes('Analisador')) || (tabId==='profile' && btn.innerText.includes('Perfil'))) {
                     btn.classList.add('active');
                 }
             });
@@ -385,39 +425,76 @@
         function activatePremium() {
             isPremium = true;
             document.getElementById('adBanner').style.display = 'none';
-            alert("💎 Premium Desbloqueado com Sucesso! Os anúncios foram removidos e o Mega Analisador está liberado.");
+            alert("💎 Premium Desbloqueado! O Mega Analisador está pronto para uso.");
             switchTab('scanner'); 
         }
 
+        // NOVO: Sincroniza o Perfil com os inputs ocultos do Construtor
+        function syncProfileToBuilder() {
+            const name = document.getElementById('profName').value;
+            const city = document.getElementById('profCity').value;
+            const phone = document.getElementById('profPhone').value;
+            const email = document.getElementById('profEmail').value;
+            const linkedin = document.getElementById('profLinkedin').value;
+            const github = document.getElementById('profGithub').value;
+
+            document.getElementById('inpName').value = name;
+            
+            let contactString = [city, phone, email, linkedin, github].filter(Boolean).join(' | ');
+            document.getElementById('inpContact').value = contactString;
+            
+            updatePreview();
+        }
+
+        function updatePreview() {
+            document.getElementById('outName').innerText = document.getElementById('inpName').value || 'SEU NOME';
+            document.getElementById('outContact').innerText = document.getElementById('inpContact').value || 'Sua Cidade | Seu Telefone | Email';
+            document.getElementById('outSummary').innerText = document.getElementById('inpSummary').value || 'Seu resumo aparecerá aqui...';
+            document.getElementById('outSkills').innerText = document.getElementById('inpSkills').value || 'Suas competências aparecerão aqui...';
+            document.getElementById('outExp').innerText = document.getElementById('inpExp').value || 'Suas experiências aparecerão aqui...';
+
+            // Lida com os novos campos e oculta a seção se estiver vazia
+            const edu = document.getElementById('inpEducation').value;
+            const certs = document.getElementById('inpCerts').value;
+            const langs = document.getElementById('inpLangs').value;
+
+            document.getElementById('sectionEdu').style.display = edu ? 'block' : 'none';
+            document.getElementById('outEducation').innerText = edu;
+
+            document.getElementById('sectionCerts').style.display = certs ? 'block' : 'none';
+            document.getElementById('outCerts').innerText = certs;
+
+            document.getElementById('sectionLangs').style.display = langs ? 'block' : 'none';
+            document.getElementById('outLangs').innerText = langs;
+        }
+
+        // BUGS CORRIGIDOS: Manipulação Honesta de Arquivos
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
             const emptyState = document.getElementById('emptyScannerState');
+            const txtArea = document.getElementById('cvInputScanner');
             
             if (file.name.endsWith('.txt')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    document.getElementById('cvInputScanner').value = e.target.result;
-                    emptyState.innerText = "Arquivo de texto carregado! Clique em Executar Auditoria.";
-                    emptyState.style.color = "var(--secondary-color)";
+                    txtArea.value = e.target.result;
+                    txtArea.style.display = 'block';
+                    emptyState.innerHTML = "Arquivo lido com sucesso! Clique em Executar Auditoria.";
+                    emptyState.style.color = "var(--success)";
                 };
                 reader.readAsText(file);
             } else {
-                document.getElementById('cvInputScanner').value = "Estudante casado e pontual. Fui proativo em manutenções e desenvolvi novos projetos. Fui responsável pela redução de custos.";
-                emptyState.innerText = `Arquivo ${file.name} carregado e convertido! Clique em Executar Auditoria.`;
-                emptyState.style.color = "var(--secondary-color)";
+                // Ao invés de injetar texto falso, revela a caixa de texto para o usuário colar o conteúdo do PDF.
+                txtArea.value = "";
+                txtArea.style.display = 'block';
+                emptyState.innerHTML = "<strong>⚠️ Limitação do Navegador:</strong> Não é possível ler PDFs nativamente sem um servidor. <br><br>Por favor, <strong>abra o seu PDF, copie o texto e cole na caixa acima</strong> para fazer a análise real.";
+                emptyState.style.color = "var(--warning)";
             }
         }
 
-        function updatePreview() {
-            document.getElementById('outName').innerText = document.getElementById('inpName').value || 'SEU NOME';
-            document.getElementById('outContact').innerText = document.getElementById('inpContact').value || 'Sua Cidade | Seu Telefone';
-            document.getElementById('outSummary').innerText = document.getElementById('inpSummary').value || 'Seu resumo aparecerá aqui...';
-            document.getElementById('outSkills').innerText = document.getElementById('inpSkills').value || 'Suas competências aparecerão aqui...';
-            document.getElementById('outExp').innerText = document.getElementById('inpExp').value || 'Suas experiências aparecerão aqui...';
-        }
-
+        // LÓGICA DE AVALIAÇÃO REFINADA (Agora o currículo perfeito tira 100%)
         function analyzeCV() {
             const text = document.getElementById('cvInputScanner').value.toLowerCase();
             const resultsDiv = document.getElementById('scannerResults');
@@ -426,7 +503,7 @@
             const feedbackContainer = document.getElementById('feedbackContainer');
 
             if(text.trim().length < 20) {
-                alert("Nenhum arquivo carregado ou arquivo vazio.");
+                alert("Nenhum texto detectado para análise.");
                 return;
             }
 
@@ -444,26 +521,29 @@
                 feedbacks.push(`<strong>⚠️ Risco de Triagem:</strong> Você incluiu dados pessoais obsoletos (${foundBadWords.join(', ')}). Robôs modernos e práticas de ESG repudiam isso. Remova-os.`);
             }
 
-            const actionVerbs = ['desenvolvi', 'otimizei', 'liderei', 'reduzi', 'aumentei', 'criei', 'garanti', 'executei'];
+            // Busca pela raiz do verbo para não penalizar variações (ex: "garanti", "garantindo", "garantir")
+            const actionVerbs = ['desenvolv', 'otimiz', 'lider', 'reduz', 'aument', 'cria', 'garant', 'execu', 'assegura', 'contribu'];
             const foundVerbs = actionVerbs.filter(verb => text.includes(verb));
             if(foundVerbs.length < 2) {
                 score -= 15;
-                feedbacks.push(`<strong>📉 Falta de Ação:</strong> Seu currículo está passivo. Use verbos de alto impacto como "otimizei", "desenvolvi" ou "reduzi".`);
+                feedbacks.push(`<strong>📉 Falta de Ação:</strong> Seu currículo está passivo. Use verbos de alto impacto como "otimizar", "desenvolver" ou "reduzir".`);
             } else {
                 feedbacks.push(`<strong>✅ Dinamismo Aprovado:</strong> Excelente uso de verbos de ação.`);
             }
 
-            const hasNumbers = /\d+%|\d+ %/g.test(text) || text.includes('resultados');
+            // Verifica qualquer número (horas, anos) ou a palavra "resultado" (singular ou plural)
+            const hasNumbers = /\d+/g.test(text) || text.includes('resultado');
             if(!hasNumbers) {
                 score -= 20;
-                feedbacks.push(`<strong>📊 Ausência de Métricas:</strong> Sêniors vendem resultados. Onde estão os números? Tente incluir dados como "aumentei a eficiência em X%".`);
+                feedbacks.push(`<strong>📊 Ausência de Métricas:</strong> Sêniors vendem resultados. Onde estão os números ou indicativos de performance?`);
             }
 
-            const cliches = ['proativo', 'perfeccionista', 'trabalho em equipe', 'pontual'];
+            // "Trabalho em equipe" foi removido da lista de penalidades, pois é uma soft skill válida.
+            const cliches = ['proativo', 'perfeccionista', 'pontual', 'focado no resultado'];
             const foundCliches = cliches.filter(word => text.includes(word));
             if(foundCliches.length > 0) {
                 score -= 10;
-                feedbacks.push(`<strong>🥱 Clichês Detectados:</strong> Você usou termos genéricos (${foundCliches.join(', ')}). Qualquer candidato diz que é "proativo". Prove isso nas descrições.`);
+                feedbacks.push(`<strong>🥱 Clichês Detectados:</strong> Você usou adjetivos genéricos (${foundCliches.join(', ')}). Prove essas qualidades nas descrições de cargo.`);
             }
 
             if(score < 0) score = 0;
