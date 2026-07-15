@@ -4,36 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ResumeTech Pro | Mega Brian HR</title>
-    <!-- Fonte Premium -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Fonte Premium Fintech (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           CSS SUPER PREMIUM: Estilo SaaS Moderno
+           CSS DARK FINTECH: Inspirado em Stripe/Nubank
            ========================================= */
         :root {
-            --primary-color: #0f172a; 
-            --secondary-color: #0ea5e9; /* Azul ciano moderno */
-            --secondary-hover: #0284c7;
-            --bg-color: #f1f5f9; /* Fundo mais sofisticado */
-            --text-color: #334155;
+            --bg-color: #09090b; /* Fundo hiper escuro (Zinc 950) */
+            --panel-bg: #18181b; /* Fundo dos cards (Zinc 900) */
+            --border-color: #27272a; /* Bordas sutis */
+            --text-main: #f8fafc; /* Branco gelo para leitura */
+            --text-muted: #a1a1aa; /* Cinza para textos secundários */
+            --primary: #6366f1; /* Indigo Fintech */
+            --primary-hover: #4f46e5;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --premium: #a855f7; /* Roxo Premium */
+            --premium-glow: rgba(168, 85, 247, 0.4);
             --success: #10b981;
-            --warning: #f59e0b;
             --danger: #ef4444;
-            --premium-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
-            --premium-color: #a855f7;
-            --gold: #fbbf24;
-            --panel-bg: rgba(255, 255, 255, 0.95);
-            --panel-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
-            --paper-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
-            --border-radius: 16px;
+            --warning: #f59e0b;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
-            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
-            background-size: 20px 20px; /* Padrão de pontilhados sutil ao fundo */
-            color: var(--text-color);
+            color: var(--text-main);
             margin: 0;
             padding: 0;
             display: flex;
@@ -43,166 +39,164 @@
 
         .main-content { flex: 1; }
 
-        /* Header de Luxo - Glassmorphism */
+        /* Header Estilo Vercel/Stripe */
         header {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            color: white;
-            padding: 25px 20px;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 24px 20px;
             text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
             position: sticky;
             top: 0;
             z-index: 50;
         }
-        header h1 { margin: 0 0 5px 0; font-size: 30px; font-weight: 800; letter-spacing: -1px; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
-        header p { margin: 0; color: #94a3b8; font-size: 14px; font-weight: 400; letter-spacing: 0.5px;}
+        header h1 { margin: 0 0 5px 0; font-size: 28px; font-weight: 800; letter-spacing: -1px; color: #ffffff;}
+        header p { margin: 0; color: var(--text-muted); font-size: 14px; letter-spacing: 0.5px;}
 
         .ad-banner {
-            background: linear-gradient(90deg, #fef08a 0%, #fde047 100%);
+            background: #fef08a;
             color: #854d0e;
             text-align: center;
             padding: 10px;
             font-weight: 600;
             font-size: 13px;
-            letter-spacing: 0.3px;
         }
 
-        /* Abas Flutuantes */
+        /* Abas Estilo Pílula (Fintech UI) */
         .tabs {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            padding: 25px 20px 0 20px;
+            gap: 12px;
+            padding: 30px 20px 0 20px;
             flex-wrap: wrap;
         }
 
         .tab-btn {
-            padding: 14px 28px;
+            padding: 12px 24px;
             cursor: pointer;
-            border: 1px solid #cbd5e1;
-            background: white;
-            border-radius: 30px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            border-radius: 100px; /* Pílula perfeita */
             font-size: 14px;
-            font-weight: 600;
-            color: #64748b;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
         }
 
-        .tab-btn:hover { border-color: var(--secondary-color); color: var(--secondary-color); transform: translateY(-2px); }
-        .tab-btn.active { background: var(--secondary-color); color: white; border-color: var(--secondary-color); box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); }
+        .tab-btn:hover { border-color: #52525b; color: var(--text-main); }
+        .tab-btn.active { 
+            background: var(--panel-bg); 
+            color: var(--text-main); 
+            border-color: var(--primary); 
+            box-shadow: 0 0 15px var(--primary-glow); 
+        }
         
-        .tab-btn.premium-tab { border-color: var(--premium-color); color: var(--premium-color); }
-        .tab-btn.premium-tab:hover { background: var(--premium-gradient); color: white; border-color: transparent; }
-        .tab-btn.premium-tab.active { background: var(--premium-gradient); color: white; border-color: transparent; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4); }
+        .tab-btn.premium-tab { color: var(--premium); border-color: rgba(168, 85, 247, 0.3); }
+        .tab-btn.premium-tab:hover { background: rgba(168, 85, 247, 0.1); border-color: var(--premium); }
+        .tab-btn.premium-tab.active { box-shadow: 0 0 15px var(--premium-glow); border-color: var(--premium); background: rgba(168, 85, 247, 0.1); color: #d8b4fe;}
 
         .container {
             max-width: 1300px;
             margin: 40px auto;
             padding: 0 20px;
             display: none;
-            animation: fadeIn 0.4s ease-in-out;
+            animation: fadeIn 0.3s ease-out;
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
-        .container.active { display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px; }
+        .container.active { display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px; }
 
-        /* Painéis Ultra Limpos */
+        /* Cards Dark Mode */
         .panel {
             background: var(--panel-bg);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--panel-shadow);
-            border: 1px solid rgba(255,255,255,0.8);
+            padding: 35px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
-        h2 { margin-top: 0; color: var(--primary-color); font-weight: 800; font-size: 24px; letter-spacing: -0.5px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px;}
+        h2 { margin-top: 0; color: #ffffff; font-weight: 700; font-size: 20px; letter-spacing: -0.5px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;}
         
-        label { display: block; font-weight: 600; color: #475569; margin-top: 25px; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;}
+        label { display: block; font-weight: 500; color: var(--text-muted); margin-top: 20px; margin-bottom: 8px; font-size: 13px; letter-spacing: 0.5px;}
         
+        /* Inputs Estilo Terminal/Fintech */
         input[type="text"], textarea {
             width: 100%;
-            padding: 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             font-family: inherit;
             font-size: 15px;
-            background-color: #f8fafc;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             transition: all 0.2s ease;
             box-sizing: border-box;
-            color: #1e293b;
         }
         input[type="text"]:focus, textarea:focus {
             outline: none;
-            border-color: var(--secondary-color);
-            background-color: white;
-            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-glow);
         }
         textarea { height: 100px; resize: vertical; line-height: 1.6; }
 
         .file-upload-wrapper {
-            border: 2px dashed #94a3b8;
+            border: 1px dashed var(--border-color);
             border-radius: 12px;
-            padding: 50px 20px;
+            padding: 40px 20px;
             text-align: center;
-            background-color: #f8fafc;
-            margin-top: 25px;
+            background-color: var(--bg-color);
+            margin-top: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
             display: block;
         }
-        .file-upload-wrapper:hover { border-color: var(--secondary-color); background-color: #f0f9ff; transform: translateY(-2px); }
+        .file-upload-wrapper:hover { border-color: var(--primary); background-color: rgba(99, 102, 241, 0.05); }
         .file-upload-wrapper input[type="file"] { display: none; }
-        .file-upload-label { font-size: 16px; font-weight: 600; color: var(--secondary-color); display: block; margin-bottom: 8px;}
+        .file-upload-label { font-size: 15px; font-weight: 600; color: var(--primary); display: block; margin-bottom: 5px;}
 
         button.btn-primary {
-            background-color: var(--secondary-color);
+            background: linear-gradient(135deg, var(--primary) 0%, #818cf8 100%);
             color: white;
             border: none;
-            padding: 18px 24px;
-            font-size: 16px;
-            font-weight: 700;
-            border-radius: 10px;
+            padding: 16px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
             cursor: pointer;
-            margin-top: 30px;
+            margin-top: 25px;
             width: 100%;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.2);
             letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        button.btn-primary:hover { background-color: var(--secondary-hover); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3); }
+        button.btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-        button.btn-premium { background: var(--premium-gradient); box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3); }
-        button.btn-premium:hover { background: linear-gradient(135deg, #4f46e5 0%, #9333ea 50%, #db2777 100%); box-shadow: 0 10px 25px rgba(168, 85, 247, 0.5); }
+        button.btn-premium { background: linear-gradient(135deg, var(--premium) 0%, #c084fc 100%); }
 
-        /* Preview A4 Premium */
+        /* Preview A4 (Branco Absoluto para Contraste) */
         .cv-preview { 
-            background: white; 
-            min-height: 842px; /* Proporção A4 real */
+            background: #ffffff; 
+            color: #0f172a; /* Texto escuro no papel claro */
+            min-height: 842px; 
             padding: 60px 50px;
             border-radius: 4px; 
-            box-shadow: var(--paper-shadow);
-            border: 1px solid #e2e8f0;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            border: none;
             position: relative;
         }
-        .cv-preview::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 8px; background: var(--secondary-color); border-radius: 4px 4px 0 0; }
+        .cv-name { font-size: 26px; font-weight: 800; text-transform: uppercase; color: #0f172a; text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 10px; letter-spacing: 1px;}
+        .cv-contact { text-align: center; font-size: 13px; color: #475569; margin-bottom: 30px; font-weight: 500;}
+        .cv-section-title { font-size: 14px; font-weight: 800; color: #0f172a; border-bottom: 2px solid #e2e8f0; margin-top: 25px; margin-bottom: 12px; padding-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;}
+        .cv-text { color: #334155; line-height: 1.7; font-size: 13px; white-space: pre-wrap;}
 
-        .cv-name { font-size: 28px; font-weight: 800; text-transform: uppercase; color: var(--primary-color); text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 10px; letter-spacing: 1.5px;}
-        .cv-contact { text-align: center; font-size: 13px; color: #64748b; margin-bottom: 30px; font-weight: 500;}
-        .cv-section-title { font-size: 15px; font-weight: 800; color: var(--primary-color); border-bottom: 2px solid #e2e8f0; margin-top: 25px; margin-bottom: 15px; padding-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;}
-        .cv-text { color: #334155; line-height: 1.7; font-size: 14px; white-space: pre-wrap;}
-
-        /* Scanner Feedbacks */
-        .score-box { text-align: center; padding: 30px; border-radius: 16px; margin-bottom: 25px; font-size: 32px; font-weight: 800; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
-        .score-high { background-color: #ecfdf5; color: var(--success); border: 2px solid #34d399;}
-        .score-med { background-color: #fffbeb; color: var(--warning); border: 2px solid #fbbf24;}
-        .score-low { background-color: #fef2f2; color: var(--danger); border: 2px solid #f87171;}
+        /* Scanner Feedbacks no Dark Mode */
+        .score-box { text-align: center; padding: 25px; border-radius: 12px; margin-bottom: 25px; font-size: 30px; font-weight: 800; background: var(--bg-color); border: 1px solid var(--border-color);}
+        .score-high { color: var(--success); border-color: rgba(16, 185, 129, 0.3); box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);}
+        .score-med { color: var(--warning); border-color: rgba(245, 158, 11, 0.3); }
+        .score-low { color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
         
-        .feedback-item { margin-bottom: 15px; padding: 20px; border-radius: 12px; border-left: 6px solid var(--secondary-color); background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; border-left-width: 6px; line-height: 1.6;}
+        .feedback-item { margin-bottom: 15px; padding: 18px; border-radius: 8px; border-left: 4px solid var(--primary); background: var(--bg-color); border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); line-height: 1.6; font-size: 14px;}
 
-        .locked-screen { text-align: center; padding: 80px 20px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border: 2px dashed var(--premium-color); border-radius: var(--border-radius); grid-column: span 2; box-shadow: var(--panel-shadow); }
+        .locked-screen { text-align: center; padding: 80px 20px; background: rgba(168, 85, 247, 0.05); border: 1px dashed var(--premium); border-radius: 16px; grid-column: span 2; }
 
         @media(max-width: 768px){
             .container.active { grid-template-columns: 1fr; }
@@ -210,10 +204,10 @@
             .cv-preview { min-height: 500px; padding: 30px;}
         }
 
-        footer { background-color: transparent; color: #94a3b8; padding: 30px 0; text-align: center; font-size: 14px; font-weight: 500; }
+        footer { border-top: 1px solid var(--border-color); color: var(--text-muted); padding: 30px 0; text-align: center; font-size: 13px; font-weight: 500; margin-top: 40px;}
         .footer-links { display: flex; justify-content: center; gap: 30px; }
         .footer-links span { cursor: pointer; transition: 0.3s; }
-        .footer-links span:hover { color: var(--primary-color); }
+        .footer-links span:hover { color: var(--text-main); }
     </style>
 </head>
 <body>
@@ -228,80 +222,59 @@
     </header>
 
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('profile')">👤 Meu Perfil</button>
-        <button class="tab-btn" onclick="switchTab('builder')">📝 Construtor de CV</button>
-        <button class="tab-btn" onclick="switchTab('scanner')">🔍 Mega Analisador</button>
-        <button class="tab-btn premium-tab" onclick="switchTab('premium')">💎 Premium</button>
+        <button class="tab-btn active" onclick="switchTab('profile')">Meu Perfil</button>
+        <button class="tab-btn" onclick="switchTab('builder')">Construtor</button>
+        <button class="tab-btn" onclick="switchTab('scanner')">Mega Analisador</button>
+        <button class="tab-btn premium-tab" onclick="switchTab('premium')">Premium 💎</button>
     </div>
 
     <div class="main-content">
-        <!-- NOVO MÓDULO: MEU PERFIL (Base de Dados do Usuário) -->
+        <!-- MÓDULO: MEU PERFIL -->
         <div id="profile" class="container active">
             <div class="panel" style="grid-column: span 2; max-width: 800px; margin: 0 auto;">
                 <h2>Configuração de Perfil Mestre</h2>
-                <p style="color: #64748b; margin-bottom: 30px;">Os dados preenchidos aqui alimentarão automaticamente o cabeçalho do seu currículo.</p>
+                <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 14px;">Os dados preenchidos aqui alimentarão automaticamente o cabeçalho do seu currículo.</p>
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div>
-                        <label>Nome Completo</label>
-                        <input type="text" id="profName" placeholder="Ex: Jefferson Oliveira" onkeyup="syncProfileToBuilder()">
-                    </div>
-                    <div>
-                        <label>E-mail Profissional</label>
-                        <input type="text" id="profEmail" placeholder="Ex: email@email.com" onkeyup="syncProfileToBuilder()">
-                    </div>
-                    <div>
-                        <label>Telefone / WhatsApp</label>
-                        <input type="text" id="profPhone" placeholder="(00) 00000-0000" onkeyup="syncProfileToBuilder()">
-                    </div>
-                    <div>
-                        <label>Cidade e Estado</label>
-                        <input type="text" id="profCity" placeholder="Ex: Campinas - SP" onkeyup="syncProfileToBuilder()">
-                    </div>
-                    <div>
-                        <label>URL do LinkedIn</label>
-                        <input type="text" id="profLinkedin" placeholder="linkedin.com/in/seu-perfil" onkeyup="syncProfileToBuilder()">
-                    </div>
-                    <div>
-                        <label>URL do GitHub / Portfólio</label>
-                        <input type="text" id="profGithub" placeholder="github.com/seu-usuario" onkeyup="syncProfileToBuilder()">
-                    </div>
+                    <div><label>Nome Completo</label><input type="text" id="profName" onkeyup="syncProfileToBuilder()"></div>
+                    <div><label>E-mail Profissional</label><input type="text" id="profEmail" onkeyup="syncProfileToBuilder()"></div>
+                    <div><label>Telefone / WhatsApp</label><input type="text" id="profPhone" onkeyup="syncProfileToBuilder()"></div>
+                    <div><label>Cidade e Estado</label><input type="text" id="profCity" onkeyup="syncProfileToBuilder()"></div>
+                    <div><label>URL do LinkedIn</label><input type="text" id="profLinkedin" onkeyup="syncProfileToBuilder()"></div>
+                    <div><label>URL do GitHub / Portfólio</label><input type="text" id="profGithub" onkeyup="syncProfileToBuilder()"></div>
                 </div>
                 <button class="btn-primary" style="width: auto; float: right; margin-top: 30px;" onclick="switchTab('builder')">Salvar e Ir para o Construtor ➔</button>
                 <div style="clear: both;"></div>
             </div>
         </div>
 
-        <!-- MÓDULO 1: CONSTRUTOR OTIMIZADO (Preservado e Expandido) -->
+        <!-- MÓDULO: CONSTRUTOR -->
         <div id="builder" class="container">
             <div class="panel">
                 <h2>Conteúdo do Currículo</h2>
                 
-                <!-- Campos ocultos que recebem dados do Perfil -->
                 <input type="hidden" id="inpName">
                 <input type="hidden" id="inpContact">
 
                 <label>Resumo Profissional</label>
-                <textarea id="inpSummary" placeholder="Estudante de Engenharia..." onkeyup="updatePreview()"></textarea>
+                <textarea id="inpSummary" onkeyup="updatePreview()"></textarea>
                 
                 <label>Competências Técnicas e Comportamentais</label>
-                <textarea id="inpSkills" placeholder="Ex: NBR 5410, HTML, CSS, Liderança..." onkeyup="updatePreview()"></textarea>
+                <textarea id="inpSkills" onkeyup="updatePreview()"></textarea>
                 
                 <label>Experiência Profissional</label>
-                <textarea id="inpExp" placeholder="Empresa - Cargo&#10;• Otimizei resultados em X%..." onkeyup="updatePreview()"></textarea>
+                <textarea id="inpExp" onkeyup="updatePreview()"></textarea>
 
-                <!-- NOVOS CAMPOS ADICIONADOS -->
                 <label>Formação Acadêmica</label>
-                <textarea id="inpEducation" style="height: 70px;" placeholder="Ex: Bacharelado em Engenharia Elétrica - Unifatecie" onkeyup="updatePreview()"></textarea>
+                <textarea id="inpEducation" style="height: 70px;" onkeyup="updatePreview()"></textarea>
 
                 <label>Cursos e Certificações</label>
-                <textarea id="inpCerts" style="height: 70px;" placeholder="Ex: NR-10 (40 horas)" onkeyup="updatePreview()"></textarea>
+                <textarea id="inpCerts" style="height: 70px;" onkeyup="updatePreview()"></textarea>
 
                 <label>Idiomas</label>
-                <input type="text" id="inpLangs" placeholder="Ex: Inglês Básico (Conversação)" onkeyup="updatePreview()">
+                <input type="text" id="inpLangs" onkeyup="updatePreview()">
             </div>
             
-            <!-- PREVIEW EXPANDIDO -->
             <div class="cv-preview" id="cvPreview">
                 <div class="cv-name" id="outName">SEU NOME</div>
                 <div class="cv-contact" id="outContact">Sua Cidade | Seu Telefone | Email</div>
@@ -315,7 +288,6 @@
                 <div class="cv-section-title">EXPERIÊNCIA PROFISSIONAL</div>
                 <div class="cv-text" id="outExp">Suas experiências...</div>
 
-                <!-- Áreas Novas no Preview -->
                 <div id="sectionEdu" style="display: none;">
                     <div class="cv-section-title">FORMAÇÃO ACADÊMICA</div>
                     <div class="cv-text" id="outEducation"></div>
@@ -333,25 +305,24 @@
             </div>
         </div>
 
-        <!-- MÓDULO 2: MEGA ANALISADOR (Bug Corrigido) -->
+        <!-- MÓDULO: MEGA ANALISADOR -->
         <div id="scanner" class="container">
             <div id="scannerLocked" class="locked-screen">
-                <h2 style="color: var(--premium-color); border: none;">🔒 Recurso Exclusivo Premium</h2>
-                <p style="color: #475569; font-size: 16px; margin: 15px auto 30px; max-width: 500px; line-height: 1.6;">O Mega Analisador com Inteligência de RH exige o pacote Premium para cruzar seus dados com os requisitos dos robôs de triagem.</p>
-                <button class="btn-primary" style="width: auto; padding: 16px 35px;" onclick="switchTab('premium')">Desbloquear Funcionalidade</button>
+                <h2 style="color: var(--premium); border: none;">🔒 Recurso Exclusivo Premium</h2>
+                <p style="color: var(--text-muted); font-size: 15px; margin: 15px auto 30px; max-width: 500px;">O Mega Analisador com Inteligência de RH exige o pacote Premium para cruzar seus dados com os requisitos dos robôs de triagem.</p>
+                <button class="btn-primary btn-premium" style="width: auto; padding: 14px 30px;" onclick="switchTab('premium')">Desbloquear Funcionalidade</button>
             </div>
 
             <div id="scannerUnlocked" style="display:none; grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
                 <div class="panel">
                     <h2>Auditoria de Documento</h2>
-                    <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">Faça upload do seu .TXT ou cole o texto do seu PDF abaixo.</p>
+                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Faça upload do seu .TXT ou cole o texto do seu PDF abaixo.</p>
                     
                     <label class="file-upload-wrapper" for="cvUpload">
                         <span class="file-upload-label">📎 Anexar Arquivo de Texto (.txt)</span>
                         <input type="file" id="cvUpload" accept=".txt,.pdf,.docx" onchange="handleFileUpload(event)">
                     </label>
 
-                    <!-- A Caixa de Texto agora fica visível para o usuário colar o PDF manualmente -->
                     <textarea id="cvInputScanner" style="display:none; margin-top: 20px; height: 200px;" placeholder="Cole o texto do seu currículo aqui..."></textarea>
                     
                     <button class="btn-primary" onclick="analyzeCV()">Executar Auditoria de RH</button>
@@ -363,25 +334,25 @@
                         <div id="scoreBox" class="score-box">Pontuação: 0/100</div>
                         <div id="feedbackContainer"></div>
                     </div>
-                    <div id="emptyScannerState" style="color: #94a3b8; text-align: center; margin-top: 60px; font-weight: 500; font-size: 15px;">
+                    <div id="emptyScannerState" style="color: var(--text-muted); text-align: center; margin-top: 60px; font-size: 14px;">
                         Aguardando envio ou colagem do documento...
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- MÓDULO 3: PREMIUM -->
+        <!-- MÓDULO: PREMIUM -->
         <div id="premium" class="container">
-            <div class="panel" style="grid-column: span 2; text-align: center; padding: 80px 40px; border: 2px solid #ede9fe; background: linear-gradient(to bottom, #ffffff, #faf5ff);">
-                <h2 style="font-size: 42px; color: var(--premium-color); margin-bottom: 10px; border: none;">ResumeTech Pro <span style="color: var(--gold);">Premium</span></h2>
-                <p style="font-size: 18px; color: #475569; max-width: 600px; margin: 0 auto;">Eleve sua carreira ao próximo nível hackeando os algoritmos de recrutamento das maiores empresas do mundo.</p>
+            <div class="panel" style="grid-column: span 2; text-align: center; padding: 60px 40px; border: 1px solid rgba(168, 85, 247, 0.3); background: rgba(168, 85, 247, 0.05);">
+                <h2 style="font-size: 32px; color: var(--premium); margin-bottom: 10px; border: none;">ResumeTech Pro Premium</h2>
+                <p style="font-size: 16px; color: var(--text-muted); max-width: 600px; margin: 0 auto;">Eleve sua carreira hackeando os algoritmos de recrutamento das maiores empresas do mundo.</p>
                 
-                <ul style="list-style: none; padding: 0; font-size: 17px; margin: 40px auto; max-width: 450px; text-align: left; color: #334155; line-height: 2.5;">
-                    <li style="border-bottom: 1px solid #f1f5f9;"><span style="color: var(--success); font-weight: bold; margin-right: 15px;">✓</span> <strong>Acesso ao Mega Analisador</strong></li>
-                    <li style="border-bottom: 1px solid #f1f5f9;"><span style="color: var(--success); font-weight: bold; margin-right: 15px;">✓</span> <strong>Remoção total de Anúncios</strong> na plataforma</li>
+                <ul style="list-style: none; padding: 0; font-size: 15px; margin: 40px auto; max-width: 450px; text-align: left; color: var(--text-main); line-height: 2.5;">
+                    <li style="border-bottom: 1px solid var(--border-color);"><span style="color: var(--success); font-weight: bold; margin-right: 15px;">✓</span> <strong>Acesso ao Mega Analisador</strong></li>
+                    <li style="border-bottom: 1px solid var(--border-color);"><span style="color: var(--success); font-weight: bold; margin-right: 15px;">✓</span> <strong>Remoção total de Anúncios</strong> na plataforma</li>
                     <li><span style="color: var(--success); font-weight: bold; margin-right: 15px;">✓</span> <strong>Auditoria contra vieses de contratação</strong></li>
                 </ul>
-                <button class="btn-primary btn-premium" style="width: auto; padding: 20px 60px; font-size: 18px;" onclick="activatePremium()">Desbloquear Premium Agora</button>
+                <button class="btn-primary btn-premium" style="width: auto; padding: 18px 50px;" onclick="activatePremium()">Desbloquear Premium Agora</button>
             </div>
         </div>
     </div>
@@ -395,7 +366,7 @@
     </footer>
 
     <script>
-        // LÓGICA PRESERVADA E EXPANDIDA
+        // LÓGICA PRESERVADA COM BUG DA REGEX CORRIGIDO
         let isPremium = false;
 
         function switchTab(tabId) {
@@ -429,7 +400,6 @@
             switchTab('scanner'); 
         }
 
-        // NOVO: Sincroniza o Perfil com os inputs ocultos do Construtor
         function syncProfileToBuilder() {
             const name = document.getElementById('profName').value;
             const city = document.getElementById('profCity').value;
@@ -453,7 +423,6 @@
             document.getElementById('outSkills').innerText = document.getElementById('inpSkills').value || 'Suas competências aparecerão aqui...';
             document.getElementById('outExp').innerText = document.getElementById('inpExp').value || 'Suas experiências aparecerão aqui...';
 
-            // Lida com os novos campos e oculta a seção se estiver vazia
             const edu = document.getElementById('inpEducation').value;
             const certs = document.getElementById('inpCerts').value;
             const langs = document.getElementById('inpLangs').value;
@@ -468,7 +437,6 @@
             document.getElementById('outLangs').innerText = langs;
         }
 
-        // BUGS CORRIGIDOS: Manipulação Honesta de Arquivos
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -486,7 +454,6 @@
                 };
                 reader.readAsText(file);
             } else {
-                // Ao invés de injetar texto falso, revela a caixa de texto para o usuário colar o conteúdo do PDF.
                 txtArea.value = "";
                 txtArea.style.display = 'block';
                 emptyState.innerHTML = "<strong>⚠️ Limitação do Navegador:</strong> Não é possível ler PDFs nativamente sem um servidor. <br><br>Por favor, <strong>abra o seu PDF, copie o texto e cole na caixa acima</strong> para fazer a análise real.";
@@ -494,7 +461,7 @@
             }
         }
 
-        // LÓGICA DE AVALIAÇÃO REFINADA (Agora o currículo perfeito tira 100%)
+        // LÓGICA CORRIGIDA: Uso de Expressões Regulares com \b
         function analyzeCV() {
             const text = document.getElementById('cvInputScanner').value.toLowerCase();
             const resultsDiv = document.getElementById('scannerResults');
@@ -514,36 +481,39 @@
             let score = 100;
             let feedbacks = [];
 
+            // BUGFIX: Agora ele exige a palavra exata usando limites de palavra (\b), ignorando acentos acidentais em regex
             const badWords = ['casado', 'solteiro', 'nascimento', 'cpf', 'rg', 'idade'];
-            const foundBadWords = badWords.filter(word => text.includes(word));
+            const foundBadWords = badWords.filter(word => {
+                // O \b garante que "rg" não seja pego dentro de "descargas", e "idade" não dentro de "eletricidade"
+                const regex = new RegExp('\\b' + word + '\\b', 'i');
+                return regex.test(text);
+            });
+
             if(foundBadWords.length > 0) {
                 score -= 20;
-                feedbacks.push(`<strong>⚠️ Risco de Triagem:</strong> Você incluiu dados pessoais obsoletos (${foundBadWords.join(', ')}). Robôs modernos e práticas de ESG repudiam isso. Remova-os.`);
+                feedbacks.push(`<strong style="color:var(--danger)">⚠️ Risco de Triagem:</strong> Você incluiu dados pessoais obsoletos (${foundBadWords.join(', ')}). Robôs modernos e práticas de ESG repudiam isso. Remova-os.`);
             }
 
-            // Busca pela raiz do verbo para não penalizar variações (ex: "garanti", "garantindo", "garantir")
             const actionVerbs = ['desenvolv', 'otimiz', 'lider', 'reduz', 'aument', 'cria', 'garant', 'execu', 'assegura', 'contribu'];
             const foundVerbs = actionVerbs.filter(verb => text.includes(verb));
             if(foundVerbs.length < 2) {
                 score -= 15;
-                feedbacks.push(`<strong>📉 Falta de Ação:</strong> Seu currículo está passivo. Use verbos de alto impacto como "otimizar", "desenvolver" ou "reduzir".`);
+                feedbacks.push(`<strong style="color:var(--warning)">📉 Falta de Ação:</strong> Seu currículo está passivo. Use verbos de alto impacto como "otimizar", "desenvolver" ou "reduzir".`);
             } else {
-                feedbacks.push(`<strong>✅ Dinamismo Aprovado:</strong> Excelente uso de verbos de ação.`);
+                feedbacks.push(`<strong style="color:var(--success)">✅ Dinamismo Aprovado:</strong> Excelente uso de verbos de ação.`);
             }
 
-            // Verifica qualquer número (horas, anos) ou a palavra "resultado" (singular ou plural)
             const hasNumbers = /\d+/g.test(text) || text.includes('resultado');
             if(!hasNumbers) {
                 score -= 20;
-                feedbacks.push(`<strong>📊 Ausência de Métricas:</strong> Sêniors vendem resultados. Onde estão os números ou indicativos de performance?`);
+                feedbacks.push(`<strong style="color:var(--warning)">📊 Ausência de Métricas:</strong> Sêniors vendem resultados. Onde estão os números ou indicativos de performance?`);
             }
 
-            // "Trabalho em equipe" foi removido da lista de penalidades, pois é uma soft skill válida.
             const cliches = ['proativo', 'perfeccionista', 'pontual', 'focado no resultado'];
             const foundCliches = cliches.filter(word => text.includes(word));
             if(foundCliches.length > 0) {
                 score -= 10;
-                feedbacks.push(`<strong>🥱 Clichês Detectados:</strong> Você usou adjetivos genéricos (${foundCliches.join(', ')}). Prove essas qualidades nas descrições de cargo.`);
+                feedbacks.push(`<strong style="color:var(--warning)">🥱 Clichês Detectados:</strong> Você usou adjetivos genéricos (${foundCliches.join(', ')}). Prove essas qualidades nas descrições de cargo.`);
             }
 
             if(score < 0) score = 0;
@@ -556,7 +526,7 @@
             scoreBox.innerText = `Pontuação ATS: ${score}/100`;
 
             if(score === 100) {
-                feedbacks.push(`<strong>🏆 Padrão Executivo:</strong> Este é um currículo impecável. Pronto para o envio!`);
+                feedbacks.push(`<strong style="color:var(--success)">🏆 Padrão Executivo:</strong> Este é um currículo impecável. Pronto para o envio!`);
             }
 
             feedbacks.forEach(msg => {
