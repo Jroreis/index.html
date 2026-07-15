@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResumeTech Pro | Mega Brian HR</title>
+    <style>
+        /* CSS: Estilização Moderna e Limpa */
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --bg-color: #f3f4f6;
+            --text-color: #1f2937;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            background-color: white;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .tab-btn {
+            padding: 15px 30px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: bold;
+            color: #6b7280;
+            transition: 0.3s;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: none; /* Oculto por padrão, ativado via JS */
+        }
+
+        .container.active {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Painéis e Formulários */
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        h2 { margin-top: 0; color: var(--primary-color); }
+        
+        label { display: block; font-weight: bold; margin-top: 15px; margin-bottom: 5px;}
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        textarea { height: 120px; resize: vertical; }
+
+        button.btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            transition: 0.3s;
+        }
+        button.btn-primary:hover { background-color: var(--primary-color); }
+
+        /* Preview do Currículo */
+        .cv-preview {
+            border: 1px solid #e5e7eb;
+            padding: 40px;
+            background: white;
+            min-height: 500px;
+        }
+        .cv-name { font-size: 24px; text-transform: uppercase; color: var(--primary-color); text-align: center; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; margin-bottom: 10px;}
+        .cv-contact { text-align: center; font-size: 14px; color: #4b5563; margin-bottom: 20px; }
+        .cv-section-title { font-size: 16px; font-weight: bold; color: var(--primary-color); border-bottom: 1px solid #d1d5db; margin-top: 20px; margin-bottom: 10px;}
+
+        /* Scanner Results */
+        .score-box {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .score-high { background-color: #d1fae5; color: var(--success); }
+        .score-med { background-color: #fef3c7; color: var(--warning); }
+        .score-low { background-color: #fee2e2; color: var(--danger); }
+        
+        .feedback-item { margin-bottom: 15px; padding: 15px; border-left: 4px solid var(--secondary-color); background: #f9fafb;}
+        
+        @media(max-width: 768px){
+            .container.active { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ResumeTech Pro</h1>
+        <p>Motor de Análise Avançada e Criação Otimizada para Algoritmos ATS</p>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('builder')">1. Construtor Otimizado</button>
+        <button class="tab-btn" onclick="switchTab('scanner')">2. Mega Analisador de RH</button>
+    </div>
+
+    <!-- MÓDULO 1: CONSTRUTOR -->
+    <div id="builder" class="container active">
+        <div class="panel">
+            <h2>Preencha seus Dados</h2>
+            <p>Os dados preenchidos aqui formam uma estrutura 100% legível por robôs ATS.</p>
+            
+            <label>Nome Completo</label>
+            <input type="text" id="inpName" placeholder="Ex: Jefferson Oliveira" onkeyup="updatePreview()">
+            
+            <label>Contatos (Cidade, Telefone, Email)</label>
+            <input type="text" id="inpContact" placeholder="Ex: Campinas - SP | (19) 90000-0000 | email@email.com" onkeyup="updatePreview()">
+            
+            <label>Resumo Profissional (Foque em hard skills e objetivos)</label>
+            <textarea id="inpSummary" placeholder="Estudante de Engenharia com experiência em..." onkeyup="updatePreview()"></textarea>
+            
+            <label>Competências (Separe por vírgulas)</label>
+            <textarea id="inpSkills" placeholder="Ex: Engenharia Elétrica, Manutenção, NBR 5410, HTML, CSS..." onkeyup="updatePreview()"></textarea>
+
+            <label>Experiência e Projetos</label>
+            <textarea id="inpExp" placeholder="Empresa X - Cargo&#10;• Otimizei o processo X gerando Y% de resultado..." onkeyup="updatePreview()"></textarea>
+        </div>
+
+        <div class="panel cv-preview" id="cvPreview">
+            <div class="cv-name" id="outName">SEU NOME</div>
+            <div class="cv-contact" id="outContact">Sua Cidade | Seu Telefone | Seu Email</div>
+            
+            <div class="cv-section-title">RESUMO PROFISSIONAL</div>
+            <div id="outSummary">Seu resumo aparecerá aqui...</div>
+
+            <div class="cv-section-title">COMPETÊNCIAS E PALAVRAS-CHAVE</div>
+            <div id="outSkills">Suas competências aparecerão aqui...</div>
+
+            <div class="cv-section-title">EXPERIÊNCIA PROFISSIONAL</div>
+            <div style="white-space: pre-wrap;" id="outExp">Suas experiências aparecerão aqui...</div>
+        </div>
+    </div>
+
+    <!-- MÓDULO 2: MEGA ANALISADOR -->
+    <div id="scanner" class="container">
+        <div class="panel">
+            <h2>Cole o texto do seu currículo</h2>
+            <p>Como Diretor de RH, meu algoritmo vai procurar verbos de ação, métricas de resultado e validar a higiene das palavras-chave.</p>
+            <textarea id="cvInputScanner" placeholder="Cole todo o texto do currículo aqui para análise profunda..."></textarea>
+            <button class="btn-primary" onclick="analyzeCV()">Executar Análise Mega Brian</button>
+        </div>
+
+        <div class="panel">
+            <h2>Laudo do Recrutador Sênior</h2>
+            <div id="scannerResults" style="display:none;">
+                <div id="scoreBox" class="score-box">Pontuação: 0/100</div>
+                <div id="feedbackContainer"></div>
+            </div>
+            <div id="emptyScannerState" style="color: #6b7280; text-align: center; margin-top: 50px;">
+                Aguardando execução do algoritmo...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JAVASCRIPT: Motor Lógico e Interatividade
+
+        // Sistema de Abas
+        function switchTab(tabId) {
+            document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Live Preview do Construtor
+        function updatePreview() {
+            document.getElementById('outName').innerText = document.getElementById('inpName').value || 'SEU NOME';
+            document.getElementById('outContact').innerText = document.getElementById('inpContact').value || 'Sua Cidade | Seu Telefone | Seu Email';
+            document.getElementById('outSummary').innerText = document.getElementById('inpSummary').value || 'Seu resumo aparecerá aqui...';
+            document.getElementById('outSkills').innerText = document.getElementById('inpSkills').value || 'Suas competências aparecerão aqui...';
+            document.getElementById('outExp').innerText = document.getElementById('inpExp').value || 'Suas experiências aparecerão aqui...';
+        }
+
+        // Mega Algoritmo de Análise de RH
+        function analyzeCV() {
+            const text = document.getElementById('cvInputScanner').value.toLowerCase();
+            const resultsDiv = document.getElementById('scannerResults');
+            const emptyState = document.getElementById('emptyScannerState');
+            const scoreBox = document.getElementById('scoreBox');
+            const feedbackContainer = document.getElementById('feedbackContainer');
+
+            if(text.trim().length < 50) {
+                alert("Por favor, insira mais texto para uma análise precisa.");
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            resultsDiv.style.display = 'block';
+            feedbackContainer.innerHTML = '';
+
+            let score = 100;
+            let feedbacks = [];
+
+            // Regra 1: Verificação de Dados Pessoais Obsoletos (Penalização Forte)
+            const badWords = ['casado', 'solteiro', 'nascimento', 'cpf', 'rg', 'idade'];
+            const foundBadWords = badWords.filter(word => text.includes(word));
+            if(foundBadWords.length > 0) {
+                score -= 20;
+                feedbacks.push(`<strong>⚠️ Risco de Triagem:</strong> Você incluiu dados pessoais obsoletos (${foundBadWords.join(', ')}). Robôs modernos e práticas de ESG repudiam isso. Remova-os imediatamente para evitar vieses de contratação.`);
+            }
+
+            // Regra 2: Verbos de Ação e Impacto
+            const actionVerbs = ['desenvolvi', 'otimizei', 'liderei', 'reduzi', 'aumentei', 'criei', 'garanti', 'executei'];
+            const foundVerbs = actionVerbs.filter(verb => text.includes(verb));
+            if(foundVerbs.length < 2) {
+                score -= 15;
+                feedbacks.push(`<strong>📉 Falta de Ação:</strong> Seu currículo está passivo. Em vez de dizer "fui responsável por", use verbos de alto impacto como "otimizei", "desenvolvi" ou "reduzi". O mercado quer realizadores.`);
+            } else {
+                feedbacks.push(`<strong>✅ Dinamismo Aprovado:</strong> Excelente uso de verbos de ação. Isso mostra postura de liderança técnica.`);
+            }
+
+            // Regra 3: Métricas e Resultados (O "Teste de Fogo" do Mega Brian)
+            const hasNumbers = /\d+%|\d+ %/g.test(text) || text.includes('resultados');
+            if(!hasNumbers) {
+                score -= 20;
+                feedbacks.push(`<strong>📊 Ausência de Métricas:</strong> Sêniors não vendem tarefas, vendem resultados. Onde estão os números? Tente incluir dados como "aumentei a eficiência em X%" ou "liderei projetos de Y mil reais".`);
+            }
+
+            // Regra 4: Clichês Comportamentais
+            const cliches = ['proativo', 'perfeccionista', 'trabalho em equipe', 'pontual'];
+            const foundCliches = cliches.filter(word => text.includes(word));
+            if(foundCliches.length > 0) {
+                score -= 10;
+                feedbacks.push(`<strong>🥱 Clichês Detectados:</strong> Você usou termos genéricos (${foundCliches.join(', ')}). Qualquer candidato diz que é "proativo". Prove isso nas descrições de suas experiências em vez de apenas listar o adjetivo.`);
+            }
+
+            // Garante que o score não fique negativo
+            if(score < 0) score = 0;
+
+            // Renderiza Nota Visual
+            scoreBox.className = 'score-box';
+            if(score >= 80) scoreBox.classList.add('score-high');
+            else if(score >= 50) scoreBox.classList.add('score-med');
+            else scoreBox.classList.add('score-low');
+            
+            scoreBox.innerText = `Pontuação ATS: ${score}/100`;
+
+            // Renderiza Feedback
+            if(score === 100) {
+                feedbacks.push(`<strong>🏆 Padrão Executivo:</strong> Este é um currículo impecável. Totalmente blindado contra reprovações automáticas. Pronto para o envio!`);
+            }
+
+            feedbacks.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = 'feedback-item';
+                div.innerHTML = msg;
+                feedbackContainer.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>
