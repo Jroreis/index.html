@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -65,13 +65,28 @@
             max-width: 400px;
             text-align: center;
         }
-        .login-box i { font-size: 50px; color: var(--primary); margin-bottom: 15px; }
+        .login-box i.logo-icon { font-size: 50px; color: var(--primary); margin-bottom: 15px; }
         .login-box h1 { font-size: 22px; color: #333; margin-bottom: 25px; }
         .login-box input {
             width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 8px;
             border: 1px solid #ccc; font-size: 16px; background: #f9f9f9;
         }
         .login-box input:focus { outline: none; border-color: var(--primary); background: #fff; }
+        
+        .divider {
+            margin: 20px 0; color: #aaa; font-size: 13px; font-weight: bold; text-transform: uppercase;
+            display: flex; align-items: center;
+        }
+        .divider::before, .divider::after { content: ""; flex: 1; border-bottom: 1px solid #eee; margin: 0 10px; }
+        
+        .btn-google {
+            background-color: white; color: #555; width: 100%; padding: 15px; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s;
+        }
+        .btn-google:active { background-color: #f1f1f1; transform: translateY(2px); }
+        .btn-google img { width: 22px; height: 22px; }
 
         /* Menu Lateral (Drawer) */
         .drawer { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background-color: #111; z-index: 200; transition: 0.3s; box-shadow: 2px 0 10px rgba(0,0,0,0.5); }
@@ -126,11 +141,18 @@
 
     <main id="tela-login" class="page active">
         <div class="login-box">
-            <i class="fas fa-bolt"></i>
+            <i class="fas fa-bolt logo-icon"></i>
             <h1>VoltCalcPro SAAS</h1>
             <input type="email" id="login-email" placeholder="E-mail de Acesso" required>
             <input type="password" id="login-password" placeholder="Senha" required>
             <button class="btn-calc" onclick="fazerLogin()">ENTRAR NO SISTEMA</button>
+            
+            <div class="divider">ou</div>
+            
+            <button class="btn-google" onclick="loginComGoogle()">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo">
+                Continuar com o Google
+            </button>
         </div>
     </main>
 
@@ -144,7 +166,7 @@
         <div class="drawer-header">
             <i class="fas fa-user-tie fa-3x" style="color:white; margin-bottom:10px;"></i>
             <h2>Área Restrita</h2>
-            <p>Acesso Verificado</p>
+            <p id="user-display-email">Acesso Verificado</p>
         </div>
         <ul class="drawer-menu">
             <li onclick="openPage('tela-config', 'Configurar Assinatura'); closeMenu();"><i class="fas fa-cog"></i> Configurar PDF</li>
@@ -331,6 +353,20 @@
                 .catch((error) => { alert("Acesso Negado: E-mail ou senha incorretos."); });
         }
 
+        // NOVO: Função de Login com o Google
+        function loginComGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider)
+                .then((result) => {
+                    // O onAuthStateChanged já vai capturar o sucesso e abrir o dashboard
+                    console.log("Login com Google efetuado com sucesso!");
+                })
+                .catch((error) => {
+                    alert("Falha ao entrar com o Google: " + error.message);
+                    console.error(error);
+                });
+        }
+
         function fazerLogout() {
             firebase.auth().signOut().then(() => {
                 closeMenu();
@@ -344,6 +380,7 @@
                 document.getElementById('tela-login').classList.remove('active');
                 document.getElementById('main-header').style.display = 'flex';
                 document.getElementById('home').classList.add('active');
+                document.getElementById('user-display-email').innerText = user.email; // Mostra o e-mail no menu
             } else {
                 // Deslogado: Esconde App, Mostra Login
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
