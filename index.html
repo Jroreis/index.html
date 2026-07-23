@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VoltCalcPro</title>
+    <title>VoltCalcPro MAX</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
-            --primary: #1976D2; /* Azul clássico de aplicativos de engenharia */
+            --primary: #1976D2; 
             --primary-dark: #115293;
-            --accent: #FFC107; /* Amarelo elétrico */
+            --accent: #FFC107; 
             --bg-color: #F4F6F8;
             --card-bg: #FFFFFF;
             --text-dark: #333333;
@@ -19,76 +19,83 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', 'Segoe UI', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-dark); overflow-x: hidden; }
 
-        /* Barra Superior (Header) igual ao app antigo */
+        /* Barra Superior (Header) */
         .header { 
             background-color: var(--primary); 
             color: white; 
-            padding: 16px 20px; 
+            padding: 18px 20px; 
             display: flex; 
             align-items: center; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
             position: sticky; top: 0; z-index: 100;
         }
-        .header h1 { font-size: 20px; font-weight: 500; margin-left: 15px; }
-        .back-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; display: none; }
-        .menu-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
+        .header h1 { font-size: 20px; font-weight: 600; margin-left: 15px; letter-spacing: 0.5px;}
+        .back-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; display: none; padding-right: 10px; }
+        .menu-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; }
 
         /* Páginas */
-        .page { display: none; padding: 15px; animation: fadeIn 0.3s; }
+        .page { display: none; padding: 15px; animation: fadeIn 0.3s; padding-bottom: 50px;}
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* Grade do Menu Principal (Igual à imagem 34591) */
-        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;}
+        /* Menu Principal FULL WIDTH (Tamanho da Página) */
+        .grid-menu { display: flex; flex-direction: column; gap: 12px; margin-top: 10px;}
         .card { 
             background: var(--card-bg); 
-            border-radius: 10px; 
-            padding: 20px 10px; 
-            text-align: center; 
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08); 
+            border-radius: 12px; 
+            padding: 22px 20px; 
+            display: flex;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06); 
             cursor: pointer;
-            border: 1px solid #eaeaea;
+            border-left: 5px solid var(--primary);
+            transition: background 0.2s;
         }
-        .card:active { transform: scale(0.96); background: #f0f8ff; }
-        .card i { font-size: 35px; color: var(--primary); margin-bottom: 10px; }
-        .card p { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+        .card:active { transform: scale(0.98); background: #E3F2FD; }
+        .card i { font-size: 32px; color: var(--primary); margin-right: 20px; width: 40px; text-align: center; }
+        .card p { font-size: 17px; font-weight: 600; color: var(--text-dark); margin: 0;}
 
-        /* Estilo de Inserção de Dados (Igual à imagem 34592) */
-        .input-group { margin-bottom: 15px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .input-group label { display: block; font-size: 13px; color: var(--text-gray); margin-bottom: 5px; font-weight: 500; }
+        /* Estilo de Inserção de Dados */
+        .input-group { margin-bottom: 18px; background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.04); border: 1px solid #eee;}
+        .input-group label { display: block; font-size: 14px; color: var(--primary-dark); margin-bottom: 8px; font-weight: 600; }
         .input-group input, .input-group select { 
             width: 100%; 
             padding: 10px 0; 
             border: none; 
-            border-bottom: 2px solid #ddd; 
-            font-size: 16px; 
-            color: var(--primary-dark);
+            border-bottom: 2px solid #ccc; 
+            font-size: 18px; 
+            color: var(--text-dark);
             background: transparent;
-            font-weight: 600;
+            font-weight: bold;
         }
         .input-group input:focus, .input-group select:focus { outline: none; border-bottom-color: var(--primary); }
 
         /* Botões */
         .btn-calc { 
-            background-color: var(--primary); color: white; width: 100%; padding: 16px; 
-            border: none; border-radius: 8px; font-size: 16px; font-weight: bold; 
-            margin-top: 10px; cursor: pointer; box-shadow: 0 4px 6px rgba(25, 118, 210, 0.3);
+            background-color: var(--primary); color: white; width: 100%; padding: 18px; 
+            border: none; border-radius: 10px; font-size: 16px; font-weight: bold; 
+            margin-top: 10px; cursor: pointer; box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3); text-transform: uppercase; letter-spacing: 1px;
         }
-        .btn-calc:active { background-color: var(--primary-dark); }
-        .btn-pdf { background-color: #D32F2F; color: white; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        .btn-calc:active { background-color: var(--primary-dark); transform: translateY(2px); }
+        .btn-pdf { background-color: #D32F2F; color: white; width: 100%; padding: 16px; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; margin-top: 20px; cursor: pointer; box-shadow: 0 4px 8px rgba(211, 47, 47, 0.3);}
 
-        /* Resultados */
-        #result-area { margin-top: 20px; display: none; }
-        .result-box { background: white; border-left: 5px solid var(--accent); padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .res-line { margin-bottom: 8px; font-size: 14px; }
-        .res-line span { color: var(--text-gray); display: block; font-size: 12px;}
-        .res-line strong { color: var(--primary-dark); font-size: 15px;}
+        /* Resultados e Notas Técnicas */
+        #result-area { margin-top: 25px; display: none; }
+        .result-box { background: white; border-top: 5px solid var(--accent); padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .res-line { margin-bottom: 12px; font-size: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px;}
+        .res-line:last-child { border-bottom: none; }
+        .res-line span { color: var(--text-gray); display: block; font-size: 13px; margin-bottom: 3px;}
+        .res-line strong { color: var(--primary-dark); font-size: 18px;}
+        
+        .nota-tecnica { background: #FFF8E1; border-left: 4px solid #FF9800; padding: 15px; margin-top: 15px; border-radius: 6px;}
+        .nota-tecnica strong { color: #E65100; font-size: 14px; display: block; margin-bottom: 5px; }
+        .nota-tecnica p { font-size: 13px; color: #424242; line-height: 1.5; text-align: justify;}
     </style>
 </head>
 <body>
 
     <header class="header">
-        <button class="menu-btn" id="btn-menu"><i class="fas fa-bars"></i></button>
+        <button class="menu-btn" id="btn-menu"><i class="fas fa-bolt"></i></button>
         <button class="back-btn" id="btn-back" onclick="goHome()"><i class="fas fa-arrow-left"></i></button>
         <h1 id="header-title">VoltCalcPro MAX</h1>
     </header>
@@ -107,13 +114,13 @@
                 <i class="fas fa-circle-notch"></i>
                 <p>Cálculo de Eletrodutos</p>
             </div>
-            <div class="card" onclick="openPage('tela-motor', 'Motores Ind.')">
+            <div class="card" onclick="openPage('tela-motor', 'Motores Industriais')">
                 <i class="fas fa-cogs"></i>
                 <p>Painel de Motores</p>
             </div>
             <div class="card" onclick="openPage('tela-fp', 'Fator de Potência')">
                 <i class="fas fa-charging-station"></i>
-                <p>Cálculo de Fator de Potência</p>
+                <p>Fator de Potência</p>
             </div>
             <div class="card" onclick="openPage('tela-curto', 'Curto-Circuito')">
                 <i class="fas fa-fire-alt"></i>
@@ -121,11 +128,11 @@
             </div>
             <div class="card" onclick="openPage('tela-spda', 'SPDA e Malha')">
                 <i class="fas fa-shield-alt"></i>
-                <p>SPDA / NBR 5419</p>
+                <p>SPDA / Aterramento</p>
             </div>
             <div class="card" onclick="openPage('tela-config', 'Configurações')">
-                <i class="fas fa-user-cog"></i>
-                <p>Configurar Laudos</p>
+                <i class="fas fa-user-tie"></i>
+                <p>Configurar Assinatura PDF</p>
             </div>
         </div>
     </main>
@@ -147,7 +154,7 @@
             <label>Distância / Comprimento (m)</label>
             <input type="number" id="qt-dist" placeholder="Ex: 50">
         </div>
-        <button class="btn-calc" onclick="calcQuedaTensao()">CALCULAR</button>
+        <button class="btn-calc" onclick="calcQuedaTensao()">CALCULAR CONDUTOR</button>
     </main>
 
     <main id="tela-condutores" class="page">
@@ -159,7 +166,7 @@
             <label>Tempo de Disparo do Disjuntor (s)</label>
             <input type="number" id="cond-t" value="0.2" placeholder="Ex: 0.2">
         </div>
-        <button class="btn-calc" onclick="calcCondutores()">VERIFICAR CONDUTOR</button>
+        <button class="btn-calc" onclick="calcCondutores()">VERIFICAR SUPORTABILIDADE</button>
     </main>
 
     <main id="tela-eletrodutos" class="page">
@@ -176,7 +183,7 @@
 
     <main id="tela-motor" class="page">
         <div class="input-group">
-            <label>Potência do Motor (CV)</label>
+            <label>Potência do Motor Trifásico (CV)</label>
             <input type="number" id="mot-cv" placeholder="Ex: 50">
         </div>
         <button class="btn-calc" onclick="calcMotor()">DIMENSIONAR PAINEL</button>
@@ -193,18 +200,18 @@
         </div>
         <div class="input-group">
             <label>Fator de Potência Desejado</label>
-            <input type="number" id="fp-novo" value="0.95" placeholder="Ex: 0.95">
+            <input type="number" id="fp-novo" value="0.92" placeholder="Ex: 0.92">
         </div>
-        <button class="btn-calc" onclick="calcFP()">DIMENSIONAR BANCO</button>
+        <button class="btn-calc" onclick="calcFP()">DIMENSIONAR CAPACITORES</button>
     </main>
 
     <main id="tela-curto" class="page">
         <div class="input-group">
-            <label>Icc Simétrica (kA)</label>
+            <label>Icc Simétrica na Barra (kA)</label>
             <input type="number" id="curto-icc" placeholder="Ex: 10">
         </div>
         <div class="input-group">
-            <label>Relação X/R do Trafo</label>
+            <label>Relação X/R do Transformador</label>
             <input type="number" id="curto-xr" value="15" placeholder="Ex: 15">
         </div>
         <button class="btn-calc" onclick="calcCurto()">CALCULAR RUPTURA</button>
@@ -212,10 +219,10 @@
 
     <main id="tela-spda" class="page">
         <div class="input-group">
-            <label>Resistividade do Solo (Ω.m)</label>
+            <label>Resistividade Média do Solo (Ω.m)</label>
             <input type="number" id="spda-rho" placeholder="Ex: 100">
         </div>
-        <button class="btn-calc" onclick="calcSPDA()">CALCULAR HASTE (DWIGHT)</button>
+        <button class="btn-calc" onclick="calcSPDA()">CALCULAR ATERRAMENTO</button>
     </main>
 
     <main id="tela-config" class="page">
@@ -235,41 +242,30 @@
     </main>
 
     <div id="result-area" class="page">
-        <div class="result-box" id="resultado-dados">
+        <div class="result-box">
+            <div id="resultado-dados"></div>
+            <div id="resultado-nota" class="nota-tecnica">
+                <strong><i class="fas fa-exclamation-triangle"></i> NOTA TÉCNICA DE ENGENHARIA:</strong>
+                <p id="nota-texto"></p>
             </div>
-        <button class="btn-pdf" onclick="gerarPDF()"><i class="fas fa-file-pdf"></i> GERAR LAUDO PROFISSIONAL</button>
+        </div>
+        <button class="btn-pdf" onclick="gerarPDF()"><i class="fas fa-file-pdf"></i> EXPORTAR LAUDO TÉCNICO PDF</button>
     </div>
 
     <script>
-        // Configurações Globais do Laudo
-        let config = { nome: "Profissional Responsável", crea: "CREA/CFT: OMNI-V10", empresa: "VoltCalcPro" };
+        let config = { nome: "Eng. Responsável", crea: "CREA: OMNI-V10", empresa: "VoltCalcPro" };
         let currentResult = null;
         let currentTitle = "";
         let currentNorm = "";
+        let currentNota = "";
 
-        // A Genial Matriz Comercial
         const Matriz = {
-            cabo: (v) => {
-                const c = [1.5, 2.5, 4.0, 6.0, 10.0, 16.0, 25.0, 35.0, 50.0, 70.0, 95.0, 120.0, 150.0];
-                for (let b of c) { if (b >= v) return `${b} mm²`; } return ">150mm²";
-            },
-            disjuntor: (v) => {
-                const d = [10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 400];
-                for (let dis of d) { if (dis >= v) return `${dis}A`; } return ">400A";
-            },
-            contator: (v) => {
-                const c = [9, 12, 18, 25, 32, 40, 50, 65, 80, 95, 115, 150, 185, 225];
-                for (let con of c) { if (con >= v) return `${con}A (AC-3)`; } return ">225A";
-            },
-            eletroduto: (mm) => {
-                if (mm <= 16) return "1/2\" (16mm)"; if (mm <= 20) return "3/4\" (20mm)";
-                if (mm <= 25) return "1\" (25mm)"; if (mm <= 32) return "1 1/4\" (32mm)";
-                if (mm <= 40) return "1 1/2\" (40mm)"; if (mm <= 50) return "2\" (50mm)";
-                return "Acima de 2\" ou Calha";
-            }
+            cabo: (v) => { const c = [1.5, 2.5, 4.0, 6.0, 10.0, 16.0, 25.0, 35.0, 50.0, 70.0, 95.0, 120.0, 150.0]; for (let b of c) { if (b >= v) return `${b} mm²`; } return ">150mm²"; },
+            disjuntor: (v) => { const d = [10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 400]; for (let dis of d) { if (dis >= v) return `${dis}A`; } return ">400A"; },
+            contator: (v) => { const c = [9, 12, 18, 25, 32, 40, 50, 65, 80, 95, 115, 150, 185, 225]; for (let con of c) { if (con >= v) return `${con}A (AC-3)`; } return ">225A"; },
+            eletroduto: (mm) => { if (mm <= 16) return "1/2\" (16mm)"; if (mm <= 20) return "3/4\" (20mm)"; if (mm <= 25) return "1\" (25mm)"; if (mm <= 32) return "1 1/4\" (32mm)"; if (mm <= 40) return "1 1/2\" (40mm)"; if (mm <= 50) return "2\" (50mm)"; return "Acima de 2\" ou Eletrocalha"; }
         };
 
-        // Navegação Visual
         function openPage(pageId, title) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
@@ -288,42 +284,48 @@
             document.getElementById('result-area').style.display = 'none';
         }
 
-        // Função para mostrar os resultados
-        function renderResult(titulo, dados, norma) {
-            currentTitle = titulo; currentResult = dados; currentNorm = norma;
+        function renderResult(titulo, dados, norma, notaTecnica) {
+            currentTitle = titulo; currentResult = dados; currentNorm = norma; currentNota = notaTecnica;
             let html = "";
             for(let key in dados){
                 html += `<div class="res-line"><span>${key}</span><strong>${dados[key]}</strong></div>`;
             }
             document.getElementById('resultado-dados').innerHTML = html;
+            document.getElementById('nota-texto').innerText = notaTecnica;
             document.getElementById('result-area').style.display = 'block';
             document.getElementById('result-area').scrollIntoView({behavior: "smooth"});
         }
 
-        // --- CÁLCULOS DA ENGENHARIA ---
+        // CÁLCULOS + NOTAS TÉCNICAS
         function calcQuedaTensao() {
             let v = parseFloat(document.getElementById('qt-tensao').value);
             let i = parseFloat(document.getElementById('qt-corrente').value) || 0;
             let l = parseFloat(document.getElementById('qt-dist').value) || 0;
             if(i===0 || l===0) return alert("Preencha Corrente e Distância!");
             let secT = (v===380) ? (Math.sqrt(3) * 0.01722 * l * i) / (v * 0.04) : (2 * 0.01722 * l * i) / (v * 0.04);
-            renderResult("Queda de Tensão e Cabos", {
-                "Corrente do Circuito": `${i} A`,
+            
+            let nota = "De acordo com a NBR 5410, a queda de tensão entre a origem da instalação e o equipamento não deve ser superior a 4%. Este cálculo dimensiona o cabo exclusivamente pela distância. É obrigatório conferir se a bitola encontrada também satisfaz o critério de Ampacidade (Capacidade de Condução de Corrente) e Fator de Agrupamento.";
+            
+            renderResult("Dimensionamento de Cabos", {
+                "Tensão": `${v} V`, "Corrente": `${i} A`, "Distância": `${l} m`,
                 "Secção Calculada (Queda 4%)": `${secT.toFixed(2)} mm²`,
                 "CABO COMERCIAL RECOMENDADO": Matriz.cabo(secT),
                 "DISJUNTOR PROTEÇÃO": Matriz.disjuntor(i * 1.25)
-            }, "NBR 5410 e Hélio Creder");
+            }, "ABNT NBR 5410", nota);
         }
 
         function calcCondutores() {
             let icc = parseFloat(document.getElementById('cond-icc').value) || 0;
             let t = parseFloat(document.getElementById('cond-t').value) || 0.2;
             let secT = (icc * Math.sqrt(t)) / 115;
-            renderResult("Suportabilidade Térmica (Curto)", {
-                "Corrente Icc": `${icc} A`,
-                "Secção Mínima P/ Não Derreter": `${secT.toFixed(2)} mm²`,
-                "CABO COMERCIAL MÍNIMO": Matriz.cabo(secT)
-            }, "NBR 5410 (K=115 PVC)");
+            
+            let nota = "Cálculo de Energia Passante (I²t). Se a bitola comercial instalada for inferior à recomendada acima, o condutor entrará em ignição térmica (derretimento da isolação de PVC) antes que o disjuntor tenha tempo físico para desarmar. Garanta a coordenação com a curva magnética do disjuntor.";
+            
+            renderResult("Suportabilidade Térmica", {
+                "Corrente de Curto (Icc)": `${icc} A`, "Tempo de Abertura": `${t} s`,
+                "Secção Mínima de Segurança": `${secT.toFixed(2)} mm²`,
+                "CABO MÍNIMO EXIGIDO": Matriz.cabo(secT)
+            }, "ABNT NBR 5410 (Critério Térmico K=115)", nota);
         }
 
         function calcEletrodutos() {
@@ -331,22 +333,28 @@
             let qtd = parseInt(document.getElementById('ele-qtd').value) || 1;
             let diam = Math.sqrt((4 * sec) / Math.PI) * 1.5;
             let areaE = ((Math.PI * Math.pow(diam, 2) / 4) * qtd) / (qtd===1?0.53:(qtd===2?0.31:0.40));
+            
+            let nota = `A taxa de ocupação máxima permitida para ${qtd} condutores é de ${(qtd===1?53:(qtd===2?31:40))}%. Ultrapassar este limite dificulta o tracionamento dos cabos, danifica o isolamento por atrito e impede a troca de calor, aumentando o risco de incêndio nas instalações embutidas.`;
+            
             renderResult("Ocupação de Tubulação", {
-                "Quantidade de Fios": qtd,
+                "Quantidade de Fios": qtd, "Secção Base": `${sec} mm²`,
                 "ELETRODUTO PVC COMERCIAL": Matriz.eletroduto(Math.sqrt((4 * areaE) / Math.PI))
-            }, "NBR 5410 (Limites: 53%, 31%, 40%)");
+            }, "NBR 5410 (Taxa de Ocupação)", nota);
         }
 
         function calcMotor() {
             let cv = parseFloat(document.getElementById('mot-cv').value) || 0;
             let iN = (cv * 736) / (Math.sqrt(3) * 380 * 0.85 * 0.88);
-            renderResult("Painel Estrela-Triângulo", {
-                "Corrente Nominal (380V)": `${iN.toFixed(2)} A`,
+            
+            let nota = "A partida Estrela-Triângulo divide a corrente de partida a 1/3 do seu valor nominal. Contudo, o motor só alcançará o torque nominal pleno no fechamento em triângulo. Certifique-se de que o equipamento acoplado ao motor permite a partida em vazio ou com carga reduzida. O Relé Térmico deve ser ajustado na corrente de fase da ligação em delta (In/√3).";
+
+            renderResult("Partida Estrela-Triângulo", {
+                "In Nominal (380V)": `${iN.toFixed(2)} A`,
                 "DISJUNTOR MOTOR GERAL": Matriz.disjuntor(iN * 1.25),
-                "CONTATOR K1 / K2": Matriz.contator(iN / Math.sqrt(3)),
-                "CONTATOR K3": Matriz.contator(iN / 3),
+                "CONTATOR K1 e K2": Matriz.contator(iN / Math.sqrt(3)),
+                "CONTATOR K3 (Estrela)": Matriz.contator(iN / 3),
                 "RELÉ TÉRMICO (Ajuste)": `${(iN / Math.sqrt(3)).toFixed(2)} A`
-            }, "Instalações Industriais (Mamede)");
+            }, "Instalações Elétricas Industriais (Mamede)", nota);
         }
 
         function calcFP() {
@@ -354,46 +362,54 @@
             let f1 = parseFloat(document.getElementById('fp-atual').value) || 0.7;
             let f2 = parseFloat(document.getElementById('fp-novo').value) || 0.95;
             let qc = p * (Math.tan(Math.acos(f1)) - Math.tan(Math.acos(f2)));
-            renderResult("Correção de Fator de Potência", {
-                "Potência da Fábrica": `${p} kW`,
+            
+            let nota = "Valores de Fator de Potência inferiores a 0.92 geram multas na fatura de energia por excedente de reativo (UFER/FER). Atenção: A correção excessiva (FP > 0.98) pode causar sobretensões no sistema e ressonância harmônica. Recomenda-se a instalação do banco de capacitores em degraus automáticos.";
+
+            renderResult("Fator de Potência", {
+                "Potência Instalada": `${p} kW`,
                 "BANCO DE CAPACITORES (Total)": `${qc.toFixed(2)} kVAr`
-            }, "Instalações Industriais (Mamede)");
+            }, "Resolução ANEEL / Mamede", nota);
         }
 
         function calcCurto() {
             let icc = parseFloat(document.getElementById('curto-icc').value) || 0;
             let xr = parseFloat(document.getElementById('curto-xr').value) || 15;
             let iccAssi = icc * Math.sqrt(1 + 2 * Math.exp(-2 * Math.PI / xr));
+            
+            let nota = "Durante um curto-circuito, a energia indutiva acumulada no transformador (relação X/R) gera um pico de corrente transitória. Disjuntores de Média/Alta tensão especificados apenas pelo curto simétrico correm sério risco de explosão mecânica. Adotar sempre o Icc Assimétrico para especificação da blindagem.";
+
             renderResult("Esforço Eletrodinâmico", {
-                "Curto Simétrico": `${icc} kA`,
-                "CAPACIDADE DE RUPTURA EXIGIDA": `${iccAssi.toFixed(2)} kA`,
-                "Pico de Fechamento": `${(icc*2.6).toFixed(2)} kA`
-            }, "Proteção de SEP");
+                "Curto Simétrico RMS": `${icc} kA`,
+                "RUPTURA EXIGIDA (Disjuntor)": `${iccAssi.toFixed(2)} kA`,
+                "Pico de Fechamento (Peak)": `${(icc*2.6).toFixed(2)} kA`
+            }, "Aplicação em Sistemas de Potência (Aragão)", nota);
         }
 
         function calcSPDA() {
             let rho = parseFloat(document.getElementById('spda-rho').value) || 100;
             let r = (rho / (2 * Math.PI * 2.4)) * Math.log((4 * 2.4) / 0.015);
+            
+            let nota = "Este valor representa a resistência de uma única haste isolada enterrada. Para resistência de aterramento global acima de 10 Ohms, a norma NBR 5419 recomenda o tratamento químico do solo ou a utilização da malha de aterramento em anel fechado com múltiplas hastes paralelizadas e ligação equipotencial (BEP).";
+
             renderResult("Resistência de Aterramento", {
                 "Resistividade": `${rho} Ω.m`,
-                "Resistência Prevista (1 Haste)": `${r.toFixed(2)} Ohms`
-            }, "NBR 5419 e Dwight");
+                "Resistência (1 Haste)": `${r.toFixed(2)} Ohms`
+            }, "Fórmula de Sunde/Dwight e NBR 5419", nota);
         }
 
         function salvarConfig() {
             if(document.getElementById('cfg-nome').value) config.nome = document.getElementById('cfg-nome').value;
             if(document.getElementById('cfg-crea').value) config.crea = document.getElementById('cfg-crea').value;
             if(document.getElementById('cfg-empresa').value) config.empresa = document.getElementById('cfg-empresa').value;
-            alert("Perfil Comercial Guardado!"); goHome();
+            alert("Perfil de Assinatura Guardado com Sucesso!"); goHome();
         }
 
-        // --- GERADOR DE LAUDO PDF ---
+        // --- GERADOR DE LAUDO PDF COM NOTA TÉCNICA ---
         function gerarPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
-            // Cabeçalho Azul
-            doc.setFillColor(25, 118, 210);
+            doc.setFillColor(25, 118, 210); // Azul
             doc.rect(0, 0, 210, 25, 'F');
             
             doc.setFont("helvetica", "bold"); doc.setTextColor(255, 255, 255);
@@ -403,7 +419,7 @@
             doc.text(currentTitle.toUpperCase(), 10, 40);
             doc.line(10, 43, 200, 43);
             
-            doc.setFontSize(12); doc.setFont("helvetica", "normal");
+            doc.setFontSize(11); doc.setFont("helvetica", "normal");
             let y = 55;
             for(let key in currentResult) {
                 doc.setFont("helvetica", "bold"); doc.text(`${key}:`, 10, y);
@@ -412,11 +428,24 @@
                 doc.setDrawColor(220); doc.line(10, y-3, 200, y-3);
             }
 
-            y += 15; doc.setFontSize(10); doc.setFont("helvetica", "bold");
+            // Nota Técnica no PDF
+            y += 10;
+            doc.setFillColor(255, 248, 225); doc.rect(10, y, 190, 45, 'F'); // Fundo Amarelo Claro
+            y += 8;
+            doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.setTextColor(230, 81, 0);
+            doc.text("NOTA TÉCNICA DE ENGENHARIA:", 15, y);
+            
+            y += 7;
+            doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50);
+            let splitNota = doc.splitTextToSize(currentNota, 180);
+            doc.text(splitNota, 15, y);
+
+            y += (splitNota.length * 6) + 15;
+            doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
             doc.text("FUNDAMENTAÇÃO NORMATIVA:", 10, y);
             doc.setFont("helvetica", "italic"); doc.text(currentNorm, 10, y+6);
             
-            // Rodapé com Assinatura
+            // Assinatura
             doc.setFont("helvetica", "normal"); doc.setDrawColor(0);
             doc.line(60, 260, 150, 260);
             doc.text(config.nome, 105, 266, {align: "center"});
