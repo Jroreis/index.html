@@ -14,79 +14,87 @@
             --bg-color: #F4F6F8;
             --card-bg: #FFFFFF;
             --text-dark: #333333;
-            --text-gray: #666666;
+            --text-gray: #777777;
+            --header-height: 60px;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-dark); overflow-x: hidden; }
+        html, body { height: 100%; background-color: var(--bg-color); color: var(--text-dark); overflow-x: hidden; }
 
         /* Barra Superior (Header) */
         .header { 
             background-color: var(--primary); 
             color: white; 
-            padding: 18px 20px; 
+            height: var(--header-height);
+            padding: 0 20px; 
             display: flex; 
             align-items: center; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             position: sticky; top: 0; z-index: 100;
         }
-        .header h1 { font-size: 20px; font-weight: 600; margin-left: 15px; letter-spacing: 0.5px;}
+        .header h1 { font-size: 18px; font-weight: 600; margin-left: 15px; letter-spacing: 0.5px; text-transform: uppercase;}
         .back-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; display: none; padding-right: 10px; }
         .menu-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; }
 
-        /* Páginas */
-        .page { display: none; padding: 15px; animation: fadeIn 0.3s; padding-bottom: 50px;}
+        /* Contêiner das Páginas */
+        .page { display: none; padding: 15px; animation: fadeIn 0.3s; min-height: calc(100vh - var(--header-height)); padding-bottom: 30px;}
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* Grade do Menu Principal: MAIOR E MAIS IMPONENTE */
+        /* HOME: PREENCHER TELA INTEIRA (CLONE DA IMAGEM) */
+        #home.active {
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+        }
         .grid-menu { 
+            flex: 1; /* Faz a grade esticar até o fundo da tela */
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
+            grid-template-rows: repeat(4, 1fr); /* 4 linhas de tamanho igual */
             gap: 15px; 
-            margin-top: 10px;
         }
         .card { 
             background: var(--card-bg); 
             border-radius: 12px; 
-            padding: 30px 10px; /* Aumentado o Padding */
-            min-height: 135px; /* Tamanho padronizado maior */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06); 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
             cursor: pointer;
-            border-top: 4px solid var(--primary);
-            transition: background 0.2s, transform 0.2s;
+            border: 1px solid #E0E0E0;
+            transition: background 0.2s, transform 0.1s;
+            padding: 10px;
         }
-        .card:active { transform: scale(0.96); background: #E3F2FD; }
-        .card i { font-size: 45px; color: var(--primary); margin-bottom: 15px; } /* Ícone maior */
-        .card p { font-size: 15px; font-weight: 600; color: var(--text-dark); margin: 0; line-height: 1.3;}
+        .card:active { transform: scale(0.96); background: #F8FBFF; border-color: var(--primary);}
+        .card i { font-size: 38px; color: var(--primary); margin-bottom: 12px; }
+        .card h3 { font-size: 14px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; line-height: 1.2;}
+        .card p { font-size: 11px; font-weight: 500; color: var(--text-gray); margin: 0;}
 
-        /* Estilo de Inserção de Dados */
+        /* Estilo de Inserção de Dados (Padrão Clean) */
         .input-group { margin-bottom: 15px; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.04); border: 1px solid #eee;}
-        .input-group label { display: block; font-size: 13px; color: var(--primary-dark); margin-bottom: 5px; font-weight: 600; }
+        .input-group label { display: block; font-size: 12px; color: var(--text-gray); margin-bottom: 5px; font-weight: 600; text-transform: uppercase; }
         .input-group input, .input-group select { 
             width: 100%; 
             padding: 8px 0; 
             border: none; 
             border-bottom: 2px solid #ccc; 
-            font-size: 16px; 
-            color: var(--text-dark);
+            font-size: 18px; 
+            color: var(--primary-dark);
             background: transparent;
             font-weight: bold;
         }
-        .input-group input:focus, .input-group select:focus { outline: none; border-bottom-color: var(--primary); }
+        .input-group input:focus, .input-group select:focus { outline: none; border-bottom-color: var(--primary); color: var(--primary); }
 
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .form-row .input-group { margin-bottom: 10px; }
 
-        /* Banner de Fórmula Topo (Queda de Tensão) */
+        /* Banner de Fórmula */
         .formula-banner {
             background: #E3F2FD; border: 1px solid #90CAF9; border-radius: 10px; padding: 15px; text-align: center; margin-bottom: 15px;
         }
-        .formula-banner h3 { color: var(--primary-dark); font-size: 18px; margin-bottom: 5px; font-family: monospace;}
+        .formula-banner h3 { color: var(--primary-dark); font-size: 16px; margin-bottom: 5px; font-family: monospace;}
         .formula-banner p { color: #555; font-size: 12px; }
 
         /* Botões */
@@ -96,70 +104,111 @@
             margin-top: 10px; cursor: pointer; box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3); text-transform: uppercase; letter-spacing: 1px;
         }
         .btn-calc:active { background-color: var(--primary-dark); transform: translateY(2px); }
-        .btn-pdf { background-color: #D32F2F; color: white; width: 100%; padding: 16px; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; margin-top: 20px; cursor: pointer; box-shadow: 0 4px 8px rgba(211, 47, 47, 0.3);}
+        .btn-pdf { background-color: #D32F2F; color: white; width: 100%; padding: 16px; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; margin-top: 20px; cursor: pointer; box-shadow: 0 4px 8px rgba(211, 47, 47, 0.3);}
 
         /* Resultados e Notas Técnicas */
         #result-area { margin-top: 25px; display: none; }
-        .result-box { background: white; border-top: 5px solid var(--accent); padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .res-line { margin-bottom: 12px; font-size: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px;}
+        .result-box { background: white; border-top: 5px solid var(--accent); padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee;}
+        .res-line { margin-bottom: 12px; font-size: 15px; border-bottom: 1px dashed #f0f0f0; padding-bottom: 8px;}
         .res-line:last-child { border-bottom: none; }
-        .res-line span { color: var(--text-gray); display: block; font-size: 12px; margin-bottom: 3px;}
+        .res-line span { color: var(--text-gray); display: block; font-size: 11px; margin-bottom: 3px; text-transform: uppercase; font-weight: bold;}
         .res-line strong { color: var(--primary-dark); font-size: 18px;}
         
         .nota-tecnica { background: #FFF8E1; border-left: 4px solid #FF9800; padding: 15px; margin-top: 15px; border-radius: 6px;}
-        .nota-tecnica strong { color: #E65100; font-size: 14px; display: block; margin-bottom: 5px; }
-        .nota-tecnica p { font-size: 13px; color: #424242; line-height: 1.5; text-align: justify;}
+        .nota-tecnica strong { color: #E65100; font-size: 13px; display: block; margin-bottom: 5px; }
+        .nota-tecnica p { font-size: 12px; color: #424242; line-height: 1.5; text-align: justify;}
     </style>
 </head>
 <body>
 
     <header class="header">
-        <button class="menu-btn" id="btn-menu"><i class="fas fa-bolt"></i></button>
+        <button class="menu-btn" id="btn-menu"><i class="fas fa-bars"></i></button>
         <button class="back-btn" id="btn-back" onclick="goHome()"><i class="fas fa-arrow-left"></i></button>
-        <h1 id="header-title">VoltCalcPro MAX</h1>
+        <h1 id="header-title">CALCVOLTPRO</h1>
     </header>
 
     <main id="home" class="page active">
         <div class="grid-menu">
+            <div class="card" onclick="openPage('tela-ohm', 'Lei de Ohm & Ampacidade')">
+                <i class="fas fa-calculator"></i>
+                <h3>Lei de Ohm</h3>
+                <p>Ampacidade & Cabos</p>
+            </div>
             <div class="card" onclick="openPage('tela-quedatensao', 'Queda de Tensão')">
                 <i class="fas fa-wave-square"></i>
-                <p>Queda de Tensão</p>
+                <h3>Queda de Tensão</h3>
+                <p>Dimensionamento BT</p>
             </div>
-            <div class="card" onclick="openPage('tela-ohm', 'Lei de Ohm & Cabos')">
-                <i class="fas fa-calculator"></i>
-                <p>Ohm e Ampacidade</p>
-            </div>
-            <div class="card" onclick="openPage('tela-condutores', 'Curto em Condutores')">
+            <div class="card" onclick="openPage('tela-condutores', 'Curto Térmico')">
                 <i class="fas fa-temperature-high"></i>
-                <p>Curto Térmico</p>
+                <h3>Curto Térmico</h3>
+                <p>Energia Passante</p>
             </div>
-            <div class="card" onclick="openPage('tela-eletrodutos', 'Eletrodutos')">
+            <div class="card" onclick="openPage('tela-eletrodutos', 'Taxa de Eletrodutos')">
                 <i class="fas fa-circle-notch"></i>
-                <p>Taxa Eletrodutos</p>
+                <h3>Eletrodutos</h3>
+                <p>Taxa de Ocupação</p>
             </div>
-            <div class="card" onclick="openPage('tela-motor', 'Motores Ind.')">
+            <div class="card" onclick="openPage('tela-motor', 'Motores Industriais')">
                 <i class="fas fa-cogs"></i>
-                <p>Motores / Painel</p>
+                <h3>Motores Ind.</h3>
+                <p>Painel & Comando</p>
             </div>
-            <div class="card" onclick="openPage('tela-fp', 'Fator de Potência')">
+            <div class="card" onclick="openPage('tela-fp', 'Banco de Capacitores')">
                 <i class="fas fa-charging-station"></i>
-                <p>Banco Capacitores</p>
+                <h3>Fator de Potência</h3>
+                <p>Correção e Multas</p>
             </div>
             <div class="card" onclick="openPage('tela-curto', 'Subestação')">
                 <i class="fas fa-fire-alt"></i>
-                <p>Subestação / Icc</p>
+                <h3>Curto-Circuito</h3>
+                <p>Ruptura e Assimetria</p>
             </div>
-            <div class="card" onclick="openPage('tela-spda', 'SPDA NBR 5419')">
+            <div class="card" onclick="openPage('tela-spda', 'Aterramento')">
                 <i class="fas fa-shield-alt"></i>
-                <p>SPDA / Aterramento</p>
+                <h3>SPDA (5419)</h3>
+                <p>Resistência Haste</p>
             </div>
         </div>
+    </main>
+
+    <main id="tela-ohm" class="page">
+        <div class="nota-tecnica" style="margin-top:0; margin-bottom:15px; border-left-color:var(--primary); background:#E3F2FD;">
+            <p><strong><i class="fas fa-info-circle"></i> OMNI-Cálculo:</strong> Preencha <b>dois</b> valores (Tensão, Corrente, Resistência ou Potência). O motor descobre o resto e define o cabo NBR 5410.</p>
+        </div>
+        <div class="input-group">
+            <label>Sistema Elétrico</label>
+            <select id="ohm-sis">
+                <option value="1">Monofásico (1F + N)</option>
+                <option value="3" selected>Trifásico (3F + N)</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <div class="input-group"><label>Tensão (V)</label><input type="number" id="ohm-v" placeholder="Opcional"></div>
+            <div class="input-group"><label>Corrente (A)</label><input type="number" id="ohm-i" placeholder="Opcional"></div>
+        </div>
+        <div class="form-row">
+            <div class="input-group"><label>Resistência (Ω)</label><input type="number" id="ohm-r" placeholder="Opcional"></div>
+            <div class="input-group"><label>Potência (W)</label><input type="number" id="ohm-p" placeholder="Opcional"></div>
+        </div>
+        <div class="form-row">
+            <div class="input-group"><label>Fator de Potência</label><input type="number" id="ohm-fp" value="1.0" placeholder="Ex: 0.92"></div>
+            <div class="input-group"><label>Agrupamento (FCA)</label><input type="number" id="ohm-fca" value="1.0" placeholder="Ex: 0.8"></div>
+        </div>
+        <div class="input-group">
+            <label>Instalação (NBR 5410)</label>
+            <select id="ohm-metodo">
+                <option value="B1" selected>B1 - Eletroduto Embutido (Parede)</option>
+                <option value="C">C - Eletrocalha Aparente</option>
+            </select>
+        </div>
+        <button class="btn-calc" onclick="calcOhmAvancado()">PROCESSAR DADOS</button>
     </main>
 
     <main id="tela-quedatensao" class="page">
         <div class="formula-banner">
             <h3>S = (K · ρ · L · I · cosφ) / (e% · V)</h3>
-            <p>Fórmula Exata NBR 5410 c/ ρ = 0.0219 (Cobre a 70°C)</p>
+            <p>Fórmula Exata NBR 5410 c/ ρ = 0.0219 (Cobre 70°C)</p>
         </div>
 
         <div class="form-row">
@@ -197,37 +246,7 @@
             <input type="number" id="qt-i" placeholder="Ex: 32">
         </div>
         
-        <button class="btn-calc" onclick="calcQuedaTensao()">CALCULAR SEÇÃO DO CONDUTOR</button>
-    </main>
-
-    <main id="tela-ohm" class="page">
-        <div class="nota-tecnica" style="margin-top:0; margin-bottom:15px; border-left-color:var(--primary); background:#E3F2FD;">
-            <p><strong><i class="fas fa-info-circle"></i> OMNI-Cálculo:</strong> Preencha <b>dois</b> valores (Tensão, Corrente, Resistência ou Potência). O motor descobre o resto e define o cabo.</p>
-        </div>
-        <div class="input-group">
-            <label>Sistema Elétrico</label>
-            <select id="ohm-sis">
-                <option value="1">Monofásico (1F + N)</option>
-                <option value="3" selected>Trifásico (3F + N)</option>
-            </select>
-        </div>
-        <div class="form-row">
-            <div class="input-group"><label>Tensão (V)</label><input type="number" id="ohm-v" placeholder="Opcional"></div>
-            <div class="input-group"><label>Corrente (A)</label><input type="number" id="ohm-i" placeholder="Opcional"></div>
-        </div>
-        <div class="form-row">
-            <div class="input-group"><label>Resistência (Ω)</label><input type="number" id="ohm-r" placeholder="Opcional"></div>
-            <div class="input-group"><label>Potência (W)</label><input type="number" id="ohm-p" placeholder="Opcional"></div>
-        </div>
-        <div class="form-row">
-            <div class="input-group"><label>FP</label><input type="number" id="ohm-fp" value="1.0" placeholder="Ex: 0.92"></div>
-            <div class="input-group"><label>Agrupamento</label><input type="number" id="ohm-fca" value="1.0" placeholder="Ex: 0.8"></div>
-        </div>
-        <div class="input-group">
-            <label>Instalação (NBR 5410)</label>
-            <select id="ohm-metodo"><option value="B1" selected>B1 - Eletroduto Embutido</option><option value="C">C - Eletrocalha Aparente</option></select>
-        </div>
-        <button class="btn-calc" onclick="calcOhmAvancado()">PROCESSAR DADOS</button>
+        <button class="btn-calc" onclick="calcQuedaTensao()">CALCULAR CONDUTOR</button>
     </main>
 
     <main id="tela-condutores" class="page">
@@ -269,13 +288,6 @@
         <button class="btn-calc" onclick="calcSPDA()">CALCULAR ATERRAMENTO</button>
     </main>
 
-    <main id="tela-config" class="page">
-        <div class="input-group"><label>Nome do Engenheiro</label><input type="text" id="cfg-nome" placeholder="Ex: João Silva"></div>
-        <div class="input-group"><label>Registro (CREA / CFT)</label><input type="text" id="cfg-crea" placeholder="Ex: 12345-D"></div>
-        <div class="input-group"><label>Empresa</label><input type="text" id="cfg-empresa" placeholder="Ex: VoltCalc Engenharia"></div>
-        <button class="btn-calc" onclick="salvarConfig()">SALVAR ASSINATURA</button>
-    </main>
-
     <div id="result-area" class="page">
         <div class="result-box">
             <div id="resultado-dados"></div>
@@ -288,7 +300,7 @@
     </div>
 
     <script>
-        let config = { nome: "Profissional Padrão", crea: "CREA/CFT: OMNI-V10", empresa: "VoltCalcPro" };
+        let config = { nome: "Profissional Padrão", crea: "CREA/CFT: OMNI", empresa: "VoltCalcPro" };
         let currentResult = null; let currentTitle = ""; let currentNorm = ""; let currentNota = "";
 
         const Matriz = {
@@ -304,7 +316,7 @@
         function openPage(pageId, title) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
-            document.getElementById('header-title').innerText = title;
+            document.getElementById('header-title').innerText = title.toUpperCase();
             document.getElementById('btn-menu').style.display = 'none';
             document.getElementById('btn-back').style.display = 'block';
             document.getElementById('result-area').style.display = 'none';
@@ -314,7 +326,7 @@
         function goHome() {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('home').classList.add('active');
-            document.getElementById('header-title').innerText = 'VoltCalcPro MAX';
+            document.getElementById('header-title').innerText = 'CALCVOLTPRO';
             document.getElementById('btn-menu').style.display = 'block';
             document.getElementById('btn-back').style.display = 'none';
             document.getElementById('result-area').style.display = 'none';
@@ -356,7 +368,7 @@
             let nota = `Dimensionamento rigoroso aplicando a resistividade do cobre em temperatura real de operação térmica (70°C, ρ = 0.0219 Ω.mm²/m). A Norma NBR 5410 estipula que o engenheiro/projetista não deve ultrapassar ${e}% de queda de tensão (${quedaV.toFixed(1)}V) nos circuitos terminais. É mandatório que o profissional cruze esta bitola com a Tabela de Ampacidade para garantir a dissipação correta de calor.`;
             
             renderResult("Memória de Cálculo de Queda de Tensão", {
-                "Sistema": sis === "mono" ? `Monofásico ${v}V` : `Trifásico ${v}V`, 
+                "Sistema": sis === "mono" ? `Monofásico/Bifásico ${v}V` : `Trifásico ${v}V`, 
                 "Demanda de Projeto": `${i} A (FP: ${fp})`, 
                 "Distância do Circuito": `${l} metros`,
                 "Secção Teórica Exata": `${secT.toFixed(3)} mm²`,
@@ -372,10 +384,11 @@
             let p = parseFloat(document.getElementById('ohm-p').value);
             let fp = parseFloat(document.getElementById('ohm-fp').value) || 1.0;
             let fca = parseFloat(document.getElementById('ohm-fca').value) || 1.0;
+            let met = document.getElementById('ohm-metodo').options[document.getElementById('ohm-metodo').selectedIndex].text;
 
             let filled = 0;
             if(!isNaN(v)) filled++; if(!isNaN(i)) filled++; if(!isNaN(r)) filled++; if(!isNaN(p)) filled++;
-            if(filled < 2) return alert("Preencha pelo menos 2 campos!");
+            if(filled < 2) return alert("Preencha pelo menos 2 campos (Ex: Tensão e Potência)!");
 
             let root = (sys === "3") ? Math.sqrt(3) : 1;
 
@@ -387,18 +400,19 @@
             else if (!isNaN(p) && !isNaN(r)) { i = Math.sqrt(p / (r * fp * root)); v = i * r; }
 
             let i_corr = i / fca;
-            
-            let nota = `Engenharia Reversa Aplicada: O algoritmo derivou os parâmetros elétricos restantes através do desdobramento da Lei de Ohm e Potência em AC. A Corrente de Projeto encontrada foi de ${i.toFixed(2)}A. Aplicou-se o Fator de Agrupamento (${fca}), resultando numa Corrente Fictícia (Corrigida) de ${i_corr.toFixed(2)}A, a qual serviu de base para consulta automática na Tabela 36 da NBR 5410.`;
+            let caboRecomendado = Matriz.ampacidade(i_corr);
+            let disjuntorRecomendado = Matriz.disjuntor(i * 1.25);
 
-            renderResult("Cálculo Omnidirecional", {
+            let nota = `A Corrente de Projeto calculada foi ${i.toFixed(2)}A. Aplicando o Fator de Agrupamento de ${fca}, a corrente corrigida para dimensionamento do condutor é de ${i_corr.toFixed(2)}A. O cabo e o disjuntor foram especificados considerando o método de instalação ${met}.`;
+
+            renderResult("Cálculo Omnidirecional (Lei de Ohm)", {
                 "Tensão (V)": `${v.toFixed(2)} V`, "Corrente (I)": `${i.toFixed(2)} A`,
                 "Resistência (R)": `${r.toFixed(2)} Ω`, "Potência Ativa (P)": `${p.toFixed(2)} W`,
-                "CABO NBR 5410 (Ampacidade)": Matriz.ampacidade(i_corr),
-                "DISJUNTOR SUGERIDO": Matriz.disjuntor(i * 1.25)
-            }, "Lei de Ohm Acoplada à NBR 5410", nota);
+                "CABO NBR 5410 (Ampacidade)": caboRecomendado,
+                "DISJUNTOR SUGERIDO": disjuntorRecomendado
+            }, "Fundamentos de Eletricidade e NBR 5410 (Ampacidade)", nota);
         }
 
-        // --- AS OUTRAS FUNÇÕES MANTÊM-SE IGUAIS COM O MESMO RIGOR DE NOTAS ---
         function calcCondutores() {
             let icc = parseFloat(document.getElementById('cond-icc').value) || 0;
             let t = parseFloat(document.getElementById('cond-t').value) || 0.2;
@@ -446,13 +460,7 @@
             renderResult("Resistência de Aterramento", {"Resistividade": `${rho} Ω.m`, "Resistência (1 Haste)": `${r.toFixed(2)} Ohms`}, "NBR 5419", nota);
         }
 
-        function salvarConfig() {
-            if(document.getElementById('cfg-nome').value) config.nome = document.getElementById('cfg-nome').value;
-            if(document.getElementById('cfg-crea').value) config.crea = document.getElementById('cfg-crea').value;
-            if(document.getElementById('cfg-empresa').value) config.empresa = document.getElementById('cfg-empresa').value;
-            alert("Perfil de Assinatura Guardado!"); goHome();
-        }
-
+        // --- GERADOR DE LAUDO PDF COM NOTA TÉCNICA ---
         function gerarPDF() {
             const { jsPDF } = window.jspdf; const doc = new jsPDF();
             doc.setFillColor(25, 118, 210); doc.rect(0, 0, 210, 25, 'F');
