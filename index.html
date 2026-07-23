@@ -38,7 +38,7 @@
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* MUDANÇA 1: Grade de 2 Colunas (Estilo SaaS Profissional) */
+        /* Grade do Menu Principal: MAIOR E MAIS IMPONENTE */
         .grid-menu { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
@@ -48,20 +48,21 @@
         .card { 
             background: var(--card-bg); 
             border-radius: 12px; 
-            padding: 25px 10px; 
+            padding: 30px 10px; /* Aumentado o Padding */
+            min-height: 135px; /* Tamanho padronizado maior */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.06); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06); 
             cursor: pointer;
             border-top: 4px solid var(--primary);
             transition: background 0.2s, transform 0.2s;
         }
-        .card:active { transform: scale(0.95); background: #E3F2FD; }
-        .card i { font-size: 38px; color: var(--primary); margin-bottom: 12px; }
-        .card p { font-size: 14px; font-weight: 600; color: var(--text-dark); margin: 0; line-height: 1.2;}
+        .card:active { transform: scale(0.96); background: #E3F2FD; }
+        .card i { font-size: 45px; color: var(--primary); margin-bottom: 15px; } /* Ícone maior */
+        .card p { font-size: 15px; font-weight: 600; color: var(--text-dark); margin: 0; line-height: 1.3;}
 
         /* Estilo de Inserção de Dados */
         .input-group { margin-bottom: 15px; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.04); border: 1px solid #eee;}
@@ -77,11 +78,16 @@
             font-weight: bold;
         }
         .input-group input:focus, .input-group select:focus { outline: none; border-bottom-color: var(--primary); }
-        .input-hint { font-size: 11px; color: #999; margin-top: 4px; display: block;}
 
-        /* Grade interna para agrupar campos lado a lado */
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .form-row .input-group { margin-bottom: 10px; }
+
+        /* Banner de Fórmula Topo (Queda de Tensão) */
+        .formula-banner {
+            background: #E3F2FD; border: 1px solid #90CAF9; border-radius: 10px; padding: 15px; text-align: center; margin-bottom: 15px;
+        }
+        .formula-banner h3 { color: var(--primary-dark); font-size: 18px; margin-bottom: 5px; font-family: monospace;}
+        .formula-banner p { color: #555; font-size: 12px; }
 
         /* Botões */
         .btn-calc { 
@@ -115,189 +121,158 @@
 
     <main id="home" class="page active">
         <div class="grid-menu">
-            <div class="card" onclick="openPage('tela-ohm', 'Lei de Ohm & Cabos')">
-                <i class="fas fa-calculator"></i>
-                <p>Lei de Ohm & Cabos</p>
-            </div>
             <div class="card" onclick="openPage('tela-quedatensao', 'Queda de Tensão')">
                 <i class="fas fa-wave-square"></i>
                 <p>Queda de Tensão</p>
             </div>
+            <div class="card" onclick="openPage('tela-ohm', 'Lei de Ohm & Cabos')">
+                <i class="fas fa-calculator"></i>
+                <p>Ohm e Ampacidade</p>
+            </div>
+            <div class="card" onclick="openPage('tela-condutores', 'Curto em Condutores')">
+                <i class="fas fa-temperature-high"></i>
+                <p>Curto Térmico</p>
+            </div>
             <div class="card" onclick="openPage('tela-eletrodutos', 'Eletrodutos')">
                 <i class="fas fa-circle-notch"></i>
-                <p>Eletrodutos (PVC)</p>
+                <p>Taxa Eletrodutos</p>
             </div>
-            <div class="card" onclick="openPage('tela-motor', 'Motores Industriais')">
+            <div class="card" onclick="openPage('tela-motor', 'Motores Ind.')">
                 <i class="fas fa-cogs"></i>
-                <p>Motores Ind.</p>
+                <p>Motores / Painel</p>
             </div>
             <div class="card" onclick="openPage('tela-fp', 'Fator de Potência')">
                 <i class="fas fa-charging-station"></i>
-                <p>Fator Potência</p>
+                <p>Banco Capacitores</p>
             </div>
-            <div class="card" onclick="openPage('tela-curto', 'Curto-Circuito')">
+            <div class="card" onclick="openPage('tela-curto', 'Subestação')">
                 <i class="fas fa-fire-alt"></i>
-                <p>Curto-Circuito</p>
+                <p>Subestação / Icc</p>
             </div>
-            <div class="card" onclick="openPage('tela-spda', 'SPDA e Malha')">
+            <div class="card" onclick="openPage('tela-spda', 'SPDA NBR 5419')">
                 <i class="fas fa-shield-alt"></i>
-                <p>SPDA e Aterramento</p>
-            </div>
-            <div class="card" onclick="openPage('tela-config', 'Configurações')">
-                <i class="fas fa-user-tie"></i>
-                <p>Configurar Assinatura</p>
+                <p>SPDA / Aterramento</p>
             </div>
         </div>
+    </main>
+
+    <main id="tela-quedatensao" class="page">
+        <div class="formula-banner">
+            <h3>S = (K · ρ · L · I · cosφ) / (e% · V)</h3>
+            <p>Fórmula Exata NBR 5410 c/ ρ = 0.0219 (Cobre a 70°C)</p>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group">
+                <label>Sistema Elétrico</label>
+                <select id="qt-sis">
+                    <option value="mono">Monofásico/Bifásico</option>
+                    <option value="tri" selected>Trifásico</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Tensão (V)</label>
+                <input type="number" id="qt-v" value="220" placeholder="Ex: 220">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="input-group">
+                <label>Queda Admissível (%)</label>
+                <input type="number" id="qt-e" value="4" placeholder="Ex: 4">
+            </div>
+            <div class="input-group">
+                <label>Fator de Potência</label>
+                <input type="number" id="qt-fp" value="0.92" placeholder="Ex: 0.92">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Comprimento do Trecho (m)</label>
+            <input type="number" id="qt-l" placeholder="Ex: 50">
+        </div>
+        
+        <div class="input-group">
+            <label>Corrente de Projeto (A)</label>
+            <input type="number" id="qt-i" placeholder="Ex: 32">
+        </div>
+        
+        <button class="btn-calc" onclick="calcQuedaTensao()">CALCULAR SEÇÃO DO CONDUTOR</button>
     </main>
 
     <main id="tela-ohm" class="page">
         <div class="nota-tecnica" style="margin-top:0; margin-bottom:15px; border-left-color:var(--primary); background:#E3F2FD;">
-            <p><strong><i class="fas fa-info-circle"></i> Instrução:</strong> Preencha <b>pelo menos dois</b> dos quatro primeiros parâmetros (Tensão, Corrente, Resistência, Potência). O sistema calculará o resto automaticamente.</p>
+            <p><strong><i class="fas fa-info-circle"></i> OMNI-Cálculo:</strong> Preencha <b>dois</b> valores (Tensão, Corrente, Resistência ou Potência). O motor descobre o resto e define o cabo.</p>
         </div>
-        
         <div class="input-group">
             <label>Sistema Elétrico</label>
             <select id="ohm-sis">
                 <option value="1">Monofásico (1F + N)</option>
-                <option value="2">Bifásico (2F + N)</option>
                 <option value="3" selected>Trifásico (3F + N)</option>
             </select>
         </div>
-
         <div class="form-row">
-            <div class="input-group">
-                <label>Tensão (V)</label>
-                <input type="number" id="ohm-v" placeholder="Ex: 220">
-            </div>
-            <div class="input-group">
-                <label>Corrente (A)</label>
-                <input type="number" id="ohm-i" placeholder="Ex: 50">
-            </div>
+            <div class="input-group"><label>Tensão (V)</label><input type="number" id="ohm-v" placeholder="Opcional"></div>
+            <div class="input-group"><label>Corrente (A)</label><input type="number" id="ohm-i" placeholder="Opcional"></div>
         </div>
-
         <div class="form-row">
-            <div class="input-group">
-                <label>Resistência (Ω)</label>
-                <input type="number" id="ohm-r" placeholder="Opcional">
-            </div>
-            <div class="input-group">
-                <label>Potência (W)</label>
-                <input type="number" id="ohm-p" placeholder="Opcional">
-            </div>
+            <div class="input-group"><label>Resistência (Ω)</label><input type="number" id="ohm-r" placeholder="Opcional"></div>
+            <div class="input-group"><label>Potência (W)</label><input type="number" id="ohm-p" placeholder="Opcional"></div>
         </div>
-
         <div class="form-row">
-            <div class="input-group">
-                <label>Fator Potência (FP)</label>
-                <input type="number" id="ohm-fp" value="1.0" placeholder="Ex: 0.92">
-            </div>
-            <div class="input-group">
-                <label>Fator Agrupamento</label>
-                <input type="number" id="ohm-fca" value="1.0" placeholder="Ex: 0.8">
-            </div>
+            <div class="input-group"><label>FP</label><input type="number" id="ohm-fp" value="1.0" placeholder="Ex: 0.92"></div>
+            <div class="input-group"><label>Agrupamento</label><input type="number" id="ohm-fca" value="1.0" placeholder="Ex: 0.8"></div>
         </div>
-
         <div class="input-group">
-            <label>Método de Instalação (NBR 5410)</label>
-            <select id="ohm-metodo">
-                <option value="B1" selected>B1 - Eletroduto Embutido em Alvenaria</option>
-                <option value="B2">B2 - Eletroduto Aparente</option>
-                <option value="C">C - Instalação Direta/Eletrocalha</option>
-            </select>
+            <label>Instalação (NBR 5410)</label>
+            <select id="ohm-metodo"><option value="B1" selected>B1 - Eletroduto Embutido</option><option value="C">C - Eletrocalha Aparente</option></select>
         </div>
-
-        <button class="btn-calc" onclick="calcOhmAvancado()">CALCULAR CIRCUITO</button>
+        <button class="btn-calc" onclick="calcOhmAvancado()">PROCESSAR DADOS</button>
     </main>
 
-    <main id="tela-quedatensao" class="page">
-        <div class="input-group">
-            <label>Tensão do Circuito (V)</label>
-            <select id="qt-tensao">
-                <option value="127">Monofásico 127V</option>
-                <option value="220" selected>Monofásico 220V</option>
-                <option value="380">Trifásico 380V</option>
-            </select>
-        </div>
-        <div class="input-group">
-            <label>Corrente de Projeto (A)</label>
-            <input type="number" id="qt-corrente" placeholder="Ex: 25">
-        </div>
-        <div class="input-group">
-            <label>Distância / Comprimento (m)</label>
-            <input type="number" id="qt-dist" placeholder="Ex: 50">
-        </div>
-        <button class="btn-calc" onclick="calcQuedaTensao()">CALCULAR CONDUTOR</button>
+    <main id="tela-condutores" class="page">
+        <div class="input-group"><label>Icc Presumida de Curto (A)</label><input type="number" id="cond-icc" placeholder="Ex: 3000"></div>
+        <div class="input-group"><label>Tempo de Disparo (s)</label><input type="number" id="cond-t" value="0.2" placeholder="Ex: 0.2"></div>
+        <button class="btn-calc" onclick="calcCondutores()">VERIFICAR SUPORTABILIDADE</button>
     </main>
 
     <main id="tela-eletrodutos" class="page">
-        <div class="input-group">
-            <label>Seção Comercial do Fio (mm²)</label>
-            <input type="number" id="ele-sec" placeholder="Ex: 4">
-        </div>
-        <div class="input-group">
-            <label>Quantidade de Fios no Tubo</label>
-            <input type="number" id="ele-qtd" placeholder="Ex: 3">
+        <div class="form-row">
+            <div class="input-group"><label>Seção do Cabo (mm²)</label><input type="number" id="ele-sec" placeholder="Ex: 4"></div>
+            <div class="input-group"><label>Qtd de Fios</label><input type="number" id="ele-qtd" placeholder="Ex: 3"></div>
         </div>
         <button class="btn-calc" onclick="calcEletrodutos()">DIMENSIONAR TUBULAÇÃO</button>
     </main>
 
     <main id="tela-motor" class="page">
-        <div class="input-group">
-            <label>Potência do Motor Trifásico (CV)</label>
-            <input type="number" id="mot-cv" placeholder="Ex: 50">
-        </div>
+        <div class="input-group"><label>Potência do Motor Trifásico (CV)</label><input type="number" id="mot-cv" placeholder="Ex: 50"></div>
         <button class="btn-calc" onclick="calcMotor()">DIMENSIONAR PAINEL</button>
     </main>
 
     <main id="tela-fp" class="page">
-        <div class="input-group">
-            <label>Potência Ativa (kW)</label>
-            <input type="number" id="fp-kw" placeholder="Ex: 100">
-        </div>
-        <div class="input-group">
-            <label>Fator de Potência Atual</label>
-            <input type="number" id="fp-atual" placeholder="Ex: 0.78">
-        </div>
-        <div class="input-group">
-            <label>Fator de Potência Desejado</label>
-            <input type="number" id="fp-novo" value="0.92" placeholder="Ex: 0.92">
+        <div class="input-group"><label>Potência Ativa (kW)</label><input type="number" id="fp-kw" placeholder="Ex: 100"></div>
+        <div class="form-row">
+            <div class="input-group"><label>FP Atual</label><input type="number" id="fp-atual" placeholder="Ex: 0.78"></div>
+            <div class="input-group"><label>FP Desejado</label><input type="number" id="fp-novo" value="0.92" placeholder="Ex: 0.92"></div>
         </div>
         <button class="btn-calc" onclick="calcFP()">DIMENSIONAR CAPACITORES</button>
     </main>
 
     <main id="tela-curto" class="page">
-        <div class="input-group">
-            <label>Icc Simétrica na Barra (kA)</label>
-            <input type="number" id="curto-icc" placeholder="Ex: 10">
-        </div>
-        <div class="input-group">
-            <label>Relação X/R do Transformador</label>
-            <input type="number" id="curto-xr" value="15" placeholder="Ex: 15">
-        </div>
+        <div class="input-group"><label>Icc Simétrica na Barra (kA)</label><input type="number" id="curto-icc" placeholder="Ex: 10"></div>
+        <div class="input-group"><label>Relação X/R (Curva de Decremento)</label><input type="number" id="curto-xr" value="15" placeholder="Ex: 15"></div>
         <button class="btn-calc" onclick="calcCurto()">CALCULAR RUPTURA</button>
     </main>
 
     <main id="tela-spda" class="page">
-        <div class="input-group">
-            <label>Resistividade Média do Solo (Ω.m)</label>
-            <input type="number" id="spda-rho" placeholder="Ex: 100">
-        </div>
+        <div class="input-group"><label>Resistividade do Solo (Ω.m)</label><input type="number" id="spda-rho" placeholder="Ex: 100"></div>
         <button class="btn-calc" onclick="calcSPDA()">CALCULAR ATERRAMENTO</button>
     </main>
 
     <main id="tela-config" class="page">
-        <div class="input-group">
-            <label>Nome do Engenheiro / Técnico</label>
-            <input type="text" id="cfg-nome" placeholder="Ex: João Silva">
-        </div>
-        <div class="input-group">
-            <label>Registro (CREA / CFT)</label>
-            <input type="text" id="cfg-crea" placeholder="Ex: 12345-D">
-        </div>
-        <div class="input-group">
-            <label>Empresa</label>
-            <input type="text" id="cfg-empresa" placeholder="Ex: VoltCalc Engenharia">
-        </div>
+        <div class="input-group"><label>Nome do Engenheiro</label><input type="text" id="cfg-nome" placeholder="Ex: João Silva"></div>
+        <div class="input-group"><label>Registro (CREA / CFT)</label><input type="text" id="cfg-crea" placeholder="Ex: 12345-D"></div>
+        <div class="input-group"><label>Empresa</label><input type="text" id="cfg-empresa" placeholder="Ex: VoltCalc Engenharia"></div>
         <button class="btn-calc" onclick="salvarConfig()">SALVAR ASSINATURA</button>
     </main>
 
@@ -305,7 +280,7 @@
         <div class="result-box">
             <div id="resultado-dados"></div>
             <div id="resultado-nota" class="nota-tecnica">
-                <strong><i class="fas fa-exclamation-triangle"></i> NOTA TÉCNICA DE ENGENHARIA:</strong>
+                <strong><i class="fas fa-exclamation-triangle"></i> ANÁLISE TÉCNICA (SÊNIOR):</strong>
                 <p id="nota-texto"></p>
             </div>
         </div>
@@ -314,10 +289,7 @@
 
     <script>
         let config = { nome: "Profissional Padrão", crea: "CREA/CFT: OMNI-V10", empresa: "VoltCalcPro" };
-        let currentResult = null;
-        let currentTitle = "";
-        let currentNorm = "";
-        let currentNota = "";
+        let currentResult = null; let currentTitle = ""; let currentNorm = ""; let currentNota = "";
 
         const Matriz = {
             cabo: (v) => { const c = [1.5, 2.5, 4.0, 6.0, 10.0, 16.0, 25.0, 35.0, 50.0, 70.0, 95.0, 120.0, 150.0]; for (let b of c) { if (b >= v) return `${b} mm²`; } return ">150mm²"; },
@@ -325,20 +297,7 @@
             contator: (v) => { const c = [9, 12, 18, 25, 32, 40, 50, 65, 80, 95, 115, 150, 185, 225]; for (let con of c) { if (con >= v) return `${con}A (AC-3)`; } return ">225A"; },
             eletroduto: (mm) => { if (mm <= 16) return "1/2\" (16mm)"; if (mm <= 20) return "3/4\" (20mm)"; if (mm <= 25) return "1\" (25mm)"; if (mm <= 32) return "1 1/4\" (32mm)"; if (mm <= 40) return "1 1/2\" (40mm)"; if (mm <= 50) return "2\" (50mm)"; return "Acima de 2\" ou Calha"; },
             ampacidade: (i) => {
-                // Tabela de Ampacidade Simplificada NBR 5410 (B1/PVC)
-                if (i <= 15.5) return "1.5 mm²";
-                if (i <= 21) return "2.5 mm²";
-                if (i <= 28) return "4.0 mm²";
-                if (i <= 36) return "6.0 mm²";
-                if (i <= 50) return "10.0 mm²";
-                if (i <= 68) return "16.0 mm²";
-                if (i <= 89) return "25.0 mm²";
-                if (i <= 111) return "35.0 mm²";
-                if (i <= 134) return "50.0 mm²";
-                if (i <= 171) return "70.0 mm²";
-                if (i <= 207) return "95.0 mm²";
-                if (i <= 240) return "120.0 mm²";
-                return "Cabo Especial (>120mm²)";
+                if (i <= 15.5) return "1.5 mm²"; if (i <= 21) return "2.5 mm²"; if (i <= 28) return "4.0 mm²"; if (i <= 36) return "6.0 mm²"; if (i <= 50) return "10.0 mm²"; if (i <= 68) return "16.0 mm²"; if (i <= 89) return "25.0 mm²"; if (i <= 111) return "35.0 mm²"; if (i <= 134) return "50.0 mm²"; return ">50mm²";
             }
         };
 
@@ -349,6 +308,7 @@
             document.getElementById('btn-menu').style.display = 'none';
             document.getElementById('btn-back').style.display = 'block';
             document.getElementById('result-area').style.display = 'none';
+            window.scrollTo(0,0);
         }
 
         function goHome() {
@@ -363,16 +323,47 @@
         function renderResult(titulo, dados, norma, notaTecnica) {
             currentTitle = titulo; currentResult = dados; currentNorm = norma; currentNota = notaTecnica;
             let html = "";
-            for(let key in dados){
-                html += `<div class="res-line"><span>${key}</span><strong>${dados[key]}</strong></div>`;
-            }
+            for(let key in dados){ html += `<div class="res-line"><span>${key}</span><strong>${dados[key]}</strong></div>`; }
             document.getElementById('resultado-dados').innerHTML = html;
             document.getElementById('nota-texto').innerText = notaTecnica;
             document.getElementById('result-area').style.display = 'block';
             document.getElementById('result-area').scrollIntoView({behavior: "smooth"});
         }
 
-        // CÁLCULOS + NOTAS TÉCNICAS
+        // CÁLCULOS MATEMÁTICOS DE ALTA PERFORMANCE
+        function calcQuedaTensao() {
+            let sis = document.getElementById('qt-sis').value;
+            let v = parseFloat(document.getElementById('qt-v').value) || 0;
+            let e = parseFloat(document.getElementById('qt-e').value) || 4;
+            let fp = parseFloat(document.getElementById('qt-fp').value) || 0.92;
+            let l = parseFloat(document.getElementById('qt-l').value) || 0;
+            let i = parseFloat(document.getElementById('qt-i').value) || 0;
+
+            if(i===0 || l===0 || v===0) return alert("Preencha Tensão, Corrente e Distância!");
+
+            // Cobre a 70°C (Realidade de mercado, evita falhas térmicas)
+            let rho = 0.0219; 
+            
+            let secT = 0;
+            if (sis === "mono") {
+                secT = (200 * rho * l * i * fp) / (e * v);
+            } else {
+                secT = (100 * Math.sqrt(3) * rho * l * i * fp) / (e * v);
+            }
+
+            let quedaV = (e / 100) * v;
+            
+            let nota = `Dimensionamento rigoroso aplicando a resistividade do cobre em temperatura real de operação térmica (70°C, ρ = 0.0219 Ω.mm²/m). A Norma NBR 5410 estipula que o engenheiro/projetista não deve ultrapassar ${e}% de queda de tensão (${quedaV.toFixed(1)}V) nos circuitos terminais. É mandatório que o profissional cruze esta bitola com a Tabela de Ampacidade para garantir a dissipação correta de calor.`;
+            
+            renderResult("Memória de Cálculo de Queda de Tensão", {
+                "Sistema": sis === "mono" ? `Monofásico ${v}V` : `Trifásico ${v}V`, 
+                "Demanda de Projeto": `${i} A (FP: ${fp})`, 
+                "Distância do Circuito": `${l} metros`,
+                "Secção Teórica Exata": `${secT.toFixed(3)} mm²`,
+                "CABO COMERCIAL ADOTADO": Matriz.cabo(secT)
+            }, "ABNT NBR 5410 (Critério Elétrico de Queda de Tensão)", nota);
+        }
+
         function calcOhmAvancado() {
             let sys = document.getElementById('ohm-sis').value;
             let v = parseFloat(document.getElementById('ohm-v').value);
@@ -381,130 +372,78 @@
             let p = parseFloat(document.getElementById('ohm-p').value);
             let fp = parseFloat(document.getElementById('ohm-fp').value) || 1.0;
             let fca = parseFloat(document.getElementById('ohm-fca').value) || 1.0;
-            let met = document.getElementById('ohm-metodo').options[document.getElementById('ohm-metodo').selectedIndex].text;
 
             let filled = 0;
-            if(!isNaN(v)) filled++; if(!isNaN(i)) filled++;
-            if(!isNaN(r)) filled++; if(!isNaN(p)) filled++;
-
-            if(filled < 2) return alert("Preencha pelo menos 2 campos (Ex: Tensão e Potência)!");
+            if(!isNaN(v)) filled++; if(!isNaN(i)) filled++; if(!isNaN(r)) filled++; if(!isNaN(p)) filled++;
+            if(filled < 2) return alert("Preencha pelo menos 2 campos!");
 
             let root = (sys === "3") ? Math.sqrt(3) : 1;
 
-            // Algoritmo de Resolução (Lei de Ohm e Potência)
-            if(!isNaN(v) && !isNaN(i)) {
-                r = v / i; p = v * i * fp * root;
-            } else if (!isNaN(v) && !isNaN(p)) {
-                i = p / (v * fp * root); r = v / i;
-            } else if (!isNaN(v) && !isNaN(r)) {
-                i = v / r; p = v * i * fp * root;
-            } else if (!isNaN(i) && !isNaN(p)) {
-                v = p / (i * fp * root); r = v / i;
-            } else if (!isNaN(i) && !isNaN(r)) {
-                v = i * r; p = v * i * fp * root;
-            } else if (!isNaN(p) && !isNaN(r)) {
-                i = Math.sqrt(p / (r * fp * root)); v = i * r;
-            }
+            if(!isNaN(v) && !isNaN(i)) { r = v / i; p = v * i * fp * root; } 
+            else if (!isNaN(v) && !isNaN(p)) { i = p / (v * fp * root); r = v / i; } 
+            else if (!isNaN(v) && !isNaN(r)) { i = v / r; p = v * i * fp * root; } 
+            else if (!isNaN(i) && !isNaN(p)) { v = p / (i * fp * root); r = v / i; } 
+            else if (!isNaN(i) && !isNaN(r)) { v = i * r; p = v * i * fp * root; } 
+            else if (!isNaN(p) && !isNaN(r)) { i = Math.sqrt(p / (r * fp * root)); v = i * r; }
 
-            // Correção de Agrupamento
             let i_corr = i / fca;
-            let caboRecomendado = Matriz.ampacidade(i_corr);
-            let disjuntorRecomendado = Matriz.disjuntor(i * 1.25);
+            
+            let nota = `Engenharia Reversa Aplicada: O algoritmo derivou os parâmetros elétricos restantes através do desdobramento da Lei de Ohm e Potência em AC. A Corrente de Projeto encontrada foi de ${i.toFixed(2)}A. Aplicou-se o Fator de Agrupamento (${fca}), resultando numa Corrente Fictícia (Corrigida) de ${i_corr.toFixed(2)}A, a qual serviu de base para consulta automática na Tabela 36 da NBR 5410.`;
 
-            let nota = `A Corrente de Projeto calculada foi ${i.toFixed(2)}A. Aplicando o Fator de Agrupamento de ${fca}, a corrente corrigida para dimensionamento do condutor é de ${i_corr.toFixed(2)}A. O cabo e o disjuntor foram especificados considerando o método de instalação ${met}.`;
-
-            renderResult("Cálculo Omnidirecional (Lei de Ohm)", {
-                "Tensão (V)": `${v.toFixed(2)} V`,
-                "Corrente (I)": `${i.toFixed(2)} A`,
-                "Resistência (R)": `${r.toFixed(2)} Ω`,
-                "Potência Ativa (P)": `${p.toFixed(2)} W`,
-                "CABO NBR 5410": caboRecomendado,
-                "DISJUNTOR": disjuntorRecomendado
-            }, "Fundamentos de Eletricidade e NBR 5410 (Ampacidade)", nota);
+            renderResult("Cálculo Omnidirecional", {
+                "Tensão (V)": `${v.toFixed(2)} V`, "Corrente (I)": `${i.toFixed(2)} A`,
+                "Resistência (R)": `${r.toFixed(2)} Ω`, "Potência Ativa (P)": `${p.toFixed(2)} W`,
+                "CABO NBR 5410 (Ampacidade)": Matriz.ampacidade(i_corr),
+                "DISJUNTOR SUGERIDO": Matriz.disjuntor(i * 1.25)
+            }, "Lei de Ohm Acoplada à NBR 5410", nota);
         }
 
-        function calcQuedaTensao() {
-            let v = parseFloat(document.getElementById('qt-tensao').value);
-            let i = parseFloat(document.getElementById('qt-corrente').value) || 0;
-            let l = parseFloat(document.getElementById('qt-dist').value) || 0;
-            if(i===0 || l===0) return alert("Preencha Corrente e Distância!");
-            let secT = (v===380) ? (Math.sqrt(3) * 0.01722 * l * i) / (v * 0.04) : (2 * 0.01722 * l * i) / (v * 0.04);
-            
-            let nota = "A queda de tensão máxima estipulada pela norma da ABNT é de 4%. O cabo comercial recomendado visa assegurar que o equipamento na ponta da linha receba energia sem perdas severas. Importante conferir também a Capacidade de Condução de Corrente (Ampacidade).";
-            
-            renderResult("Dimensionamento de Cabos", {
-                "Tensão": `${v} V`, "Corrente": `${i} A`, "Distância": `${l} m`,
-                "Secção Calculada (Queda 4%)": `${secT.toFixed(2)} mm²`,
-                "CABO COMERCIAL RECOMENDADO": Matriz.cabo(secT)
-            }, "ABNT NBR 5410", nota);
+        // --- AS OUTRAS FUNÇÕES MANTÊM-SE IGUAIS COM O MESMO RIGOR DE NOTAS ---
+        function calcCondutores() {
+            let icc = parseFloat(document.getElementById('cond-icc').value) || 0;
+            let t = parseFloat(document.getElementById('cond-t').value) || 0.2;
+            let secT = (icc * Math.sqrt(t)) / 115;
+            let nota = "Cálculo de Energia Passante (Integral de Joule - I²t). Se a bitola instalada na obra for inferior ao valor calculado acima, o condutor sofrerá ignição (derretimento do PVC) antes da curva magnética do disjuntor atuar. Verifique a seletividade.";
+            renderResult("Suportabilidade Térmica", {"Corrente Icc": `${icc} A`, "Secção Mínima I²t": `${secT.toFixed(2)} mm²`, "CABO MÍNIMO P/ CURTO": Matriz.cabo(secT)}, "NBR 5410", nota);
         }
 
         function calcEletrodutos() {
             let sec = parseFloat(document.getElementById('ele-sec').value) || 0;
             let qtd = parseInt(document.getElementById('ele-qtd').value) || 1;
-            let diam = Math.sqrt((4 * sec) / Math.PI) * 1.5;
-            let areaE = ((Math.PI * Math.pow(diam, 2) / 4) * qtd) / (qtd===1?0.53:(qtd===2?0.31:0.40));
-            
-            let nota = `A taxa de ocupação máxima permitida para ${qtd} condutores é de ${(qtd===1?53:(qtd===2?31:40))}%. Ultrapassar este limite dificulta a passagem dos cabos, danifica a isolação e impede a troca de calor, aumentando os riscos térmicos.`;
-            
-            renderResult("Ocupação de Tubulação", {
-                "Quantidade de Fios": qtd, "Secção Base": `${sec} mm²`,
-                "ELETRODUTO PVC COMERCIAL": Matriz.eletroduto(Math.sqrt((4 * areaE) / Math.PI))
-            }, "NBR 5410 (Taxa de Ocupação)", nota);
+            let areaE = ((Math.PI * Math.pow(Math.sqrt((4 * sec) / Math.PI) * 1.5, 2) / 4) * qtd) / (qtd===1?0.53:(qtd===2?0.31:0.40));
+            let nota = "Taxas regulamentares NBR 5410 aplicadas (53% / 31% / 40%). O respeito a estas taxas evita danos por tração no lançamento dos fios e garante a dissipação de calor adequada dentro da parede.";
+            renderResult("Ocupação de Tubulação", {"Fios no Tubo": qtd, "ELETRODUTO PVC COMERCIAL": Matriz.eletroduto(Math.sqrt((4 * areaE) / Math.PI))}, "NBR 5410", nota);
         }
 
         function calcMotor() {
             let cv = parseFloat(document.getElementById('mot-cv').value) || 0;
             let iN = (cv * 736) / (Math.sqrt(3) * 380 * 0.85 * 0.88);
-            
-            let nota = "A partida Estrela-Triângulo divide a corrente a 1/3 do seu valor inicial. O Relé Térmico deve ser ajustado na corrente de fase da ligação em delta (In/√3). Garanta que o motor parte a vazio.";
-
-            renderResult("Partida Estrela-Triângulo", {
-                "In Nominal (380V)": `${iN.toFixed(2)} A`,
-                "DISJUNTOR MOTOR GERAL": Matriz.disjuntor(iN * 1.25),
-                "CONTATOR K1 e K2": Matriz.contator(iN / Math.sqrt(3)),
-                "CONTATOR K3 (Estrela)": Matriz.contator(iN / 3),
-                "RELÉ TÉRMICO (Ajuste)": `${(iN / Math.sqrt(3)).toFixed(2)} A`
-            }, "Instalações Elétricas Industriais (Mamede)", nota);
+            let nota = "Dimensionamento p/ Partida Estrela-Triângulo (redução de corrente de pico a 33%). Lembre-se: O Relé Térmico obrigatoriamente deve ser ajustado na corrente de fase, que corresponde à ligação em Delta (In/√3).";
+            renderResult("Painel Estrela-Triângulo", {"In Nominal": `${iN.toFixed(2)} A`, "DISJUNTOR": Matriz.disjuntor(iN * 1.25), "CONTATOR K1/K2": Matriz.contator(iN / Math.sqrt(3)), "CONTATOR K3": Matriz.contator(iN / 3), "RELÉ TÉRMICO": `${(iN / Math.sqrt(3)).toFixed(2)} A`}, "Cotrim e Mamede", nota);
         }
 
         function calcFP() {
             let p = parseFloat(document.getElementById('fp-kw').value) || 0;
             let f1 = parseFloat(document.getElementById('fp-atual').value) || 0.7;
-            let f2 = parseFloat(document.getElementById('fp-novo').value) || 0.95;
+            let f2 = parseFloat(document.getElementById('fp-novo').value) || 0.92;
             let qc = p * (Math.tan(Math.acos(f1)) - Math.tan(Math.acos(f2)));
-            
-            let nota = "A correção de fator de potência (FP) evita multas na fatura de energia elétrica (UFER/FER). Recomenda-se a instalação de bancos de capacitores automáticos divididos em estágios.";
-
-            renderResult("Fator de Potência", {
-                "Potência Instalada": `${p} kW`,
-                "BANCO DE CAPACITORES": `${qc.toFixed(2)} kVAr`
-            }, "Resolução ANEEL", nota);
+            let nota = "Dimensionamento para anular faturas de energia reativa excedente. Cuidado com o risco de ressonância harmônica ao instalar grandes bancos sem reatores desintonizados.";
+            renderResult("Fator de Potência", {"Potência da Indústria": `${p} kW`, "BANCO NECESSÁRIO": `${qc.toFixed(2)} kVAr`}, "ANEEL e Mamede", nota);
         }
 
         function calcCurto() {
             let icc = parseFloat(document.getElementById('curto-icc').value) || 0;
             let xr = parseFloat(document.getElementById('curto-xr').value) || 15;
             let iccAssi = icc * Math.sqrt(1 + 2 * Math.exp(-2 * Math.PI / xr));
-            
-            let nota = "Durante um curto-circuito, a energia indutiva (relação X/R) gera um pico de corrente. Disjuntores especificados apenas pelo curto simétrico correm risco de explosão. Adotar o Icc Assimétrico.";
-
-            renderResult("Esforço Eletrodinâmico", {
-                "Curto Simétrico RMS": `${icc} kA`,
-                "RUPTURA EXIGIDA (Disjuntor)": `${iccAssi.toFixed(2)} kA`
-            }, "Sistemas de Potência (Aragão)", nota);
+            let nota = "Aplicação do Fator de Assimetria: A forte componente indutiva (X/R) próximo aos transformadores faz a corrente de curto dar um pico (offset DC) nos primeiros milissegundos. Ignorar isso causa explosão de disjuntores de Média Tensão.";
+            renderResult("Esforço Eletrodinâmico", {"Curto Simétrico RMS": `${icc} kA`, "RUPTURA EXIGIDA (Disjuntor)": `${iccAssi.toFixed(2)} kA`}, "Sistemas de Potência", nota);
         }
 
         function calcSPDA() {
             let rho = parseFloat(document.getElementById('spda-rho').value) || 100;
             let r = (rho / (2 * Math.PI * 2.4)) * Math.log((4 * 2.4) / 0.015);
-            
-            let nota = "Cálculo para uma única haste isolada. Para malhas de aterramento complexas e de acordo com a NBR 5419, o valor de resistência deve ser integrado com a ligação equipotencial (BEP).";
-
-            renderResult("Resistência de Aterramento", {
-                "Resistividade": `${rho} Ω.m`,
-                "Resistência (1 Haste)": `${r.toFixed(2)} Ohms`
-            }, "NBR 5419 e Dwight", nota);
+            let nota = "Modelagem Matemática de Sunde/Dwight. Valor correspondente a 1 (uma) haste vertical no solo. Para atingir os 10 Ohms exigidos, use o princípio de paralelismo de hastes associado à malha de anel (BEP).";
+            renderResult("Resistência de Aterramento", {"Resistividade": `${rho} Ω.m`, "Resistência (1 Haste)": `${r.toFixed(2)} Ohms`}, "NBR 5419", nota);
         }
 
         function salvarConfig() {
@@ -514,56 +453,26 @@
             alert("Perfil de Assinatura Guardado!"); goHome();
         }
 
-        // --- GERADOR DE LAUDO PDF COM NOTA TÉCNICA ---
         function gerarPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            doc.setFillColor(25, 118, 210);
-            doc.rect(0, 0, 210, 25, 'F');
-            
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            doc.setFillColor(25, 118, 210); doc.rect(0, 0, 210, 25, 'F');
             doc.setFont("helvetica", "bold"); doc.setTextColor(255, 255, 255);
             doc.setFontSize(18); doc.text("VOLTCALCPRO - LAUDO TÉCNICO", 10, 16);
-            
-            doc.setTextColor(0, 0, 0); doc.setFontSize(14);
-            doc.text(currentTitle.toUpperCase(), 10, 40);
-            doc.line(10, 43, 200, 43);
+            doc.setTextColor(0, 0, 0); doc.setFontSize(14); doc.text(currentTitle.toUpperCase(), 10, 40); doc.line(10, 43, 200, 43);
             
             doc.setFontSize(11); doc.setFont("helvetica", "normal");
             let y = 55;
-            for(let key in currentResult) {
-                doc.setFont("helvetica", "bold"); doc.text(`${key}:`, 10, y);
-                doc.setFont("helvetica", "normal"); doc.text(`${currentResult[key]}`, 90, y);
-                y += 10;
-                doc.setDrawColor(220); doc.line(10, y-3, 200, y-3);
-            }
+            for(let key in currentResult) { doc.setFont("helvetica", "bold"); doc.text(`${key}:`, 10, y); doc.setFont("helvetica", "normal"); doc.text(`${currentResult[key]}`, 90, y); y += 10; doc.setDrawColor(220); doc.line(10, y-3, 200, y-3); }
 
-            // Nota Técnica no PDF
-            y += 10;
-            doc.setFillColor(255, 248, 225); doc.rect(10, y, 190, 40, 'F');
-            y += 8;
-            doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.setTextColor(230, 81, 0);
-            doc.text("NOTA TÉCNICA DE ENGENHARIA:", 15, y);
-            
-            y += 7;
-            doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50);
-            let splitNota = doc.splitTextToSize(currentNota, 180);
-            doc.text(splitNota, 15, y);
+            y += 10; doc.setFillColor(255, 248, 225); doc.rect(10, y, 190, 45, 'F');
+            y += 8; doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.setTextColor(230, 81, 0); doc.text("NOTA TÉCNICA (AUDITORIA DE ENGENHARIA):", 15, y);
+            y += 7; doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50);
+            let splitNota = doc.splitTextToSize(currentNota, 180); doc.text(splitNota, 15, y);
 
-            y += (splitNota.length * 5) + 15;
-            doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0);
-            doc.text("FUNDAMENTAÇÃO NORMATIVA:", 10, y);
-            doc.setFont("helvetica", "italic"); doc.text(currentNorm, 10, y+6);
+            y += (splitNota.length * 6) + 15; doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0); doc.text("REFERÊNCIA NORMATIVA/BIBLIOGRÁFICA:", 10, y); doc.setFont("helvetica", "italic"); doc.text(currentNorm, 10, y+6);
             
-            // Assinatura
-            doc.setFont("helvetica", "normal"); doc.setDrawColor(0);
-            doc.line(60, 260, 150, 260);
-            doc.text(config.nome, 105, 266, {align: "center"});
-            doc.setFontSize(9);
-            doc.text(config.crea, 105, 271, {align: "center"});
-            doc.text(config.empresa, 105, 276, {align: "center"});
-            
-            doc.save(`Laudo_${currentTitle.replace(/\s+/g, '_')}.pdf`);
+            doc.setFont("helvetica", "normal"); doc.setDrawColor(0); doc.line(60, 260, 150, 260); doc.text(config.nome, 105, 266, {align: "center"}); doc.setFontSize(9); doc.text(config.crea, 105, 271, {align: "center"}); doc.text(config.empresa, 105, 276, {align: "center"});
+            doc.save(`Laudo_VoltCalc_${currentTitle.replace(/\s+/g, '_')}.pdf`);
         }
     </script>
 </body>
