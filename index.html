@@ -3,10 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CalcVoltPro MAX - V10</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>CalcVoltPro MAX - V10 TITANIUM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #070707;
+            --card-bg: #1A1A1A;
+            --primary: #FFC107;
+            --primary-dark: #b38600;
+            --text-light: #E0E0E0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-light); overflow-x: hidden; }
+
+        /* Navbar */
+        .navbar { display: flex; align-items: center; justify-content: space-between; background-color: #111; padding: 15px 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.5); position: sticky; top: 0; z-index: 100; }
+        .navbar h1 { font-size: 18px; color: var(--primary); }
+        .navbar button { background: none; border: none; color: var(--primary); font-size: 20px; cursor: pointer; }
+
+        /* Drawer */
+        .drawer { position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background-color: #111; z-index: 200; transition: 0.3s; box-shadow: 2px 0 10px rgba(0,0,0,0.5); }
+        .drawer.open { left: 0; }
+        .drawer-header { background-color: var(--primary); color: #000; padding: 30px 20px; text-align: center; }
+        .drawer-header h2 { font-size: 18px; margin-top: 10px; }
+        .drawer-header p { font-size: 12px; font-weight: bold; }
+        .drawer-menu { list-style: none; padding: 20px 0; }
+        .drawer-menu li { padding: 15px 20px; font-size: 16px; border-bottom: 1px solid #222; cursor: pointer; }
+        .drawer-menu li i { color: var(--primary); margin-right: 10px; width: 20px; }
+        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); z-index: 150; display: none; }
+
+        /* Main Content & Views */
+        main { padding: 20px; padding-bottom: 80px; }
+        .view { display: none; animation: fadeIn 0.3s ease; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Grid Dashboard */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
+        .card { background-color: var(--card-bg); border-radius: 12px; padding: 25px 15px; text-align: center; cursor: pointer; border: 1px solid #333; transition: 0.2s; }
+        .card:active { transform: scale(0.95); border-color: var(--primary); }
+        .card-icon { font-size: 40px; color: var(--primary); margin-bottom: 15px; }
+        .card h3 { font-size: 15px; margin-bottom: 5px; }
+        .card p { font-size: 11px; color: #888; }
+
+        /* Forms & Tabs */
+        h2 { font-size: 20px; color: #fff; margin-bottom: 15px; text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 10px;}
+        .tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #333; }
+        .tab { flex: 1; background: none; border: none; color: #888; padding: 10px; font-size: 14px; cursor: pointer; transition: 0.3s; }
+        .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); font-weight: bold; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #333; background-color: #222; color: #fff; font-size: 16px; }
+        input:focus { outline: none; border-color: var(--primary); }
+        .form-group label { display: block; margin-bottom: 5px; color: var(--primary); font-size: 12px; }
+
+        .btn-primary, .btn-pdf { width: 100%; padding: 16px; border-radius: 8px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-primary { background-color: var(--primary); color: #000; }
+        .btn-primary:active { background-color: var(--primary-dark); }
+        .btn-pdf { background-color: #d32f2f; color: #fff; margin-top: 15px; }
+
+        /* Resultado Box */
+        #resultado-container { margin-top: 30px; }
+        #resultado-box { background-color: #111; border-left: 4px solid #00E676; padding: 15px; border-radius: 5px; font-size: 14px; }
+        .res-row { margin-bottom: 8px; }
+        .res-label { color: #888; font-size: 12px; display:block; }
+        .res-val { color: #00E676; font-weight: bold; }
+    </style>
 </head>
 <body>
     <header class="navbar">
@@ -172,6 +236,266 @@
         </div>
     </main>
 
-    <script src="js/script.js"></script>
+    <script>
+        let config = { nome: "Eng. Responsável", crea: "CREA: OMNI-V10", empresa: "VoltCalcPro", logo: null };
+        let currentResult = null;
+        let currentNorm = "";
+        let currentTitle = "";
+
+        const Matriz = {
+            cabo: (v) => {
+                const c = [1.5, 2.5, 4.0, 6.0, 10.0, 16.0, 25.0, 35.0, 50.0, 70.0, 95.0, 120.0, 150.0, 185.0, 240.0, 300.0, 400.0, 500.0];
+                for (let b of c) { if (b >= v) return `${b} mm²`; } return "Especial (>500mm²)";
+            },
+            disjuntor: (v) => {
+                const d = [10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 320, 400, 500, 630, 800, 1000];
+                for (let dis of d) { if (dis >= v) return `${dis}A`; } return "Caixa Aberta (>1000A)";
+            },
+            contator: (v) => {
+                const c = [9, 12, 18, 25, 32, 40, 50, 65, 80, 95, 115, 150, 185, 225, 265, 330, 400, 500];
+                for (let con of c) { if (con >= v) return `${con}A (Cat. AC-3)`; } return "Especial (>500A)";
+            },
+            eletroduto: (mm) => {
+                if (mm <= 16) return "1/2\" (16mm)"; if (mm <= 20) return "3/4\" (20mm)";
+                if (mm <= 25) return "1\" (25mm)"; if (mm <= 32) return "1 1/4\" (32mm)";
+                if (mm <= 40) return "1 1/2\" (40mm)"; if (mm <= 50) return "2\" (50mm)";
+                if (mm <= 75) return "3\" (75mm)"; return "4\" (110mm) ou Calha";
+            },
+            trafo: (v) => {
+                const t = [15, 30, 45, 75, 112.5, 150, 225, 300, 500, 750, 1000, 1500, 2000, 3000];
+                for (let tr of t) { if (tr >= v) return `${tr} kVA`; } return "Dedicada (>3MVA)";
+            }
+        };
+
+        document.getElementById('menu-btn').addEventListener('click', () => {
+            document.getElementById('drawer').classList.add('open');
+            document.getElementById('overlay').style.display = 'block';
+        });
+        const closeMenu = () => {
+            document.getElementById('drawer').classList.remove('open');
+            document.getElementById('overlay').style.display = 'none';
+        };
+        document.getElementById('nav-close').addEventListener('click', closeMenu);
+        document.getElementById('overlay').addEventListener('click', closeMenu);
+        document.getElementById('home-btn').addEventListener('click', () => {
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            document.getElementById('dashboard').classList.add('active');
+            document.getElementById('resultado-container').style.display = 'none';
+        });
+
+        document.getElementById('nav-config').addEventListener('click', () => {
+            closeMenu();
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            document.getElementById('config-view').classList.add('active');
+            document.getElementById('resultado-container').style.display = 'none';
+        });
+
+        function openModule(modId) {
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            document.getElementById(modId + '-view').classList.add('active');
+            document.getElementById('resultado-container').style.display = 'none';
+        }
+
+        function switchTab(tabId, btn) {
+            let parent = btn.parentElement.parentElement;
+            parent.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            parent.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('resultado-container').style.display = 'none';
+        }
+
+        document.getElementById('logo-input').addEventListener('change', function(e) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                config.logo = event.target.result;
+                document.getElementById('logo-preview').src = config.logo;
+                document.getElementById('logo-preview').style.display = 'inline-block';
+                document.getElementById('logo-icon').style.display = 'none';
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
+        function salvarConfig() {
+            let n = document.getElementById('cfg-nome').value;
+            let c = document.getElementById('cfg-crea').value;
+            let e = document.getElementById('cfg-empresa').value;
+            if(n) config.nome = n; if(c) config.crea = c; if(e) config.empresa = e;
+            document.getElementById('display-nome').innerText = config.nome;
+            document.getElementById('display-empresa').innerText = config.empresa;
+            alert("Assinatura Guardada!");
+            document.getElementById('home-btn').click();
+        }
+
+        function showResult(title, data, norma) {
+            currentTitle = title; currentResult = data; currentNorm = norma;
+            let html = "";
+            for (let key in data) {
+                html += `<div class="res-row"><span class="res-label">${key}:</span><span class="res-val">${data[key]}</span></div>`;
+            }
+            document.getElementById('resultado-box').innerHTML = html;
+            document.getElementById('resultado-container').style.display = 'block';
+            document.getElementById('resultado-container').scrollIntoView({behavior: "smooth"});
+        }
+
+        function calcCabos() {
+            let i = parseFloat(document.getElementById('bt-corrente').value) || 0;
+            let l = parseFloat(document.getElementById('bt-dist').value) || 0;
+            if(i===0 || l===0) return alert("Preencha os campos corretamente");
+            let secTeorica = (2 * 0.01722 * l * i) / (220 * 0.04);
+            showResult("Dimensionamento de Cabos BT", {
+                "Circuito": "Monofásico 220V", "Corrente": `${i} A`, "Distância": `${l} m`, "Secção Teórica": `${secTeorica.toFixed(2)} mm²`,
+                "Cabo Comercial Adotado": Matriz.cabo(secTeorica), "Disjuntor Termomagnético": Matriz.disjuntor(i * 1.25)
+            }, "ABNT NBR 5410 - Critério Queda Tensão 4%");
+        }
+
+        function calcEletro() {
+            let sec = parseFloat(document.getElementById('bt-sec').value) || 0;
+            let qtd = parseInt(document.getElementById('bt-qtd').value) || 1;
+            let diam = Math.sqrt((4 * sec) / Math.PI) * 1.5;
+            let areaC = (Math.PI * Math.pow(diam, 2) / 4) * qtd;
+            let taxa = qtd === 1 ? 0.53 : (qtd === 2 ? 0.31 : 0.40);
+            let areaE = areaC / taxa;
+            let diamMm = Math.sqrt((4 * areaE) / Math.PI);
+            showResult("Taxa de Ocupação", {
+                "Condutor Base": `${sec} mm²`, "Qtd de Condutores": `${qtd}`, "Taxa de Ocupação Máx": `${taxa*100}%`,
+                "Eletroduto Comercial PVC": Matriz.eletroduto(diamMm)
+            }, "ABNT NBR 5410");
+        }
+
+        function calcMotor() {
+            let cv = parseFloat(document.getElementById('ind-cv').value) || 0;
+            let iN = (cv * 736) / (Math.sqrt(3) * 380 * 0.85 * 0.88);
+            let k1 = iN / Math.sqrt(3); let k3 = iN / 3;
+            showResult("Painel Estrela-Triângulo", {
+                "Motor Trifásico": `${cv} CV (380V)`, "Corrente (In)": `${iN.toFixed(2)} A`, "Disjuntor Motor": Matriz.disjuntor(iN * 1.25),
+                "K1 (Rede) / K2 (Triângulo)": Matriz.contator(k1), "K3 (Estrela)": Matriz.contator(k3), "Relé Térmico (Ajuste)": `${k1.toFixed(2)} A`
+            }, "Instalações Industriais (Mamede)");
+        }
+
+        function calcFP() {
+            let p = parseFloat(document.getElementById('ind-kw').value) || 0;
+            let fp1 = parseFloat(document.getElementById('ind-fp1').value) || 0.01;
+            let fp2 = parseFloat(document.getElementById('ind-fp2').value) || 0.95;
+            let qc = p * (Math.tan(Math.acos(fp1)) - Math.tan(Math.acos(fp2)));
+            showResult("Fator de Potência", {
+                "Potência Ativa": `${p} kW`, "FP Registado": `${fp1}`, "FP Desejado": `${fp2}`,
+                "Banco de Capacitores": `${qc.toFixed(2)} kVAr`
+            }, "Instalações Industriais (Mamede)");
+        }
+
+        function calcAT() {
+            let icc = parseFloat(document.getElementById('at-icc').value) || 0;
+            let xr = parseFloat(document.getElementById('at-xr').value) || 15;
+            let k = Math.sqrt(1 + 2 * Math.exp(-2 * Math.PI / xr));
+            let iccAssi = icc * k;
+            showResult("Esforço Eletrodinâmico (Ruptura)", {
+                "Icc Simétrico (RMS)": `${icc} kA`, "Relação X/R": `${xr}`, "Fator de Assimetria": `${k.toFixed(2)}`,
+                "Capacidade de Ruptura (Assi)": `${iccAssi.toFixed(2)} kA`, "Pico de Fechamento (Peak)": `${(icc*2.6).toFixed(2)} kA`
+            }, "Disjuntores e Chaves - Aplicação em Sistemas de Potência");
+        }
+
+        function calcTermica() {
+            let icc = parseFloat(document.getElementById('at-icct').value) || 0;
+            let t = parseFloat(document.getElementById('at-tempo').value) || 0.2;
+            let secT = (icc * Math.sqrt(t)) / 115;
+            showResult("Suportabilidade Térmica a Curto", {
+                "Corrente Icc": `${icc} A`, "Tempo de Abertura": `${t} s`, "Secção Mínima I²t": `${secT.toFixed(2)} mm²`,
+                "Cabo Comercial Mínimo p/ Curto": Matriz.cabo(secT)
+            }, "ABNT NBR 5410 e Cotrim");
+        }
+
+        function calcMalha() {
+            let h = parseFloat(document.getElementById('spda-h').value) || 0;
+            let p = parseFloat(document.getElementById('spda-p').value) || 0;
+            let desc = Math.max(2, Math.ceil(p / 15));
+            showResult("SPDA - Estrutural", {
+                "Nível Adotado": "Nível III (Comercial Padrão)", "Altura": `${h} m`, "Esfera Rolante": "45 m",
+                "Malha Captora": "15x15 m", "Descidas Necessárias": `${desc} (a cada 15m)`
+            }, "ABNT NBR 5419");
+        }
+
+        function calcHaste() {
+            let rho = parseFloat(document.getElementById('spda-rho').value) || 100;
+            let r = (rho / (2 * Math.PI * 2.4)) * Math.log((4 * 2.4) / 0.015);
+            showResult("Resistência de Aterramento", {
+                "Resistividade": `${rho} Ω.m`, "Haste Cobre": "2.4m x 15mm", "Resistência Prevista": `${r.toFixed(2)} Ω`
+            }, "Fórmula de Sunde/Dwight");
+        }
+
+        function calcDemanda() {
+            let a = parseFloat(document.getElementById('dist-apt').value) || 0;
+            let p = parseFloat(document.getElementById('dist-com').value) || 0;
+            let d = (a * 0.40) + p; let kva = d / 0.92;
+            showResult("Demanda Predial", {
+                "Carga Ativa Total": `${a+p} kW`, "Demanda Calculada": `${d.toFixed(2)} kW`, "Potência Aparente": `${kva.toFixed(2)} kVA`,
+                "Transformador Comercial": Matriz.trafo(kva)
+            }, "Metodologia Hélio Creder");
+        }
+
+        function calcLux() {
+            let c = parseFloat(document.getElementById('lux-c').value) || 0;
+            let l = parseFloat(document.getElementById('lux-l').value) || 0;
+            let h = parseFloat(document.getElementById('lux-h').value) || 1;
+            let k = (c * l) / (h * (c + l));
+            showResult("Luminotécnica", {
+                "Dimensões": `${c}m x ${l}m`, "Altura Útil": `${h}m`, "Índice de Recinto (K)": `${k.toFixed(2)}`,
+                "Observação": "Usar Fator K no catálogo do fabricante da luminária."
+            }, "Método dos Lúmens (Projetos Arquitetónicos)");
+        }
+
+        document.getElementById('btn-pdf').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFillColor(255, 193, 7);
+            doc.rect(0, 0, 210, 20, 'F');
+            
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(16);
+            doc.text("CALCVOLTPRO - LAUDO TÉCNICO", 10, 14);
+
+            if(config.logo) {
+                doc.addImage(config.logo, 'JPEG', 180, 2, 16, 16);
+            }
+            
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(14);
+            doc.text(currentTitle.toUpperCase(), 10, 40);
+            doc.line(10, 42, 200, 42);
+            
+            doc.setFontSize(11);
+            doc.setFont("helvetica", "normal");
+            
+            let y = 55;
+            for(let key in currentResult) {
+                doc.setFont("helvetica", "bold");
+                doc.text(`${key}:`, 10, y);
+                doc.setFont("helvetica", "normal");
+                doc.text(`${currentResult[key]}`, 80, y);
+                y += 10;
+                doc.setDrawColor(200);
+                doc.line(10, y-3, 200, y-3);
+            }
+
+            y += 15;
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+            doc.text("FUNDAMENTAÇÃO NORMATIVA:", 10, y);
+            doc.setFont("helvetica", "italic");
+            doc.text(currentNorm, 10, y+6);
+            
+            doc.setFont("helvetica", "normal");
+            doc.setDrawColor(0);
+            doc.line(60, 260, 150, 260);
+            doc.text(config.nome, 105, 266, {align: "center"});
+            doc.setFontSize(9);
+            doc.text(config.crea, 105, 271, {align: "center"});
+            doc.text(config.empresa, 105, 276, {align: "center"});
+            
+            doc.save(`Laudo_${currentTitle.replace(/\s+/g, '_')}.pdf`);
+        });
+    </script>
 </body>
 </html>
