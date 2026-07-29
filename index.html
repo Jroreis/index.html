@@ -1,198 +1,622 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VoltCalcPro MAX - Software de Engenharia</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-nav: #111C30; 
-            --bg-body: #F4F7F9; 
-            --primary: #1976D2; 
-            --accent: #FFC107; 
-            --text-dark: #1A1A1A;
-            --text-gray: #555555;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
-        body { background-color: var(--bg-body); color: var(--text-dark); overflow-x: hidden; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoltCalc Pro - Sistema de Orçamentos Elétricos</title>
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-        /* NAVBAR */
-        .navbar { background-color: var(--bg-nav); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { color: white; font-size: 24px; font-weight: 900; }
-        .logo span { color: var(--accent); }
-        .nav-links { display: flex; gap: 30px; align-items: center; }
-        .nav-links a { color: white; text-decoration: none; font-size: 14px; font-weight: 500; transition: 0.2s;}
-        .nav-links a:hover { color: var(--accent); }
-        .btn-criar { background-color: var(--primary); padding: 10px 20px; border-radius: 6px; font-weight: bold; }
-        .btn-criar:hover { background-color: #115293; }
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        /* HERO SECTION */
-        .hero { display: flex; align-items: center; justify-content: space-between; padding: 60px 50px; max-width: 1200px; margin: 0 auto; gap: 40px;}
-        .hero-text { flex: 1; }
-        .hero-tag { font-size: 14px; font-weight: 700; color: var(--text-gray); margin-bottom: 10px; display: block; }
-        .hero-text h1 { font-size: 42px; line-height: 1.2; margin-bottom: 20px; font-weight: 900;}
-        .hero-text p { font-size: 16px; color: var(--text-gray); margin-bottom: 30px; line-height: 1.5; }
-        .btn-hero { background-color: var(--primary); color: white; padding: 15px 30px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; font-size: 15px; box-shadow: 0 4px 15px rgba(25, 118, 210, 0.4); transition: 0.3s;}
-        .btn-hero:hover { transform: translateY(-3px); background-color: #115293; }
-        .hero-image { flex: 1; text-align: center; }
-        .mockup-box { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: inline-block;}
-        .mockup-box i { font-size: 150px; color: #cbd5e1; }
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --neon-green: #39FF14;
+      --bg-color: #020617;
+      --card-bg: #0f172a;
+      --border-color: #1e293b;
+      --text: #f8fafc;
+      --text-light: #94a3b8;
+      --input-bg: #020617;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+    }
 
-        /* SECTION TITLES */
-        .section-title { text-align: center; font-size: 28px; font-weight: 900; margin: 60px 0 30px; text-transform: uppercase;}
-        .section-title span { background-color: var(--accent); padding: 0 8px; border-radius: 4px; color: #000; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-color); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
 
-        /* FEATURES GRID */
-        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1100px; margin: 0 auto; padding: 0 20px;}
-        .feature-card { background: white; padding: 30px 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eaeaea; transition: 0.3s;}
-        .feature-card:hover { border-color: var(--primary); transform: translateY(-5px); }
-        .feature-card i { font-size: 50px; color: var(--primary); margin-bottom: 20px; }
-        .feature-card h3 { font-size: 16px; margin-bottom: 10px; color: var(--text-dark); }
-        .feature-card p { font-size: 13px; color: var(--text-gray); }
+    /* LAYOUT: SIDEBAR E MAIN */
+    .sidebar { width: 280px; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 24px; display: flex; flex-direction: column; overflow-y: auto; }
+    .sidebar-logo { font-size: 24px; font-weight: 800; color: var(--neon-green); margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-logo span { color: var(--text); }
+    .nav-btn { background: transparent; border: none; color: var(--text-light); text-align: left; padding: 12px 16px; font-size: 15px; font-weight: 600; cursor: pointer; border-radius: 10px; margin-bottom: 8px; transition: 0.2s; }
+    .nav-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); }
+    .nav-btn.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.1); border: 1px solid rgba(57, 255, 20, 0.2); }
 
-        /* FUNDAMENTAÇÃO */
-        .fundamentacao { display: flex; justify-content: center; align-items: center; gap: 40px; margin: 60px 0; flex-wrap: wrap;}
-        .fund-title { font-size: 18px; font-weight: 800; text-transform: uppercase; text-align: right;}
-        .fund-title p { font-size: 13px; font-weight: 400; color: var(--text-gray); text-transform: none;}
-        .fund-icons { display: flex; gap: 20px; }
-        .circle-icon { width: 70px; height: 70px; background: white; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 2px solid #e2e8f0; font-weight: bold; font-size: 11px; color: var(--primary-dark);}
-        .circle-icon i { font-size: 24px; margin-bottom: 4px; color: var(--accent); }
+    .main-content { flex: 1; overflow-y: auto; padding: 40px; }
+    .tab-content { display: none; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.3s; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* PRICING */
-        .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 900px; margin: 0 auto; padding: 0 20px; align-items: end;}
-        .price-card { background: white; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eaeaea; padding: 30px 20px; position: relative; overflow: hidden;}
-        .price-card.popular { border: 2px solid var(--accent); box-shadow: 0 10px 25px rgba(255, 193, 7, 0.2); padding: 40px 20px;}
-        .popular-tag { background: var(--accent); color: #000; font-weight: bold; font-size: 12px; padding: 8px; position: absolute; top: 0; left: 0; width: 100%; text-transform: uppercase;}
-        .price-card h3 { font-size: 20px; font-weight: 900; margin-bottom: 5px; }
-        .price-card p { font-size: 14px; color: var(--text-gray); margin-bottom: 15px;}
-        .price-card .price { font-size: 28px; font-weight: 900; color: var(--text-dark); margin-bottom: 15px; }
+    /* COMPONENTES GERAIS */
+    .card { background: var(--card-bg); border-radius: 16px; padding: 32px; border: 1px solid var(--border-color); margin-bottom: 24px; box-shadow: var(--shadow); }
+    .card-title { font-size: 20px; font-weight: 700; margin-bottom: 24px; color: var(--neon-green); border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+    
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+    .form-group { display: flex; flex-direction: column; margin-bottom: 16px; }
+    .form-group label { font-size: 13px; font-weight: 600; color: var(--text-light); margin-bottom: 8px; }
+    .form-group input, .form-group select, .form-group textarea { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text); padding: 12px; border-radius: 8px; font-family: inherit; font-size: 14px; outline: none; transition: 0.2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--neon-green); }
+    .form-group.full { grid-column: 1 / -1; }
 
-        /* CTA FINAL */
-        .final-cta { text-align: center; margin: 60px 0; }
-        .btn-large { background-color: var(--primary); color: white; padding: 18px 40px; text-decoration: none; border-radius: 30px; font-weight: 900; font-size: 16px; display: inline-block; box-shadow: 0 4px 15px rgba(25, 118, 210, 0.4); text-transform: uppercase; transition: 0.3s;}
-        .btn-large:hover { background-color: #115293; transform: scale(1.02); }
+    .btn-primary { background: var(--primary); color: #fff; border: none; padding: 14px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 14px; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-success { background: #10b981; color: #020617; border: none; padding: 14px 24px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+    .btn-success:hover { background: #059669; }
 
-        /* FOOTER */
-        footer { border-top: 1px solid #ddd; padding: 20px 50px; display: flex; gap: 20px; justify-content: center; background: #fff;}
-        footer a { color: var(--text-gray); text-decoration: none; font-size: 13px; font-weight: 500;}
-        footer a:hover { color: var(--primary); }
+    /* TABELAS */
+    .table-container { overflow-x: auto; border: 1px solid var(--border-color); border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { background: rgba(255,255,255,0.05); text-align: left; padding: 14px; color: var(--text-light); border-bottom: 1px solid var(--border-color); }
+    td { padding: 14px; border-bottom: 1px solid var(--border-color); }
 
-        /* RESPONSIVO PARA CELULAR */
-        @media (max-width: 768px) {
-            .navbar { padding: 15px 20px; flex-direction: column; gap: 15px; }
-            .hero { flex-direction: column; padding: 40px 20px; text-align: center; }
-            .hero-text h1 { font-size: 32px; }
-            .features-grid, .pricing-grid { grid-template-columns: 1fr; }
-            .fundamentacao { flex-direction: column; text-align: center; }
-            .fund-title { text-align: center; }
-        }
-    </style>
+    /* ORÇAMENTO & MATERIAIS */
+    .row-item { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px; align-items: center; }
+    .row-item input { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text); padding: 10px; border-radius: 6px; width: 100%; }
+    .btn-remove { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+    /* FOTO DE PERFIL */
+    .logo-preview { width: 100px; height: 100px; border-radius: 12px; border: 2px dashed var(--border-color); display: flex; align-items: center; justify-content: center; overflow: hidden; background: var(--bg-color); cursor: pointer; }
+    .logo-preview img { width: 100%; height: 100%; object-fit: contain; }
+
+    /* PRINT CSS (PDF) */
+    .print-only { display: none; }
+    @media print {
+      body { background: #fff !important; color: #000 !important; display: block; overflow: visible; font-size: 12pt; }
+      .sidebar, .nav-btn, .btn-primary, .btn-success, .btn-remove, .print-hidden { display: none !important; }
+      .main-content { padding: 0 !important; }
+      .tab-content { display: none !important; }
+      #tab-orcamento { display: block !important; max-width: 100% !important; }
+      .card { border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+      
+      .print-only { display: block; }
+      
+      /* CABEÇALHO DO PDF */
+      .pdf-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 20px; }
+      .pdf-header img { max-width: 120px; max-height: 80px; }
+      .pdf-user-info { text-align: right; font-size: 10pt; }
+      .pdf-user-info h2 { font-size: 16pt; margin-bottom: 4px; color: #000; }
+      
+      /* DADOS DO CLIENTE E OBRA */
+      .pdf-client-box { border: 1px solid #000; padding: 10px; margin-bottom: 20px; border-radius: 8px; font-size: 11pt; }
+      .pdf-client-box strong { display: inline-block; width: 120px; }
+
+      /* TABELA IMPRESSÃO */
+      .table-container { border: none !important; }
+      table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+      th { background: #f0f0f0 !important; color: #000 !important; border: 1px solid #000; padding: 8px; font-weight: bold; }
+      td { border: 1px solid #000; padding: 8px; }
+      
+      /* TOTAL */
+      .pdf-total { text-align: right; font-size: 16pt; font-weight: bold; margin-top: 20px; }
+
+      /* RODAPÉ VOLTCALCPRO */
+      @page { margin: 1cm; }
+      body::after { content: "Gerado pelo sistema VoltCalc Pro - www.voltcalcpro.com"; position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; font-size: 9pt; font-weight: bold; color: #666; border-top: 1px solid #000; padding-top: 5px; }
+    }
+  </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="logo"><i class="fas fa-bolt" style="color:var(--accent)"></i> VoltCalcPro <span>MAX</span></div>
-        <div class="nav-links">
-            <a href="#recursos">Recursos</a>
-            <a href="#precos">Preços</a>
-            <a href="app.html">Login</a>
-            <a href="app.html" class="btn-criar">Criar Conta</a>
-        </div>
-    </nav>
+  <!-- SIDEBAR -->
+  <aside class="sidebar print-hidden">
+    <div class="sidebar-logo">⚡ VoltCalc<span>Pro</span></div>
+    <button class="nav-btn active" onclick="openTab('tab-perfil', this)">1. Meu Perfil / Empresa</button>
+    <button class="nav-btn" onclick="openTab('tab-clientes', this)">2. Meus Clientes</button>
+    <button class="nav-btn" onclick="openTab('tab-orcamento', this)">3. Gerar Orçamento</button>
+    <button class="nav-btn" onclick="openTab('tab-precos', this)">4. Preços & Materiais</button>
+  </aside>
 
-    <section class="hero">
-        <div class="hero-text">
-            <span class="hero-tag">VoltCalcPro MAX - V10 TITANIUM</span>
-            <h1>Domine a Engenharia Elétrica Profissional: Cálculos Precisos, Normas ABNT e Laudos em Segundos.</h1>
-            <p>A ferramenta essencial para engenheiros seniores e instaladores que exigem precisão blindada na obra e no escritório.</p>
-            <a href="app.html" class="btn-hero">QUERO ACESSO IMEDIATO - COMEÇAR GRÁTIS</a>
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    
+    <!-- 1. PAINEL DO USUÁRIO (PERFIL) -->
+    <section id="tab-perfil" class="tab-content active">
+      <div class="card">
+        <div class="card-title">1. Dados do Profissional / Empresa</div>
+        <p style="color: var(--text-light); margin-bottom: 20px;">Estes dados aparecerão no cabeçalho do seu PDF de orçamento.</p>
+        
+        <div style="display: flex; gap: 20px; margin-bottom: 20px; align-items: flex-start;">
+          <div class="form-group">
+            <label>Logomarca (Clique para alterar)</label>
+            <label class="logo-preview" for="userLogoInput">
+              <img id="userLogoImg" src="" style="display: none;" alt="Sua Logo">
+              <span id="userLogoText">📷</span>
+            </label>
+            <input type="file" id="userLogoInput" accept="image/*" style="display: none;" onchange="loadLogo(event)">
+          </div>
+          <div class="form-grid" style="flex: 1;">
+            <div class="form-group"><label>Nome Completo ou Empresa</label><input type="text" id="profNome" placeholder="Ex: VoltTech Instalações"></div>
+            <div class="form-group"><label>CNPJ ou CPF</label><input type="text" id="profDoc" placeholder="00.000.000/0001-00"></div>
+            <div class="form-group"><label>Telefone / WhatsApp</label><input type="text" id="profTel" placeholder="(11) 99999-9999"></div>
+            <div class="form-group"><label>Email Profissional</label><input type="email" id="profEmail" placeholder="contato@empresa.com"></div>
+          </div>
         </div>
-        <div class="hero-image">
-            <div class="mockup-box">
-                <i class="fas fa-laptop-code"></i>
-                <p style="margin-top:10px; font-weight:bold; color:#888;">Multiplataforma Web/Mobile</p>
-            </div>
+
+        <h4 style="margin-bottom: 15px; color: var(--text);">Endereço Completo</h4>
+        <div class="form-grid">
+          <div class="form-group"><label>CEP</label><input type="text" id="profCep"></div>
+          <div class="form-group"><label>Rua / Logradouro</label><input type="text" id="profRua"></div>
+          <div class="form-group"><label>Número</label><input type="text" id="profNum"></div>
+          <div class="form-group"><label>Bairro</label><input type="text" id="profBairro"></div>
+          <div class="form-group"><label>Cidade</label><input type="text" id="profCidade"></div>
+          <div class="form-group"><label>Estado (UF)</label><input type="text" id="profEstado"></div>
         </div>
+        <button class="btn-primary" onclick="saveProfile()">💾 Salvar Dados do Perfil</button>
+      </div>
     </section>
 
-    <h2 class="section-title" id="recursos">O QUE O VoltCalcPro <span>MAX</span> FAZ POR VOCÊ</h2>
-    <div class="features-grid">
-        <div class="feature-card">
-            <i class="fas fa-temperature-high" style="color:#D32F2F;"></i>
-            <h3>Queda de Tensão NBR 5410 com Correção Térmica</h3>
-            <p>Cálculos rigorosos com resistividade a 70°C</p>
+    <!-- 2. PAINEL DE CLIENTES -->
+    <section id="tab-clientes" class="tab-content">
+      <div class="card">
+        <div class="card-title">2. Cadastrar Novo Cliente</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Nome do Cliente</label><input type="text" id="cliNome"></div>
+          <div class="form-group"><label>Telefone / WhatsApp</label><input type="text" id="cliTel"></div>
+          <div class="form-group"><label>CPF / CNPJ</label><input type="text" id="cliDoc"></div>
+          <div class="form-group"><label>E-mail</label><input type="email" id="cliEmail"></div>
+          <div class="form-group full"><label>Endereço Completo (Rua, Num, Bairro, Cidade)</label><input type="text" id="cliEnd"></div>
         </div>
-        <div class="feature-card">
-            <i class="fas fa-cogs" style="color:#1976D2;"></i>
-            <h3>Dimensionamento de Motores e Painéis de Comando</h3>
-            <p>Partidas Estrela-Triângulo, relés térmicos</p>
-        </div>
-        <div class="feature-card">
-            <i class="fas fa-charging-station" style="color:#388E3C;"></i>
-            <h3>Correção de Fator de Potência</h3>
-            <p>Elimine multas por energia reativa</p>
-        </div>
-        <div class="feature-card">
-            <i class="fas fa-bolt" style="color:#FF9800;"></i>
-            <h3>Análise de Curto-Circuito Assimétrico e Térmico (I²t)</h3>
-            <p>Cálculos de engenharia sênior</p>
-        </div>
-        <div class="feature-card">
-            <i class="fas fa-file-pdf" style="color:#D32F2F;"></i>
-            <h3>Emissão de Laudos Técnicos Profissionais</h3>
-            <p>Com Sua Logomarca e Notas Técnicas</p>
-        </div>
-        <div class="feature-card">
-            <i class="fas fa-shield-alt" style="color:#1976D2;"></i>
-            <h3>SPDA NBR 5419 e Aterramento</h3>
-            <p>Resistência de haste Dwight e Malha</p>
-        </div>
-    </div>
+        <button class="btn-primary" onclick="saveClient()">➕ Salvar Cliente</button>
+      </div>
 
-    <div class="fundamentacao">
-        <div class="fund-title">
-            FUNDAMENTAÇÃO SÊNIOR:
-            <p>Referências com autores e normas oficiais:</p>
+      <div class="card">
+        <div class="card-title">Clientes Salvos</div>
+        <div class="table-container">
+          <table>
+            <thead><tr><th>Nome</th><th>Telefone</th><th>Endereço</th></tr></thead>
+            <tbody id="clientTableBody"></tbody>
+          </table>
         </div>
-        <div class="fund-icons">
-            <div class="circle-icon"><i class="fas fa-book"></i> Cotrim</div>
-            <div class="circle-icon"><i class="fas fa-book"></i> Mamede</div>
-            <div class="circle-icon"><i class="fas fa-check-circle" style="color:#388E3C;"></i> NBR 5410</div>
-            <div class="circle-icon"><i class="fas fa-check-circle" style="color:#388E3C;"></i> NBR 5419</div>
-        </div>
-    </div>
+      </div>
+    </section>
 
-    <h2 class="section-title" id="precos">PLANOS</h2>
-    <div class="pricing-grid">
-        <div class="price-card">
-            <h3>GRÁTIS</h3>
-            <p>Limitado</p>
+    <!-- 3. PAINEL DE ORÇAMENTO -->
+    <section id="tab-orcamento" class="tab-content">
+      
+      <!-- CABEÇALHO DE IMPRESSÃO (Visível apenas no PDF) -->
+      <div class="print-only pdf-header">
+        <div><img id="pdfUserLogo" src="" alt="Logo"></div>
+        <div class="pdf-user-info">
+          <h2 id="pdfUserName">NOME DA EMPRESA</h2>
+          <p id="pdfUserDoc"></p>
+          <p id="pdfUserPhone"></p>
+          <p id="pdfUserEmail"></p>
+          <p id="pdfUserAddress"></p>
         </div>
-        <div class="price-card popular">
-            <div class="popular-tag">Popular</div>
-            <h3>ENGENHEIRO</h3>
-            <p>Acesso Completo</p>
-            <div class="price">R$199<span style="font-size:14px; font-weight:normal; color:#777;">/mês</span></div>
-            <p style="font-weight:bold; color:#1976D2;">Laudos PDF Incluídos</p>
+      </div>
+
+      <div class="card print-hidden">
+        <div class="card-title">3. Configuração do Orçamento</div>
+        
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Selecione o Cliente (Cadastrado na aba anterior)</label>
+            <select id="orcClientSelect" onchange="updatePdfClientInfo()">
+              <option value="">-- Selecione um cliente --</option>
+            </select>
+          </div>
+          
+          <div class="form-group full">
+            <label>Tipo de Orçamento</label>
+            <select id="orcTypeSelect" onchange="toggleObraType()">
+              <option value="simples">Obra Simples (Apenas lista de serviços e valores)</option>
+              <option value="completa">Obra Completa (Com escopo e descrições detalhadas)</option>
+            </select>
+          </div>
+
+          <div class="form-group full" id="orcEscopoContainer" style="display: none;">
+            <label>Descrição Completa do Escopo da Obra</label>
+            <textarea id="orcEscopoTexto" rows="4" placeholder="Descreva os detalhes gerais do projeto elétrico..."></textarea>
+          </div>
         </div>
-        <div class="price-card">
-            <h3>EMPRESA</h3>
-            <p>Múltiplos Usuários</p>
+      </div>
+
+      <!-- CAIXA DE DADOS DO CLIENTE (Visível no PDF) -->
+      <div class="print-only pdf-client-box">
+        <h3 style="margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">PROPOSTA TÉCNICA E COMERCIAL</h3>
+        <p><strong>Cliente:</strong> <span id="pdfClientName"></span></p>
+        <p><strong>Telefone:</strong> <span id="pdfClientPhone"></span></p>
+        <p><strong>Endereço Obra:</strong> <span id="pdfClientAddress"></span></p>
+        <p id="pdfEscopoPrint" style="margin-top: 10px; font-style: italic; display: none;"></p>
+      </div>
+
+      <!-- LISTA DE SERVIÇOS -->
+      <div class="card">
+        <div class="card-title print-hidden">Lista de Serviços</div>
+        <div id="orcServicesContainer">
+          <!-- Cabeçalho Tabela Visível na Impressão -->
+          <table class="print-only" style="margin-bottom: 0;">
+            <thead><tr><th style="width: 50%;">Descrição do Serviço</th><th style="width: 15%;">Qtd</th><th style="width: 15%;">V. Unit</th><th style="width: 20%;">Subtotal</th></tr></thead>
+            <tbody id="pdfServicesTableBody"></tbody>
+          </table>
         </div>
-    </div>
 
-    <div class="final-cta">
-        <a href="app.html" class="btn-large">PRONTO PARA ACELERAR SEU TRABALHO? ACESSE O SISTEMA</a>
-    </div>
+        <button class="btn-primary print-hidden" onclick="addServiceRow()" style="margin-top: 15px;">+ Adicionar Serviço</button>
+      </div>
 
-    <footer>
-        <a href="#recursos">Recursos</a>
-        <a href="#precos">Preços</a>
-        <a href="#">Contato</a>
-        <a href="app.html">Login no Sistema</a>
-    </footer>
+      <!-- LISTA DE MATERIAIS NO PDF (Preenchida na aba 4) -->
+      <div id="pdfMaterialsSection" class="print-only" style="display: none; margin-top: 20px;">
+        <h3>Lista de Materiais Necessários</h3>
+        <table>
+          <thead><tr><th>Material / Descrição</th><th>Quantidade</th></tr></thead>
+          <tbody id="pdfMaterialsTableBody"></tbody>
+        </table>
+      </div>
 
+      <!-- TOTAIS E IMPRESSÃO -->
+      <div class="card print-hidden" style="text-align: right;">
+        <h2 style="font-size: 24px;">Total: R$ <span id="orcTotalDisplay">0,00</span></h2>
+        <button class="btn-success" onclick="generatePDF()" style="margin-top: 20px; font-size: 16px;">🖨️ Gerar PDF do Orçamento</button>
+      </div>
+
+      <div class="print-only pdf-total">
+        VALOR TOTAL DO SERVIÇO: R$ <span id="pdfTotalValue">0,00</span>
+      </div>
+
+    </section>
+
+    <!-- 4. PAINEL DE PREÇOS E MATERIAIS -->
+    <section id="tab-precos" class="tab-content">
+      
+      <!-- LISTA DE MATERIAIS -->
+      <div class="card">
+        <div class="card-title">Lista de Materiais da Obra</div>
+        <p style="color: var(--text-light); margin-bottom: 20px;">Adicione os materiais aqui. Eles serão impressos automaticamente no seu PDF de orçamento.</p>
+        
+        <div id="materialsContainer"></div>
+        <button class="btn-primary" onclick="addMaterialRow()">+ Adicionar Material</button>
+      </div>
+
+      <!-- BASE DE PREÇOS NACIONAL -->
+      <div class="card">
+        <div class="card-title">Base de Preços Nacional (Mão de Obra)</div>
+        <div class="table-container">
+          <table>
+            <thead><tr><th>Serviço</th><th>Valor Médio Referência</th></tr></thead>
+            <tbody id="pricesTableBody">
+              <!-- Preenchido via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ------------------------------------------------------------------------
+    // 1. INICIALIZAÇÃO FIREBASE (Autenticação Anônima Invisível)
+    // ------------------------------------------------------------------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyCbTPTFMUkuF3VVRgl8OOx_w6gIAekAVoQ",
+      authDomain: "voltcalc-pro.firebaseapp.com",
+      projectId: "voltcalc-pro",
+      storageBucket: "voltcalc-pro.appspot.com",
+      messagingSenderId: "411208955318",
+      appId: "1:411208955318:web:8735802bf0f4ac8a1a3d17"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    let currentUserUid = null;
+    let userLogoBase64 = "";
+    let clientsList = [];
+
+    // Login Anônimo Automático
+    auth.signInAnonymously()
+      .then((userCredential) => {
+        currentUserUid = userCredential.user.uid;
+        loadProfileData();
+        loadClientsData();
+      })
+      .catch((error) => console.error("Erro na autenticação anônima:", error));
+
+
+    // ------------------------------------------------------------------------
+    // 2. CONTROLE DE ABAS (NAVEGAÇÃO)
+    // ------------------------------------------------------------------------
+    function openTab(tabId, btnElement) {
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btnElement.classList.add('active');
+    }
+
+
+    // ------------------------------------------------------------------------
+    // 3. LÓGICA DO PERFIL (ABA 1)
+    // ------------------------------------------------------------------------
+    function loadLogo(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          userLogoBase64 = e.target.result;
+          document.getElementById('userLogoImg').src = userLogoBase64;
+          document.getElementById('userLogoImg').style.display = 'block';
+          document.getElementById('userLogoText').style.display = 'none';
+          document.getElementById('pdfUserLogo').src = userLogoBase64; // Atualiza o PDF
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function saveProfile() {
+      if(!currentUserUid) return alert("Aguarde a conexão com o banco de dados...");
+      const profileData = {
+        nome: document.getElementById('profNome').value,
+        doc: document.getElementById('profDoc').value,
+        tel: document.getElementById('profTel').value,
+        email: document.getElementById('profEmail').value,
+        cep: document.getElementById('profCep').value,
+        rua: document.getElementById('profRua').value,
+        num: document.getElementById('profNum').value,
+        bairro: document.getElementById('profBairro').value,
+        cidade: document.getElementById('profCidade').value,
+        estado: document.getElementById('profEstado').value,
+        logo: userLogoBase64
+      };
+
+      db.collection('users').doc(currentUserUid).set(profileData, {merge: true})
+        .then(() => alert("Perfil salvo com sucesso no banco de dados!"))
+        .catch(e => alert("Erro ao salvar: " + e.message));
+
+      updatePdfHeader(profileData);
+    }
+
+    function loadProfileData() {
+      db.collection('users').doc(currentUserUid).get().then(doc => {
+        if(doc.exists) {
+          const d = doc.data();
+          document.getElementById('profNome').value = d.nome || '';
+          document.getElementById('profDoc').value = d.doc || '';
+          document.getElementById('profTel').value = d.tel || '';
+          document.getElementById('profEmail').value = d.email || '';
+          document.getElementById('profCep').value = d.cep || '';
+          document.getElementById('profRua').value = d.rua || '';
+          document.getElementById('profNum').value = d.num || '';
+          document.getElementById('profBairro').value = d.bairro || '';
+          document.getElementById('profCidade').value = d.cidade || '';
+          document.getElementById('profEstado').value = d.estado || '';
+          
+          if(d.logo) {
+            userLogoBase64 = d.logo;
+            document.getElementById('userLogoImg').src = userLogoBase64;
+            document.getElementById('userLogoImg').style.display = 'block';
+            document.getElementById('userLogoText').style.display = 'none';
+          }
+          updatePdfHeader(d);
+        }
+      });
+    }
+
+    function updatePdfHeader(d) {
+      document.getElementById('pdfUserName').textContent = d.nome || 'NOME DA EMPRESA';
+      document.getElementById('pdfUserDoc').textContent = d.doc ? 'CNPJ/CPF: ' + d.doc : '';
+      document.getElementById('pdfUserPhone').textContent = d.tel ? 'WhatsApp: ' + d.tel : '';
+      document.getElementById('pdfUserEmail').textContent = d.email ? 'E-mail: ' + d.email : '';
+      let end = [d.rua, d.num, d.bairro, d.cidade, d.estado].filter(Boolean).join(', ');
+      document.getElementById('pdfUserAddress').textContent = end ? 'Endereço: ' + end : '';
+      if(d.logo) document.getElementById('pdfUserLogo').src = d.logo;
+    }
+
+
+    // ------------------------------------------------------------------------
+    // 4. LÓGICA DE CLIENTES (ABA 2)
+    // ------------------------------------------------------------------------
+    function saveClient() {
+      if(!currentUserUid) return;
+      const clientData = {
+        profId: currentUserUid,
+        nome: document.getElementById('cliNome').value,
+        tel: document.getElementById('cliTel').value,
+        doc: document.getElementById('cliDoc').value,
+        email: document.getElementById('cliEmail').value,
+        endereco: document.getElementById('cliEnd').value
+      };
+
+      if(!clientData.nome) return alert("O nome do cliente é obrigatório!");
+
+      db.collection('clientes').add(clientData).then(() => {
+        alert("Cliente cadastrado!");
+        document.getElementById('cliNome').value = '';
+        document.getElementById('cliTel').value = '';
+        document.getElementById('cliDoc').value = '';
+        document.getElementById('cliEmail').value = '';
+        document.getElementById('cliEnd').value = '';
+        loadClientsData(); // Recarrega a tabela e o select de orçamentos
+      });
+    }
+
+    function loadClientsData() {
+      db.collection('clientes').where('profId', '==', currentUserUid).get().then(snap => {
+        clientsList = [];
+        let htmlTable = '';
+        let htmlSelect = '<option value="">-- Selecione o Cliente --</option>';
+
+        snap.forEach(doc => {
+          let c = doc.data();
+          c.id = doc.id;
+          clientsList.push(c);
+          
+          htmlTable += `<tr><td>${c.nome}</td><td>${c.tel}</td><td>${c.endereco}</td></tr>`;
+          htmlSelect += `<option value="${c.id}">${c.nome}</option>`;
+        });
+
+        document.getElementById('clientTableBody').innerHTML = htmlTable;
+        document.getElementById('orcClientSelect').innerHTML = htmlSelect;
+      });
+    }
+
+
+    // ------------------------------------------------------------------------
+    // 5. LÓGICA DE ORÇAMENTO (ABA 3) E PDF
+    // ------------------------------------------------------------------------
+    function toggleObraType() {
+      const type = document.getElementById('orcTypeSelect').value;
+      const escopoContainer = document.getElementById('orcEscopoContainer');
+      const escopoPrint = document.getElementById('pdfEscopoPrint');
+      
+      if(type === 'completa') {
+        escopoContainer.style.display = 'block';
+        escopoPrint.style.display = 'block';
+      } else {
+        escopoContainer.style.display = 'none';
+        escopoPrint.style.display = 'none';
+        document.getElementById('orcEscopoTexto').value = '';
+      }
+    }
+
+    function updatePdfClientInfo() {
+      const cliId = document.getElementById('orcClientSelect').value;
+      const client = clientsList.find(c => c.id === cliId);
+      if(client) {
+        document.getElementById('pdfClientName').textContent = client.nome;
+        document.getElementById('pdfClientPhone').textContent = client.tel;
+        document.getElementById('pdfClientAddress').textContent = client.endereco;
+      } else {
+        document.getElementById('pdfClientName').textContent = '';
+        document.getElementById('pdfClientPhone').textContent = '';
+        document.getElementById('pdfClientAddress').textContent = '';
+      }
+    }
+
+    function addServiceRow() {
+      const container = document.getElementById('orcServicesContainer');
+      const rowId = Date.now();
+      const div = document.createElement('div');
+      div.className = 'row-item print-hidden';
+      div.id = `serv-${rowId}`;
+      div.innerHTML = `
+        <input type="text" placeholder="Descrição do Serviço (Ex: Ponto de Luz)" class="serv-desc">
+        <input type="number" placeholder="Qtd" value="1" min="1" class="serv-qty" oninput="calcOrcTotal()">
+        <input type="number" placeholder="Valor Un (R$)" value="0" class="serv-val" oninput="calcOrcTotal()">
+        <button class="btn-remove" onclick="document.getElementById('serv-${rowId}').remove(); calcOrcTotal();">X</button>
+      `;
+      container.appendChild(div);
+    }
+
+    function calcOrcTotal() {
+      let total = 0;
+      let pdfTableHTML = '';
+      
+      document.querySelectorAll('.row-item').forEach(row => {
+        if(row.id && row.id.startsWith('serv-')) {
+          let desc = row.querySelector('.serv-desc').value || '-';
+          let qty = parseFloat(row.querySelector('.serv-qty').value) || 0;
+          let val = parseFloat(row.querySelector('.serv-val').value) || 0;
+          let subtotal = qty * val;
+          total += subtotal;
+
+          // Monta a linha da tabela que será impressa no PDF
+          if(desc !== '-') {
+             pdfTableHTML += `<tr>
+                <td>${desc}</td>
+                <td>${qty}</td>
+                <td>R$ ${val.toFixed(2)}</td>
+                <td>R$ ${subtotal.toFixed(2)}</td>
+             </tr>`;
+          }
+        }
+      });
+
+      document.getElementById('orcTotalDisplay').textContent = total.toFixed(2);
+      document.getElementById('pdfTotalValue').textContent = total.toFixed(2);
+      document.getElementById('pdfServicesTableBody').innerHTML = pdfTableHTML;
+    }
+
+    function generatePDF() {
+      // Atualiza escopo se for Obra Completa
+      if(document.getElementById('orcTypeSelect').value === 'completa') {
+         document.getElementById('pdfEscopoPrint').innerHTML = "<strong>Escopo do Projeto:</strong> " + document.getElementById('orcEscopoTexto').value;
+      }
+
+      // Prepara lista de materiais para impressão
+      let matHTML = '';
+      let hasMaterials = false;
+      document.querySelectorAll('.mat-row').forEach(row => {
+          let desc = row.querySelector('.mat-desc').value;
+          let qty = row.querySelector('.mat-qty').value;
+          if(desc) {
+             hasMaterials = true;
+             matHTML += `<tr><td>${desc}</td><td>${qty}</td></tr>`;
+          }
+      });
+      
+      const matSection = document.getElementById('pdfMaterialsSection');
+      if(hasMaterials) {
+          document.getElementById('pdfMaterialsTableBody').innerHTML = matHTML;
+          matSection.style.display = 'block';
+      } else {
+          matSection.style.display = 'none';
+      }
+
+      // Dispara a impressão (O CSS @media print formata tudo)
+      window.print();
+    }
+
+
+    // ------------------------------------------------------------------------
+    // 6. LÓGICA DE PREÇOS E MATERIAIS (ABA 4)
+    // ------------------------------------------------------------------------
+    function addMaterialRow() {
+      const container = document.getElementById('materialsContainer');
+      const rowId = Date.now();
+      const div = document.createElement('div');
+      div.className = 'row-item mat-row';
+      div.id = `mat-${rowId}`;
+      div.style.gridTemplateColumns = "3fr 1fr auto";
+      div.innerHTML = `
+        <input type="text" placeholder="Nome do Material (Ex: Cabo 2.5mm)" class="mat-desc">
+        <input type="text" placeholder="Qtd (Ex: 2 rolos)" class="mat-qty">
+        <button class="btn-remove" onclick="document.getElementById('mat-${rowId}').remove();">X</button>
+      `;
+      container.appendChild(div);
+    }
+
+    // Base de Preços Nacional Fixa
+    const basePrecos = [
+      { servico: "Ponto de luz (Interruptor simples + Bocal)", valor: "R$ 75,00" },
+      { servico: "Instalação / Troca de tomada simples (10A/20A)", valor: "R$ 50,00" },
+      { servico: "Instalação de chuveiro elétrico básico", valor: "R$ 100,00" },
+      { servico: "Montagem de QDC (até 12 disjuntores)", valor: "R$ 450,00" },
+      { servico: "Instalação de Padrão Monofásico (sem poste)", valor: "R$ 550,00" },
+      { servico: "Instalação de interruptor inteligente", valor: "R$ 100,00" },
+      { servico: "Visita Técnica / Diagnóstico de falha", valor: "R$ 150,00" }
+    ];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Iniciar com uma linha vazia de orçamento e material
+      addServiceRow();
+      addMaterialRow();
+      
+      // Carregar tabela de preços
+      let htmlPrecos = '';
+      basePrecos.forEach(p => {
+        htmlPrecos += `<tr><td>${p.servico}</td><td style="color: var(--neon-green); font-weight: bold;">${p.valor}</td></tr>`;
+      });
+      document.getElementById('pricesTableBody').innerHTML = htmlPrecos;
+    });
+
+  </script>
 </body>
 </html>
