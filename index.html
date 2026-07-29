@@ -37,7 +37,7 @@
         color: var(--text); 
         display: flex; 
         flex-direction: column; 
-        min-height: 100vh; /* Permite que o footer fique no final */
+        min-height: 100vh;
     }
 
     /* ================= CABEÇALHO PRINCIPAL ================= */
@@ -65,7 +65,7 @@
     .tab-content.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* ================= DASHBOARD GRID (NOVO LAYOUT) ================= */
+    /* ================= DASHBOARD GRID ================= */
     .dashboard-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -136,6 +136,7 @@
         margin: 0 10px;
         transition: 0.2s;
         text-transform: capitalize;
+        cursor: pointer;
     }
     .main-footer a:hover { color: var(--neon-green); }
 
@@ -170,6 +171,12 @@
     /* FOTO DE PERFIL */
     .logo-preview { width: 100px; height: 100px; border-radius: 12px; border: 2px dashed var(--border-color); display: flex; align-items: center; justify-content: center; overflow: hidden; background: var(--bg-color); cursor: pointer; }
     .logo-preview img { width: 100%; height: 100%; object-fit: contain; }
+
+    /* ESTILOS DE TEXTO PARA AS PÁGINAS LEGAIS */
+    .legal-title { color: var(--neon-green); font-size: 1.25rem; font-weight: 600; margin-top: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+    .legal-text { color: var(--text-light); margin-top: 15px; margin-bottom: 15px; line-height: 1.6; }
+    .legal-list { color: var(--text-light); margin-bottom: 20px; padding-left: 20px; }
+    .legal-list li { margin-bottom: 10px; }
 
     /* PRINT CSS (PDF) */
     .print-only { display: none; }
@@ -488,15 +495,129 @@
       </div>
     </section>
 
+    <!-- ========================================== -->
+    <!-- 5. PÁGINAS LEGAIS E INFORMATIVAS (NOVAS) -->
+    <!-- ========================================== -->
+    
+    <!-- FAQ -->
+    <section id="tab-faq" class="tab-content">
+      <button class="btn-back print-hidden" onclick="openTab('tab-home')">⬅️ Voltar ao Menu Principal</button>
+      <div class="card">
+        <div class="card-title" style="text-align: center;">Perguntas Frequentes (FAQ)</div>
+        <p style="text-align: center; color: var(--text-light); margin-bottom: 30px;">Tire suas dúvidas técnicas sobre o dimensionamento elétrico e o uso da plataforma VoltCalc Pro.</p>
+
+        <h2 class="legal-title">1. O VoltCalc Pro segue as normas técnicas brasileiras?</h2>
+        <p class="legal-text">Sim. Todos os algoritmos de dimensionamento de condutores e cálculos de demanda dentro do aplicativo são baseados estritamente na <strong>ABNT NBR 5410</strong>, que regulamenta as instalações elétricas de baixa tensão no Brasil.</p>
+
+        <h2 class="legal-title">2. Como o aplicativo calcula a Queda de Tensão?</h2>
+        <p class="legal-text">A ferramenta utiliza os parâmetros de resistividade do material (Cobre ou Alumínio), a corrente do circuito, a tensão nominal e a distância do lance. O objetivo é garantir que a bitola escolhida mantenha a queda de tensão dentro dos limites percentuais seguros exigidos por norma, protegendo a vida útil dos equipamentos.</p>
+
+        <h2 class="legal-title">3. O sistema ajuda a encontrar a "Bitola Mínima"?</h2>
+        <p class="legal-text">Exatamente. Ao cruzar os dados de capacidade de condução de corrente (considerando os métodos de instalação) e o cálculo de queda de tensão, o VoltCalc Pro indica a seção transversal (bitola) mínima segura para o circuito, evitando superaquecimento e desperdício de material.</p>
+
+        <h2 class="legal-title">4. Posso usar o app para dimensionar Disjuntores?</h2>
+        <p class="legal-text">Sim, o aplicativo oferece suporte para o dimensionamento da proteção. A regra básica que o sistema adota assegura que a corrente nominal do disjuntor seja compatível com a capacidade máxima de condução do cabo escolhido, garantindo o desarme seguro em caso de sobrecarga.</p>
+
+        <h2 class="legal-title">5. Meus orçamentos em PDF ficam salvos?</h2>
+        <p class="legal-text">Sim, a plataforma possui gestão eficiente e segurança em nuvem via Google Firebase. Os orçamentos detalhados de mão de obra e materiais que você gera são arquivados para você acessar ou reenviar aos seus clientes a qualquer momento.</p>
+      </div>
+    </section>
+
+    <!-- PRIVACIDADE -->
+    <section id="tab-privacidade" class="tab-content">
+      <button class="btn-back print-hidden" onclick="openTab('tab-home')">⬅️ Voltar ao Menu Principal</button>
+      <div class="card">
+        <div class="card-title" style="text-align: center;">Política de Privacidade</div>
+        <p class="legal-text" style="text-align: center;"><strong>Última atualização: Junho de 2026</strong></p>
+        <p class="legal-text">Esta política descreve como o <strong>VoltCalc Pro</strong>, tanto em sua versão de <strong>site (web)</strong> quanto em seus <strong>aplicativos móveis</strong>, coleta, usa e protege as informações dos usuários.</p>
+        
+        <h2 class="legal-title">1. Coleta de Dados e Publicidade</h2>
+        <p class="legal-text">Utilizamos serviços de publicidade para manter nossos serviços gratuitos. Na web, utilizamos o <strong>Google AdSense</strong>. Nos aplicativos móveis, utilizamos o <strong>Google AdMob</strong>. Ambos os serviços podem utilizar cookies e identificadores de dispositivo para exibir anúncios personalizados com base nos seus interesses e visitas anteriores.</p>
+        
+        <h2 class="legal-title">2. Funcionalidades e Armazenamento (Firebase)</h2>
+        <p class="legal-text">Para garantir a sincronização de orçamentos, autenticação de usuários e configurações personalizadas, utilizamos a infraestrutura do <strong>Firebase (Google)</strong>. Os dados processados (como nome e e-mail) são usados exclusivamente para garantir o funcionamento técnico e a segurança da sua conta profissional.</p>
+        
+        <h2 class="legal-title">3. Cookies e Identificadores</h2>
+        <p class="legal-text">Ao navegar em nosso site ou usar nossos aplicativos, você consente com o uso de cookies e identificadores de anúncios. Você pode gerenciar suas preferências de publicidade a qualquer momento através das <strong>Configurações de anúncios do Google</strong>.</p>
+        
+        <h2 class="legal-title">4. Integridade e Compartilhamento</h2>
+        <p class="legal-text">Preservamos 100% da integridade técnica de todas as ferramentas e cálculos. Não vendemos informações pessoais a terceiros. As únicas informações processadas externamente são metadados de tráfego e dados gerenciados pelas redes de anúncios oficiais (Google).</p>
+
+        <h2 class="legal-title">5. Contato</h2>
+        <p class="legal-text">Se tiver dúvidas sobre esta política, entre em contato através do e-mail de suporte disponível em nossos canais oficiais ou na página da loja de aplicativos.</p>
+      </div>
+    </section>
+
+    <!-- SOBRE -->
+    <section id="tab-sobre" class="tab-content">
+      <button class="btn-back print-hidden" onclick="openTab('tab-home')">⬅️ Voltar ao Menu Principal</button>
+      <div class="card">
+        <div class="card-title" style="text-align: center;">Sobre o VoltCalc Pro</div>
+        <p class="legal-text">O <strong>VoltCalc Pro</strong> é a plataforma de engenharia elétrica desenvolvida para levar precisão e agilidade ao dia a dia de eletricistas, técnicos e engenheiros. Nossa ferramenta integra tecnologia de ponta com o rigor técnico exigido pelas normas brasileiras.</p>
+
+        <h2 class="legal-title">Segurança Técnica e NBR 5410</h2>
+        <p class="legal-text">Sabemos que o <strong>dimensionamento elétrico</strong> é o coração de qualquer instalação segura. Por isso, nossa plataforma é baseada nos critérios da <strong>NBR 5410</strong>, garantindo que nossos usuários tenham um suporte confiável para realizar:</p>
+        
+        <ul class="legal-list">
+            <li><strong>Cálculo de Queda de Tensão:</strong> Evite perdas de performance e garanta a operação segura dos equipamentos.</li>
+            <li><strong>Dimensionamento de Condutores:</strong> Seleção correta da bitola para evitar superaquecimento e riscos de incêndio.</li>
+            <li><strong>Projetos de Baixa Tensão:</strong> Ferramentas completas para orçamentos e dimensionamento de demanda.</li>
+        </ul>
+
+        <h2 class="legal-title">Nosso Compromisso</h2>
+        <p class="legal-text">O VoltCalc Pro não entrega apenas cálculos, entrega profissionalismo. Nossa missão é otimizar o tempo do profissional no campo, permitindo que a gestão de orçamentos e a validação técnica aconteçam em poucos cliques, sempre com a segurança que a engenharia exige.</p>
+        <p class="legal-text">Conte com o VoltCalc Pro para transformar a forma como você executa seus projetos elétricos.</p>
+      </div>
+    </section>
+
+    <!-- TERMOS -->
+    <section id="tab-termos" class="tab-content">
+      <button class="btn-back print-hidden" onclick="openTab('tab-home')">⬅️ Voltar ao Menu Principal</button>
+      <div class="card">
+        <div class="card-title" style="text-align: center;">Termos de Uso</div>
+        <p class="legal-text">Ao acessar o site VoltCalc Pro, você concorda em cumprir estes termos de serviço.</p>
+        
+        <h2 class="legal-title">1. Uso da Ferramenta</h2>
+        <p class="legal-text">O VoltCalc Pro é uma plataforma de cálculos e orçamentos desenvolvida para profissionais da área elétrica. Os valores são referenciais e podem ser ajustados pelo usuário.</p>
+        
+        <h2 class="legal-title">2. Isenção de Responsabilidade</h2>
+        <p class="legal-text">A plataforma não se responsabiliza pela execução técnica ou conformidade com a NBR 5410, sendo a responsabilidade inteiramente do profissional.</p>
+      </div>
+    </section>
+
   </main>
 
-  <!-- RODAPÉ DO SITE -->
-  <footer class="main-footer">
-      <a href="#">Faq</a> - 
-      <a href="#">Privacidade</a> - 
-      <a href="#">Sobre</a> - 
-      <a href="#">Termos</a>
+  <!-- RODAPÉ DO SITE (COM LINKS PARA AS NOVAS ABAS) -->
+  <footer class="main-footer print-hidden">
+      <a onclick="openTab('tab-faq')">Faq</a> - 
+      <a onclick="openTab('tab-privacidade')">Privacidade</a> - 
+      <a onclick="openTab('tab-sobre')">Sobre</a> - 
+      <a onclick="openTab('tab-termos')">Termos</a>
   </footer>
+
+  <!-- Botão Flutuante WhatsApp Global (Fica oculto na impressão do PDF) -->
+  <a href="https://wa.me/5519989142713" target="_blank" class="print-hidden" style="
+      position: fixed; 
+      bottom: 25px; 
+      right: 25px; 
+      background-color: #25d366; 
+      color: white; 
+      width: 60px; 
+      height: 60px; 
+      border-radius: 50%; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+      z-index: 9999; 
+      font-size: 30px; 
+      transition: transform 0.3s;"
+      onmouseover="this.style.transform='scale(1.1)'" 
+      onmouseout="this.style.transform='scale(1)'">
+      <svg viewBox="0 0 24 24" width="35" height="35" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.372-.025-.521-.075-.148-.67-1.611-.916-2.206-.242-.579-.487-.501-.67-.51-.172-.008-.369-.01-.567-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.955c-.003 5.444-4.437 9.88-9.875 9.88z"/>
+      </svg>
+  </a>
 
   <script>
     // ========================================================================
@@ -704,6 +825,8 @@
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       // Adiciona a classe 'active' apenas na aba solicitada
       document.getElementById(tabId).classList.add('active');
+      // Scrolla para o topo para garantir que o usuário veja a nova tela
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // ========================================================================
