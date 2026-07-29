@@ -65,7 +65,7 @@
     .tab-content.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* ================= DASHBOARD GRID ================= */
+    /* ================= DASHBOARD GRID (COM ÍCONES) ================= */
     .dashboard-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -77,11 +77,11 @@
         background: var(--card-bg);
         border: 2px solid var(--border-color);
         border-radius: 20px;
-        padding: 50px 20px;
+        padding: 45px 20px;
         text-align: center;
         cursor: pointer;
         transition: all 0.3s ease;
-        font-size: 22px;
+        font-size: 20px;
         font-weight: 800;
         color: var(--text);
         text-transform: uppercase;
@@ -92,11 +92,19 @@
         justify-content: center;
         gap: 15px;
     }
+    .dash-card svg {
+        transition: all 0.3s ease;
+        stroke: var(--text-light);
+    }
     .dash-card:hover {
         border-color: var(--neon-green);
         transform: translateY(-8px);
         box-shadow: 0 15px 30px rgba(57, 255, 20, 0.15);
         color: var(--neon-green);
+    }
+    .dash-card:hover svg {
+        stroke: var(--neon-green);
+        transform: scale(1.1);
     }
     @media (max-width: 768px) {
         .dashboard-grid { grid-template-columns: 1fr; margin: 30px auto; }
@@ -239,14 +247,48 @@
   <main class="main-content">
     
     <!-- ========================================== -->
-    <!-- 0. DASHBOARD PRINCIPAL (HOME) -->
+    <!-- 0. DASHBOARD PRINCIPAL (HOME) COM ÍCONES -->
     <!-- ========================================== -->
     <section id="tab-home" class="tab-content active">
         <div class="dashboard-grid">
-            <div class="dash-card" onclick="openTab('tab-perfil')">Meu Perfil Empresa</div>
-            <div class="dash-card" onclick="openTab('tab-clientes')">Meus Clientes</div>
-            <div class="dash-card" onclick="openTab('tab-orcamento')">Gerar Orçamentos</div>
-            <div class="dash-card" onclick="openTab('tab-precos')">Catálogo Referência</div>
+            
+            <div class="dash-card" onclick="openTab('tab-perfil')">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                Meu Perfil Empresa
+            </div>
+            
+            <div class="dash-card" onclick="openTab('tab-clientes')">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                Meus Clientes
+            </div>
+            
+            <div class="dash-card" onclick="openTab('tab-orcamento')">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Gerar Orçamentos
+            </div>
+            
+            <div class="dash-card" onclick="openTab('tab-precos')">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
+                Catálogo Referência
+            </div>
+
         </div>
     </section>
 
@@ -587,7 +629,7 @@
 
   </main>
 
-  <!-- RODAPÉ DO SITE (COM LINKS PARA AS NOVAS ABAS) -->
+  <!-- RODAPÉ DO SITE -->
   <footer class="main-footer print-hidden">
       <a onclick="openTab('tab-faq')">Faq</a> - 
       <a onclick="openTab('tab-privacidade')">Privacidade</a> - 
@@ -595,7 +637,7 @@
       <a onclick="openTab('tab-termos')">Termos</a>
   </footer>
 
-  <!-- Botão Flutuante WhatsApp Global (Fica oculto na impressão do PDF) -->
+  <!-- Botão Flutuante WhatsApp Global -->
   <a href="https://wa.me/5519989142713" target="_blank" class="print-hidden" style="
       position: fixed; 
       bottom: 25px; 
@@ -621,17 +663,17 @@
 
   <script>
     // ========================================================================
-    // A MAIOR BASE DE DADOS NACIONAL (MÃO DE OBRA E MATERIAIS)
+    // BASE DE DADOS NACIONAL REVISADA E ATUALIZADA (2026)
     // ========================================================================
 
     const baseServicos = [
       { cat: "💡 ILUMINAÇÃO" },
-      { nome: "Ponto de luz (Interruptor simples + Bocal)", valor: "75.00" },
+      { nome: "Ponto de luz (Interruptor simples + Bocal)", valor: "80.00" },
       { nome: "Instalação de spot ou luminária LED de embutir", valor: "60.00" },
       { nome: "Instalação de lustre simples/pendente", valor: "120.00" },
       { nome: "Instalação de lustre de cristal / alto padrão", valor: "350.00" },
       { nome: "Instalação de fita LED (por metro)", valor: "35.00" },
-      { nome: "Instalação de interruptor paralelo (Three-way)", valor: "100.00" },
+      { nome: "Instalação de interruptor paralelo (Three-way)", valor: "85.00" },
       { nome: "Instalação de refletor (área externa)", valor: "90.00" },
       { nome: "Instalação de sensor de presença ou fotocélula", valor: "80.00" },
       
@@ -643,7 +685,7 @@
       
       { cat: "🚿 AQUECIMENTO E CLIMATIZAÇÃO" },
       { nome: "Instalação de chuveiro elétrico (ponto pronto)", valor: "100.00" },
-      { nome: "Instalação de chuveiro elétrico (com fiação até 10m)", valor: "250.00" },
+      { nome: "Instalação de chuveiro elétrico (com fiação até 10m)", valor: "280.00" },
       { nome: "Troca de resistência de chuveiro elétrico", valor: "60.00" },
       { nome: "Ponto elétrico para Ar Condicionado (fiação e disjuntor)", valor: "350.00" },
       { nome: "Instalação de ventilador de teto", valor: "180.00" },
@@ -657,9 +699,9 @@
       { nome: "Aterramento (Haste + Caixa de inspeção + Conexão)", valor: "300.00" },
       
       { cat: "🏡 PADRÃO DE ENTRADA (MEDIDOR)" },
-      { nome: "Instalação de Padrão Monofásico (caixa pronta/sem poste)", valor: "550.00" },
-      { nome: "Instalação de Padrão Bifásico (caixa pronta/sem poste)", valor: "750.00" },
-      { nome: "Instalação de Padrão Trifásico (caixa pronta/sem poste)", valor: "1100.00" },
+      { nome: "Instalação de Padrão Monofásico (caixa pronta/sem poste)", valor: "650.00" },
+      { nome: "Instalação de Padrão Bifásico (caixa pronta/sem poste)", valor: "850.00" },
+      { nome: "Instalação de Padrão Trifásico (caixa pronta/sem poste)", valor: "1250.00" },
       
       { cat: "🏗️ INFRAESTRUTURA & OUTROS" },
       { nome: "Instalação de eletroduto aparente (por metro)", valor: "25.00" },
@@ -668,14 +710,14 @@
 
     const baseMateriais = [
       { cat: "🧵 FIOS E CABOS ELÉTRICOS" },
-      { nome: "Cabo Flexível 1.5mm² (Rolo 100m) - Diversas Cores", valor: "120.00" },
-      { nome: "Cabo Flexível 2.5mm² (Rolo 100m) - Diversas Cores", valor: "180.00" },
-      { nome: "Cabo Flexível 4.0mm² (Rolo 100m) - Diversas Cores", valor: "300.00" },
-      { nome: "Cabo Flexível 6.0mm² (Rolo 100m) - Diversas Cores", valor: "450.00" },
-      { nome: "Cabo Flexível 10.0mm² (Rolo 100m)", valor: "800.00" },
-      { nome: "Cabo Flexível 16.0mm² (Por Metro)", valor: "12.00" },
-      { nome: "Cabo Flexível 25.0mm² (Por Metro)", valor: "18.00" },
-      { nome: "Cabo PP 2x2.5mm² (Rolo 100m)", valor: "350.00" },
+      { nome: "Cabo Flexível 1.5mm² (Rolo 100m) - Diversas Cores", valor: "145.00" },
+      { nome: "Cabo Flexível 2.5mm² (Rolo 100m) - Diversas Cores", valor: "220.00" },
+      { nome: "Cabo Flexível 4.0mm² (Rolo 100m) - Diversas Cores", valor: "350.00" },
+      { nome: "Cabo Flexível 6.0mm² (Rolo 100m) - Diversas Cores", valor: "520.00" },
+      { nome: "Cabo Flexível 10.0mm² (Rolo 100m)", valor: "900.00" },
+      { nome: "Cabo Flexível 16.0mm² (Por Metro)", valor: "14.00" },
+      { nome: "Cabo Flexível 25.0mm² (Por Metro)", valor: "22.00" },
+      { nome: "Cabo PP 2x2.5mm² (Rolo 100m)", valor: "380.00" },
 
       { cat: "⚡ DISJUNTORES E PROTEÇÃO" },
       { nome: "Disjuntor DIN Monopolar 10A a 32A", valor: "15.00" },
@@ -684,15 +726,15 @@
       { nome: "Disjuntor DIN Bipolar 40A a 63A", valor: "60.00" },
       { nome: "Disjuntor DIN Tripolar 10A a 63A", valor: "90.00" },
       { nome: "Interruptor DR Bipolar (2P) 25A a 63A - 30mA", valor: "150.00" },
-      { nome: "Interruptor DR Tetrapolar (4P) 25A a 63A - 30mA", valor: "220.00" },
+      { nome: "Interruptor DR Tetrapolar (4P) 25A a 63A - 30mA", valor: "240.00" },
       { nome: "Protetor de Surto (DPS) 20kA a 45kA", valor: "65.00" },
       
       { cat: "🎛️ QUADROS E CAIXAS" },
       { nome: "Quadro de Distribuição Embutir (12 a 16 disjuntores)", valor: "90.00" },
       { nome: "Quadro de Distribuição Embutir (24 disjuntores)", valor: "140.00" },
-      { nome: "Caixa de Passagem 4x2 Plástica (Unidade)", valor: "2.50" },
-      { nome: "Caixa de Passagem 4x4 Plástica (Unidade)", valor: "4.50" },
-      { nome: "Caixa de Passagem Octogonal de Teto", valor: "3.50" },
+      { nome: "Caixa de Passagem 4x2 Plástica (Unidade)", valor: "3.00" },
+      { nome: "Caixa de Passagem 4x4 Plástica (Unidade)", valor: "5.00" },
+      { nome: "Caixa de Passagem Octogonal de Teto", valor: "4.00" },
 
       { cat: "🔌 TOMADAS E INTERRUPTORES (LINHA MODULAR)" },
       { nome: "Conjunto Completo Tomada Simples 10A", valor: "18.00" },
@@ -703,12 +745,12 @@
       { nome: "Conjunto Completo Interruptor Paralelo (Three-Way)", valor: "22.00" },
 
       { cat: "🛠️ INFRAESTRUTURA E ACESSÓRIOS" },
-      { nome: "Eletroduto Corrugado Flexível Amarelo 25mm (3/4\") - 50m", valor: "70.00" },
-      { nome: "Eletroduto Corrugado Flexível Laranja Reforçado 25mm - 50m", valor: "110.00" },
-      { nome: "Fita Isolante Profissional 3M (20m)", valor: "9.00" },
+      { nome: "Eletroduto Corrugado Flexível Amarelo 25mm (3/4\") - 50m", valor: "85.00" },
+      { nome: "Eletroduto Corrugado Flexível Laranja Reforçado 25mm - 50m", valor: "130.00" },
+      { nome: "Fita Isolante Profissional 3M (20m)", valor: "12.00" },
       { nome: "Fita Isolante de Auto-Fusão", valor: "25.00" },
-      { nome: "Conector de Derivação Wago (Caixa c/ 50)", valor: "120.00" },
-      { nome: "Haste de Aterramento Cobreada 2.4m + Conector", valor: "55.00" },
+      { nome: "Conector de Derivação Wago (Caixa c/ 50)", valor: "150.00" },
+      { nome: "Haste de Aterramento Cobreada 2.4m + Conector", valor: "75.00" },
 
       { cat: "💡 ILUMINAÇÃO" },
       { nome: "Lâmpada LED Bulbo 9W a 12W", valor: "12.00" },
@@ -821,11 +863,8 @@
     // 2. CONTROLE DE ABAS (NOVO SISTEMA)
     // ========================================================================
     function openTab(tabId) {
-      // Remove a classe 'active' de todas as abas
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      // Adiciona a classe 'active' apenas na aba solicitada
       document.getElementById(tabId).classList.add('active');
-      // Scrolla para o topo para garantir que o usuário veja a nova tela
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
