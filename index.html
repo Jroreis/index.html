@@ -68,8 +68,9 @@
     td { padding: 14px; border-bottom: 1px solid var(--border-color); }
 
     /* ORÇAMENTO & MATERIAIS */
-    .row-item { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px; align-items: center; }
+    .row-item { display: grid; grid-template-columns: 3fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px; align-items: center; }
     .row-item input { background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text); padding: 10px; border-radius: 6px; width: 100%; }
+    .row-item input:focus { border-color: var(--neon-green); outline: none; }
     .btn-remove { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
 
     /* FOTO DE PERFIL */
@@ -115,6 +116,9 @@
 </head>
 <body>
 
+  <!-- ELEMENTO NATIVO HTML5 PARA AUTOCOMPLETAR SERVIÇOS E PREÇOS -->
+  <datalist id="lista-servicos-nacional"></datalist>
+
   <!-- SIDEBAR -->
   <aside class="sidebar print-hidden">
     <div class="sidebar-logo">⚡ VoltCalc<span>Pro</span></div>
@@ -133,7 +137,7 @@
         <div class="card-title">1. Dados do Profissional / Empresa</div>
         <p style="color: var(--text-light); margin-bottom: 20px;">Estes dados aparecerão no cabeçalho do seu PDF de orçamento.</p>
         
-        <div style="display: flex; gap: 20px; margin-bottom: 20px; align-items: flex-start;">
+        <div style="display: flex; gap: 20px; margin-bottom: 20px; align-items: flex-start; flex-wrap: wrap;">
           <div class="form-group">
             <label>Logomarca (Clique para alterar)</label>
             <label class="logo-preview" for="userLogoInput">
@@ -241,6 +245,10 @@
       <!-- LISTA DE SERVIÇOS -->
       <div class="card">
         <div class="card-title print-hidden">Lista de Serviços</div>
+        <p class="print-hidden" style="color: var(--neon-green); font-size: 13px; margin-bottom: 15px;">
+          💡 Dica: Comece a digitar o nome do serviço para ver as sugestões da nossa Base de Preços Nacional com autopreenchimento de valor!
+        </p>
+        
         <div id="orcServicesContainer">
           <!-- Cabeçalho Tabela Visível na Impressão -->
           <table class="print-only" style="margin-bottom: 0;">
@@ -279,7 +287,7 @@
       <!-- LISTA DE MATERIAIS -->
       <div class="card">
         <div class="card-title">Lista de Materiais da Obra</div>
-        <p style="color: var(--text-light); margin-bottom: 20px;">Adicione os materiais aqui. Eles serão impressos automaticamente no seu PDF de orçamento.</p>
+        <p style="color: var(--text-light); margin-bottom: 20px;">Adicione os materiais aqui. Eles serão impressos automaticamente na página final do seu PDF de orçamento.</p>
         
         <div id="materialsContainer"></div>
         <button class="btn-primary" onclick="addMaterialRow()">+ Adicionar Material</button>
@@ -290,9 +298,9 @@
         <div class="card-title">Base de Preços Nacional (Mão de Obra)</div>
         <div class="table-container">
           <table>
-            <thead><tr><th>Serviço</th><th>Valor Médio Referência</th></tr></thead>
+            <thead><tr><th>Serviço / Etapa da Obra</th><th>Valor Médio Nacional</th></tr></thead>
             <tbody id="pricesTableBody">
-              <!-- Preenchido via JS -->
+              <!-- Preenchido via JS automaticamente -->
             </tbody>
           </table>
         </div>
@@ -302,6 +310,86 @@
   </main>
 
   <script>
+    // ------------------------------------------------------------------------
+    // BASE DE DADOS COMPLETA NACIONAL (INTELIGÊNCIA DO VOLTCALC)
+    // ------------------------------------------------------------------------
+    const basePrecos = [
+      { cat: "💡 ILUMINAÇÃO" },
+      { servico: "Ponto de luz (Interruptor simples + Bocal)", valor: "75.00" },
+      { servico: "Instalação de spot ou luminária LED de embutir", valor: "60.00" },
+      { servico: "Instalação de lustre simples/pendente", valor: "120.00" },
+      { servico: "Instalação de lustre de cristal / alto padrão", valor: "350.00" },
+      { servico: "Instalação de fita LED (por metro)", valor: "35.00" },
+      { servico: "Instalação de interruptor paralelo (Three-way)", valor: "100.00" },
+      { servico: "Instalação de refletor (área externa)", valor: "90.00" },
+      { servico: "Instalação de sensor de presença ou fotocélula", valor: "80.00" },
+      
+      { cat: "🔌 TOMADAS E PONTOS DE FORÇA" },
+      { servico: "Instalação / Troca de tomada simples (10A/20A)", valor: "50.00" },
+      { servico: "Conjunto conjugado (Tomada + Interruptor)", valor: "65.00" },
+      { servico: "Instalação de tomada inteligente / USB / Wi-Fi", valor: "60.00" },
+      { servico: "Passagem de fiação nova (por ponto, até 10m)", valor: "110.00" },
+      
+      { cat: "🚿 AQUECIMENTO E CLIMATIZAÇÃO" },
+      { servico: "Instalação de chuveiro elétrico (ponto pronto)", valor: "100.00" },
+      { servico: "Instalação de chuveiro elétrico (com fiação até 10m)", valor: "250.00" },
+      { servico: "Troca de resistência de chuveiro elétrico", valor: "60.00" },
+      { servico: "Ponto elétrico para Ar Condicionado (fiação e disjuntor)", valor: "350.00" },
+      { servico: "Instalação de ventilador de teto", valor: "180.00" },
+      { servico: "Ligação de boia elétrica em caixa d'água", valor: "150.00" },
+      
+      { cat: "⚡ QUADROS, DISJUNTORES E PROTEÇÃO" },
+      { servico: "Montagem/Troca de QDC (até 12 disjuntores)", valor: "450.00" },
+      { servico: "Montagem de QDC (13 a 24 disjuntores)", valor: "850.00" },
+      { servico: "Montagem de QDC (25 a 40 disjuntores)", valor: "1400.00" },
+      { servico: "Troca de disjuntor termomagnético simples", valor: "70.00" },
+      { servico: "Instalação de DR (Interruptor Diferencial Residual)", valor: "120.00" },
+      { servico: "Instalação de DPS (Protetor de Surtos - por polo)", valor: "80.00" },
+      { servico: "Aterramento (Haste + Caixa de inspeção + Conexão)", valor: "300.00" },
+      
+      { cat: "🏡 PADRÃO DE ENTRADA (MEDIDOR)" },
+      { servico: "Instalação de Padrão Monofásico (caixa pronta/sem poste)", valor: "550.00" },
+      { servico: "Instalação de Padrão Bifásico (caixa pronta/sem poste)", valor: "750.00" },
+      { servico: "Instalação de Padrão Trifásico (caixa pronta/sem poste)", valor: "1100.00" },
+      
+      { cat: "🏗️ INFRAESTRUTURA" },
+      { servico: "Instalação de eletroduto/conduíte aparente (por metro)", valor: "25.00" },
+      { servico: "Instalação de eletrocalha / perfilado (por metro)", valor: "60.00" },
+      
+      { cat: "🤖 AUTOMAÇÃO, SEGURANÇA E OUTROS" },
+      { servico: "Visita Técnica / Diagnóstico de falha", valor: "150.00" },
+      { servico: "Instalação de fechadura digital", valor: "250.00" },
+      { servico: "Instalação de motor de portão eletrônico", valor: "350.00" },
+      { servico: "Câmera CFTV Wi-Fi (Instalação e configuração)", valor: "140.00" }
+    ];
+
+    // Popula as sugestões (Datalist HTML5) e a Tabela Visível
+    window.addEventListener('DOMContentLoaded', () => {
+      let datalistHtml = '';
+      let tableHtml = '';
+
+      basePrecos.forEach(item => {
+        if(item.cat) {
+            tableHtml += `<tr><td colspan="2" style="background: rgba(57, 255, 20, 0.1); color: var(--neon-green); font-weight: 800; text-transform: uppercase;">${item.cat}</td></tr>`;
+        } else {
+            // Formata valor para R$ 00,00 na tabela
+            let precoBRL = "R$ " + parseFloat(item.valor).toFixed(2).replace('.', ',');
+            tableHtml += `<tr><td>${item.servico}</td><td style="color: var(--neon-green); font-weight: bold;">${precoBRL}</td></tr>`;
+            
+            // Popula as sugestões do Input
+            datalistHtml += `<option value="${item.servico}">`;
+        }
+      });
+
+      document.getElementById('lista-servicos-nacional').innerHTML = datalistHtml;
+      document.getElementById('pricesTableBody').innerHTML = tableHtml;
+      
+      // Inicia as abas com uma linha
+      addServiceRow();
+      addMaterialRow();
+    });
+
+
     // ------------------------------------------------------------------------
     // 1. INICIALIZAÇÃO FIREBASE (Autenticação Anônima Invisível)
     // ------------------------------------------------------------------------
@@ -469,7 +557,7 @@
 
 
     // ------------------------------------------------------------------------
-    // 5. LÓGICA DE ORÇAMENTO (ABA 3) E PDF
+    // 5. LÓGICA DE ORÇAMENTO (ABA 3) E PDF (COM AUTOPREENCHIMENTO)
     // ------------------------------------------------------------------------
     function toggleObraType() {
       const type = document.getElementById('orcTypeSelect').value;
@@ -500,16 +588,30 @@
       }
     }
 
+    // Função inteligente de auto-preencher preço
+    function autoFillPrice(inputElement, valueInputId) {
+      const selectedText = inputElement.value;
+      const foundItem = basePrecos.find(p => p.servico === selectedText);
+      
+      if(foundItem) {
+        // Encontrou na base nacional, preenche o valor sozinho
+        document.getElementById(valueInputId).value = parseFloat(foundItem.valor);
+        calcOrcTotal();
+      }
+    }
+
     function addServiceRow() {
       const container = document.getElementById('orcServicesContainer');
       const rowId = Date.now();
       const div = document.createElement('div');
       div.className = 'row-item print-hidden';
       div.id = `serv-${rowId}`;
+      
+      // O campo input usa "list" apontando para o <datalist> criado no carregamento
       div.innerHTML = `
-        <input type="text" placeholder="Descrição do Serviço (Ex: Ponto de Luz)" class="serv-desc">
+        <input type="text" list="lista-servicos-nacional" placeholder="Selecione ou digite um serviço personalizado..." class="serv-desc" oninput="autoFillPrice(this, 'val-${rowId}')" onchange="calcOrcTotal()">
         <input type="number" placeholder="Qtd" value="1" min="1" class="serv-qty" oninput="calcOrcTotal()">
-        <input type="number" placeholder="Valor Un (R$)" value="0" class="serv-val" oninput="calcOrcTotal()">
+        <input type="number" id="val-${rowId}" placeholder="Valor Un (R$)" value="0" class="serv-val" oninput="calcOrcTotal()">
         <button class="btn-remove" onclick="document.getElementById('serv-${rowId}').remove(); calcOrcTotal();">X</button>
       `;
       container.appendChild(div);
@@ -532,15 +634,15 @@
              pdfTableHTML += `<tr>
                 <td>${desc}</td>
                 <td>${qty}</td>
-                <td>R$ ${val.toFixed(2)}</td>
-                <td>R$ ${subtotal.toFixed(2)}</td>
+                <td>R$ ${val.toFixed(2).replace('.', ',')}</td>
+                <td>R$ ${subtotal.toFixed(2).replace('.', ',')}</td>
              </tr>`;
           }
         }
       });
 
-      document.getElementById('orcTotalDisplay').textContent = total.toFixed(2);
-      document.getElementById('pdfTotalValue').textContent = total.toFixed(2);
+      document.getElementById('orcTotalDisplay').textContent = total.toFixed(2).replace('.', ',');
+      document.getElementById('pdfTotalValue').textContent = total.toFixed(2).replace('.', ',');
       document.getElementById('pdfServicesTableBody').innerHTML = pdfTableHTML;
     }
 
@@ -570,13 +672,13 @@
           matSection.style.display = 'none';
       }
 
-      // Dispara a impressão (O CSS @media print formata tudo)
+      // Dispara a impressão (O CSS @media print formata tudo magicamente)
       window.print();
     }
 
 
     // ------------------------------------------------------------------------
-    // 6. LÓGICA DE PREÇOS E MATERIAIS (ABA 4)
+    // 6. LÓGICA DE MATERIAIS (ABA 4)
     // ------------------------------------------------------------------------
     function addMaterialRow() {
       const container = document.getElementById('materialsContainer');
@@ -586,36 +688,12 @@
       div.id = `mat-${rowId}`;
       div.style.gridTemplateColumns = "3fr 1fr auto";
       div.innerHTML = `
-        <input type="text" placeholder="Nome do Material (Ex: Cabo 2.5mm)" class="mat-desc">
+        <input type="text" placeholder="Nome do Material (Ex: Cabo Flexível 2.5mm² Azul Sil)" class="mat-desc">
         <input type="text" placeholder="Qtd (Ex: 2 rolos)" class="mat-qty">
         <button class="btn-remove" onclick="document.getElementById('mat-${rowId}').remove();">X</button>
       `;
       container.appendChild(div);
     }
-
-    // Base de Preços Nacional Fixa
-    const basePrecos = [
-      { servico: "Ponto de luz (Interruptor simples + Bocal)", valor: "R$ 75,00" },
-      { servico: "Instalação / Troca de tomada simples (10A/20A)", valor: "R$ 50,00" },
-      { servico: "Instalação de chuveiro elétrico básico", valor: "R$ 100,00" },
-      { servico: "Montagem de QDC (até 12 disjuntores)", valor: "R$ 450,00" },
-      { servico: "Instalação de Padrão Monofásico (sem poste)", valor: "R$ 550,00" },
-      { servico: "Instalação de interruptor inteligente", valor: "R$ 100,00" },
-      { servico: "Visita Técnica / Diagnóstico de falha", valor: "R$ 150,00" }
-    ];
-
-    window.addEventListener('DOMContentLoaded', () => {
-      // Iniciar com uma linha vazia de orçamento e material
-      addServiceRow();
-      addMaterialRow();
-      
-      // Carregar tabela de preços
-      let htmlPrecos = '';
-      basePrecos.forEach(p => {
-        htmlPrecos += `<tr><td>${p.servico}</td><td style="color: var(--neon-green); font-weight: bold;">${p.valor}</td></tr>`;
-      });
-      document.getElementById('pricesTableBody').innerHTML = htmlPrecos;
-    });
 
   </script>
 </body>
