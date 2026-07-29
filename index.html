@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VoltCalc Pro - Sistema de Orçamentos Elétricos</title>
+  <title>VoltCalc Pro - MAX</title>
   
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -30,22 +30,116 @@
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg-color); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+    
+    body { 
+        font-family: 'Inter', sans-serif; 
+        background: var(--bg-color); 
+        color: var(--text); 
+        display: flex; 
+        flex-direction: column; 
+        min-height: 100vh; /* Permite que o footer fique no final */
+    }
 
-    /* LAYOUT: SIDEBAR E MAIN */
-    .sidebar { width: 280px; background: var(--card-bg); border-right: 1px solid var(--border-color); padding: 24px; display: flex; flex-direction: column; overflow-y: auto; }
-    .sidebar-logo { font-size: 24px; font-weight: 800; color: var(--neon-green); margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
-    .sidebar-logo span { color: var(--text); }
-    .nav-btn { background: transparent; border: none; color: var(--text-light); text-align: left; padding: 12px 16px; font-size: 15px; font-weight: 600; cursor: pointer; border-radius: 10px; margin-bottom: 8px; transition: 0.2s; }
-    .nav-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.05); }
-    .nav-btn.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.1); border: 1px solid rgba(57, 255, 20, 0.2); }
+    /* ================= CABEÇALHO PRINCIPAL ================= */
+    .main-header {
+        text-align: center;
+        padding: 40px 20px 20px 20px;
+    }
+    .main-header h1 {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .main-header h1 span { color: var(--neon-green); }
 
-    .main-content { flex: 1; overflow-y: auto; padding: 40px; }
-    .tab-content { display: none; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.3s; }
+    /* ================= CONTEÚDO E ABAS ================= */
+    .main-content { flex: 1; padding: 20px 40px; }
+    
+    .tab-content { display: none; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.3s ease-in-out; }
     .tab-content.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* COMPONENTES GERAIS */
+    /* ================= DASHBOARD GRID (NOVO LAYOUT) ================= */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+        max-width: 800px;
+        margin: 60px auto;
+    }
+    .dash-card {
+        background: var(--card-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 20px;
+        padding: 50px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--text);
+        text-transform: uppercase;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+    .dash-card:hover {
+        border-color: var(--neon-green);
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(57, 255, 20, 0.15);
+        color: var(--neon-green);
+    }
+    @media (max-width: 768px) {
+        .dashboard-grid { grid-template-columns: 1fr; margin: 30px auto; }
+        .dash-card { padding: 35px 20px; font-size: 18px; }
+        .main-content { padding: 15px; }
+    }
+
+    /* ================= BOTÃO VOLTAR ================= */
+    .btn-back {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-light);
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-bottom: 25px;
+        font-size: 15px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
+    }
+    .btn-back:hover { border-color: var(--neon-green); color: var(--text); background: rgba(57, 255, 20, 0.05); }
+
+    /* ================= RODAPÉ (FOOTER) ================= */
+    .main-footer {
+        text-align: center;
+        padding: 30px 20px;
+        color: var(--text-light);
+        font-size: 14px;
+        font-weight: 500;
+    }
+    .main-footer a {
+        color: var(--text-light);
+        text-decoration: none;
+        margin: 0 10px;
+        transition: 0.2s;
+        text-transform: capitalize;
+    }
+    .main-footer a:hover { color: var(--neon-green); }
+
+    /* ================= COMPONENTES GERAIS ================= */
     .card { background: var(--card-bg); border-radius: 16px; padding: 32px; border: 1px solid var(--border-color); margin-bottom: 24px; box-shadow: var(--shadow); }
     .card-title { font-size: 20px; font-weight: 700; margin-bottom: 24px; color: var(--neon-green); border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
     
@@ -82,7 +176,7 @@
     @media print {
       @page { margin: 1cm; size: A4; }
       body { background: #fff !important; color: #000 !important; display: block; overflow: visible; font-size: 10pt; }
-      .sidebar, .nav-btn, .btn-primary, .btn-success, .btn-remove, .print-hidden { display: none !important; }
+      .print-hidden, .main-header, .main-footer, .btn-back { display: none !important; }
       .main-content { padding: 0 !important; }
       .tab-content { display: none !important; }
       #tab-orcamento { display: block !important; max-width: 100% !important; }
@@ -118,29 +212,42 @@
       .pdf-totals-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 11pt; color: #000; }
       .pdf-totals-row.grand-total { font-weight: bold; font-size: 14pt; border-top: 2px solid #000; padding-top: 8px; margin-top: 8px; }
 
-      /* RODAPÉ VOLTCALCPRO */
       body::after { content: "Documento gerado pelo sistema VoltCalc Pro - A plataforma do eletricista | www.voltcalcpro.com"; position: fixed; bottom: 0; left: 0; width: 100%; text-align: center; font-size: 8pt; font-weight: bold; color: #555; border-top: 1px solid #000; padding-top: 5px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar print-hidden">
-    <div class="sidebar-logo">⚡ VoltCalc<span>Pro</span></div>
-    <button class="nav-btn active" onclick="openTab('tab-perfil', this)">1. Meu Perfil / Empresa</button>
-    <button class="nav-btn" onclick="openTab('tab-clientes', this)">2. Meus Clientes</button>
-    <button class="nav-btn" onclick="openTab('tab-orcamento', this)">3. Gerar Orçamento</button>
-    <button class="nav-btn" onclick="openTab('tab-precos', this)">4. Catálogo Referência</button>
-  </aside>
+  <!-- CABEÇALHO DO SITE -->
+  <header class="main-header">
+      <h1>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--neon-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        VOLTCALCPRO - MAX
+      </h1>
+  </header>
 
   <!-- MAIN CONTENT -->
   <main class="main-content">
     
     <!-- ========================================== -->
+    <!-- 0. DASHBOARD PRINCIPAL (HOME) -->
+    <!-- ========================================== -->
+    <section id="tab-home" class="tab-content active">
+        <div class="dashboard-grid">
+            <div class="dash-card" onclick="openTab('tab-perfil')">Meu Perfil Empresa</div>
+            <div class="dash-card" onclick="openTab('tab-clientes')">Meus Clientes</div>
+            <div class="dash-card" onclick="openTab('tab-orcamento')">Gerar Orçamentos</div>
+            <div class="dash-card" onclick="openTab('tab-precos')">Catálogo Referência</div>
+        </div>
+    </section>
+
+    <!-- ========================================== -->
     <!-- 1. PAINEL DO USUÁRIO (PERFIL & LOGIN) -->
     <!-- ========================================== -->
-    <section id="tab-perfil" class="tab-content active">
+    <section id="tab-perfil" class="tab-content">
+      <button class="btn-back print-hidden" onclick="openTab('tab-home')">⬅️ Voltar ao Menu Principal</button>
       
       <!-- DIV DE LOGIN -->
       <div class="card" id="loginContainer" style="max-width: 500px; margin: 0 auto;">
@@ -166,7 +273,7 @@
       <!-- DIV DO PERFIL -->
       <div class="card" id="profileContainer" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px;">
-          <div class="card-title" style="border: none; padding: 0; margin: 0;">1. Dados do Profissional / Empresa</div>
+          <div class="card-title" style="border: none; padding: 0; margin: 0;">Dados do Profissional / Empresa</div>
           <button onclick="logout()" style="background: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: bold;">Sair / Logout</button>
         </div>
         
@@ -207,8 +314,10 @@
     <!-- 2. PAINEL DE CLIENTES -->
     <!-- ========================================== -->
     <section id="tab-clientes" class="tab-content">
+      <button class="btn-back print-hidden" onclick="openTab('tab-home')">⬅️ Voltar ao Menu Principal</button>
+      
       <div class="card">
-        <div class="card-title" id="tituloCardCliente">2. Cadastrar Novo Cliente</div>
+        <div class="card-title" id="tituloCardCliente">Cadastrar Novo Cliente</div>
         <!-- Input escondido para edição -->
         <input type="hidden" id="cliEditId" value="">
         
@@ -242,6 +351,7 @@
     <!-- 3. PAINEL DE ORÇAMENTO (Serviços e Materiais) -->
     <!-- ========================================== -->
     <section id="tab-orcamento" class="tab-content">
+      <button class="btn-back print-hidden" onclick="openTab('tab-home')">⬅️ Voltar ao Menu Principal</button>
       
       <!-- ================= PDF RENDER AREA ================= -->
       <!-- Cabeçalho (Oculto na tela, visível no PDF) -->
@@ -275,11 +385,11 @@
 
       <!-- CONFIGURAÇÃO GERAL -->
       <div class="card print-hidden">
-        <div class="card-title">3. Configuração do Orçamento</div>
+        <div class="card-title">Configuração do Orçamento</div>
         
         <div class="form-grid">
           <div class="form-group full">
-            <label>1. Selecione o Cliente (Cadastrado na aba 2)</label>
+            <label>1. Selecione o Cliente (Cadastrado na aba Meus Clientes)</label>
             <select id="orcClientSelect" onchange="updatePdfClientInfo()" style="border: 1px solid var(--neon-green);">
               <option value="">-- Clique para selecionar um cliente --</option>
             </select>
@@ -361,6 +471,8 @@
 
     <!-- 4. PAINEL DE CATÁLOGOS -->
     <section id="tab-precos" class="tab-content">
+      <button class="btn-back print-hidden" onclick="openTab('tab-home')">⬅️ Voltar ao Menu Principal</button>
+      
       <div class="card">
         <div class="card-title">Catálogo Nacional de Referência</div>
         <p style="color: var(--text-light); margin-bottom: 20px;">Use esta aba apenas para consulta de preços base para Serviços e Materiais elétricos do mercado nacional.</p>
@@ -377,6 +489,14 @@
     </section>
 
   </main>
+
+  <!-- RODAPÉ DO SITE -->
+  <footer class="main-footer">
+      <a href="#">Faq</a> - 
+      <a href="#">Privacidade</a> - 
+      <a href="#">Sobre</a> - 
+      <a href="#">Termos</a>
+  </footer>
 
   <script>
     // ========================================================================
@@ -576,16 +696,18 @@
     }
     function logout() { auth.signOut(); }
 
-    function openTab(tabId, btnElement) {
+    // ========================================================================
+    // 2. CONTROLE DE ABAS (NOVO SISTEMA)
+    // ========================================================================
+    function openTab(tabId) {
+      // Remove a classe 'active' de todas as abas
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      // Adiciona a classe 'active' apenas na aba solicitada
       document.getElementById(tabId).classList.add('active');
-      btnElement.classList.add('active');
     }
 
-
     // ========================================================================
-    // 2. PERFIL (SALVAR E CARREGAR) E CABEÇALHO DO PDF
+    // 3. PERFIL E CLIENTES (LÓGICA INTACTA)
     // ========================================================================
     function loadLogo(event) {
       const file = event.target.files[0];
@@ -660,10 +782,6 @@
       if(d.logo) document.getElementById('pdfUserLogo').src = d.logo;
     }
 
-
-    // ========================================================================
-    // 3. CLIENTES (SALVAR, EDITAR, EXCLUIR)
-    // ========================================================================
     function saveClient() {
       if(!currentUserUid) return alert("Faça login para salvar clientes.");
       const clientData = {
@@ -703,7 +821,7 @@
             document.getElementById('cliEmail').value = c.email || '';
             document.getElementById('cliEnd').value = c.endereco || '';
             
-            document.getElementById('tituloCardCliente').innerText = "2. Editar Cliente";
+            document.getElementById('tituloCardCliente').innerText = "Editar Cliente";
             document.getElementById('btnSaveClient').innerText = "💾 Atualizar Cliente";
             document.getElementById('btnCancelEdit').style.display = "inline-block";
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -718,7 +836,7 @@
         document.getElementById('cliEmail').value = '';
         document.getElementById('cliEnd').value = '';
         
-        document.getElementById('tituloCardCliente').innerText = "2. Cadastrar Novo Cliente";
+        document.getElementById('tituloCardCliente').innerText = "Cadastrar Novo Cliente";
         document.getElementById('btnSaveClient').innerText = "➕ Salvar Cliente";
         document.getElementById('btnCancelEdit').style.display = "none";
     }
@@ -755,9 +873,8 @@
       });
     }
 
-
     // ========================================================================
-    // 4. LÓGICA DE ORÇAMENTO E GERADOR DE PDF (SERVIÇOS E MATERIAIS)
+    // 4. LÓGICA DE ORÇAMENTO E GERADOR DE PDF (INTACTOS)
     // ========================================================================
     function toggleObraType() {
       const type = document.getElementById('orcTypeSelect').value;
@@ -789,7 +906,6 @@
       }
     }
 
-    // Gerencia o Dropdown (Busca Preço Automático de Serviços e Materiais)
     function handleItemSelect(selectElement, rowId, type) {
         const customInput = document.getElementById(`custom-desc-${rowId}`);
         const valInput = document.getElementById(`val-${rowId}`);
@@ -802,7 +918,6 @@
             customInput.style.display = 'none';
             customInput.value = '';
             
-            // Procura o valor no banco correspondente (Serviços ou Materiais)
             let base = type === 'servico' ? baseServicos : baseMateriais;
             const found = base.find(p => p.nome === selectElement.value);
             
@@ -812,7 +927,6 @@
         calcOrcTotal();
     }
 
-    // Adicionar Linha de Mão de Obra
     function addServiceRow() {
       const container = document.getElementById('orcServicesContainer');
       const rowId = Date.now();
@@ -834,7 +948,6 @@
       container.appendChild(div);
     }
 
-    // Adicionar Linha de Material
     function addMaterialRow() {
       const container = document.getElementById('orcMaterialsContainer');
       const rowId = Date.now();
@@ -856,7 +969,6 @@
       container.appendChild(div);
     }
 
-    // Motor de Cálculo Geral
     function calcOrcTotal() {
       let totalServicos = 0;
       let totalMateriais = 0;
@@ -865,7 +977,6 @@
       let hasServicos = false;
       let hasMateriais = false;
       
-      // Itera sobre todos os itens de Mão de Obra e Materiais
       document.querySelectorAll('.row-item').forEach(row => {
           let isService = row.classList.contains('serv-row');
           let selectElement = row.querySelector(isService ? '.serv-select' : '.mat-select');
@@ -900,19 +1011,16 @@
 
       let totalGeral = totalServicos + totalMateriais;
 
-      // Atualiza a Tela do App
       document.getElementById('displayTotalServicos').textContent = `R$ ${totalServicos.toFixed(2).replace('.', ',')}`;
       document.getElementById('displayTotalMateriais').textContent = `R$ ${totalMateriais.toFixed(2).replace('.', ',')}`;
       document.getElementById('displayTotalGeral').textContent = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
 
-      // Atualiza as Tabelas e Totais do PDF
       document.getElementById('pdfServicesTableBody').innerHTML = pdfServTableHTML;
       document.getElementById('pdfMaterialsTableBody').innerHTML = pdfMatTableHTML;
       document.getElementById('pdfTotalServicos').textContent = `R$ ${totalServicos.toFixed(2).replace('.', ',')}`;
       document.getElementById('pdfTotalMateriais').textContent = `R$ ${totalMateriais.toFixed(2).replace('.', ',')}`;
       document.getElementById('pdfTotalGeral').textContent = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
 
-      // Controla visibilidade da tabela de Materiais no PDF
       const pdfMatTable = document.getElementById('pdfTableMaterials');
       const pdfMatTitle = document.getElementById('pdfTitleMaterials');
       if(hasMateriais) {
@@ -925,16 +1033,13 @@
     }
 
     function generatePDF() {
-      // Validação rápida
       const cliId = document.getElementById('orcClientSelect').value;
       if(!cliId) return alert("Atenção: Selecione o cliente para gerar o orçamento.");
 
-      // Atualiza Escopo se for Obra Completa
       if(document.getElementById('orcTypeSelect').value === 'completa') {
          document.getElementById('pdfEscopoPrint').innerHTML = "<strong>Escopo Técnico da Obra:</strong> " + document.getElementById('orcEscopoTexto').value;
       }
 
-      // Chama a tela nativa de impressão (Ctrl+P)
       window.print();
     }
 
