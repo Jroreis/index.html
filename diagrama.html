@@ -32,7 +32,7 @@
         /* Oculta UI durante PDF se necessário, mas o html2pdf permite targetar um div específico */
     </style>
 </head>
-<body class="min-h-screen p-2 md:p-4 flex flex-col h-screen overflow-hidden text-slate-800">
+<body class="min-h-screen p-2 md:p-4 flex flex-col h-screen overflow-auto text-slate-800">
 
     <header class="text-center mb-4 flex-shrink-0 flex flex-col md:flex-row justify-between items-center px-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
         <div class="text-left mb-2 md:mb-0">
@@ -45,15 +45,15 @@
         </button>
     </header>
 
-    <div class="flex flex-col md:flex-row gap-4 flex-1 overflow-hidden">
+    <div class="flex flex-col gap-4 flex-1">
         
-        <aside class="w-full md:w-80 lg:w-96 bg-white p-4 rounded-xl shadow-sm overflow-y-auto flex-shrink-0 flex flex-col gap-5 border border-slate-200">
-            
-            <!-- Sistema -->
-            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                <h3 class="text-xs font-bold text-slate-500 uppercase mb-2">Sistema Elétrico</h3>
-                <select id="sys-type" class="w-full text-sm border-slate-300 rounded shadow-sm border p-2 bg-white focus:ring-blue-500" onchange="changeSystem()">
-                    <option value="mono" selected>Monofásico (1F + N + T)</option>
+        <aside class="w-full bg-white p-4 rounded-xl shadow-sm flex-shrink-0 border border-slate-200 z-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Coluna 1: Configurações Iniciais -->
+                <div class="flex flex-col gap-4">
+                    <!-- Sistema -->
+                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase mb-2">Sistema Elétrico</h3>
                     <option value="bi">Bifásico (2F + N + T)</option>
                     <option value="tri">Trifásico (3F + N + T)</option>
                 </select>
@@ -82,33 +82,33 @@
                             <option value="25">25 mm²</option>
                         </select>
                     </div>
+                    <div class="flex gap-4">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="has-dps" checked class="rounded text-blue-600" onchange="renderApp()">
+                            <span class="text-xs font-medium text-slate-700">Incluir DPS</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="has-dr" checked class="rounded text-blue-600" onchange="renderApp()">
+                            <span class="text-xs font-medium text-slate-700">Incluir DR (Geral)</span>
+                        </label>
+                    </div>
                 </div>
-                
-                <div class="flex gap-4">
-                    <label class="flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" id="has-dps" checked class="rounded text-blue-600" onchange="renderApp()">
-                        <span class="text-xs font-medium text-slate-700">Incluir DPS</span>
-                    </label>
-                    <label class="flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" id="has-dr" checked class="rounded text-blue-600" onchange="renderApp()">
-                        <span class="text-xs font-medium text-slate-700">Incluir DR (Geral)</span>
-                    </label>
                 </div>
-            </div>
 
-            <!-- Circuitos -->
-            <div class="flex-1 flex flex-col min-h-0">
-                <h3 class="font-semibold text-slate-700 mb-2 flex items-center border-b pb-1 text-sm">Circuitos de Distribuição</h3>
-                <div id="circuit-list" class="flex-1 overflow-y-auto space-y-2 pr-1">
-                    <!-- Preenchido via JS -->
+                <!-- Coluna 2: Circuitos -->
+                <div class="flex flex-col max-h-[300px]">
+                    <h3 class="font-semibold text-slate-700 mb-2 flex items-center border-b pb-1 text-sm">Circuitos de Distribuição</h3>
+                    <div id="circuit-list" class="flex-1 overflow-y-auto space-y-2 pr-1">
+                        <!-- Preenchido via JS -->
+                    </div>
+                    <button onclick="addCircuit()" class="mt-3 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2 px-4 border border-slate-300 rounded shadow-sm flex items-center justify-center transition-colors shrink-0">
+                        + Adicionar Circuito
+                    </button>
                 </div>
-                <button onclick="addCircuit()" class="mt-3 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2 px-4 border border-slate-300 rounded shadow-sm flex items-center justify-center transition-colors">
-                    + Adicionar Circuito
-                </button>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative">
+        <main class="flex-1 flex flex-col bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden relative min-h-[600px]">
             
             <div class="flex border-b border-slate-200 bg-slate-50 px-2 py-2 gap-2 shrink-0">
                 <button onclick="switchTab('fisico')" id="btn-fisico" class="tab-btn active px-4 py-1.5 rounded text-sm font-semibold text-slate-600 bg-white shadow-sm border border-slate-200 hover:bg-slate-100 transition-colors">
@@ -217,15 +217,63 @@
         }
 
         function downloadPDF() {
-            const element = document.getElementById('export-container');
+            // Cria um container temporário invisível com tamanho fixo grande para evitar cortes
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
+            tempContainer.style.width = '1200px'; 
+            tempContainer.style.backgroundColor = 'white';
+            tempContainer.style.padding = '20px';
+            
+            // Força a geração dos dois desenhos para injetar no PDF simultaneamente
+            const fisicoSVG = generateFisicoSVG();
+            const unifilarSVG = generateUnifilarSVG();
+            const sysName = state.sys === 'mono' ? 'Monofásico' : state.sys === 'bi' ? 'Bifásico' : 'Trifásico';
+            
+            // Constrói o layout interno do PDF (2 páginas)
+            tempContainer.innerHTML = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="font-size: 26px; font-weight: bold; font-family: sans-serif; text-transform: uppercase; color: #1e293b;">
+                        Quadro de Distribuição - Sistema ${sysName}
+                    </h2>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <h3 style="font-size: 18px; color: #475569; font-family: sans-serif; margin-bottom: 15px; text-align: center;">
+                        Esquema Físico de Ligação
+                    </h3>
+                    <div style="display: flex; justify-content: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px;">
+                        ${fisicoSVG}
+                    </div>
+                </div>
+                
+                <!-- Quebra de página CSS para forçar o Unifilar na página seguinte -->
+                <div style="page-break-before: always; padding-top: 20px;">
+                    <h3 style="font-size: 18px; color: #475569; font-family: sans-serif; margin-bottom: 15px; text-align: center;">
+                        Diagrama Unifilar
+                    </h3>
+                    <div style="display: flex; justify-content: center; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px;">
+                        ${unifilarSVG}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(tempContainer);
+
             const opt = {
-                margin:       0.5,
-                filename:     `Diagrama_${state.currentTab}_${state.sys}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+                margin:       0.3,
+                filename:     `Projeto_QDC_${sysName}.pdf`,
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 2, useCORS: true, windowWidth: 1200 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' },
+                pagebreak:    { mode: ['css', 'legacy'] }
             };
-            html2pdf().set(opt).from(element).save();
+
+            // Gera, salva e depois remove o container temporário
+            html2pdf().set(opt).from(tempContainer).save().then(() => {
+                document.body.removeChild(tempContainer);
+            });
         }
 
         function renderFormControls() {
