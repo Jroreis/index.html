@@ -1,0 +1,579 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador Interativo de Quadro Elétrico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .svg-container {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            overflow: auto;
+            min-height: 600px;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .tab-btn.active {
+            background-color: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 flex flex-col h-screen overflow-hidden">
+
+    <header class="text-center mb-4 flex-shrink-0">
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-800">Gerador Dinâmico de QDC Monofásico</h1>
+        <p class="text-sm text-slate-500">Adicione os componentes e o diagrama será gerado automaticamente.</p>
+    </header>
+
+    <div class="flex flex-col md:flex-row gap-6 flex-1 overflow-hidden">
+        
+        <!-- ==================== SIDEBAR / FORMULÁRIO ==================== -->
+        <aside class="w-full md:w-80 lg:w-96 bg-white p-5 rounded-xl shadow-md overflow-y-auto flex-shrink-0 flex flex-col gap-6 border border-slate-200">
+            
+            <!-- Configuração de Entrada -->
+            <div>
+                <h3 class="font-semibold text-slate-700 mb-3 flex items-center border-b pb-2">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Entrada e Proteção Geral
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1">Disjuntor Geral (A)</label>
+                        <select id="geral-amp" class="w-full text-sm border-slate-300 rounded-md shadow-sm border p-2 bg-slate-50 focus:ring-blue-500 focus:border-blue-500" onchange="renderApp()">
+                            <option value="32">32A</option>
+                            <option value="40">40A</option>
+                            <option value="50">50A</option>
+                            <option value="63" selected>63A</option>
+                            <option value="80">80A</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1">Cabo Entrada (mm²)</label>
+                        <select id="geral-cabo" class="w-full text-sm border-slate-300 rounded-md shadow-sm border p-2 bg-slate-50 focus:ring-blue-500 focus:border-blue-500" onchange="renderApp()">
+                            <option value="6">6 mm²</option>
+                            <option value="10" selected>10 mm²</option>
+                            <option value="16">16 mm²</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mt-4 space-y-2">
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" id="has-dps" checked class="form-checkbox h-4 w-4 text-blue-600 border-slate-300 rounded" onchange="renderApp()">
+                        <span class="text-sm font-medium text-slate-700">Incluir DPS (Proteção contra Surto)</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" id="has-dr" checked class="form-checkbox h-4 w-4 text-blue-600 border-slate-300 rounded" onchange="renderApp()">
+                        <span class="text-sm font-medium text-slate-700">Incluir DR (Proteção contra Choque)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Circuitos -->
+            <div class="flex-1 flex flex-col min-h-0">
+                <h3 class="font-semibold text-slate-700 mb-3 flex items-center border-b pb-2">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    Circuitos de Distribuição
+                </h3>
+                
+                <div id="circuit-list" class="flex-1 overflow-y-auto space-y-3 pr-1">
+                    <!-- Circuitos inseridos via JS -->
+                </div>
+
+                <button onclick="addCircuit()" class="mt-4 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold py-2 px-4 border border-slate-300 rounded shadow-sm flex items-center justify-center transition-colors">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Adicionar Circuito
+                </button>
+            </div>
+        </aside>
+
+        <!-- ==================== ÁREA DE DESENHO ==================== -->
+        <main class="flex-1 flex flex-col bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
+            
+            <div class="flex border-b border-slate-200 bg-slate-50 px-4 py-3 gap-2">
+                <button onclick="switchTab('fisico')" id="btn-fisico" class="tab-btn active px-4 py-2 rounded-md text-sm font-semibold text-slate-600 bg-white shadow-sm border border-slate-200 hover:bg-slate-100 transition-colors">
+                    Esquema Físico
+                </button>
+                <button onclick="switchTab('unifilar')" id="btn-unifilar" class="tab-btn px-4 py-2 rounded-md text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors">
+                    Diagrama Unifilar
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-auto bg-slate-100 relative w-full h-full p-4 flex items-center justify-center">
+                <div id="svg-render-area" class="w-full h-full max-w-5xl bg-white rounded shadow-sm flex items-center justify-center min-h-[600px] border border-slate-200">
+                    <!-- SVG Gerado será injetado aqui -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- Estado da Aplicação ---
+        const state = {
+            geral: { amp: 63, cabo: 10 },
+            hasDPS: true,
+            hasDR: true,
+            circuitos: [
+                { id: 1, nome: 'Chuveiro', amp: 50, cabo: '6.0', type: 'FNT' },
+                { id: 2, nome: 'Tomadas', amp: 20, cabo: '2.5', type: 'FNT' },
+                { id: 3, nome: 'Iluminação', amp: 16, cabo: '1.5', type: 'FNT' }
+            ],
+            currentTab: 'fisico'
+        };
+
+        let nextCircuitId = 4;
+
+        // --- Funções de UI e Interação ---
+        function addCircuit() {
+            state.circuitos.push({
+                id: nextCircuitId++,
+                nome: `Circuito ${state.circuitos.length + 1}`,
+                amp: 20,
+                cabo: '2.5',
+                type: 'FNT'
+            });
+            renderApp();
+        }
+
+        function removeCircuit(id) {
+            state.circuitos = state.circuitos.filter(c => c.id !== id);
+            renderApp();
+        }
+
+        function updateCircuit(id, field, value) {
+            const circuito = state.circuitos.find(c => c.id === id);
+            if (circuito) {
+                circuito[field] = field === 'amp' ? parseInt(value) : value;
+                renderApp();
+            }
+        }
+
+        function switchTab(tab) {
+            state.currentTab = tab;
+            document.getElementById('btn-fisico').classList.remove('active', 'bg-blue-600', 'text-white');
+            document.getElementById('btn-unifilar').classList.remove('active', 'bg-blue-600', 'text-white');
+            
+            const activeBtn = document.getElementById(`btn-${tab}`);
+            activeBtn.classList.add('active');
+            activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+            
+            renderApp();
+        }
+
+        // --- Atualização do DOM do Formulário ---
+        function renderFormControls() {
+            // Sincroniza Entradas
+            state.geral.amp = parseInt(document.getElementById('geral-amp').value);
+            state.geral.cabo = parseInt(document.getElementById('geral-cabo').value);
+            state.hasDPS = document.getElementById('has-dps').checked;
+            state.hasDR = document.getElementById('has-dr').checked;
+
+            const listContainer = document.getElementById('circuit-list');
+            listContainer.innerHTML = '';
+
+            state.circuitos.forEach((c, index) => {
+                const div = document.createElement('div');
+                div.className = 'bg-slate-50 border border-slate-200 rounded-lg p-3 relative';
+                div.innerHTML = `
+                    <button onclick="removeCircuit(${c.id})" class="absolute top-2 right-2 text-slate-400 hover:text-red-500" title="Remover Circuito">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                    <div class="mb-2 pr-6">
+                        <input type="text" value="${c.nome}" onchange="updateCircuit(${c.id}, 'nome', this.value)" class="w-full text-sm font-semibold bg-transparent border-b border-slate-300 focus:border-blue-500 focus:outline-none p-1 text-slate-700">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[10px] uppercase font-bold text-slate-500">Disjuntor</label>
+                            <select onchange="updateCircuit(${c.id}, 'amp', this.value)" class="w-full text-xs p-1 border rounded bg-white">
+                                ${[10, 16, 20, 25, 32, 40, 50, 63].map(v => `<option value="${v}" ${c.amp === v ? 'selected' : ''}>${v}A</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] uppercase font-bold text-slate-500">Cabo (mm²)</label>
+                            <select onchange="updateCircuit(${c.id}, 'cabo', this.value)" class="w-full text-xs p-1 border rounded bg-white">
+                                ${['1.5', '2.5', '4.0', '6.0', '10'].map(v => `<option value="${v}" ${c.cabo === v ? 'selected' : ''}>${v}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+
+        // --- Geração de SVG (Templates e Helpers) ---
+        const svgDefs = `
+            <defs>
+                <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="1" dy="3" stdDeviation="2" flood-opacity="0.15"/></filter>
+                <g id="screw"><circle cx="0" cy="0" r="3" fill="#94a3b8" stroke="#64748b" stroke-width="1"/><line x1="-2" y1="0" x2="2" y2="0" stroke="#475569"/><line x1="0" y1="-2" x2="0" y2="2" stroke="#475569"/></g>
+                
+                <!-- Disjuntor 1 Polo -->
+                <g id="breaker">
+                    <rect x="0" y="0" width="40" height="90" rx="3" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+                    <rect x="5" y="5" width="30" height="15" rx="2" fill="#e2e8f0" />
+                    <rect x="5" y="70" width="30" height="15" rx="2" fill="#e2e8f0" />
+                    <use href="#screw" x="20" y="12.5" />
+                    <use href="#screw" x="20" y="77.5" />
+                    <rect x="12" y="35" width="16" height="20" rx="2" fill="#334155" />
+                    <rect x="12" y="32" width="16" height="10" rx="2" fill="#ef4444" />
+                </g>
+                
+                <!-- DPS -->
+                <g id="dps">
+                    <rect x="0" y="0" width="40" height="90" rx="3" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+                    <rect x="5" y="5" width="30" height="15" rx="2" fill="#e2e8f0" />
+                    <rect x="5" y="70" width="30" height="15" rx="2" fill="#e2e8f0" />
+                    <use href="#screw" x="20" y="12.5" />
+                    <use href="#screw" x="20" y="77.5" />
+                    <rect x="5" y="30" width="30" height="30" fill="#fca5a5" /> <!-- Indicador vermelho/verde -->
+                    <text x="20" y="50" text-anchor="middle" font-size="10" font-weight="bold" fill="#7f1d1d">DPS</text>
+                </g>
+
+                <!-- DR (2 Polos) -->
+                <g id="dr">
+                    <rect x="0" y="0" width="80" height="90" rx="3" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+                    <!-- Terminais Fase (Esq) -->
+                    <rect x="5" y="5" width="30" height="15" rx="2" fill="#e2e8f0" />
+                    <use href="#screw" x="20" y="12.5" />
+                    <rect x="5" y="70" width="30" height="15" rx="2" fill="#e2e8f0" />
+                    <use href="#screw" x="20" y="77.5" />
+                    <!-- Terminais Neutro (Dir) -->
+                    <rect x="45" y="5" width="30" height="15" rx="2" fill="#e2e8f0" />
+                    <use href="#screw" x="60" y="12.5" />
+                    <rect x="45" y="70" width="30" height="15" rx="2" fill="#e2e8f0" />
+                    <use href="#screw" x="60" y="77.5" />
+                    
+                    <rect x="15" y="35" width="30" height="20" rx="2" fill="#334155" />
+                    <rect x="15" y="32" width="30" height="10" rx="2" fill="#3b82f6" /> <!-- Alavanca azul -->
+                    <circle cx="60" cy="45" r="5" fill="#e2e8f0" stroke="#94a3b8" /> <!-- Botão Teste -->
+                    <text x="60" y="60" text-anchor="middle" font-size="8" fill="#64748b">TESTE</text>
+                </g>
+                
+                <!-- Unifilar Symbols -->
+                <g id="uni-breaker"><line x1="0" y1="0" x2="0" y2="15" stroke="#000" stroke-width="2"/><line x1="-5" y1="15" x2="5" y2="15" stroke="#000" stroke-width="2"/><path d="M -5 15 A 5 5 0 0 0 5 15" fill="none" stroke="#000" stroke-width="2"/><line x1="0" y1="15" x2="0" y2="30" stroke="#000" stroke-width="2"/></g>
+                <g id="sym-fase"><line x1="-6" y1="-6" x2="6" y2="6" stroke="#000" stroke-width="1.5"/></g>
+                <g id="sym-neutro"><line x1="-6" y1="-6" x2="6" y2="6" stroke="#000" stroke-width="1.5"/><line x1="-6" y1="-6" x2="-2" y2="-10" stroke="#000" stroke-width="1.5"/></g>
+                <g id="sym-terra"><line x1="-6" y1="-6" x2="6" y2="6" stroke="#000" stroke-width="1.5"/><line x1="-4" y1="9" x2="4" y2="-1" stroke="#000" stroke-width="1.5"/></g>
+                <g id="sym-fnt"><use href="#sym-fase" x="-8" /><use href="#sym-neutro" x="0" /><use href="#sym-terra" x="8" /></g>
+            </defs>
+        `;
+
+        function generateFisicoSVG() {
+            // Cálculo de larguras
+            const numComponents = 1 + (state.hasDPS ? 1 : 0) + (state.hasDR ? 2 : 0) + state.circuitos.length;
+            const compSpacing = 50; // Largura do componente + margem
+            const railWidth = numComponents * compSpacing + 40;
+            const svgWidth = Math.max(800, railWidth + 300); // Garante tamanho mínimo
+            const svgHeight = 600;
+            
+            let svgContent = `<svg viewBox="0 0 ${svgWidth} ${svgHeight}" class="w-full h-auto drop-shadow-md rounded bg-slate-50 border border-slate-200" xmlns="http://www.w3.org/2000/svg">`;
+            svgContent += svgDefs;
+
+            // Fundo
+            svgContent += `<rect x="40" y="40" width="${svgWidth - 80}" height="520" fill="none" stroke="#e2e8f0" stroke-width="2" rx="10" stroke-dasharray="5 5"/>`;
+
+            // Barramentos Laterais
+            const barNeutralX = 80;
+            const barEarthX = svgWidth - 110;
+            
+            // Neutro
+            svgContent += `
+                <rect x="${barNeutralX}" y="150" width="30" height="300" rx="3" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+                <text x="${barNeutralX + 15}" y="140" text-anchor="middle" font-size="12" font-weight="bold" fill="#2563eb">NEUTRO</text>
+            `;
+            for(let i=170; i<=430; i+=30) svgContent += `<use href="#screw" x="${barNeutralX+15}" y="${i}" />`;
+
+            // Terra
+            svgContent += `
+                <rect x="${barEarthX}" y="150" width="30" height="300" rx="3" fill="#f0fdf4" stroke="#22c55e" stroke-width="2" filter="url(#shadow)"/>
+                <text x="${barEarthX + 15}" y="140" text-anchor="middle" font-size="12" font-weight="bold" fill="#16a34a">TERRA</text>
+            `;
+            for(let i=170; i<=430; i+=30) svgContent += `<use href="#screw" x="${barEarthX+15}" y="${i}" />`;
+
+            // Trilho DIN
+            const startX = 200;
+            svgContent += `<rect x="${startX - 20}" y="255" width="${railWidth}" height="30" fill="#cbd5e1" stroke="#94a3b8" rx="2"/>`;
+            svgContent += `<line x1="${startX - 20}" y1="270" x2="${startX - 20 + railWidth}" y2="270" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4"/>`;
+
+            // --- Posicionamento dos Componentes ---
+            let currentX = startX;
+            let componentsHTML = '';
+            let wiringHTML = '';
+
+            // 1. GERAL
+            const geralX = currentX;
+            componentsHTML += `
+                <g transform="translate(${geralX}, 225)">
+                    <use href="#breaker" />
+                    <text x="20" y="-10" text-anchor="middle" font-size="12" font-weight="bold" fill="#334155">GERAL</text>
+                    <text x="20" y="28" text-anchor="middle" font-size="9" font-weight="bold" fill="#ffffff">C${state.geral.amp}</text>
+                </g>`;
+            
+            // Entrada Fase Geral
+            wiringHTML += `<path d="M ${geralX + 20} 50 L ${geralX + 20} 225" fill="none" stroke="#ef4444" stroke-width="4"/>`;
+            wiringHTML += `<text x="${geralX + 30}" y="70" font-size="11" font-weight="bold" fill="#ef4444">Fase (${state.geral.cabo}mm)</text>`;
+            
+            currentX += 50;
+
+            // 2. DPS
+            let dpsX = 0;
+            if (state.hasDPS) {
+                dpsX = currentX;
+                componentsHTML += `
+                    <g transform="translate(${dpsX}, 225)">
+                        <use href="#dps" />
+                    </g>`;
+                
+                // Conexão Terra DPS -> Barramento Terra
+                wiringHTML += `<path d="M ${dpsX + 20} 315 L ${dpsX + 20} 380 L ${barEarthX + 15} 380" fill="none" stroke="#22c55e" stroke-width="3" stroke-linejoin="round"/>`;
+                currentX += 50;
+            }
+
+            // 3. DR
+            let drX = 0;
+            if (state.hasDR) {
+                drX = currentX;
+                componentsHTML += `
+                    <g transform="translate(${drX}, 225)">
+                        <use href="#dr" />
+                        <text x="40" y="-10" text-anchor="middle" font-size="12" font-weight="bold" fill="#334155">IDR Geral</text>
+                    </g>`;
+                
+                // Entrada Neutro DR
+                wiringHTML += `<path d="M ${drX + 60} 50 L ${drX + 60} 225" fill="none" stroke="#3b82f6" stroke-width="4"/>`;
+                wiringHTML += `<text x="${drX + 70}" y="70" font-size="11" font-weight="bold" fill="#3b82f6">Neutro In</text>`;
+                
+                // Saída Neutro DR -> Barramento Neutro (por baixo)
+                wiringHTML += `<path d="M ${drX + 60} 315 L ${drX + 60} 350 L ${barNeutralX + 15} 350" fill="none" stroke="#3b82f6" stroke-width="4" stroke-linejoin="round"/>`;
+
+                currentX += 90; // DR ocupa espaço duplo (80 + 10 margin)
+            } else {
+                // Se não tem DR, Neutro vai direto pro barramento
+                wiringHTML += `<path d="M ${barNeutralX + 15} 50 L ${barNeutralX + 15} 170" fill="none" stroke="#3b82f6" stroke-width="4"/>`;
+                wiringHTML += `<text x="${barNeutralX + 25}" y="70" font-size="11" font-weight="bold" fill="#3b82f6">Neutro In</text>`;
+            }
+
+            // Entrada Terra Principal
+            wiringHTML += `<path d="M ${barEarthX + 15} 50 L ${barEarthX + 15} 170" fill="none" stroke="#22c55e" stroke-width="4"/>`;
+            wiringHTML += `<text x="${barEarthX - 50}" y="70" font-size="11" font-weight="bold" fill="#22c55e">Terra In</text>`;
+
+            // --- Lógica do Cabo Alimentador Fase ---
+            // Geral (Baixo) -> DR (Cima) E/OU Pente (Cima)
+            
+            let caboFaseDerivacaoD = `M ${geralX + 20} 315 L ${geralX + 20} 340`; // Desce do Geral
+            const loopX = (drX || dpsX || currentX) - 25; // Sobe no vão antes do próximo componente
+            
+            caboFaseDerivacaoD += ` L ${loopX} 340 L ${loopX} 190`; // Faz a volta por baixo e sobe
+            
+            if (state.hasDPS) {
+                // Deriva pra cima do DPS
+                caboFaseDerivacaoD += ` L ${dpsX + 20} 190 L ${dpsX + 20} 225`; 
+                caboFaseDerivacaoD += ` M ${dpsX + 20} 190`; // Volta pro tronco
+            }
+            
+            if (state.hasDR) {
+                // Entra no DR
+                caboFaseDerivacaoD += ` L ${drX + 20} 190 L ${drX + 20} 225`;
+            } else {
+                // Se não tem DR, vai direto pro Pente dos circuitos
+                caboFaseDerivacaoD += ` L ${currentX + 20} 190 L ${currentX + 20} 225`;
+            }
+            wiringHTML += `<path d="${caboFaseDerivacaoD}" fill="none" stroke="#ef4444" stroke-width="4" stroke-linejoin="round"/>`;
+
+            // Saída do DR (se houver) para o Barramento Pente
+            let penteStartX = currentX + 20;
+            if (state.hasDR) {
+                wiringHTML += `<path d="M ${drX + 20} 315 L ${drX + 20} 340 L ${loopX + 10} 340 L ${loopX + 10} 200 L ${penteStartX} 200 L ${penteStartX} 225" fill="none" stroke="#ef4444" stroke-width="4" stroke-linejoin="round"/>`;
+            }
+
+            // 4. CIRCUITOS E BARRAMENTO PENTE
+            const circuitosXStart = currentX;
+            let lastCircuitX = currentX;
+
+            state.circuitos.forEach((circ, index) => {
+                componentsHTML += `
+                    <g transform="translate(${currentX}, 225)">
+                        <use href="#breaker" />
+                        <text x="20" y="-10" text-anchor="middle" font-size="10" font-weight="bold" fill="#334155">${circ.nome.substring(0,8)}</text>
+                        <text x="20" y="28" text-anchor="middle" font-size="9" font-weight="bold" fill="#ffffff">C${circ.amp}</text>
+                    </g>`;
+                
+                // Saídas dos Circuitos (Embaixo)
+                let yOut = 450 + (index * 30); // Escalonar as saídas para não cruzar feio
+                
+                // Fase do disjuntor
+                wiringHTML += `<path d="M ${currentX + 20} 315 L ${currentX + 20} ${yOut}" fill="none" stroke="#ef4444" stroke-width="2"/>`;
+                
+                // Neutro do barramento
+                let neutroY = 200 + (index * 20);
+                wiringHTML += `<path d="M ${barNeutralX + 15} ${neutroY} L ${currentX - 5} ${neutroY} L ${currentX - 5} ${yOut}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round"/>`;
+                
+                // Terra do barramento
+                let terraY = 200 + (index * 20);
+                wiringHTML += `<path d="M ${barEarthX + 15} ${terraY} L ${currentX + 45} ${terraY} L ${currentX + 45} ${yOut}" fill="none" stroke="#22c55e" stroke-width="2" stroke-linejoin="round"/>`;
+                
+                // Label de Saída
+                wiringHTML += `<rect x="${currentX - 10}" y="${yOut}" width="60" height="20" rx="2" fill="#f8fafc" stroke="#cbd5e1" />`;
+                wiringHTML += `<text x="${currentX + 20}" y="${yOut + 14}" text-anchor="middle" font-size="9" font-weight="bold" fill="#475569">${circ.nome}</text>`;
+
+                lastCircuitX = currentX;
+                currentX += 50;
+            });
+
+            // Barramento Pente Fisico (Cobre)
+            if (state.circuitos.length > 0) {
+                const penteEndX = lastCircuitX + 20;
+                wiringHTML += `<path d="M ${penteStartX} 225 L ${penteEndX} 225" fill="none" stroke="#d97706" stroke-width="5" stroke-linecap="square"/>`;
+                // Dentes
+                for(let cx = penteStartX; cx <= penteEndX; cx += 50) {
+                    wiringHTML += `<path d="M ${cx} 225 L ${cx} 235" fill="none" stroke="#d97706" stroke-width="3"/>`;
+                }
+                wiringHTML += `<text x="${penteStartX + (penteEndX - penteStartX)/2}" y="215" text-anchor="middle" font-size="9" font-weight="bold" fill="#b45309">Barramento Pente (Fase)</text>`;
+            }
+
+            svgContent += wiringHTML;
+            svgContent += componentsHTML;
+            svgContent += `</svg>`;
+            return svgContent;
+        }
+
+        function generateUnifilarSVG() {
+            const numCircs = state.circuitos.length;
+            const svgWidth = Math.max(800, 200 + (numCircs * 100));
+            let svgContent = `<svg viewBox="0 0 ${svgWidth} 600" class="w-full h-auto bg-white rounded border border-slate-200" xmlns="http://www.w3.org/2000/svg">`;
+            svgContent += svgDefs;
+
+            let layoutHTML = '';
+            
+            // Entrada e Geral
+            layoutHTML += `<text x="100" y="50" font-size="14" font-weight="bold">REDE MONOFÁSICA</text>`;
+            layoutHTML += `<line x1="150" y1="60" x2="150" y2="150" stroke="#000" stroke-width="2"/>`;
+            
+            // Símbolo Entrada (FNT)
+            layoutHTML += `
+                <g transform="translate(150, 90)">
+                    <use href="#sym-fnt" />
+                    <text x="25" y="5" font-size="12">${state.geral.cabo} mm²</text>
+                </g>
+            `;
+
+            let currentY = 150;
+
+            // Disjuntor Geral
+            layoutHTML += `
+                <use href="#uni-breaker" x="150" y="${currentY}" />
+                <text x="170" y="${currentY + 15}" font-size="12" font-weight="bold">Disj. Geral</text>
+                <text x="170" y="${currentY + 30}" font-size="11">1x ${state.geral.amp}A</text>
+            `;
+            layoutHTML += `<line x1="150" y1="${currentY+30}" x2="150" y2="${currentY+70}" stroke="#000" stroke-width="2"/>`;
+            currentY += 70;
+
+            // DPS
+            if (state.hasDPS) {
+                layoutHTML += `
+                    <rect x="140" y="${currentY}" width="20" height="20" fill="none" stroke="#000" stroke-width="1.5" />
+                    <text x="170" y="${currentY + 15}" font-size="12" font-weight="bold" fill="#7f1d1d">DPS (Fase-Terra)</text>
+                    <line x1="150" y1="${currentY+20}" x2="150" y2="${currentY+60}" stroke="#000" stroke-width="2"/>
+                `;
+                currentY += 60;
+            }
+
+            // DR
+            if (state.hasDR) {
+                layoutHTML += `
+                    <rect x="135" y="${currentY}" width="30" height="20" rx="2" fill="none" stroke="#000" stroke-width="1.5" />
+                    <text x="150" y="${currentY+15}" text-anchor="middle" font-size="10" font-weight="bold">IDR</text>
+                    <text x="175" y="${currentY + 15}" font-size="12" font-weight="bold" fill="#1d4ed8">DR 2 Polos (30mA)</text>
+                    <line x1="150" y1="${currentY+20}" x2="150" y2="${currentY+60}" stroke="#000" stroke-width="2"/>
+                `;
+                currentY += 60;
+            }
+
+            // Barramento Principal (Linha horizontal do QDC)
+            const qdcY = currentY;
+            const endQdcX = 150 + (numCircs * 100);
+            layoutHTML += `<line x1="150" y1="${qdcY}" x2="${endQdcX}" y2="${qdcY}" stroke="#000" stroke-width="3"/>`;
+            layoutHTML += `<text x="${150 + ((endQdcX-150)/2)}" y="${qdcY - 10}" text-anchor="middle" font-size="12" font-style="italic">Quadro de Distribuição (QDC)</text>`;
+
+            // Derivações dos Circuitos
+            state.circuitos.forEach((circ, index) => {
+                const circX = 250 + (index * 100);
+                
+                // Conexão ao barramento
+                layoutHTML += `<line x1="${circX}" y1="${qdcY}" x2="${circX}" y2="${qdcY + 30}" stroke="#000" stroke-width="1.5"/>`;
+                
+                // Disjuntor Circuito
+                layoutHTML += `
+                    <use href="#uni-breaker" x="${circX}" y="${qdcY + 30}" />
+                    <text x="${circX + 15}" y="${qdcY + 45}" font-size="12" font-weight="bold">C${index+1}</text>
+                    <text x="${circX + 15}" y="${qdcY + 60}" font-size="11">1x ${circ.amp}A</text>
+                `;
+
+                // Fio descendo
+                layoutHTML += `<line x1="${circX}" y1="${qdcY + 60}" x2="${circX}" y2="${qdcY + 150}" stroke="#000" stroke-width="1.5"/>`;
+
+                // Símbolos FNT do circuito
+                layoutHTML += `
+                    <g transform="translate(${circX}, ${qdcY + 100})">
+                        <use href="#sym-fnt" />
+                        <text x="25" y="5" font-size="11">${circ.cabo} mm²</text>
+                    </g>
+                `;
+
+                // Caixinha de destino
+                layoutHTML += `
+                    <rect x="${circX - 40}" y="${qdcY + 150}" width="80" height="25" fill="#f8fafc" stroke="#94a3b8" rx="2" />
+                    <text x="${circX}" y="${qdcY + 167}" text-anchor="middle" font-size="11" font-weight="bold">${circ.nome}</text>
+                `;
+            });
+
+            // Legenda Inferior
+            layoutHTML += `
+                <rect x="30" y="500" width="220" height="80" fill="none" stroke="#cbd5e1" stroke-dasharray="4"/>
+                <text x="140" y="520" text-anchor="middle" font-size="11" font-weight="bold">Legenda</text>
+                
+                <use href="#sym-fase" x="60" y="540"/><text x="75" y="544" font-size="10">Fase</text>
+                <use href="#sym-neutro" x="140" y="540"/><text x="155" y="544" font-size="10">Neutro</text>
+                <use href="#sym-terra" x="60" y="565"/><text x="75" y="569" font-size="10">Terra (PE)</text>
+                <use href="#uni-breaker" x="140" y="555" transform="scale(0.8)"/><text x="155" y="569" font-size="10">Disjuntor</text>
+            `;
+
+            svgContent += layoutHTML;
+            svgContent += `</svg>`;
+            return svgContent;
+        }
+
+        function renderApp() {
+            renderFormControls();
+            
+            const renderArea = document.getElementById('svg-render-area');
+            
+            if (state.currentTab === 'fisico') {
+                renderArea.innerHTML = generateFisicoSVG();
+            } else {
+                renderArea.innerHTML = generateUnifilarSVG();
+            }
+        }
+
+        // Inicialização
+        window.onload = () => {
+            renderApp();
+        };
+
+    </script>
+</body>
+</html>
+```
