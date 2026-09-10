@@ -187,16 +187,14 @@
             state.sys = document.getElementById('sys-type').value;
             const maxPoles = getNumPhases();
             
-            <comment-tag id="1">state.circuitos.forEach(c => {
-                if (c.poles > maxPoles) c.poles = maxPoles;
-            });</comment-tag id="1" text="state.circuitos.forEach(c => {
+            state.circuitos.forEach(c => {
                 if (c.poles > maxPoles) {
                     c.poles = maxPoles;
                     if (c.poles === 1) c.type = 'FNT';
                     else if (c.poles === 2) c.type = 'FFT';
                     else if (c.poles === 3) c.type = 'FFFT';
                 }
-            });" type="suggestion">
+            });
             renderApp();
         }
 
@@ -219,10 +217,7 @@
 
         function updateCircuit(id, field, value) {
             const c = state.circuitos.find(c => c.id === id);
-            <comment-tag id="2">if (c) {
-                c[field] = (field === 'amp' || field === 'poles') ? parseInt(value) : value;
-                renderApp();
-            }</comment-tag id="2" text="if (c) {
+            if (c) {
                 c[field] = (field === 'amp' || field === 'poles') ? parseInt(value) : value;
                 
                 if (field === 'poles') {
@@ -232,7 +227,7 @@
                 }
                 
                 renderApp();
-            }" type="suggestion">
+            }
         }
 
         function switchTab(tab) {
