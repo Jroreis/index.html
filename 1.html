@@ -24,24 +24,12 @@
             border-color: #2563eb;
         }
 
-        /* ----- Lógica de Impressão PDF Inteligente (A4 Paisagem) ----- */
+        /* ----- Print Logic ----- */
         @media print {
-            body { background: white; margin: 0; padding: 0; }
-            body * { visibility: hidden; }
-            
-            #svg-render-area, #svg-render-area * { visibility: visible; }
-            #svg-render-area { 
-                position: absolute; 
-                left: 0; 
-                top: 0; 
-                width: 100%; 
-                display: block; 
-                background: white; 
-                border: none;
-                box-shadow: none;
-                overflow: visible;
-            }
-            
+            @page { size: A4 landscape; margin: 0; }
+            body { background: white; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            #ui-wrapper { display: none !important; }
+            #print-wrapper { display: block !important; width: 100%; }
             .print-page { 
                 width: 297mm; 
                 height: 210mm; 
@@ -49,168 +37,155 @@
                 display: flex; 
                 justify-content: center; 
                 align-items: center; 
+                padding: 10mm;
                 box-sizing: border-box;
-                padding: 5mm;
             }
             .print-page svg { 
                 width: 100%; 
                 height: 100%; 
-                max-height: 100%;
                 object-fit: contain; 
             }
-            
-            .no-print { display: none !important; }
-            @page { size: A4 landscape; margin: 0; }
         }
     </style>
 </head>
-<body class="min-h-screen p-4 flex flex-col items-center">
+<body class="min-h-screen flex flex-col items-center">
 
-    <header class="w-full max-w-6xl flex justify-between items-center mb-4 no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-800">QDC Pro Generator</h1>
-            <p class="text-sm text-slate-500">Desenho Físico Inteligente e Diagrama Unifilar (NBR 5410)</p>
-        </div>
-        <button onclick="exportPDF()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-5 rounded-lg shadow-sm flex items-center transition-colors">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-            Exportar PDF
-        </button>
-    </header>
-
-    <!-- ==================== FORMULÁRIO (SUPERIOR) ==================== -->
-    <div class="w-full max-w-6xl bg-white p-5 rounded-xl shadow-md flex flex-col gap-4 border border-slate-200 mb-6 no-print">
+    <!-- WRAPPER DA INTERFACE (Oculto na impressão) -->
+    <div id="ui-wrapper" class="w-full flex flex-col items-center p-4">
         
-        <!-- Dados do Projeto & Sistema -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pb-4 border-b border-slate-100">
+        <header class="w-full max-w-6xl flex justify-between items-center mb-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
             <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Responsável (Eng./Eletricista)</label>
-                <input type="text" id="proj-resp" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50 focus:border-blue-500 outline-none" placeholder="Nome do profissional..." onchange="renderApp()">
+                <h1 class="text-2xl font-bold text-slate-800">QDC Pro Generator</h1>
+                <p class="text-sm text-slate-500">Desenho Físico e Diagrama Unifilar (NBR 5410)</p>
             </div>
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Obra / Cliente</label>
-                <input type="text" id="proj-obra" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50 focus:border-blue-500 outline-none" placeholder="Identificação da obra..." onchange="renderApp()">
+            <button onclick="exportPDF()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-5 rounded-lg shadow-sm flex items-center transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Exportar PDF
+            </button>
+        </header>
+
+        <!-- FORMULÁRIO -->
+        <div class="w-full max-w-6xl bg-white p-5 rounded-xl shadow-md flex flex-col gap-4 border border-slate-200 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pb-4 border-b border-slate-100">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Responsável (Eng./Eletricista)</label>
+                    <input type="text" id="proj-resp" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50 focus:border-blue-500 outline-none" placeholder="Nome do profissional..." onchange="renderApp()">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Obra / Cliente</label>
+                    <input type="text" id="proj-obra" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50 focus:border-blue-500 outline-none" placeholder="Identificação da obra..." onchange="renderApp()">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sistema Elétrico</label>
+                    <select id="sys-type" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50 outline-none" onchange="changeSystem()">
+                        <option value="mono" selected>Monofásico (1F+N)</option>
+                        <option value="bi">Bifásico (2F+N)</option>
+                        <option value="tri">Trifásico (3F+N)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Aterramento (NBR 5410)</label>
+                    <select id="sys-aterramento" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50 outline-none" onchange="renderApp()">
+                        <option value="tn-s" selected>TN-S (Separados)</option>
+                        <option value="tn-c-s">TN-C-S (Jumper N-PE)</option>
+                        <option value="tn-c">TN-C (Comum)</option>
+                        <option value="tt">TT (Independente)</option>
+                        <option value="it">IT (Isolado)</option>
+                    </select>
+                </div>
             </div>
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sistema Elétrico</label>
-                <select id="sys-type" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50 outline-none" onchange="changeSystem()">
-                    <option value="mono" selected>Monofásico (1F+N)</option>
-                    <option value="bi">Bifásico (2F+N)</option>
-                    <option value="tri">Trifásico (3F+N)</option>
-                </select>
+
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 pb-4 border-b border-slate-100">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Qtd. Trilhos (Linhas)</label>
+                    <select id="sys-trilhos" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50 outline-none" onchange="renderApp()">
+                        <option value="1">1 Trilho</option>
+                        <option value="2" selected>2 Trilhos</option>
+                        <option value="3">3 Trilhos</option>
+                        <option value="4">4 Trilhos</option>
+                        <option value="5">5 Trilhos</option>
+                        <option value="6">6 Trilhos</option>
+                        <option value="7">7 Trilhos</option>
+                        <option value="8">8 Trilhos</option>
+                        <option value="9">9 Trilhos</option>
+                        <option value="10">10 Trilhos</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Disjuntor Geral (A)</label>
+                    <select id="geral-amp" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50" onchange="renderApp()">
+                        <option value="40">40A</option>
+                        <option value="50">50A</option>
+                        <option value="63" selected>63A</option>
+                        <option value="80">80A</option>
+                        <option value="100">100A</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Cabo Entrada (mm²)</label>
+                    <select id="geral-cabo" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50" onchange="renderApp()">
+                        <option value="10">10 mm²</option>
+                        <option value="16" selected>16 mm²</option>
+                        <option value="25">25 mm²</option>
+                        <option value="35">35 mm²</option>
+                    </select>
+                </div>
+                <div class="flex items-end pb-2">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="has-dps" checked class="form-checkbox h-4 w-4 text-blue-600 rounded" onchange="renderApp()">
+                        <span class="text-sm font-semibold text-slate-700">Incluir DPS (Surto)</span>
+                    </label>
+                </div>
+                <div class="flex items-end pb-2">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="has-dr" checked class="form-checkbox h-4 w-4 text-blue-600 rounded" onchange="renderApp()">
+                        <span class="text-sm font-semibold text-slate-700">Incluir DR (Geral)</span>
+                    </label>
+                </div>
             </div>
+
             <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Aterramento (NBR 5410)</label>
-                <select id="sys-aterramento" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50 outline-none" onchange="renderApp()">
-                    <option value="tn-s" selected>TN-S (Separados)</option>
-                    <option value="tn-c-s">TN-C-S (Jumper N-PE)</option>
-                    <option value="tn-c">TN-C (Comum)</option>
-                    <option value="tt">TT (Independente)</option>
-                    <option value="it">IT (Isolado)</option>
-                </select>
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-bold text-slate-700 text-sm uppercase">Circuitos de Distribuição</h3>
+                    <button onclick="addCircuit()" class="bg-blue-50 text-blue-600 hover:bg-blue-100 text-xs font-bold py-1.5 px-3 rounded flex items-center transition-colors">
+                        + Adicionar Circuito
+                    </button>
+                </div>
+                <div id="circuit-list" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <!-- Inicia vazio -->
+                </div>
             </div>
         </div>
 
-        <!-- Entrada e Geral -->
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 pb-4 border-b border-slate-100">
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Qtd. Trilhos (Linhas)</label>
-                <select id="sys-trilhos" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50 outline-none" onchange="renderApp()">
-                    <option value="1">1 Trilho</option>
-                    <option value="2" selected>2 Trilhos</option>
-                    <option value="3">3 Trilhos</option>
-                    <option value="4">4 Trilhos</option>
-                    <option value="5">5 Trilhos</option>
-                    <option value="6">6 Trilhos</option>
-                    <option value="7">7 Trilhos</option>
-                    <option value="8">8 Trilhos</option>
-                    <option value="9">9 Trilhos</option>
-                    <option value="10">10 Trilhos</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Disjuntor Geral (A)</label>
-                <select id="geral-amp" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50" onchange="renderApp()">
-                    <option value="40">40A</option>
-                    <option value="50">50A</option>
-                    <option value="63" selected>63A</option>
-                    <option value="80">80A</option>
-                    <option value="100">100A</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Cabo Entrada (mm²)</label>
-                <select id="geral-cabo" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50" onchange="renderApp()">
-                    <option value="10">10 mm²</option>
-                    <option value="16" selected>16 mm²</option>
-                    <option value="25">25 mm²</option>
-                    <option value="35">35 mm²</option>
-                </select>
-            </div>
-            <div class="flex items-end pb-2">
-                <label class="flex items-center space-x-2 cursor-pointer">
-                    <input type="checkbox" id="has-dps" checked class="form-checkbox h-4 w-4 text-blue-600 rounded" onchange="renderApp()">
-                    <span class="text-sm font-semibold text-slate-700">Incluir DPS (Surto)</span>
-                </label>
-            </div>
-            <div class="flex items-end pb-2">
-                <label class="flex items-center space-x-2 cursor-pointer">
-                    <input type="checkbox" id="has-dr" checked class="form-checkbox h-4 w-4 text-blue-600 rounded" onchange="renderApp()">
-                    <span class="text-sm font-semibold text-slate-700">Incluir DR (Geral)</span>
-                </label>
-            </div>
-        </div>
-
-        <!-- Circuitos -->
-        <div>
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="font-bold text-slate-700 text-sm uppercase">Circuitos de Distribuição</h3>
-                <button onclick="addCircuit()" class="bg-blue-50 text-blue-600 hover:bg-blue-100 text-xs font-bold py-1.5 px-3 rounded flex items-center transition-colors">
-                    + Adicionar Circuito
+        <!-- ÁREA DE DESENHO UI -->
+        <main class="w-full max-w-6xl flex flex-col bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
+            <div class="flex border-b border-slate-200 bg-slate-50 px-4 py-3 gap-2">
+                <button onclick="switchTab('fisico')" id="btn-fisico" class="tab-btn active px-4 py-2 rounded-md text-sm font-semibold text-slate-600 bg-white shadow-sm border border-slate-200 transition-colors">
+                    Esquema Físico
+                </button>
+                <button onclick="switchTab('unifilar')" id="btn-unifilar" class="tab-btn px-4 py-2 rounded-md text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors">
+                    Diagrama Unifilar
                 </button>
             </div>
-            <div id="circuit-list" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                <!-- Inicia vazio -->
+            <div class="overflow-auto bg-slate-100 relative w-full p-4 flex items-center justify-center">
+                <div id="svg-render-area" class="w-full max-w-5xl bg-white rounded shadow-sm flex items-center justify-center min-h-[600px] border border-slate-200">
+                    <!-- SVG injetado via JS -->
+                </div>
             </div>
-        </div>
+        </main>
     </div>
 
-    <!-- ==================== ÁREA DE DESENHO ==================== -->
-    <main class="w-full max-w-6xl flex flex-col bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden no-print-border">
-        
-        <div class="flex border-b border-slate-200 bg-slate-50 px-4 py-3 gap-2 no-print">
-            <button onclick="switchTab('fisico')" id="btn-fisico" class="tab-btn active px-4 py-2 rounded-md text-sm font-semibold text-slate-600 bg-white shadow-sm border border-slate-200 transition-colors">
-                Esquema Físico
-            </button>
-            <button onclick="switchTab('unifilar')" id="btn-unifilar" class="tab-btn px-4 py-2 rounded-md text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors">
-                Diagrama Unifilar
-            </button>
-        </div>
-
-        <div class="overflow-auto bg-slate-100 relative w-full p-4 flex items-center justify-center">
-            <div id="svg-render-area" class="w-full max-w-5xl bg-white rounded shadow-sm flex items-center justify-center min-h-[600px] border border-slate-200">
-                <!-- SVG será injetado aqui -->
-            </div>
-        </div>
-    </main>
+    <!-- WRAPPER DO PDF (Oculto na tela, visível na impressão) -->
+    <div id="print-wrapper" style="display: none;"></div>
 
     <script>
-        // --- Estado da Aplicação ---
         const state = {
-            resp: '',
-            obra: '',
-            sistema: 'mono', 
-            aterramento: 'tn-s',
-            numTrilhos: 2,
-            geral: { amp: 63, cabo: 16 },
-            hasDPS: true,
-            hasDR: true,
-            circuitos: [], 
-            currentTab: 'fisico'
+            resp: '', obra: '', sistema: 'mono', aterramento: 'tn-s', numTrilhos: 2,
+            geral: { amp: 63, cabo: 16 }, hasDPS: true, hasDR: true, circuitos: [], currentTab: 'fisico'
         };
 
-        const phaseColors = ['#ef4444', '#000000', '#78716c']; // Vermelho, Preto, Cinza
+        const phaseColors = ['#ef4444', '#000000', '#78716c'];
 
-        // --- SVGs Definitions (Formatos Bonitos Antigos) ---
         const svgDefs = `
             <defs>
                 <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="1" dy="3" stdDeviation="2" flood-opacity="0.15"/></filter>
@@ -222,16 +197,9 @@
             </defs>
         `;
 
-        // --- Funções Lógicas ---
         function addCircuit() {
             const maxPoles = state.sistema === 'mono' ? 1 : (state.sistema === 'bi' ? 2 : 3);
-            state.circuitos.push({
-                id: Date.now(),
-                nome: `Circuito ${state.circuitos.length + 1}`,
-                polos: maxPoles === 3 ? 1 : maxPoles, 
-                amp: 20,
-                cabo: '2.5'
-            });
+            state.circuitos.push({ id: Date.now(), nome: `Circuito ${state.circuitos.length + 1}`, polos: maxPoles === 3 ? 1 : maxPoles, amp: 20, cabo: '2.5' });
             renderApp();
         }
 
@@ -243,52 +211,39 @@
         function changeSystem() {
             state.sistema = document.getElementById('sys-type').value;
             const maxPoles = state.sistema === 'mono' ? 1 : (state.sistema === 'bi' ? 2 : 3);
-            
-            state.circuitos.forEach(c => {
-                if(c.polos > maxPoles) c.polos = maxPoles;
-            });
+            state.circuitos.forEach(c => { if(c.polos > maxPoles) c.polos = maxPoles; });
             renderApp();
         }
 
         function updateCircuit(id, field, value) {
             const c = state.circuitos.find(x => x.id === id);
-            if (c) {
-                c[field] = (field === 'amp' || field === 'polos') ? parseInt(value) : value;
-                renderApp();
-            }
+            if (c) { c[field] = (field === 'amp' || field === 'polos') ? parseInt(value) : value; renderApp(); }
         }
 
         function switchTab(tab) {
             if (tab) state.currentTab = tab;
             document.getElementById('btn-fisico').classList.remove('active', 'bg-blue-600', 'text-white');
             document.getElementById('btn-unifilar').classList.remove('active', 'bg-blue-600', 'text-white');
-            
             const activeBtn = document.getElementById(`btn-${state.currentTab}`);
             activeBtn.classList.add('active');
             activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-100');
-            
-            const renderArea = document.getElementById('svg-render-area');
-            renderArea.innerHTML = state.currentTab === 'fisico' ? generateFisicoSVG() : generateUnifilarSVG();
+            document.getElementById('svg-render-area').innerHTML = state.currentTab === 'fisico' ? generateFisicoSVG() : generateUnifilarSVG();
         }
 
         function exportPDF() {
-            const renderArea = document.getElementById('svg-render-area');
-            
-            // Injeta AMBOS os SVG para a impressão nativa
-            renderArea.innerHTML = `
+            // Injeta as páginas no container de impressão
+            const printWrapper = document.getElementById('print-wrapper');
+            printWrapper.innerHTML = `
                 <div class="print-page">${generateFisicoSVG()}</div>
                 <div class="print-page">${generateUnifilarSVG()}</div>
             `;
-            
-            setTimeout(() => {
-                window.print();
-                switchTab(); 
-            }, 300);
+            // Chama a impressão (O CSS lida com a ocultação da UI)
+            setTimeout(() => { window.print(); }, 200);
         }
 
         function renderFormControls() {
-            state.resp = document.getElementById('proj-resp').value;
-            state.obra = document.getElementById('proj-obra').value;
+            state.resp = document.getElementById('proj-resp').value || 'Não Informado';
+            state.obra = document.getElementById('proj-obra').value || 'Não Informada';
             state.aterramento = document.getElementById('sys-aterramento').value;
             state.numTrilhos = parseInt(document.getElementById('sys-trilhos').value) || 2;
             state.geral.amp = parseInt(document.getElementById('geral-amp').value);
@@ -298,7 +253,6 @@
 
             const list = document.getElementById('circuit-list');
             list.innerHTML = '';
-
             const maxPoles = state.sistema === 'mono' ? 1 : (state.sistema === 'bi' ? 2 : 3);
 
             state.circuitos.forEach((c) => {
@@ -307,7 +261,7 @@
                 if (maxPoles === 3) poleOptions += `<option value="3" ${c.polos===3?'selected':''}>3 Polos</option>`;
 
                 list.innerHTML += `
-                    <div class="bg-slate-50 border border-slate-200 rounded p-2 relative text-xs">
+                    <div class="bg-slate-50 border border-slate-200 rounded p-2 relative text-xs shadow-sm">
                         <button onclick="removeCircuit(${c.id})" class="absolute top-1 right-1 text-red-400 hover:text-red-600 font-bold text-lg leading-none">&times;</button>
                         <input type="text" value="${c.nome}" onchange="updateCircuit(${c.id}, 'nome', this.value)" class="w-[90%] font-bold bg-transparent border-b border-slate-300 focus:border-blue-500 outline-none mb-2 text-slate-700">
                         <div class="grid grid-cols-3 gap-1">
@@ -326,7 +280,6 @@
             });
         }
 
-        // --- Desenhista de Disjuntores (Visual Antigo Bonito) ---
         function drawBreaker(x, y, poles, label, sublabel, type="disj") {
             const w = poles * 40;
             let html = `<g transform="translate(${x}, ${y})">`;
@@ -335,257 +288,206 @@
                 html += `<rect x="${p*40+5}" y="5" width="30" height="15" rx="2" fill="#e2e8f0" /><rect x="${p*40+5}" y="70" width="30" height="15" rx="2" fill="#e2e8f0" />`;
                 html += `<use href="#screw" x="${p*40+20}" y="12.5" /><use href="#screw" x="${p*40+20}" y="77.5" />`;
             }
-            
             if (type === "dps") {
-                for(let p=0; p<poles; p++) {
-                    html += `<rect x="${p*40+5}" y="30" width="30" height="30" fill="#fca5a5" />`; // Visor Vermelho
-                }
+                for(let p=0; p<poles; p++) html += `<rect x="${p*40+5}" y="30" width="30" height="30" fill="#fca5a5" />`; 
             } else if (type === "dr") {
-                html += `<rect x="${(w/2)-15}" y="35" width="30" height="20" rx="2" fill="#334155" />`;
-                html += `<rect x="${(w/2)-15}" y="32" width="30" height="10" rx="2" fill="#3b82f6" />`; // Alavanca Azul
-                html += `<circle cx="${w-20}" cy="45" r="5" fill="#e2e8f0" stroke="#94a3b8" /><text x="${w-20}" y="60" text-anchor="middle" font-size="8" fill="#64748b">TESTE</text>`;
-            } else { // Disjuntor Normal
-                html += `<rect x="${(w/2)-10}" y="35" width="20" height="20" rx="2" fill="#334155" />`;
-                html += `<rect x="${(w/2)-10}" y="32" width="20" height="10" rx="2" fill="#ef4444" />`; // Alavanca Vermelha
+                html += `<rect x="${(w/2)-15}" y="35" width="30" height="20" rx="2" fill="#334155" /><rect x="${(w/2)-15}" y="32" width="30" height="10" rx="2" fill="#3b82f6" /><circle cx="${w-20}" cy="45" r="5" fill="#e2e8f0" stroke="#94a3b8" /><text x="${w-20}" y="60" text-anchor="middle" font-size="8" fill="#64748b">TESTE</text>`;
+            } else { 
+                html += `<rect x="${(w/2)-10}" y="35" width="20" height="20" rx="2" fill="#334155" /><rect x="${(w/2)-10}" y="32" width="20" height="10" rx="2" fill="#ef4444" />`; 
             }
-
             html += `<text x="${w/2}" y="-10" text-anchor="middle" font-size="11" font-weight="bold" fill="#334155">${label}</text>`;
-            if(sublabel) html += `<text x="${w/2}" y="28" text-anchor="middle" font-size="9" font-weight="bold" fill="#ffffff">${sublabel}</text>`;
-            html += `</g>`;
+            if(sublabel) html += `<text x="${w/2}" y="28" text-anchor="middle" font-size="9" font-weight="bold" fill="#ffffff">${sublabel}</text></g>`;
             return html;
         }
 
-
-        // --- GERAÇÃO: ESQUEMA FÍSICO ---
+        // --- GERAÇÃO FÍSICA ---
         function generateFisicoSVG() {
             const numFases = state.sistema === 'mono' ? 1 : (state.sistema === 'bi' ? 2 : 3);
             const hasMainNeutral = true; 
-            
-            const svgHeight = Math.max(700, 350 + (state.numTrilhos * 180));
+            const svgHeight = Math.max(700, 350 + (state.numTrilhos * 190));
             
             let svg = `<svg viewBox="0 0 1200 ${svgHeight}" class="w-full h-auto bg-white" xmlns="http://www.w3.org/2000/svg">${svgDefs}`;
 
-            // Títulos
-            svg += `<text x="600" y="40" text-anchor="middle" font-size="18" font-weight="bold" fill="#1e293b">QUADRO DE DISTRIBUIÇÃO - SISTEMA ${state.sistema.toUpperCase()}</text>`;
-            svg += `<text x="600" y="60" text-anchor="middle" font-size="12" fill="#64748b">Esquema Físico de Ligação / Simulação Realista</text>`;
-            if (state.resp || state.obra) {
-                svg += `<text x="600" y="80" text-anchor="middle" font-size="11" font-weight="bold" fill="#475569">RESPONSÁVEL: ${state.resp || '-'} | OBRA: ${state.obra || '-'} | ATERRAMENTO: ${state.aterramento.toUpperCase()}</text>`;
-            }
+            // CABEÇALHO OFICIAL (Garante presença no PDF)
+            svg += `<rect x="50" y="20" width="1100" height="70" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" rx="5"/>`;
+            svg += `<text x="600" y="45" text-anchor="middle" font-size="20" font-weight="bold" fill="#1e293b">QUADRO DE DISTRIBUIÇÃO - SISTEMA ${state.sistema.toUpperCase()} (FÍSICO)</text>`;
+            svg += `<text x="600" y="70" text-anchor="middle" font-size="13" font-weight="bold" fill="#475569">RESPONSÁVEL: ${state.resp.toUpperCase()}   |   OBRA/CLIENTE: ${state.obra.toUpperCase()}   |   ATERRAMENTO: ${state.aterramento.toUpperCase()}</text>`;
 
             // Caixa do Quadro
-            svg += `<rect x="50" y="100" width="1100" height="${svgHeight - 140}" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2" rx="10"/>`;
+            svg += `<rect x="50" y="110" width="1100" height="${svgHeight - 130}" fill="#ffffff" stroke="#e2e8f0" stroke-width="2" rx="10"/>`;
 
-            // Barramentos Laterais
-            const barH = svgHeight - 250;
-            const barNY = 150, barPEY = 150;
+            const barH = svgHeight - 200;
+            const barNY = 160, barPEY = 160;
             const busNx = 80, busPEx = 1090;
 
-            // N
+            // Barramento N e PE
             svg += `<rect x="${busNx}" y="${barNY}" width="30" height="${barH}" rx="3" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>`;
             svg += `<text x="${busNx+15}" y="${barNY-10}" text-anchor="middle" font-size="12" font-weight="bold" fill="#2563eb">NEUTRO</text>`;
-            for(let i=170; i<=(150 + barH - 20); i+=30) svg += `<use href="#screw" x="${busNx+15}" y="${i}"/>`;
+            for(let i=180; i<=(160 + barH - 20); i+=30) svg += `<use href="#screw" x="${busNx+15}" y="${i}"/>`;
 
-            // PE
             svg += `<rect x="${busPEx}" y="${barPEY}" width="30" height="${barH}" rx="3" fill="#f0fdf4" stroke="#22c55e" stroke-width="2" filter="url(#shadow)"/>`;
             svg += `<text x="${busPEx+15}" y="${barPEY-10}" text-anchor="middle" font-size="12" font-weight="bold" fill="#16a34a">TERRA</text>`;
-            for(let i=170; i<=(150 + barH - 20); i+=30) svg += `<use href="#screw" x="${busPEx+15}" y="${i}"/>`;
+            for(let i=180; i<=(160 + barH - 20); i+=30) svg += `<use href="#screw" x="${busPEx+15}" y="${i}"/>`;
 
-            // BEP (Barramento de Equipotencialização)
-            const bepX = 900, bepY = 110;
-            svg += `<rect x="${bepX}" y="${bepY}" width="120" height="25" rx="3" fill="#b45309" stroke="#78350f" stroke-width="2" filter="url(#shadow)"/>`;
-            svg += `<text x="${bepX+60}" y="${bepY+17}" text-anchor="middle" font-size="12" font-weight="bold" fill="#ffffff">BEP Principal</text>`;
+            // BEP ORGANIZADO (No Topo Direito)
+            const bepX = 850, bepY = 130;
+            svg += `<rect x="${bepX}" y="${bepY}" width="140" height="25" rx="3" fill="#b45309" stroke="#78350f" stroke-width="2" filter="url(#shadow)"/>`;
+            svg += `<text x="${bepX+70}" y="${bepY+17}" text-anchor="middle" font-size="12" font-weight="bold" fill="#ffffff">BEP Principal</text>`;
+            svg += `<path d="M ${bepX+125} ${bepY+25} L ${bepX+125} 145 L ${busPEx+15} 145 L ${busPEx+15} 160" fill="none" stroke="#22c55e" stroke-width="4" stroke-linejoin="round"/>`; // BEP -> Barramento PE
 
-            // JUMPER N-PE (TN-C ou TN-C-S)
-            const entNx = 250, entPEx = 300; // Coordenadas de entrada
+            // JUMPER N-PE
+            const entNx = 250, entPEx = 300;
             if (state.aterramento === 'tn-c-s' || state.aterramento === 'tn-c') {
-                svg += `<path d="M ${entNx} 125 L ${bepX} 125" fill="none" stroke="#3b82f6" stroke-width="4" stroke-dasharray="8 4"/>`;
-                svg += `<text x="${entNx + (bepX-entNx)/2}" y="120" text-anchor="middle" font-size="10" font-weight="bold" fill="#2563eb">JUMPER N-PE (${state.aterramento.toUpperCase()})</text>`;
+                svg += `<path d="M ${entNx} 142 L ${bepX} 142" fill="none" stroke="#3b82f6" stroke-width="4" stroke-dasharray="8 4"/>`;
+                svg += `<text x="${entNx + (bepX-entNx)/2}" y="137" text-anchor="middle" font-size="10" font-weight="bold" fill="#2563eb">JUMPER N-PE (${state.aterramento.toUpperCase()})</text>`;
             }
-            
-            // Ligação BEP -> Barramento PE
-            svg += `<path d="M ${bepX+110} ${bepY+25} L ${bepX+110} 140 L ${busPEx+15} 140 L ${busPEx+15} 150" fill="none" stroke="#22c55e" stroke-width="4" stroke-linejoin="round"/>`;
 
-
-            // --- COMPONENTES PRINCIPAIS (Fila Superior) ---
-            const yMain = 200;
+            // --- Componentes Principais ---
+            const yMain = 220;
             const xGeral = 350;
             const xDPS = xGeral + (numFases*40) + 40;
-            
-            // Polos DPS: Se tem neutro no sistema, DPS ganha polo pro neutro
             const dpsPolos = numFases + (hasMainNeutral ? 1 : 0);
-            
             const xDR = state.hasDPS ? (xDPS + (dpsPolos*40) + 40) : xDPS;
             const drPolos = numFases + (hasMainNeutral ? 1 : 0);
 
-            // Desenhar Geral
             svg += drawBreaker(xGeral, yMain, numFases, "GERAL", `C${state.geral.amp}`, "disj");
-            
-            // Desenhar DPS
             if (state.hasDPS) svg += drawBreaker(xDPS, yMain, dpsPolos, "DPS (Surto)", "275V", "dps");
-            
-            // Desenhar DR
             if (state.hasDR) svg += drawBreaker(xDR, yMain, drPolos, "IDR GERAL", "30mA", "dr");
 
-
-            // --- ROTEAMENTO SUPERIOR (O Mais Organizado) ---
-            // Fases da Rua -> Geral
+            // Roteamento de Entrada
             for(let f=0; f<numFases; f++) {
                 let px = xGeral + (f*40) + 20;
-                svg += `<path d="M ${px} 100 L ${px} ${yMain}" fill="none" stroke="${phaseColors[f]}" stroke-width="4"/>`;
-                svg += `<text x="${px}" y="95" text-anchor="middle" font-size="12" font-weight="bold" fill="${phaseColors[f]}">F${f+1}</text>`;
+                svg += `<path d="M ${px} 115 L ${px} ${yMain}" fill="none" stroke="${phaseColors[f]}" stroke-width="4"/>`;
+                svg += `<text x="${px}" y="110" text-anchor="middle" font-size="12" font-weight="bold" fill="${phaseColors[f]}">F${f+1}</text>`;
             }
+            svg += `<path d="M ${entNx} 115 L ${entNx} 160" fill="none" stroke="#3b82f6" stroke-width="4"/><text x="${entNx}" y="110" text-anchor="middle" font-size="12" font-weight="bold" fill="#3b82f6">N</text>`;
+            svg += `<path d="M ${entPEx} 115 L ${entPEx} 142 L ${bepX+15} 142" fill="none" stroke="#22c55e" stroke-width="4" stroke-linejoin="round"/><text x="${entPEx}" y="110" text-anchor="middle" font-size="12" font-weight="bold" fill="#22c55e">PE</text>`;
 
-            // Neutro e Terra da Rua
-            svg += `<path d="M ${entNx} 100 L ${entNx} 150" fill="none" stroke="#3b82f6" stroke-width="4"/><text x="${entNx}" y="95" text-anchor="middle" font-size="12" font-weight="bold" fill="#3b82f6">N</text>`;
-            svg += `<path d="M ${entPEx} 100 L ${entPEx} 125 L ${bepX+10} 125" fill="none" stroke="#22c55e" stroke-width="4" stroke-linejoin="round"/><text x="${entPEx}" y="95" text-anchor="middle" font-size="12" font-weight="bold" fill="#22c55e">PE</text>`;
-
-            // Roteamento: Geral (Baixo) -> DR (Cima)
-            const gapY = 175; // Canaleta horizontal por cima do DPS/DR
+            // Roteamento Superior (Geral -> DPS -> DR)
+            const gapY = 195; 
             for(let f=0; f<numFases; f++) {
-                let outX = xGeral + (f*40) + 20;
-                let drInX = xDR + (f*40) + 20;
-                let dropY = yMain + 90 + 15 + (f*5); // Desce escalonado pra não cruzar
-
+                let outX = xGeral + (f*40) + 20, drInX = xDR + (f*40) + 20, dropY = yMain + 90 + 15 + (f*5);
                 if (state.hasDR) {
-                    // Vai pro DR
                     svg += `<path d="M ${outX} ${yMain+90} L ${outX} ${dropY} L ${xGeral-30} ${dropY} L ${xGeral-30} ${gapY-(f*5)} L ${drInX} ${gapY-(f*5)} L ${drInX} ${yMain}" fill="none" stroke="${phaseColors[f]}" stroke-width="3" stroke-linejoin="round"/>`;
-                    
-                    if (state.hasDPS) { // Deriva pro DPS
+                    if (state.hasDPS) {
                         let dpsInX = xDPS + (f*40) + 20;
-                        svg += `<path d="M ${dpsInX} ${gapY-(f*5)} L ${dpsInX} ${yMain}" fill="none" stroke="${phaseColors[f]}" stroke-width="3"/>`;
-                        svg += `<circle cx="${dpsInX}" cy="${gapY-(f*5)}" r="3" fill="${phaseColors[f]}"/>`;
+                        svg += `<path d="M ${dpsInX} ${gapY-(f*5)} L ${dpsInX} ${yMain}" fill="none" stroke="${phaseColors[f]}" stroke-width="3"/><circle cx="${dpsInX}" cy="${gapY-(f*5)}" r="3" fill="${phaseColors[f]}"/>`;
                     }
                 } else if (state.hasDPS) {
-                    // Sem DR, só pro DPS
                     let dpsInX = xDPS + (f*40) + 20;
                     svg += `<path d="M ${outX} ${yMain+90} L ${outX} ${dropY} L ${xGeral-30} ${dropY} L ${xGeral-30} ${gapY-(f*5)} L ${dpsInX} ${gapY-(f*5)} L ${dpsInX} ${yMain}" fill="none" stroke="${phaseColors[f]}" stroke-width="3" stroke-linejoin="round"/>`;
                 }
             }
 
-            // Roteamento Neutro pro DR e DPS
             if (hasMainNeutral) {
-                let drNInX = xDR + (numFases*40) + 20;
-                let dpsNInX = xDPS + (numFases*40) + 20;
-                let nGapY = gapY - (numFases*5);
-
+                let drNInX = xDR + (numFases*40) + 20, dpsNInX = xDPS + (numFases*40) + 20, nGapY = gapY - (numFases*5);
                 if (state.hasDR) {
-                    svg += `<path d="M ${entNx} 150 L ${entNx} ${nGapY} L ${drNInX} ${nGapY} L ${drNInX} ${yMain}" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round"/>`;
-                    if (state.hasDPS) {
-                        svg += `<path d="M ${dpsNInX} ${nGapY} L ${dpsNInX} ${yMain}" fill="none" stroke="#3b82f6" stroke-width="3"/>`;
-                        svg += `<circle cx="${dpsNInX}" cy="${nGapY}" r="3" fill="#3b82f6"/>`;
-                    }
+                    svg += `<path d="M ${entNx} 160 L ${entNx} ${nGapY} L ${drNInX} ${nGapY} L ${drNInX} ${yMain}" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round"/>`;
+                    if (state.hasDPS) svg += `<path d="M ${dpsNInX} ${nGapY} L ${dpsNInX} ${yMain}" fill="none" stroke="#3b82f6" stroke-width="3"/><circle cx="${dpsNInX}" cy="${nGapY}" r="3" fill="#3b82f6"/>`;
                 } else {
-                    svg += `<path d="M ${entNx} 150 L ${busNx+15} 150" fill="none" stroke="#3b82f6" stroke-width="3"/>`; // Vai pro barramento se nao tem DR
-                    if (state.hasDPS) {
-                        svg += `<path d="M ${entNx} 150 L ${entNx} ${nGapY} L ${dpsNInX} ${nGapY} L ${dpsNInX} ${yMain}" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round"/>`;
-                    }
+                    svg += `<path d="M ${entNx} 160 L ${busNx+15} 160" fill="none" stroke="#3b82f6" stroke-width="3"/>`;
+                    if (state.hasDPS) svg += `<path d="M ${entNx} 160 L ${entNx} ${nGapY} L ${dpsNInX} ${nGapY} L ${dpsNInX} ${yMain}" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round"/>`;
                 }
             }
 
-            // Saída do DPS (Aterramento pro BEP)
+            // ATERRAMENTO DPS LIMPO (Issue 2)
             if (state.hasDPS) {
-                let dpsBotY = yMain + 90;
-                let gBusY = dpsBotY + 15; // Unificando saídas
-                svg += `<path d="M ${xDPS+20} ${dpsBotY} L ${xDPS+20} ${gBusY} L ${bepX+20} ${gBusY} L ${bepX+20} ${bepY+25}" fill="none" stroke="#22c55e" stroke-width="3" stroke-linejoin="round"/>`;
+                let dpsBotY = yMain + 90, gBusY = dpsBotY + 20;
+                let upTrunkX = (state.hasDR ? xDR + (drPolos*40) : xDPS + (dpsPolos*40)) + 30; // Sobe pela direita do bloco
+                
+                svg += `<path d="M ${xDPS+20} ${dpsBotY} L ${xDPS+20} ${gBusY} L ${upTrunkX} ${gBusY} L ${upTrunkX} ${bepY+12.5} L ${bepX+140} ${bepY+12.5}" fill="none" stroke="#22c55e" stroke-width="3" stroke-linejoin="round"/>`;
                 for(let i=1; i<dpsPolos; i++) {
                     let px = xDPS + (i*40) + 20;
-                    svg += `<path d="M ${px} ${dpsBotY} L ${px} ${gBusY}" fill="none" stroke="#22c55e" stroke-width="3"/>`;
-                    svg += `<circle cx="${px}" cy="${gBusY}" r="3" fill="#22c55e"/>`;
+                    svg += `<path d="M ${px} ${dpsBotY} L ${px} ${gBusY}" fill="none" stroke="#22c55e" stroke-width="3"/><circle cx="${px}" cy="${gBusY}" r="3" fill="#22c55e"/>`;
                 }
             }
 
-            // TRONCO PRINCIPAL DE DESCIDA (Pela Esquerda)
+            // TRONCO MESTRE FASES ESQUERDA
             const trunkX = 180;
             let sourceX = state.hasDR ? xDR : xGeral;
             for(let f=0; f<numFases; f++) {
-                let px = sourceX + (f*40) + 20;
-                let dropY = yMain + 90 + 35 + (f*6);
-                svg += `<path d="M ${px} ${yMain+90} L ${px} ${dropY} L ${trunkX+(f*10)} ${dropY} L ${trunkX+(f*10)} 350" fill="none" stroke="${phaseColors[f]}" stroke-width="3" stroke-linejoin="round"/>`;
+                let px = sourceX + (f*40) + 20, dropY = yMain + 90 + 40 + (f*6);
+                svg += `<path d="M ${px} ${yMain+90} L ${px} ${dropY} L ${trunkX+(f*10)} ${dropY} L ${trunkX+(f*10)} 370" fill="none" stroke="${phaseColors[f]}" stroke-width="3" stroke-linejoin="round"/>`;
             }
             if (hasMainNeutral && state.hasDR) {
                 let nOutX = sourceX + (numFases*40) + 20;
-                svg += `<path d="M ${nOutX} ${yMain+90} L ${nOutX} 320 L ${busNx+15} 320" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round"/>`;
+                svg += `<path d="M ${nOutX} ${yMain+90} L ${nOutX} 340 L ${busNx+15} 340" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round"/>`;
             }
 
-
-            // --- CIRCUITOS (Organização Limpa em Trilhos) ---
+            // --- CIRCUITOS E ROTEAMENTO ORGANIZADO (Issue 1) ---
             let trilhoIdx = 0;
-            let currentX = 260; // Inicia logo após o tronco
+            let currentX = 260; 
             
             for (let i = 0; i < state.circuitos.length; i++) {
                 let c = state.circuitos[i];
                 let w = c.polos * 40;
                 
-                // Se exceder a largura, desce pro próximo trilho
-                if (currentX + w > 1050) {
-                    trilhoIdx++;
-                    currentX = 260;
-                    if(trilhoIdx >= state.numTrilhos) break;
-                }
+                if (currentX + w > 1050) { trilhoIdx++; currentX = 260; if(trilhoIdx >= state.numTrilhos) break; }
 
-                let cY = 400 + (trilhoIdx * 180);
+                let cY = 410 + (trilhoIdx * 190);
 
-                // Desenha o Trilho DIN físico se estiver no início
+                // Trilho e Pente
                 if (currentX === 260) {
                     svg += `<rect x="230" y="${cY+30}" width="830" height="30" fill="#cbd5e1" stroke="#94a3b8" rx="2"/>`;
-                    // Alimenta Barramento Pente do Tronco
                     for(let f=0; f<numFases; f++) {
-                        svg += `<path d="M ${trunkX+(f*10)} ${cY-20+(f*5)} L ${currentX+(f*40)+20} ${cY-20+(f*5)} L ${currentX+(f*40)+20} ${cY}" fill="none" stroke="${phaseColors[f]}" stroke-width="3" stroke-linejoin="round"/>`;
-                        svg += `<circle cx="${trunkX+(f*10)}" cy="${cY-20+(f*5)}" r="3" fill="${phaseColors[f]}"/>`;
+                        svg += `<path d="M ${trunkX+(f*10)} ${cY-20+(f*5)} L ${currentX+(f*40)+20} ${cY-20+(f*5)} L ${currentX+(f*40)+20} ${cY}" fill="none" stroke="${phaseColors[f]}" stroke-width="3" stroke-linejoin="round"/><circle cx="${trunkX+(f*10)}" cy="${cY-20+(f*5)}" r="3" fill="${phaseColors[f]}"/>`;
                     }
                     svg += `<rect x="${currentX}" y="${cY-15}" width="80" height="10" rx="3" fill="#b45309" stroke="#78350f"/><text x="${currentX+40}" y="${cY-20}" text-anchor="middle" font-size="8" font-weight="bold" fill="#b45309">PENTE</text>`;
                 }
 
                 // Disjuntor
                 svg += drawBreaker(currentX, cY, c.polos, c.nome.substring(0,8), `C${c.amp}`);
-                svg += `<rect x="${currentX+(w/2)-40}" y="${cY+140}" width="80" height="20" rx="2" fill="#f1f5f9" stroke="#cbd5e1"/>`;
-                svg += `<text x="${currentX+(w/2)}" y="${cY+153}" text-anchor="middle" font-size="9" font-weight="bold" fill="#475569">${c.nome} (${c.cabo}mm)</text>`;
-
-                // ROTEAMENTO PARA A CARGA (NUNCA CRUZAM!)
-                let bY = cY + 90; // Bottom do disjuntor
                 
-                // 1. Fases descem reto
+                // CAIXA DO CONDUÍTE / CARGA
+                let labelY = cY + 160;
+                svg += `<rect x="${currentX-10}" y="${labelY}" width="${w+20}" height="20" rx="2" fill="#f1f5f9" stroke="#cbd5e1"/>`;
+                svg += `<text x="${currentX+(w/2)}" y="${labelY+13}" text-anchor="middle" font-size="9" font-weight="bold" fill="#475569">${c.nome} (${c.cabo}mm)</text>`;
+
+                // ROTEAMENTO DESCENDO PARA O CONDUÍTE (Efeito Escada Limpo)
+                let bY = cY + 90; 
+                
+                // 1. Fases
                 for(let p=0; p<c.polos; p++) {
                     let px = currentX + (p*40) + 20;
-                    svg += `<path d="M ${px} ${bY} L ${px} ${cY+140}" fill="none" stroke="${phaseColors[p % numFases]}" stroke-width="2"/>`;
+                    svg += `<path d="M ${px} ${bY} L ${px} ${labelY}" fill="none" stroke="${phaseColors[p % numFases]}" stroke-width="2"/>`;
                 }
                 
-                // 2. Terra sai da direita do grupo e vai pro barramento PE (Altura 120)
-                let dropPE = currentX + (c.polos*40) + 5;
-                svg += `<path d="M ${currentX+20} ${bY} L ${dropPE} ${cY+120}" fill="none" stroke="#22c55e" stroke-width="2" opacity="0"/>`; // Hack alinhamento
-                svg += `<path d="M ${currentX+20} ${cY+140} L ${dropPE} ${cY+120} L ${busPEx+15} ${cY+120}" fill="none" stroke="#22c55e" stroke-width="2" stroke-linejoin="round"/>`;
+                // 2. Terra (Em Degrau, descendo pela lateral)
+                let peY = cY + 120 + ((i%6)*4); // Escada dinâmica suave
+                svg += `<path d="M ${busPEx+15} ${peY} L ${currentX+w+5} ${peY} L ${currentX+w+5} ${labelY}" fill="none" stroke="#22c55e" stroke-width="2" stroke-linejoin="round"/>`;
+                svg += `<circle cx="${busPEx+15}" cy="${peY}" r="2" fill="#22c55e"/>`; // Ponto de conexão no barramento
                 
-                // 3. Neutro (SÓ MONOFÁSICO 1 POLO) sai da esquerda e vai pro barramento N (Altura 105)
+                // 3. Neutro (Em Degrau SÓ MONOFÁSICO 1 POLO)
                 if (c.polos === 1) {
-                    let dropN = currentX - 5;
-                    svg += `<path d="M ${currentX+20} ${cY+140} L ${dropN} ${cY+105} L ${busNx+15} ${cY+105}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round"/>`;
+                    let nY = cY + 105 + ((i%6)*4); // Escada dinâmica suave
+                    svg += `<path d="M ${busNx+15} ${nY} L ${currentX-5} ${nY} L ${currentX-5} ${labelY}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round"/>`;
+                    svg += `<circle cx="${busNx+15}" cy="${nY}" r="2" fill="#3b82f6"/>`; // Ponto de conexão no barramento
                 }
 
-                currentX += w + 15;
+                currentX += w + 20;
             }
 
             svg += `</svg>`;
             return svg;
         }
 
-        // --- GERAÇÃO: DIAGRAMA UNIFILAR (Com Símbolos Originais) ---
+        // --- GERAÇÃO UNIFILAR ---
         function generateUnifilarSVG() {
             const uniWidth = Math.max(1000, 300 + (state.circuitos.length * 100));
             const numFases = state.sistema === 'mono' ? 1 : (state.sistema === 'bi' ? 2 : 3);
 
             let svg = `<svg viewBox="0 0 ${uniWidth} 800" class="w-full h-auto bg-white" xmlns="http://www.w3.org/2000/svg">${svgDefs}`;
             
-            svg += `<text x="${uniWidth/2}" y="40" text-anchor="middle" font-size="16" font-weight="bold">DIAGRAMA UNIFILAR - NBR 5410 (${state.sistema.toUpperCase()})</text>`;
-            if (state.resp || state.obra) {
-                svg += `<text x="${uniWidth/2}" y="60" text-anchor="middle" font-size="12">Responsável: ${state.resp || '-'} | Obra: ${state.obra || '-'}</text>`;
-            }
+            // CABEÇALHO OFICIAL NO DIAGRAMA
+            svg += `<rect x="50" y="20" width="900" height="70" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" rx="5"/>`;
+            svg += `<text x="500" y="45" text-anchor="middle" font-size="20" font-weight="bold" fill="#1e293b">DIAGRAMA UNIFILAR - SISTEMA ${state.sistema.toUpperCase()} (NBR 5410)</text>`;
+            svg += `<text x="500" y="70" text-anchor="middle" font-size="13" font-weight="bold" fill="#475569">RESPONSÁVEL: ${state.resp.toUpperCase()}   |   OBRA/CLIENTE: ${state.obra.toUpperCase()}   |   ATERRAMENTO: ${state.aterramento.toUpperCase()}</text>`;
 
-            let layX = 200, layY = 120;
+            let layX = 200, layY = 150;
 
             svg += `<line x1="${layX}" y1="${layY}" x2="${layX}" y2="${layY+100}" stroke="#000" stroke-width="2"/>`;
             svg += `<text x="${layX}" y="${layY-10}" text-anchor="middle" font-weight="bold">REDE</text>`;
             
-            // Simbologia FNT de Entrada
             svg += `<g transform="translate(${layX}, ${layY+30})">`;
             for(let i=0; i<numFases; i++) svg += `<use href="#sym-fase" x="${i*8 - 8}"/>`;
             svg += `<use href="#sym-neutro" x="${numFases*8}"/><use href="#sym-terra" x="${numFases*8 + 8}"/>`;
@@ -601,7 +503,7 @@
 
             if (state.hasDPS) {
                 svg += `<rect x="${layX-10}" y="${layY}" width="20" height="20" fill="none" stroke="#ef4444" stroke-width="2" />`;
-                svg += `<text x="${layX+20}" y="${layY+15}" font-weight="bold" fill="#dc2626">DPS (${numFases+1}x 275V/45kA)</text>`;
+                svg += `<text x="${layX+20}" y="${layY+15}" font-weight="bold" fill="#dc2626">DPS (${numFases+1}x 275V)</text>`;
                 layY += 40;
                 svg += `<line x1="${layX}" y1="${layY-20}" x2="${layX}" y2="${layY+40}" stroke="#000" stroke-width="2"/>`;
             }
@@ -614,12 +516,10 @@
                 svg += `<line x1="${layX}" y1="${layY-20}" x2="${layX}" y2="${layY+40}" stroke="#000" stroke-width="2"/>`;
             }
 
-            // QDC Horizontal
             let qdcEndX = layX + (state.circuitos.length * 100) + 100;
             svg += `<line x1="${layX}" y1="${layY}" x2="${qdcEndX}" y2="${layY}" stroke="#000" stroke-width="4"/>`;
             svg += `<text x="${layX + (qdcEndX-layX)/2}" y="${layY-10}" text-anchor="middle" font-style="italic" font-weight="bold">Barramento Principal (QDC)</text>`;
 
-            // Circuitos
             state.circuitos.forEach((c, i) => {
                 let cx = layX + 100 + (i * 100);
                 svg += `<line x1="${cx}" y1="${layY}" x2="${cx}" y2="${layY+30}" stroke="#000" stroke-width="1.5"/>`;
@@ -631,7 +531,7 @@
                 svg += `<g transform="translate(${cx}, ${layY+100})">`;
                 let off = 0;
                 for(let p=0; p<c.polos; p++) { svg += `<use href="#sym-fase" x="${off}"/>`; off+=8; }
-                if(c.polos === 1) { svg += `<use href="#sym-neutro" x="${off}"/>`; off+=8; } // Regra Neutro
+                if(c.polos === 1) { svg += `<use href="#sym-neutro" x="${off}"/>`; off+=8; } 
                 svg += `<use href="#sym-terra" x="${off}"/>`;
                 svg += `<text x="25" y="5" font-size="11">${c.cabo} mm²</text></g>`;
 
@@ -639,7 +539,6 @@
                 svg += `<text x="${cx}" y="${layY+157}" text-anchor="middle" font-size="10" font-weight="bold">${c.nome}</text>`;
             });
 
-            // Legenda Inferior
             svg += `<rect x="50" y="700" width="220" height="80" fill="none" stroke="#cbd5e1" stroke-dasharray="4"/>`;
             svg += `<text x="160" y="720" text-anchor="middle" font-size="11" font-weight="bold">Legenda</text>`;
             svg += `<use href="#sym-fase" x="70" y="740"/><text x="85" y="744" font-size="10">Fase</text>`;
@@ -649,11 +548,6 @@
 
             svg += `</svg>`;
             return svg;
-        }
-
-        function renderApp() {
-            renderFormControls();
-            switchTab();
         }
 
         window.onload = renderApp;
