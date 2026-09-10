@@ -593,6 +593,7 @@
                 if (index === 0) firstCircX = currX + 17.5; // Centro do primeiro polo
                 
                 // Tratar polos
+                const outY = row2Y + 140 + (index * 40); // Escalonar verticalmente para os fios não cruzarem
                 let circOuts = [];
                 for(let p=0; p<c.poles; p++) {
                     const px = currX + (p*pWidth) + (pWidth/2);
@@ -601,28 +602,31 @@
                     // Cor da fase
                     const pColor = phaseColors[(currentPhaseIdx + p) % phases];
                     
-                    // Fio Saindo (Carga) - Desce reto até a caixa
-                    const outY = row2Y + 110 + (index * 35); // Escalonar labels verticalmente
+                    // Fio Saindo (Carga) - Desce reto até a caixa separadamente
                     wiresHTML += drawWire(px, row2Y+85, px, outY, pColor, 2);
                     circOuts.push(px);
                 }
                 
-                // Conexão Neutro e Terra pra Carga (Retas horizontais limpas)
-                const nOutY = row2Y + 110 + (index * 35);
-                const boxW = cWidth + 60;
-                const boxX = currX - 30;
+                const boxW = cWidth + 40;
+                const boxX = currX - 20;
                 
-                // Fio Neutro: Da caixa até o barramento neutro à esquerda
-                wiresHTML += drawWire(xN+15, nOutY+10, boxX, nOutY+10, COLORS.N, 2);
-                wiresHTML += `<circle cx="${xN+15}" cy="${nOutY+10}" r="3" fill="${COLORS.N}"/>`;
+                // Fio Neutro: Apenas se for 1 Polo (Monofásico), e desce separado pelo lado esquerdo
+                if (c.poles === 1) {
+                    const nHorizY = row2Y + 105 + (index * 6);
+                    const nDropX = boxX + 10;
+                    wiresHTML += `<path d="M ${xN+15} ${nHorizY} L ${nDropX} ${nHorizY} L ${nDropX} ${outY}" fill="none" stroke="${COLORS.N}" stroke-width="2" stroke-linejoin="round"/>`;
+                    wiresHTML += `<circle cx="${xN+15}" cy="${nHorizY}" r="3" fill="${COLORS.N}"/>`;
+                }
                 
-                // Fio Terra: Da caixa até o barramento terra à direita
-                wiresHTML += drawWire(boxX+boxW, nOutY+10, xPE+15, nOutY+10, COLORS.PE, 2);
-                wiresHTML += `<circle cx="${xPE+15}" cy="${nOutY+10}" r="3" fill="${COLORS.PE}"/>`;
+                // Fio Terra: Desce separado pelo lado direito
+                const peHorizY = row2Y + 110 + (index * 6);
+                const peDropX = boxX + boxW - 10;
+                wiresHTML += `<path d="M ${xPE+15} ${peHorizY} L ${peDropX} ${peHorizY} L ${peDropX} ${outY}" fill="none" stroke="${COLORS.PE}" stroke-width="2" stroke-linejoin="round"/>`;
+                wiresHTML += `<circle cx="${xPE+15}" cy="${peHorizY}" r="3" fill="${COLORS.PE}"/>`;
                 
-                // Caixa da Carga
-                wiresHTML += `<rect x="${boxX}" y="${nOutY}" width="${boxW}" height="20" rx="3" fill="#f1f5f9" stroke="#cbd5e1"/>`;
-                wiresHTML += `<text x="${boxX + boxW/2}" y="${nOutY + 14}" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">${c.nome} (${c.cabo}mm²)</text>`;
+                // Caixa da Carga simulando o conduite/saída
+                wiresHTML += `<rect x="${boxX}" y="${outY}" width="${boxW}" height="20" rx="3" fill="#f1f5f9" stroke="#cbd5e1"/>`;
+                wiresHTML += `<text x="${boxX + boxW/2}" y="${outY + 14}" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">${c.nome} (${c.cabo}mm²)</text>`;
 
                 currentPhaseIdx = (currentPhaseIdx + c.poles) % phases;
                 currX += cWidth + 10;
@@ -756,8 +760,9 @@
                 const dropY = currentY + 150;
                 svg += `<line x1="${cx}" y1="${currentY+60}" x2="${cx}" y2="${dropY}" stroke="#000" stroke-width="1.5"/>`;
                 
-                // Simbologia Fio Carga
-                svg += drawUnifilarSymbol(cx, currentY + 110, c.poles, true, true);
+                // Simbologia Fio Carga: Oculta Neutro se não for 1 Polo (Monofásico)
+                const needsN = (c.poles === 1);
+                svg += drawUnifilarSymbol(cx, currentY + 110, c.poles, needsN, true);
                 svg += `<text x="${cx + 20}" y="${currentY + 115}" font-size="10">${c.cabo} mm²</text>`;
                 
                 // Carga (Caixa)
