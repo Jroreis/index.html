@@ -297,7 +297,7 @@
             const maxPoles = state.sistema === 'mono' ? 1 : (state.sistema === 'bi' ? 2 : 3);
             state.circuitos.forEach(c => { 
                 if(c.polos > maxPoles) c.polos = maxPoles; 
-                c.usaDR = c.usaDR !== false; // Fix missing default if older version loaded
+                c.usaDR = c.usaDR !== false; 
             });
             renderApp();
         }
@@ -332,7 +332,8 @@
         function drawBreaker(x, y, poles, label, sublabel, type="disj") {
             const w = poles * 40;
             let html = `<g transform="translate(${x}, ${y})">`;
-            html += `<rect x="0" y="0" width="${w}" height="90" rx="4" fill="#ffffff" stroke="#1e293b" stroke-width="2.5" filter="url(#shadow)"/>`;
+            // Removido o filter="url(#shadow)" para corrigir o bug de PDF onde os componentes ficam invisíveis
+            html += `<rect x="0" y="0" width="${w}" height="90" rx="4" fill="#ffffff" stroke="#1e293b" stroke-width="2.5"/>`;
             for(let p=0; p<poles; p++) {
                 html += `<rect x="${p*40+5}" y="5" width="30" height="15" rx="2" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" />`;
                 html += `<rect x="${p*40+5}" y="70" width="30" height="15" rx="2" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" />`;
@@ -346,7 +347,8 @@
                 html += `<rect x="${(w/2)-10}" y="35" width="20" height="20" rx="2" fill="#0f172a" /><rect x="${(w/2)-10}" y="32" width="20" height="10" rx="2" fill="#ef4444" />`; 
             }
             html += `<text x="${w/2}" y="-10" text-anchor="middle" font-size="12" font-weight="900" fill="#0f172a">${label}</text>`;
-            if(sublabel) html += `<text x="${w/2}" y="28" text-anchor="middle" font-size="10" font-weight="900" fill="#ffffff">${sublabel}</text></g>`;
+            // Alterado de fill="#ffffff" para fill="#0f172a" para garantir cores fortes e visibilidade nas etiquetas (C10, C20)
+            if(sublabel) html += `<text x="${w/2}" y="28" text-anchor="middle" font-size="10" font-weight="900" fill="#0f172a">${sublabel}</text></g>`;
             return html;
         }
 
@@ -389,12 +391,12 @@
             const busNx = 80, busPEx = 1090;
             const barH = qHeight - 50;
 
-            // Barramento PE (Filtro de sombra removido para correção de bug no gerador de PDF do navegador)
+            // Barramento PE 
             svg += `<rect x="${busPEx}" y="${barPEY}" width="30" height="${barH}" rx="3" fill="#f0fdf4" stroke="#22c55e" stroke-width="2" />`;
             svg += `<text x="${busPEx+15}" y="${barPEY-10}" text-anchor="middle" font-size="12" font-weight="bold" fill="#16a34a">TERRA (PE)</text>`;
             for(let i=180; i<=(160 + barH - 20); i+=20) svg += `<use href="#screw" x="${busPEx+15}" y="${i}"/>`;
 
-            // Barramento N - DIVIDIDO (Pré-DR e Pós-DR) (Filtro de sombra removido)
+            // Barramento N - DIVIDIDO (Pré-DR e Pós-DR)
             let halfBar = (barH/2) - 10;
             svg += `<rect x="${busNx}" y="${barNY}" width="30" height="${halfBar}" rx="3" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" />`;
             svg += `<text x="${busNx+15}" y="${barNY-10}" text-anchor="middle" font-size="10" font-weight="bold" fill="#2563eb">N (PRÉ-DR)</text>`;
@@ -411,7 +413,8 @@
             if (state.aterramento === 'tn-c-s' || state.aterramento === 'tn-c') {
                 let bepW = 100;
                 let bepX = 550;
-                svg += `<rect x="${bepX}" y="125" width="${bepW}" height="20" rx="3" fill="#b45309" stroke="#78350f" stroke-width="2" filter="url(#shadow)"/>`;
+                // Removido filter="url(#shadow)"
+                svg += `<rect x="${bepX}" y="125" width="${bepW}" height="20" rx="3" fill="#b45309" stroke="#78350f" stroke-width="2"/>`;
                 svg += `<text x="${bepX + (bepW/2)}" y="139" text-anchor="middle" font-size="10" font-weight="900" fill="#ffffff">BEP (${state.aterramento.toUpperCase()})</text>`;
                 
                 // PEN -> BEP
