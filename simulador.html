@@ -3,840 +3,1002 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Construtor de Sistemas de Motores e CLP</title>
+    <title>Simulador Industrial - Sistemas de Motores</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome para ícones industriais -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --grid-color: rgba(255, 255, 255, 0.05);
+            --bg-color: #0f172a;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            overflow: hidden; /* Previne scroll no body para o canvas funcionar bem */
-            overscroll-behavior-y: contain;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Previne scroll da página inteira */
+            background-color: var(--bg-color);
+            color: #f8fafc;
+            touch-action: none; /* Desabilita pull-to-refresh no mobile */
         }
 
-        /* Tema Blueprint (Planta Baixa) para o Canvas */
-        .blueprint-bg {
-            background-color: #0f172a;
-            background-image: 
-                linear-gradient(rgba(56, 189, 248, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(56, 189, 248, 0.1) 1px, transparent 1px),
-                linear-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
-            background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
-            background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px;
-        }
-
-        /* Estilos dos Componentes no Canvas */
-        .component-node {
-            position: absolute;
-            background: #1e293b;
-            border: 2px solid #3b82f6;
-            border-radius: 0.5rem;
-            color: white;
-            min-width: 100px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-            cursor: grab;
-            user-select: none;
-            touch-action: none; /* Importante para drag no mobile */
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-        }
-        .component-node:active {
-            cursor: grabbing;
-        }
-        
-        .component-header {
-            background: #3b82f6;
-            padding: 4px 8px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            border-top-left-radius: 0.35rem;
-            border-top-right-radius: 0.35rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .component-body {
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
-            color: #93c5fd;
-            min-height: 50px;
-        }
-
-        /* Estilos dos Bornes (Portas de conexão) */
-        .ports-container {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            padding: 2px 0;
-            background: #0f172a;
-        }
-        
-        .ports-container.top {
-            border-bottom: 1px solid #334155;
-        }
-        
-        .ports-container.bottom {
-            border-top: 1px solid #334155;
-            border-bottom-left-radius: 0.35rem;
-            border-bottom-right-radius: 0.35rem;
-        }
-
-        .port {
-            width: 14px;
-            height: 14px;
-            background: #cbd5e1;
-            border: 2px solid #475569;
-            border-radius: 50%;
-            cursor: crosshair;
+        #workspace {
             position: relative;
-            transition: all 0.2s;
-            z-index: 20;
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 20px 20px;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
         }
 
-        .port:hover, .port.active {
-            background: #fbbf24;
-            border-color: #f59e0b;
-            transform: scale(1.3);
-        }
-
-        .port-label {
-            position: absolute;
-            font-size: 0.5rem;
-            color: #94a3b8;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            pointer-events: none;
-        }
-        .ports-container.bottom .port-label {
-            top: 14px;
-        }
-
-        /* Fios (SVG) */
-        #wires-layer {
+        #wire-layer {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none; /* Deixa os cliques passarem para os componentes */
-            z-index: 5;
+            z-index: 10;
         }
 
-        .wire {
-            stroke: #fbbf24;
-            stroke-width: 3;
+        .wire-path {
             fill: none;
-            pointer-events: stroke;
+            stroke: #ef4444; /* Cor vermelha para os cabos de força/comando padrão */
+            stroke-width: 4;
+            stroke-linecap: round;
+            pointer-events: stroke; /* Permite clicar no cabo para deletar */
             cursor: pointer;
             transition: stroke 0.2s, stroke-width 0.2s;
-        }
-        .wire:hover {
-            stroke: #ef4444;
-            stroke-width: 5;
+            filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));
         }
 
-        /* Sidebar Item */
-        .palette-item {
-            cursor: grab;
-            transition: transform 0.1s;
+        .wire-path:hover {
+            stroke: #fbbf24;
+            stroke-width: 6;
         }
-        .palette-item:active {
+
+        .component-node {
+            position: absolute;
+            border-radius: 8px;
+            user-select: none;
+            touch-action: none;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
+            transition: box-shadow 0.2s;
+        }
+
+        .component-node.dragging {
+            z-index: 50;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+            opacity: 0.9;
+        }
+        
+        .component-header {
+            background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #475569;
+            border-bottom: none;
+            cursor: grab;
+        }
+
+        .component-header:active {
             cursor: grabbing;
         }
 
-        /* Toast Notifications */
+        .component-body {
+            position: relative;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .component-body svg {
+            display: block;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .ports-container {
+            display: flex;
+            justify-content: space-evenly;
+            width: 100%;
+            position: absolute;
+            z-index: 30;
+            left: 0;
+        }
+        
+        .ports-container.top { top: -6px; }
+        .ports-container.bottom { bottom: -6px; }
+        
+        /* Ajuste específico para o Inversor e CLP onde os bornes ficam em recuos */
+        .inset-ports.top { top: 12px; }
+        .inset-ports.bottom { bottom: 12px; }
+
+        .port-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .port {
+            width: 14px;
+            height: 14px;
+            background-color: #cbd5e1;
+            border: 1px solid #334155;
+            border-radius: 50%;
+            cursor: crosshair;
+            position: relative;
+            transition: all 0.2s;
+            /* Textura de parafuso Phillips realista */
+            background-image: 
+                linear-gradient(45deg, transparent 42%, #475569 45%, #475569 55%, transparent 58%),
+                linear-gradient(-45deg, transparent 42%, #475569 45%, #475569 55%, transparent 58%);
+            box-shadow: inset 0 -2px 4px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .port:hover, .port.active {
+            background-color: #fbbf24;
+            transform: scale(1.3);
+            background-image: none; /* Destaca a bolinha de conexão ao passar o mouse */
+            box-shadow: 0 0 10px #f59e0b, inset 0 -1px 2px rgba(0,0,0,0.4);
+            z-index: 40;
+        }
+
+        .port-label {
+            position: absolute;
+            font-size: 0.55rem;
+            font-weight: 700;
+            color: #0f172a;
+            background: rgba(241, 245, 249, 0.9);
+            padding: 1px 3px;
+            border-radius: 3px;
+            border: 1px solid #94a3b8;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 35;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .ports-container.top .port-label { top: -18px; }
+        .ports-container.bottom .port-label { bottom: -18px; }
+        
+        .inset-ports.top .port-label { top: -14px; background: transparent; color: #fff; border: none; text-shadow: 0 1px 2px #000;}
+        .inset-ports.bottom .port-label { bottom: -14px; background: transparent; color: #fff; border: none; text-shadow: 0 1px 2px #000;}
+
+
+        .sidebar-item {
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .sidebar-item:hover {
+            transform: translateY(-2px);
+            background-color: #334155;
+        }
+        
         #toast-container {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            z-index: 50;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
+        
+        .toast {
+            background: #1e293b;
+            border-left: 4px solid #3b82f6;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out forwards;
+            font-size: 0.875rem;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* SVG Font para o display do Inversor */
+        .digital-font { font-family: 'JetBrains Mono', monospace; font-weight: bold; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-200 h-screen flex flex-col">
+<body class="flex flex-col h-screen">
 
-    <!-- Navbar / Toolbar -->
-    <header class="bg-slate-800 border-b border-slate-700 h-14 flex items-center justify-between px-4 shrink-0">
+    <header class="bg-slate-800 border-b border-slate-700 h-14 flex items-center justify-between px-6 shrink-0 z-40">
         <div class="flex items-center gap-3">
-            <i class="fa-solid fa-microchip text-blue-400 text-xl"></i>
-            <h1 class="text-lg font-bold text-white hidden sm:block">Simulador de Automação & Acionamentos</h1>
-            <h1 class="text-lg font-bold text-white sm:hidden">Simulador CAD</h1>
+            <div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.5)]">
+                <i class="fa-solid fa-bolt text-white"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight text-white hidden sm:block">Simulador Industrial CAD</h1>
         </div>
-        <div class="flex gap-2">
-            <button id="btn-clear" class="bg-red-900/50 hover:bg-red-800 text-red-300 px-3 py-1.5 rounded text-sm font-semibold transition-colors flex items-center gap-2">
-                <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline">Limpar Tudo</span>
+        <div class="flex items-center gap-4">
+            <button onclick="clearWorkspace()" class="bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white px-4 py-1.5 rounded text-sm font-medium transition-colors border border-red-500/20">
+                <i class="fa-solid fa-trash-can mr-2"></i> Limpar Bancada
             </button>
-            <button id="btn-help" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1.5 rounded text-sm font-semibold transition-colors">
-                <i class="fa-solid fa-circle-info"></i>
+            <button onclick="showHelp()" class="text-slate-400 hover:text-white transition-colors">
+                <i class="fa-solid fa-circle-info text-xl"></i>
             </button>
         </div>
     </header>
 
     <div class="flex flex-1 overflow-hidden">
-        
-        <!-- Sidebar - Component Palette -->
-        <aside class="w-24 sm:w-64 bg-slate-800 border-r border-slate-700 flex flex-col shrink-0">
-            <div class="p-3 bg-slate-800/80 backdrop-blur border-b border-slate-700 sticky top-0 z-10">
-                <h2 class="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider">Componentes</h2>
-                <p class="text-[10px] sm:text-xs text-slate-500 hidden sm:block mt-1">Arraste para a área azul para adicionar.</p>
+        <!-- Sidebar Esquerda -->
+        <aside class="w-64 sm:w-72 bg-slate-900 border-r border-slate-800 flex flex-col z-30 shrink-0 shadow-2xl">
+            <div class="p-4 border-b border-slate-800 bg-slate-800/50">
+                <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Biblioteca de Componentes</h2>
+                <p class="text-xs text-slate-500 mt-1">Arraste para a área de projeto</p>
             </div>
-            <div class="overflow-y-auto flex-1 p-2 sm:p-3 space-y-2 sm:space-y-3" id="component-palette">
-                <!-- Gerado dinamicamente via JS -->
+            <div id="component-palette" class="flex-1 overflow-y-auto p-3 space-y-2 pb-20 scrollbar-hide">
+                <!-- Os itens serão gerados via JS aqui -->
             </div>
         </aside>
 
-        <!-- Workspace - Área de Desenho -->
-        <main class="flex-1 relative blueprint-bg overflow-hidden" id="workspace">
-            <svg id="wires-layer"></svg>
-            <div id="temp-wire-container" class="absolute inset-0 pointer-events-none z-10">
-                <!-- Para desenhar a linha seguindo o mouse -->
-                <svg width="100%" height="100%">
-                    <path id="temp-wire" stroke="#fbbf24" stroke-width="3" stroke-dasharray="5,5" fill="none" d="M0,0" style="display: none; opacity: 0.6;" />
-                </svg>
+        <!-- Área de Projeto (Canvas) -->
+        <main id="workspace" class="flex-1 relative">
+            <!-- Camada SVG para desenhar os fios -->
+            <svg id="wire-layer"></svg>
+            
+            <!-- Linha indicadora enquanto desenha um fio -->
+            <svg id="drawing-layer" class="absolute inset-0 w-full h-full pointer-events-none z-10" style="display: none;">
+                <path id="drawing-wire" class="wire-path" stroke-dasharray="5,5" opacity="0.6"></path>
+            </svg>
+            
+            <!-- Container para as caixas de ferramentas/componentes -->
+            <div id="components-container" class="absolute inset-0 pointer-events-none"></div>
+            
+            <!-- Instrução inicial na tela -->
+            <div id="welcome-text" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                <div class="text-center">
+                    <i class="fa-solid fa-arrow-pointer text-6xl mb-4"></i>
+                    <h2 class="text-3xl font-bold">Arraste componentes para cá</h2>
+                    <p class="text-lg mt-2">Clique nos parafusos (bornes) para ligar os cabos</p>
+                </div>
             </div>
         </main>
-
     </div>
 
-    <!-- Container de Mensagens -->
-    <div id="toast-container" class="flex flex-col gap-2"></div>
+    <div id="toast-container"></div>
 
-    <!-- Modal de Ajuda -->
-    <div id="help-modal" class="fixed inset-0 bg-black/70 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-slate-800 rounded-xl p-6 max-w-md w-full border border-slate-600 shadow-2xl relative">
-            <button id="close-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-            <h2 class="text-2xl font-bold text-white mb-4"><i class="fa-solid fa-graduation-cap text-blue-400 mr-2"></i>Como Usar</h2>
-            <ul class="space-y-3 text-sm text-slate-300">
-                <li class="flex gap-3"><i class="fa-solid fa-hand-pointer mt-1 text-blue-400"></i> <span><strong>Adicionar:</strong> Arraste os componentes do menu lateral para a área de desenho (planta azul).</span></li>
-                <li class="flex gap-3"><i class="fa-solid fa-arrows-up-down-left-right mt-1 text-blue-400"></i> <span><strong>Mover:</strong> Arraste os componentes pela barra superior azul (título) para organizá-los.</span></li>
-                <li class="flex gap-3"><i class="fa-solid fa-plug mt-1 text-yellow-400"></i> <span><strong>Fiação:</strong> Clique no borne (bolinha) de um componente e, em seguida, clique no borne de outro componente para criar um fio.</span></li>
-                <li class="flex gap-3"><i class="fa-solid fa-eraser mt-1 text-red-400"></i> <span><strong>Apagar:</strong> Clique na lixeira vermelha no cabeçalho de um componente para excluí-lo. Clique sobre um fio para deletá-lo.</span></li>
-                <li class="flex gap-3"><i class="fa-solid fa-lightbulb mt-1 text-green-400"></i> <span><strong>Dica:</strong> Construa desde partidas diretas simples até lógicas com CLP e Inversores!</span></li>
-            </ul>
-            <button id="btn-start" class="mt-6 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-lg transition-colors">Entendi, vamos começar!</button>
-        </div>
-    </div>
+    <script>
+        // Aqui criamos SVGs 2D altamente realistas simulando os hardwares físicos.
+        const componentLibrary = [
+            {
+                type: 'rede_trifasica', name: 'Barramento 380V (3F+T)', category: 'ALIMENTAÇÃO',
+                width: 160, height: 40,
+                inputs: [], outputs: ['L1', 'L2', 'L3', 'PE'],
+                portStyle: 'edge', // 'edge' fica na borda, 'inset' fica recuado no SVG
+                svg: `
+                <svg viewBox="0 0 160 40" width="100%" height="100%" preserveAspectRatio="none">
+                    <rect x="0" y="0" width="160" height="40" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+                    <!-- Barras de Cobre -->
+                    <rect x="10" y="8" width="140" height="4" fill="#b45309" />
+                    <rect x="10" y="18" width="140" height="4" fill="#b45309" />
+                    <rect x="10" y="28" width="140" height="4" fill="#b45309" />
+                    <text x="80" y="22" font-size="10" font-family="sans-serif" font-weight="bold" fill="#475569" text-anchor="middle" opacity="0.5">3~ 380V / 60Hz</text>
+                </svg>`
+            },
+            {
+                type: 'fonte_24v', name: 'Fonte 24V DC', category: 'ALIMENTAÇÃO',
+                width: 70, height: 110,
+                inputs: ['L', 'N', 'PE'], outputs: ['+24V', '0V'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 70 110" width="100%" height="100%">
+                    <!-- Carcaça Metálica -->
+                    <rect x="0" y="0" width="70" height="110" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="5" y="5" width="60" height="15" fill="#e2e8f0" />
+                    <!-- Grelhas de ventilação -->
+                    <line x1="10" y1="30" x2="60" y2="30" stroke="#cbd5e1" stroke-width="2"/>
+                    <line x1="10" y1="38" x2="60" y2="38" stroke="#cbd5e1" stroke-width="2"/>
+                    <line x1="10" y1="46" x2="60" y2="46" stroke="#cbd5e1" stroke-width="2"/>
+                    <line x1="10" y1="54" x2="60" y2="54" stroke="#cbd5e1" stroke-width="2"/>
+                    <!-- Logo e LED -->
+                    <text x="35" y="75" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">MEAN WELL</text>
+                    <text x="35" y="85" font-size="7" font-family="sans-serif" fill="#64748b" text-anchor="middle">24V 5A</text>
+                    <circle cx="15" cy="98" r="3" fill="#22c55e" filter="drop-shadow(0 0 2px #22c55e)"/>
+                    <text x="22" y="100" font-size="6" font-family="sans-serif" fill="#64748b">DC OK</text>
+                </svg>`
+            },
+            {
+                type: 'disjuntor_motor', name: 'Disjuntor-Motor', category: 'PROTEÇÃO',
+                width: 70, height: 110,
+                inputs: ['1(L1)', '3(L2)', '5(L3)'], outputs: ['2(T1)', '4(T2)', '6(T3)'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 70 110" width="100%" height="100%">
+                    <rect x="0" y="0" width="70" height="110" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+                    <!-- Degrau central -->
+                    <rect x="0" y="20" width="70" height="70" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+                    <!-- Botões rotativos -->
+                    <circle cx="35" cy="55" r="18" fill="#1e293b" />
+                    <circle cx="35" cy="55" r="12" fill="#334155" />
+                    <!-- Chave rotativa (vermelha indicando ON) -->
+                    <rect x="32" y="38" width="6" height="17" fill="#ef4444" rx="2"/>
+                    <text x="12" y="58" font-size="8" font-weight="bold" font-family="sans-serif" fill="#64748b">O</text>
+                    <text x="54" y="58" font-size="8" font-weight="bold" font-family="sans-serif" fill="#64748b">I</text>
+                    <!-- Dial de ajuste de corrente -->
+                    <circle cx="20" cy="80" r="5" fill="#fde047" stroke="#eab308" stroke-width="1"/>
+                    <line x1="20" y1="80" x2="23" y2="77" stroke="#334155" stroke-width="1"/>
+                </svg>`
+            },
+            {
+                type: 'contator', name: 'Contator K1', category: 'MANOBRA',
+                width: 70, height: 100,
+                inputs: ['L1', 'L2', 'L3', 'A1'], outputs: ['T1', 'T2', 'T3', 'A2'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 70 100" width="100%" height="100%">
+                    <!-- Corpo -->
+                    <rect x="0" y="0" width="70" height="100" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="0" y="15" width="70" height="70" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+                    <!-- Marca central azul (Indica bobina) -->
+                    <rect x="10" y="35" width="50" height="30" fill="#3b82f6" rx="2" />
+                    <rect x="25" y="40" width="20" height="20" fill="#1e293b" />
+                    <line x1="20" y1="50" x2="50" y2="50" stroke="#60a5fa" stroke-width="1" opacity="0.5"/>
+                    <text x="35" y="90" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">Siemens</text>
+                </svg>`
+            },
+            {
+                type: 'inversor', name: 'Inversor VFD', category: 'CONTROLE',
+                width: 90, height: 150,
+                inputs: ['R', 'S', 'T', 'DI1', 'DI2'], outputs: ['U', 'V', 'W', 'PE'],
+                portStyle: 'inset', // Bornes recuados dentro do componente
+                svg: `
+                <svg viewBox="0 0 90 150" width="100%" height="100%">
+                    <!-- Dissipador Traseiro -->
+                    <rect x="5" y="0" width="80" height="150" fill="#334155" rx="2"/>
+                    <!-- Corpo Frontal -->
+                    <rect x="10" y="5" width="70" height="140" fill="#1e293b" rx="2"/>
+                    <!-- Bornes Área de Proteção -->
+                    <rect x="10" y="5" width="70" height="25" fill="#0f172a" />
+                    <rect x="10" y="120" width="70" height="25" fill="#0f172a" />
+                    <!-- Display IHM -->
+                    <rect x="15" y="35" width="60" height="25" fill="#000" rx="2" stroke="#475569" stroke-width="1"/>
+                    <text class="digital-font" x="70" y="52" font-size="14" fill="#ef4444" text-anchor="end" filter="drop-shadow(0 0 2px #ef4444)">60.0</text>
+                    <text x="18" y="44" font-size="5" fill="#fff" font-family="sans-serif">Hz</text>
+                    <!-- Botões -->
+                    <circle cx="25" cy="75" r="6" fill="#22c55e" /> <!-- Run -->
+                    <circle cx="45" cy="75" r="6" fill="#ef4444" /> <!-- Stop -->
+                    <circle cx="65" cy="75" r="6" fill="#3b82f6" /> <!-- Prog -->
+                    <polygon points="45,95 40,105 50,105" fill="#94a3b8" /> <!-- Up -->
+                    <polygon points="45,115 40,105 50,105" fill="#94a3b8" transform="rotate(180 45 110)" /> <!-- Down -->
+                    <!-- Detalhes texto -->
+                    <text x="25" y="86" font-size="5" fill="#94a3b8" font-family="sans-serif" text-anchor="middle">RUN</text>
+                    <text x="45" y="86" font-size="5" fill="#94a3b8" font-family="sans-serif" text-anchor="middle">STOP</text>
+                </svg>`
+            },
+            {
+                type: 'clp', name: 'CLP (Siemens S7)', category: 'AUTOMAÇÃO',
+                width: 140, height: 110,
+                inputs: ['L+', 'M', 'I0.0', 'I0.1', 'I0.2'], outputs: ['Q0.0', 'Q0.1', 'Q0.2', 'Q0.3'],
+                portStyle: 'inset',
+                svg: `
+                <svg viewBox="0 0 140 110" width="100%" height="100%">
+                    <rect x="0" y="0" width="140" height="110" fill="#f8fafc" stroke="#94a3b8" stroke-width="1" rx="2"/>
+                    <!-- Áreas de Borne com tampas cinzas -->
+                    <rect x="0" y="0" width="140" height="25" fill="#cbd5e1" />
+                    <rect x="0" y="85" width="140" height="25" fill="#cbd5e1" />
+                    
+                    <!-- Painel Central Escuro -->
+                    <rect x="10" y="30" width="120" height="50" fill="#0f172a" rx="2" />
+                    
+                    <!-- LEDs Diagnóstico -->
+                    <circle cx="20" cy="40" r="3" fill="#22c55e" filter="drop-shadow(0 0 2px #22c55e)"/>
+                    <text x="28" y="43" font-size="6" fill="#94a3b8" font-family="sans-serif">RUN</text>
+                    <circle cx="20" cy="50" r="3" fill="#334155" />
+                    <text x="28" y="53" font-size="6" fill="#94a3b8" font-family="sans-serif">STOP</text>
+                    <circle cx="20" cy="60" r="3" fill="#ef4444" />
+                    <text x="28" y="63" font-size="6" fill="#94a3b8" font-family="sans-serif">ERROR</text>
+                    
+                    <!-- LEDs de Entradas (Em cima) -->
+                    <rect x="50" y="35" width="80" height="15" fill="#1e293b" />
+                    <text x="52" y="45" font-size="6" fill="#fff" font-family="sans-serif">DI</text>
+                    <circle cx="65" cy="42" r="2" fill="#22c55e" filter="drop-shadow(0 0 1px #22c55e)"/>
+                    <circle cx="75" cy="42" r="2" fill="#334155" />
+                    <circle cx="85" cy="42" r="2" fill="#22c55e" filter="drop-shadow(0 0 1px #22c55e)"/>
+                    
+                    <!-- LEDs de Saídas (Embaixo) -->
+                    <rect x="50" y="60" width="80" height="15" fill="#1e293b" />
+                    <text x="52" y="70" font-size="6" fill="#fff" font-family="sans-serif">DQ</text>
+                    <circle cx="65" cy="67" r="2" fill="#22c55e" filter="drop-shadow(0 0 1px #22c55e)"/>
+                    <circle cx="75" cy="67" r="2" fill="#22c55e" filter="drop-shadow(0 0 1px #22c55e)"/>
+                    <circle cx="85" cy="67" r="2" fill="#334155" />
+                    <circle cx="95" cy="67" r="2" fill="#334155" />
+                </svg>`
+            },
+            {
+                type: 'botoeira_na', name: 'Botão LIGA (Verde)', category: 'COMANDO',
+                width: 60, height: 60,
+                inputs: ['13'], outputs: ['14'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 60 60" width="100%" height="100%">
+                    <rect x="0" y="0" width="60" height="60" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1" rx="4"/>
+                    <!-- Aro do botão -->
+                    <circle cx="30" cy="30" r="20" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+                    <!-- Botão interno verde -->
+                    <circle cx="30" cy="30" r="16" fill="#22c55e" stroke="#166534" stroke-width="1" />
+                    <!-- Reflexo p/ 3D -->
+                    <path d="M 20 20 Q 30 15 40 20 Q 30 25 20 20 Z" fill="#4ade80" opacity="0.6"/>
+                </svg>`
+            },
+            {
+                type: 'botoeira_nf', name: 'Botão DESLIGA', category: 'COMANDO',
+                width: 60, height: 60,
+                inputs: ['11'], outputs: ['12'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 60 60" width="100%" height="100%">
+                    <rect x="0" y="0" width="60" height="60" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1" rx="4"/>
+                    <circle cx="30" cy="30" r="20" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+                    <circle cx="30" cy="30" r="16" fill="#ef4444" stroke="#991b1b" stroke-width="1" />
+                    <path d="M 20 20 Q 30 15 40 20 Q 30 25 20 20 Z" fill="#f87171" opacity="0.6"/>
+                </svg>`
+            },
+            {
+                type: 'motor_3f', name: 'Motor 3~ (Gaiola)', category: 'MÁQUINAS',
+                width: 150, height: 120,
+                inputs: ['U1', 'V1', 'W1', 'PE'], outputs: [],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 150 120" width="100%" height="100%">
+                    <!-- Base de fixação -->
+                    <rect x="30" y="100" width="90" height="15" fill="#475569" rx="2" />
+                    <circle cx="40" cy="110" r="3" fill="#1e293b"/>
+                    <circle cx="110" cy="110" r="3" fill="#1e293b"/>
+                    <!-- Eixo mecânico -->
+                    <rect x="130" y="55" width="20" height="14" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="145" y="58" width="5" height="8" fill="#94a3b8"/> <!-- Chaveta -->
+                    
+                    <!-- Corpo cilíndrico (Azul industrial padrão WEG/Siemens) -->
+                    <rect x="25" y="30" width="105" height="65" fill="#1e3a8a" rx="8" />
+                    
+                    <!-- Aletas de Resfriamento -->
+                    <line x1="30" y1="40" x2="125" y2="40" stroke="#1e40af" stroke-width="3"/>
+                    <line x1="30" y1="50" x2="125" y2="50" stroke="#1e40af" stroke-width="3"/>
+                    <line x1="30" y1="60" x2="125" y2="60" stroke="#1e40af" stroke-width="3"/>
+                    <line x1="30" y1="70" x2="125" y2="70" stroke="#1e40af" stroke-width="3"/>
+                    <line x1="30" y1="80" x2="125" y2="80" stroke="#1e40af" stroke-width="3"/>
+                    
+                    <!-- Tampa Defletora (Traseira) -->
+                    <path d="M 25 30 Q 10 62 25 95 L 15 90 L 15 35 Z" fill="#172554"/>
+                    <!-- Frestas de ventilação traseira -->
+                    <line x1="18" y1="40" x2="18" y2="80" stroke="#0f172a" stroke-width="1" stroke-dasharray="4,2"/>
+                    
+                    <!-- Caixa de Ligação (Bornes) no Topo -->
+                    <rect x="0" y="0" width="150" height="15" fill="transparent" /> <!-- Margem para bornes HTML -->
+                    <path d="M 50 15 L 100 15 L 105 30 L 45 30 Z" fill="#172554" />
+                    <rect x="55" y="10" width="40" height="5" fill="#1e3a8a" />
+                </svg>`
+            }
+        ];
 
-<script>
-    // --- BIBLIOTECA DE COMPONENTES ---
-    // Define os tipos de componentes, seus ícones e portas (entradas no topo, saídas embaixo)
-    const componentLibrary = [
-        {
-            type: 'power_3f',
-            name: 'Rede 380V Trifásica',
-            category: 'Alimentação',
-            icon: 'fa-bolt',
-            color: 'text-yellow-400',
-            inputs: [],
-            outputs: ['L1', 'L2', 'L3', 'N', 'PE']
-        },
-        {
-            type: 'power_24v',
-            name: 'Fonte 24V DC',
-            category: 'Alimentação',
-            icon: 'fa-car-battery',
-            color: 'text-green-400',
-            inputs: ['L1', 'N'],
-            outputs: ['+24V', '0V']
-        },
-        {
-            type: 'disjuntor_motor',
-            name: 'Disjuntor Motor',
-            category: 'Proteção',
-            icon: 'fa-toggle-off',
-            color: 'text-slate-300',
-            inputs: ['1(L1)', '3(L2)', '5(L3)'],
-            outputs: ['2(T1)', '4(T2)', '6(T3)']
-        },
-        {
-            type: 'contator',
-            name: 'Contator (K1)',
-            category: 'Manobra',
-            icon: 'fa-box',
-            color: 'text-blue-300',
-            inputs: ['1(L1)', '3(L2)', '5(L3)', 'A1'],
-            outputs: ['2(T1)', '4(T2)', '6(T3)', 'A2']
-        },
-        {
-            type: 'rele_termico',
-            name: 'Relé Térmico',
-            category: 'Proteção',
-            icon: 'fa-temperature-half',
-            color: 'text-orange-400',
-            inputs: ['1', '3', '5', '95'],
-            outputs: ['2', '4', '6', '96']
-        },
-        {
-            type: 'inversor',
-            name: 'Inversor (VFD)',
-            category: 'Controle Avançado',
-            icon: 'fa-server',
-            color: 'text-purple-400',
-            inputs: ['R', 'S', 'T', 'DI1', 'DI2'],
-            outputs: ['U', 'V', 'W', 'PE']
-        },
-        {
-            type: 'clp',
-            name: 'CLP (Controlador)',
-            category: 'Automação',
-            icon: 'fa-microchip',
-            color: 'text-emerald-400',
-            inputs: ['L+', 'M', 'I1', 'I2', 'I3'],
-            outputs: ['Q1', 'Q2', 'Q3']
-        },
-        {
-            type: 'botoeira_na',
-            name: 'Botão LIGA (NA)',
-            category: 'Comando',
-            icon: 'fa-circle-dot',
-            color: 'text-green-500',
-            inputs: ['3'],
-            outputs: ['4']
-        },
-        {
-            type: 'botoeira_nf',
-            name: 'Botão DESLIGA (NF)',
-            category: 'Comando',
-            icon: 'fa-circle-stop',
-            color: 'text-red-500',
-            inputs: ['1'],
-            outputs: ['2']
-        },
-        {
-            type: 'motor_3f',
-            name: 'Motor Trifásico',
-            category: 'Carga',
-            icon: 'fa-fan',
-            color: 'text-slate-400',
-            inputs: ['U1', 'V1', 'W1', 'PE'],
-            outputs: []
-        }
-    ];
-
-    // --- VARIÁVEIS DE ESTADO ---
-    let nodes = []; // Instâncias de componentes na tela
-    let wires = []; // Array de { id, fromNode, fromPort, toNode, toPort }
-    let nodeIdCounter = 0;
-    let wireIdCounter = 0;
-    
-    // Estado da Fiação Interativa
-    let activeWiring = false;
-    let wiringStartPort = null; // { nodeId, portName, isInput, el }
-
-    const workspace = document.getElementById('workspace');
-    const wiresLayer = document.getElementById('wires-layer');
-    const tempWire = document.getElementById('temp-wire');
-
-    // Inicializar Sidebar
-    function renderPalette() {
-        const palette = document.getElementById('component-palette');
+        let nodes = []; // { id, type, x, y, el }
+        let wires = []; // { id, sourceNode, sourcePort, targetNode, targetPort, pathEl }
+        let nodeIdCounter = 0;
+        let wireIdCounter = 0;
         
-        componentLibrary.forEach(comp => {
-            const el = document.createElement('div');
-            el.className = 'palette-item bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded-lg p-2 sm:p-3 flex sm:flex-row flex-col items-center gap-2 sm:gap-3 touch-none';
-            el.draggable = true;
-            el.dataset.type = comp.type;
-            
-            el.innerHTML = `
-                <div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center shrink-0">
-                    <i class="fa-solid ${comp.icon} ${comp.color} text-lg"></i>
-                </div>
-                <div class="text-center sm:text-left flex-1 min-w-0">
-                    <div class="text-[10px] sm:text-sm font-semibold text-white truncate">${comp.name}</div>
-                    <div class="text-[8px] sm:text-xs text-slate-400 hidden sm:block truncate">${comp.category}</div>
-                </div>
-            `;
+        let drawingWire = null; // { sourceNode, sourcePort }
+        
+        const workspace = document.getElementById('workspace');
+        const wireLayer = document.getElementById('wire-layer');
+        const drawingLayer = document.getElementById('drawing-layer');
+        const drawingWirePath = document.getElementById('drawing-wire');
+        const componentsContainer = document.getElementById('components-container');
 
-            // Eventos Mouse Drag
-            el.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('component_type', comp.type);
-                // Setar offset para o drop não ficar com o mouse na quina
-                e.dataTransfer.setDragImage(el, el.offsetWidth / 2, el.offsetHeight / 2);
+        function initPalette() {
+            const palette = document.getElementById('component-palette');
+            
+            // Agrupar por categorias
+            const categories = {};
+            componentLibrary.forEach(comp => {
+                if(!categories[comp.category]) categories[comp.category] = [];
+                categories[comp.category].push(comp);
             });
 
-            // Suporte a Touch Drag (Mobile - Fake Drag&Drop)
-            el.addEventListener('touchstart', handleTouchStartPalette, {passive: false});
+            for(let cat in categories) {
+                const title = document.createElement('div');
+                title.className = 'text-[10px] font-bold text-slate-500 mt-4 mb-2';
+                title.innerText = cat;
+                palette.appendChild(title);
 
-            palette.appendChild(el);
+                categories[cat].forEach(comp => {
+                    const item = document.createElement('div');
+                    item.className = 'sidebar-item bg-slate-800 border border-slate-700 rounded-lg p-2 flex items-center gap-3 cursor-grab text-white select-none';
+                    item.draggable = true;
+                    item.dataset.type = comp.type;
+                    
+                    // Miniatura SVG
+                    const svgWrap = document.createElement('div');
+                    svgWrap.className = 'w-10 h-10 flex items-center justify-center shrink-0';
+                    // Escalar miniatura
+                    let miniSvg = comp.svg.replace('width="100%"', 'width="30"').replace('height="100%"', 'height="30"');
+                    svgWrap.innerHTML = miniSvg;
+                    
+                    const nameWrap = document.createElement('div');
+                    nameWrap.className = 'text-xs font-medium';
+                    nameWrap.innerText = comp.name;
+
+                    item.appendChild(svgWrap);
+                    item.appendChild(nameWrap);
+                    
+                    // Eventos Drag Native (Desktop)
+                    item.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', comp.type);
+                        // Offset para soltar no centro do mouse
+                        e.dataTransfer.setData('offsetX', e.offsetX);
+                        e.dataTransfer.setData('offsetY', e.offsetY);
+                    });
+                    
+                    // Eventos Touch (Mobile)
+                    item.addEventListener('touchstart', handleTouchStartPalette, {passive: false});
+
+                    palette.appendChild(item);
+                });
+            }
+        }
+
+        workspace.addEventListener('dragover', (e) => {
+            e.preventDefault(); // Necessário para permitir o drop
+            e.dataTransfer.dropEffect = 'copy';
         });
-    }
 
-    // Variáveis para touch drag do palette
-    let touchDraggingType = null;
-    let ghostElement = null;
+        workspace.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const type = e.dataTransfer.getData('text/plain');
+            if (type) {
+                // Remove tela de boas vindas
+                document.getElementById('welcome-text').style.display = 'none';
+                
+                const rect = workspace.getBoundingClientRect();
+                // Ajusta a coordenada baseada no scroll e posição do workspace
+                const x = e.clientX - rect.left - 35; // 35 é aprox metade da largura p/ centralizar
+                const y = e.clientY - rect.top - 20;
+                
+                createComponent(type, x, y);
+            }
+        });
 
-    function handleTouchStartPalette(e) {
-        const touch = e.touches[0];
-        touchDraggingType = e.currentTarget.dataset.type;
-        
-        // Criar elemento fantasma para arrastar visualmente
-        ghostElement = e.currentTarget.cloneNode(true);
-        ghostElement.style.position = 'fixed';
-        ghostElement.style.opacity = '0.7';
-        ghostElement.style.pointerEvents = 'none';
-        ghostElement.style.zIndex = '1000';
-        document.body.appendChild(ghostElement);
-        
-        moveGhost(touch.clientX, touch.clientY);
+        // Variáveis para simular drag and drop via Touch a partir da paleta
+        let touchDragType = null;
+        let touchDragElement = null;
 
-        document.addEventListener('touchmove', handleTouchMovePalette, {passive: false});
-        document.addEventListener('touchend', handleTouchEndPalette);
-    }
-
-    function handleTouchMovePalette(e) {
-        e.preventDefault(); // Previne scroll da página
-        const touch = e.touches[0];
-        moveGhost(touch.clientX, touch.clientY);
-    }
-
-    function moveGhost(x, y) {
-        if (ghostElement) {
-            ghostElement.style.left = (x - ghostElement.offsetWidth / 2) + 'px';
-            ghostElement.style.top = (y - ghostElement.offsetHeight / 2) + 'px';
-        }
-    }
-
-    function handleTouchEndPalette(e) {
-        const touch = e.changedTouches[0];
-        document.removeEventListener('touchmove', handleTouchMovePalette);
-        document.removeEventListener('touchend', handleTouchEndPalette);
-        
-        if (ghostElement) {
-            ghostElement.remove();
-            ghostElement = null;
-        }
-
-        // Checar se soltou dentro do workspace
-        const rect = workspace.getBoundingClientRect();
-        if (touch.clientX >= rect.left && touch.clientX <= rect.right && 
-            touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+        function handleTouchStartPalette(e) {
+            touchDragType = e.currentTarget.dataset.type;
+            const touch = e.touches[0];
             
-            const x = touch.clientX - rect.left - 50; // Ajuste fino pro centro
-            const y = touch.clientY - rect.top - 50;
-            createComponentNode(touchDraggingType, x, y);
+            // Cria um "fantasma" para seguir o dedo
+            touchDragElement = e.currentTarget.cloneNode(true);
+            touchDragElement.style.position = 'fixed';
+            touchDragElement.style.opacity = '0.7';
+            touchDragElement.style.pointerEvents = 'none';
+            touchDragElement.style.zIndex = '9999';
+            document.body.appendChild(touchDragElement);
+            
+            moveTouchGhost(touch.clientX, touch.clientY);
+            
+            document.addEventListener('touchmove', handleTouchMovePalette, {passive: false});
+            document.addEventListener('touchend', handleTouchEndPalette);
         }
-        touchDraggingType = null;
-    }
 
-    // Configurar Workspace para receber drop do Mouse
-    workspace.addEventListener('dragover', (e) => {
-        e.preventDefault(); // Necessário para permitir o drop
-        e.dataTransfer.dropEffect = 'copy';
-    });
+        function moveTouchGhost(x, y) {
+            if(touchDragElement) {
+                touchDragElement.style.left = (x - 20) + 'px';
+                touchDragElement.style.top = (y - 20) + 'px';
+            }
+        }
 
-    workspace.addEventListener('drop', (e) => {
-        e.preventDefault();
-        const type = e.dataTransfer.getData('component_type');
-        if (type) {
+        function handleTouchMovePalette(e) {
+            e.preventDefault();
+            moveTouchGhost(e.touches[0].clientX, e.touches[0].clientY);
+        }
+
+        function handleTouchEndPalette(e) {
+            document.removeEventListener('touchmove', handleTouchMovePalette);
+            document.removeEventListener('touchend', handleTouchEndPalette);
+            
+            if (touchDragElement) {
+                touchDragElement.remove();
+                touchDragElement = null;
+            }
+            
+            if (touchDragType) {
+                const touch = e.changedTouches[0];
+                const rect = workspace.getBoundingClientRect();
+                
+                // Checa se soltou dentro do workspace
+                if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+                    touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+                    
+                    document.getElementById('welcome-text').style.display = 'none';
+                    const x = touch.clientX - rect.left - 35;
+                    const y = touch.clientY - rect.top - 20;
+                    createComponent(touchDragType, x, y);
+                }
+                touchDragType = null;
+            }
+        }
+
+        function createComponent(type, x, y) {
+            const template = componentLibrary.find(c => c.type === type);
+            if (!template) return;
+
+            nodeIdCounter++;
+            const id = 'node_' + nodeIdCounter;
+            
+            // Garantir que não caia fora da tela
+            x = Math.max(0, x);
+            y = Math.max(0, y);
+
+            const el = document.createElement('div');
+            el.className = 'component-node pointer-events-auto';
+            el.id = id;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            el.style.width = template.width + 'px';
+            
+            // Header (Área de rastro)
+            const header = document.createElement('div');
+            header.className = 'component-header';
+            header.innerHTML = `
+                <span class="truncate">${template.name}</span>
+                <button class="text-slate-400 hover:text-red-400 ml-2" title="Remover" onclick="deleteComponent('${id}')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
+
+            // Configurar Drag do Componente já instanciado
+            setupNodeDragging(header, el, id);
+
+            // Container do SVG
+            const body = document.createElement('div');
+            body.className = 'component-body';
+            body.style.width = template.width + 'px';
+            body.style.height = template.height + 'px';
+            body.innerHTML = template.svg; // Injeta o SVG renderizado
+
+            // Containers de Portas (Bornes)
+            const portClass = template.portStyle === 'inset' ? 'inset-ports' : 'ports-container';
+            
+            const inputsContainer = document.createElement('div');
+            inputsContainer.className = `ports-container ${portClass} top`;
+            template.inputs.forEach(portName => {
+                inputsContainer.appendChild(createPortElement(id, portName, 'in'));
+            });
+
+            const outputsContainer = document.createElement('div');
+            outputsContainer.className = `ports-container ${portClass} bottom`;
+            template.outputs.forEach(portName => {
+                outputsContainer.appendChild(createPortElement(id, portName, 'out'));
+            });
+
+            el.appendChild(header);
+            el.appendChild(body);
+            if(template.inputs.length > 0) el.appendChild(inputsContainer);
+            if(template.outputs.length > 0) el.appendChild(outputsContainer);
+
+            componentsContainer.appendChild(el);
+
+            nodes.push({ id, type, el, x, y });
+            
+            showToast(`${template.name} adicionado.`, 'success');
+        }
+
+        function createPortElement(nodeId, portName, type) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'port-wrapper';
+
+            const port = document.createElement('div');
+            port.className = 'port';
+            port.dataset.node = nodeId;
+            port.dataset.port = portName;
+            port.dataset.type = type; // 'in' or 'out'
+
+            const label = document.createElement('div');
+            label.className = 'port-label';
+            label.innerText = portName;
+
+            wrapper.appendChild(port);
+            wrapper.appendChild(label);
+
+            // Eventos para desenhar fio (Click & Touch)
+            port.addEventListener('pointerdown', handlePortClick);
+            
+            return wrapper;
+        }
+
+        function handlePortClick(e) {
+            e.stopPropagation(); // Evita drag do componente se clicar no borne
+            const portEl = e.target;
+            const nodeId = portEl.dataset.node;
+            const portName = portEl.dataset.port;
+
+            if (!drawingWire) {
+                // Iniciar novo fio
+                drawingWire = { sourceNode: nodeId, sourcePort: portName, sourceEl: portEl };
+                portEl.classList.add('active');
+                
+                // Mostra a linha fantasma
+                drawingLayer.style.display = 'block';
+                updateDrawingWire(e.clientX, e.clientY);
+                
+                // Ouve movimento do mouse no workspace todo
+                document.addEventListener('pointermove', onPointerMoveDraw);
+                
+                // Se clicar em qualquer lugar vazio, cancela
+                setTimeout(() => {
+                    workspace.addEventListener('pointerdown', cancelDrawing);
+                }, 10);
+            } else {
+                // Finalizar fio
+                if (drawingWire.sourceNode === nodeId && drawingWire.sourcePort === portName) {
+                    // Clicou no mesmo borne, cancela
+                    cancelDrawing();
+                } else {
+                    // Tenta conectar
+                    createWire(drawingWire.sourceNode, drawingWire.sourcePort, nodeId, portName);
+                    cancelDrawing();
+                }
+            }
+        }
+
+        function onPointerMoveDraw(e) {
+            updateDrawingWire(e.clientX, e.clientY);
+        }
+
+        function updateDrawingWire(clientX, clientY) {
+            if (!drawingWire) return;
             const rect = workspace.getBoundingClientRect();
-            // Subtrai metade do tamanho base (100x100) para centralizar no mouse
-            const x = e.clientX - rect.left - 50;
-            const y = e.clientY - rect.top - 20;
-            createComponentNode(type, x, y);
+            const startPos = getPortCenter(drawingWire.sourceEl);
+            
+            const mouseX = clientX - rect.left;
+            const mouseY = clientY - rect.top;
+            
+            drawingWirePath.setAttribute('d', getBezierPath(startPos.x, startPos.y, mouseX, mouseY));
         }
-    });
 
-    function createComponentNode(type, x, y) {
-        const template = componentLibrary.find(c => c.type === type);
-        if (!template) return;
-
-        const id = 'node_' + (++nodeIdCounter);
-        
-        const nodeObj = {
-            id: id,
-            type: template.type,
-            x: x,
-            y: y,
-            inputs: template.inputs,
-            outputs: template.outputs
-        };
-        nodes.push(nodeObj);
-
-        // Criar elemento DOM
-        const el = document.createElement('div');
-        el.className = 'component-node';
-        el.id = id;
-        el.style.left = x + 'px';
-        el.style.top = y + 'px';
-
-        // Header (Área de arrasto do componente)
-        const header = document.createElement('div');
-        header.className = 'component-header';
-        header.innerHTML = `
-            <span>${template.name}</span>
-            <button class="text-slate-900 hover:text-red-300 delete-btn px-1" title="Apagar componente">
-                <i class="fa-solid fa-trash-can text-[10px]"></i>
-            </button>
-        `;
-        
-        // Logica para mover componente (Mouse & Touch) na barra de título
-        setupNodeDragging(header, el, nodeObj);
-
-        // Deletar componente
-        header.querySelector('.delete-btn').addEventListener('click', (e) => {
-            e.stopPropagation(); // Previne iniciar drag
-            deleteNode(id);
-        });
-
-        // Ports Inputs (Topo)
-        const inputsContainer = document.createElement('div');
-        inputsContainer.className = 'ports-container top';
-        template.inputs.forEach(portName => {
-            inputsContainer.appendChild(createPort(id, portName, true));
-        });
-
-        // Body (Ícone)
-        const body = document.createElement('div');
-        body.className = 'component-body';
-        body.innerHTML = `<i class="fa-solid ${template.icon} ${template.color}"></i>`;
-
-        // Ports Outputs (Embaixo)
-        const outputsContainer = document.createElement('div');
-        outputsContainer.className = 'ports-container bottom';
-        template.outputs.forEach(portName => {
-            outputsContainer.appendChild(createPort(id, portName, false));
-        });
-
-        el.appendChild(header);
-        if(template.inputs.length > 0) el.appendChild(inputsContainer);
-        el.appendChild(body);
-        if(template.outputs.length > 0) el.appendChild(outputsContainer);
-
-        workspace.appendChild(el);
-        showToast(`${template.name} adicionado.`, 'success');
-    }
-
-    function createPort(nodeId, portName, isInput) {
-        const portWrapper = document.createElement('div');
-        portWrapper.style.position = 'relative';
-
-        const portEl = document.createElement('div');
-        portEl.className = 'port';
-        portEl.dataset.nodeId = nodeId;
-        portEl.dataset.portName = portName;
-        portEl.dataset.isInput = isInput;
-        portEl.title = portName;
-
-        const label = document.createElement('div');
-        label.className = 'port-label';
-        label.innerText = portName;
-
-        portWrapper.appendChild(portEl);
-        portWrapper.appendChild(label);
-
-        // Lógica de clicar no borne para criar fios (Mouse & Touch)
-        const handlePortInteraction = (e) => {
-            e.stopPropagation();
-            e.preventDefault(); // Evita scroll em touch
-            handlePortClick(nodeId, portName, isInput, portEl);
-        };
-
-        portEl.addEventListener('mousedown', handlePortInteraction);
-        portEl.addEventListener('touchstart', handlePortInteraction, {passive: false});
-
-        return portWrapper;
-    }
-
-    function handlePortClick(nodeId, portName, isInput, portEl) {
-        if (!activeWiring) {
-            // Inicia a criação do fio
-            activeWiring = true;
-            wiringStartPort = { nodeId, portName, isInput, el: portEl };
-            portEl.classList.add('active');
+        function cancelDrawing(e) {
+            if(e && e.target.classList.contains('port')) return; // Deixa o port lidar com o click
             
-            // Ativa o tracking do mouse para linha temporária
-            document.addEventListener('mousemove', trackTempWire);
-            document.addEventListener('touchmove', trackTempWireTouch, {passive: false});
-            tempWire.style.display = 'block';
+            if(drawingWire && drawingWire.sourceEl) drawingWire.sourceEl.classList.remove('active');
+            drawingWire = null;
+            drawingLayer.style.display = 'none';
+            document.removeEventListener('pointermove', onPointerMoveDraw);
+            workspace.removeEventListener('pointerdown', cancelDrawing);
+        }
+
+        function createWire(srcNode, srcPort, tgtNode, tgtPort) {
+            // Previne múltiplas conexões idênticas
+            const exists = wires.find(w => 
+                (w.sourceNode === srcNode && w.sourcePort === srcPort && w.targetNode === tgtNode && w.targetPort === tgtPort) ||
+                (w.sourceNode === tgtNode && w.sourcePort === tgtPort && w.targetNode === srcNode && w.targetPort === srcPort)
+            );
             
-            // Posição inicial do fio temporário
-            updateTempWireStart(portEl);
-            
-            // Se clicar no fundo, cancela a fiação
-            workspace.addEventListener('mousedown', cancelWiring);
-            workspace.addEventListener('touchstart', cancelWiring);
-        } else {
-            // Finaliza a criação do fio
-            if (wiringStartPort.nodeId !== nodeId) { // Não permite ligar no mesmo componente
-                createWire(
-                    wiringStartPort.nodeId, wiringStartPort.portName, wiringStartPort.el, wiringStartPort.isInput,
-                    nodeId, portName, portEl, isInput
-                );
+            if(exists) {
+                showToast("Esses bornes já estão conectados.", 'error');
+                return;
             }
-            cleanupWiringState();
+
+            wireIdCounter++;
+            const wireId = 'wire_' + wireIdCounter;
+            
+            // Elemento SVG Path
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.id = wireId;
+            path.setAttribute('class', 'wire-path');
+            
+            // Adiciona evento para deletar o fio
+            path.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteWire(wireId);
+            });
+
+            wireLayer.appendChild(path);
+
+            const wireObj = { id: wireId, sourceNode: srcNode, sourcePort: srcPort, targetNode: tgtNode, targetPort: tgtPort, pathEl: path };
+            wires.push(wireObj);
+            
+            updateWirePath(wireObj);
+            
+            // Efeito sonoro/visual pequeno
+            showToast("Conexão estabelecida.", 'success');
         }
-    }
 
-    function cancelWiring(e) {
-        // Só cancela se clicou direto no workspace (não em outro port)
-        if (e.target === workspace || e.target.id === 'wires-layer' || e.target.id === 'temp-wire-container') {
-            cleanupWiringState();
+        function getPortCenter(portEl) {
+            const rect = portEl.getBoundingClientRect();
+            const workspaceRect = workspace.getBoundingClientRect();
+            return {
+                x: rect.left - workspaceRect.left + (rect.width / 2),
+                y: rect.top - workspaceRect.top + (rect.height / 2)
+            };
         }
-    }
 
-    function cleanupWiringState() {
-        activeWiring = false;
-        if (wiringStartPort && wiringStartPort.el) {
-            wiringStartPort.el.classList.remove('active');
+        function getBezierPath(x1, y1, x2, y2) {
+            const dx = Math.abs(x2 - x1);
+            const dy = Math.abs(y2 - y1);
+            
+            // Curvatura dinâmica baseada na distância. Faz o fio "cair" como gravidade ou curvar lateralmente.
+            const offset = Math.max(dy / 2, dx / 3, 40); 
+            
+            // Control points para fazer uma curva em "S" vertical suave, típica de diagramas elétricos
+            return `M ${x1} ${y1} C ${x1} ${y1 + offset}, ${x2} ${y2 - offset}, ${x2} ${y2}`;
         }
-        wiringStartPort = null;
-        tempWire.style.display = 'none';
-        document.removeEventListener('mousemove', trackTempWire);
-        document.removeEventListener('touchmove', trackTempWireTouch);
-        workspace.removeEventListener('mousedown', cancelWiring);
-        workspace.removeEventListener('touchstart', cancelWiring);
-    }
 
-    // Retorna a coordenada central absoluta do port relativa ao workspace
-    function getPortCenter(portEl) {
-        const rect = portEl.getBoundingClientRect();
-        const wsRect = workspace.getBoundingClientRect();
-        return {
-            x: rect.left - wsRect.left + (rect.width / 2),
-            y: rect.top - wsRect.top + (rect.height / 2)
-        };
-    }
-
-    function updateTempWireStart(portEl) {
-        const start = getPortCenter(portEl);
-        tempWire.dataset.startX = start.x;
-        tempWire.dataset.startY = start.y;
-        tempWire.setAttribute('d', `M${start.x},${start.y} L${start.x},${start.y}`);
-    }
-
-    function trackTempWire(e) {
-        const wsRect = workspace.getBoundingClientRect();
-        const mouseX = e.clientX - wsRect.left;
-        const mouseY = e.clientY - wsRect.top;
-        drawBezierCurve(tempWire, parseFloat(tempWire.dataset.startX), parseFloat(tempWire.dataset.startY), mouseX, mouseY, wiringStartPort.isInput, !wiringStartPort.isInput);
-    }
-    
-    function trackTempWireTouch(e) {
-        const touch = e.touches[0];
-        const wsRect = workspace.getBoundingClientRect();
-        const mouseX = touch.clientX - wsRect.left;
-        const mouseY = touch.clientY - wsRect.top;
-        drawBezierCurve(tempWire, parseFloat(tempWire.dataset.startX), parseFloat(tempWire.dataset.startY), mouseX, mouseY, wiringStartPort.isInput, !wiringStartPort.isInput);
-    }
-
-    function createWire(node1, port1, el1, isInput1, node2, port2, el2, isInput2) {
-        // Evita duplicatas exatas
-        const exists = wires.find(w => 
-            (w.fromNode === node1 && w.fromPort === port1 && w.toNode === node2 && w.toPort === port2) ||
-            (w.fromNode === node2 && w.fromPort === port2 && w.toNode === node1 && w.toPort === port1)
-        );
-        if (exists) return;
-
-        const wireId = 'wire_' + (++wireIdCounter);
-        const wireObj = {
-            id: wireId,
-            fromNode: node1, fromPort: port1, fromEl: el1, isFromInput: isInput1,
-            toNode: node2, toPort: port2, toEl: el2, isToInput: isInput2
-        };
-        wires.push(wireObj);
-
-        // Criar elemento SVG Path
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('id', wireId);
-        path.setAttribute('class', 'wire');
-        
-        // Deletar fio ao clicar
-        const handleDeleteWire = (e) => {
-            e.stopPropagation();
-            deleteWire(wireId);
-        };
-        path.addEventListener('click', handleDeleteWire);
-        path.addEventListener('touchstart', handleDeleteWire, {passive: true});
-
-        wiresLayer.appendChild(path);
-        
-        updateAllWires();
-        showToast('Conexão estabelecida.', 'info');
-    }
-
-    function drawBezierCurve(pathEl, x1, y1, x2, y2, isInput1, isInput2) {
-        // Calcula a força da curva baseada na distância vertical, para ficar estilo CAD
-        const dy = Math.abs(y2 - y1);
-        const curveForce = Math.max(dy * 0.5, 40); // Mínimo de 40px de curva
-        
-        // Se a porta for entrada (topo), o fio deve vir de cima. Se for saída (baixo), deve ir para baixo.
-        const c1y = isInput1 ? y1 - curveForce : y1 + curveForce;
-        const c2y = isInput2 ? y2 - curveForce : y2 + curveForce;
-
-        // Monta o SVG Path (C = Cubic Bezier)
-        const d = `M${x1},${y1} C${x1},${c1y} ${x2},${c2y} ${x2},${y2}`;
-        pathEl.setAttribute('d', d);
-    }
-
-    function updateAllWires() {
-        wires.forEach(w => {
-            const start = getPortCenter(w.fromEl);
-            const end = getPortCenter(w.toEl);
-            const path = document.getElementById(w.id);
-            if (path) {
-                drawBezierCurve(path, start.x, start.y, end.x, end.y, w.isFromInput, w.isToInput);
+        function updateWirePath(wire) {
+            // Busca elementos no DOM
+            const srcSelector = `.port[data-node="${wire.sourceNode}"][data-port="${wire.sourcePort}"]`;
+            const tgtSelector = `.port[data-node="${wire.targetNode}"][data-port="${wire.targetPort}"]`;
+            
+            const srcEl = document.querySelector(srcSelector);
+            const tgtEl = document.querySelector(tgtSelector);
+            
+            if (srcEl && tgtEl) {
+                const p1 = getPortCenter(srcEl);
+                const p2 = getPortCenter(tgtEl);
+                wire.pathEl.setAttribute('d', getBezierPath(p1.x, p1.y, p2.x, p2.y));
+                
+                // Pinta o cabo baseado na fase (L1, L2, L3) para ficar profissional
+                if(['L1', 'R', 'U', 'U1', '1(L1)', '2(T1)'].includes(wire.sourcePort) || ['L1', 'R', 'U', 'U1', '1(L1)', '2(T1)'].includes(wire.targetPort)) wire.pathEl.style.stroke = '#3b82f6'; // Azul escuro
+                else if(['L2', 'S', 'V', 'V1', '3(L2)', '4(T2)'].includes(wire.sourcePort) || ['L2', 'S', 'V', 'V1', '3(L2)', '4(T2)'].includes(wire.targetPort)) wire.pathEl.style.stroke = '#f97316'; // Laranja
+                else if(['L3', 'T', 'W', 'W1', '5(L3)', '6(T3)'].includes(wire.sourcePort) || ['L3', 'T', 'W', 'W1', '5(L3)', '6(T3)'].includes(wire.targetPort)) wire.pathEl.style.stroke = '#8b5cf6'; // Roxo
+                else if(['PE'].includes(wire.sourcePort) || ['PE'].includes(wire.targetPort)) wire.pathEl.style.stroke = '#22c55e'; // Verde
+                else if(['N', '0V', 'M'].includes(wire.sourcePort) || ['N', '0V', 'M'].includes(wire.targetPort)) wire.pathEl.style.stroke = '#0ea5e9'; // Azul claro
+                else wire.pathEl.style.stroke = '#ef4444'; // Comando padrão
             }
-        });
-    }
-
-    function setupNodeDragging(handleEl, nodeEl, nodeData) {
-        let isDragging = false;
-        let startX, startY, initialNodeX, initialNodeY;
-
-        const startDrag = (clientX, clientY, e) => {
-            // Não arrasta se clicou no botão de fechar
-            if (e.target.closest('.delete-btn')) return;
-            
-            isDragging = true;
-            startX = clientX;
-            startY = clientY;
-            initialNodeX = nodeData.x;
-            initialNodeY = nodeData.y;
-            nodeEl.style.zIndex = 100; // Traz pra frente
-        };
-
-        const onDrag = (clientX, clientY) => {
-            if (!isDragging) return;
-            const dx = clientX - startX;
-            const dy = clientY - startY;
-            
-            nodeData.x = initialNodeX + dx;
-            nodeData.y = initialNodeY + dy;
-            
-            // Limites básicos para não sumir da tela
-            if(nodeData.x < 0) nodeData.x = 0;
-            if(nodeData.y < 0) nodeData.y = 0;
-
-            nodeEl.style.left = nodeData.x + 'px';
-            nodeEl.style.top = nodeData.y + 'px';
-            
-            updateAllWires(); // Atualiza cabos em tempo real
-        };
-
-        const stopDrag = () => {
-            isDragging = false;
-            nodeEl.style.zIndex = 10;
-        };
-
-        // Eventos Mouse
-        handleEl.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY, e));
-        document.addEventListener('mousemove', (e) => onDrag(e.clientX, e.clientY));
-        document.addEventListener('mouseup', stopDrag);
-
-        // Eventos Touch
-        handleEl.addEventListener('touchstart', (e) => {
-            const touch = e.touches[0];
-            startDrag(touch.clientX, touch.clientY, e);
-        }, {passive: false});
-        
-        document.addEventListener('touchmove', (e) => {
-            if(!isDragging) return;
-            e.preventDefault(); // Previne scroll ao mover peça
-            const touch = e.touches[0];
-            onDrag(touch.clientX, touch.clientY);
-        }, {passive: false});
-        
-        document.addEventListener('touchend', stopDrag);
-    }
-
-    function deleteNode(nodeId) {
-        // Remover elemento DOM
-        const el = document.getElementById(nodeId);
-        if (el) el.remove();
-        
-        // Remover do array
-        nodes = nodes.filter(n => n.id !== nodeId);
-
-        // Remover fios conectados a este nó
-        const wiresToDelete = wires.filter(w => w.fromNode === nodeId || w.toNode === nodeId);
-        wiresToDelete.forEach(w => deleteWire(w.id));
-        
-        showToast('Componente removido.', 'error');
-    }
-
-    function deleteWire(wireId) {
-        const el = document.getElementById(wireId);
-        if (el) el.remove();
-        wires = wires.filter(w => w.id !== wireId);
-    }
-
-    function clearAll() {
-        // Limpar arrays
-        nodes = [];
-        wires = [];
-        nodeIdCounter = 0;
-        wireIdCounter = 0;
-
-        // Limpar DOM do Workspace (mantendo a layer de wires limpa)
-        const allNodes = document.querySelectorAll('.component-node');
-        allNodes.forEach(n => n.remove());
-        wiresLayer.innerHTML = '';
-        
-        cleanupWiringState();
-        showToast('Área de trabalho limpa.', 'info');
-    }
-
-    function showToast(message, type = 'info') {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        
-        let bgColor = 'bg-slate-800 border-slate-600 text-white';
-        let icon = 'fa-info-circle text-blue-400';
-        
-        if (type === 'success') {
-            icon = 'fa-check-circle text-green-400';
-        } else if (type === 'error') {
-            icon = 'fa-trash text-red-400';
         }
 
-        toast.className = `${bgColor} border px-4 py-2 rounded shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-y-10 opacity-0 text-sm font-medium`;
-        toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
-        
-        container.appendChild(toast);
-        
-        // Anim in
-        requestAnimationFrame(() => {
-            toast.classList.remove('translate-y-10', 'opacity-0');
-        });
+        function updateAllWires() {
+            wires.forEach(w => updateWirePath(w));
+        }
 
-        // Anim out
-        setTimeout(() => {
-            toast.classList.add('opacity-0');
-            setTimeout(() => toast.remove(), 300);
-        }, 2500);
-    }
+        function setupNodeDragging(handleEl, nodeEl, id) {
+            let isDragging = false;
+            let startX, startY, initialX, initialY;
 
-    // Listeners do Menu Superior
-    document.getElementById('btn-clear').addEventListener('click', clearAll);
-    
-    const helpModal = document.getElementById('help-modal');
-    document.getElementById('btn-help').addEventListener('click', () => helpModal.classList.remove('hidden'));
-    document.getElementById('close-modal').addEventListener('click', () => helpModal.classList.add('hidden'));
-    document.getElementById('btn-start').addEventListener('click', () => helpModal.classList.add('hidden'));
+            function onPointerDown(e) {
+                // Não arrasta se clicou no botão de apagar
+                if(e.target.closest('button')) return;
+                
+                isDragging = true;
+                nodeEl.classList.add('dragging');
+                
+                startX = e.clientX;
+                startY = e.clientY;
+                initialX = parseInt(nodeEl.style.left) || 0;
+                initialY = parseInt(nodeEl.style.top) || 0;
+                
+                document.addEventListener('pointermove', onPointerMove);
+                document.addEventListener('pointerup', onPointerUp);
+                
+                e.preventDefault(); // Previne seleção de texto
+            }
 
-    // Atualiza fios se a janela for redimensionada
-    window.addEventListener('resize', () => {
-        if (wires.length > 0) updateAllWires();
-    });
+            function onPointerMove(e) {
+                if (!isDragging) return;
+                
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                
+                let newX = initialX + dx;
+                let newY = initialY + dy;
+                
+                // Limites rudimentares
+                newX = Math.max(0, newX);
+                newY = Math.max(0, newY);
+                
+                nodeEl.style.left = newX + 'px';
+                nodeEl.style.top = newY + 'px';
+                
+                // Atualizar nó na array e fios conectados
+                const nodeData = nodes.find(n => n.id === id);
+                if(nodeData) {
+                    nodeData.x = newX;
+                    nodeData.y = newY;
+                    
+                    // Atualiza apenas os fios conectados a este nó para performance
+                    wires.forEach(w => {
+                        if (w.sourceNode === id || w.targetNode === id) {
+                            updateWirePath(w);
+                        }
+                    });
+                }
+            }
 
-    // Inicializar App
-    renderPalette();
-    
-    // Mostrar modal na primeira vez (ou no load)
-    setTimeout(() => {
-        helpModal.classList.remove('hidden');
-    }, 500);
+            function onPointerUp() {
+                isDragging = false;
+                nodeEl.classList.remove('dragging');
+                document.removeEventListener('pointermove', onPointerMove);
+                document.removeEventListener('pointerup', onPointerUp);
+            }
 
-</script>
+            handleEl.addEventListener('pointerdown', onPointerDown);
+        }
+
+        function deleteComponent(id) {
+            // Remove Elemento HTML
+            const el = document.getElementById(id);
+            if(el) el.remove();
+            
+            // Remove da Array
+            nodes = nodes.filter(n => n.id !== id);
+            
+            // Encontra e remove fios conectados
+            const wiresToRemove = wires.filter(w => w.sourceNode === id || w.targetNode === id);
+            wiresToRemove.forEach(w => {
+                if(w.pathEl) w.pathEl.remove();
+            });
+            wires = wires.filter(w => w.sourceNode !== id && w.targetNode !== id);
+        }
+
+        function deleteWire(id) {
+            const wire = wires.find(w => w.id === id);
+            if (wire) {
+                wire.pathEl.remove();
+                wires = wires.filter(w => w.id !== id);
+            }
+        }
+
+        function clearWorkspace() {
+            // Limpa HTML
+            componentsContainer.innerHTML = '';
+            wireLayer.innerHTML = '';
+            
+            // Reseta Arrays
+            nodes = [];
+            wires = [];
+            nodeIdCounter = 0;
+            wireIdCounter = 0;
+            
+            // Volta texto de instrução
+            document.getElementById('welcome-text').style.display = 'flex';
+            showToast("Bancada limpa.", 'success');
+        }
+
+        function showHelp() {
+            alert("Instruções do Simulador CAD:\n\n1. Arraste os componentes do painel esquerdo para a grade.\n2. Para conectar componentes, clique em um borne (parafuso prata) e depois em outro borne de destino.\n3. Arraste os componentes pelo título cinza escuro para reposicioná-los.\n4. Para apagar um fio, basta clicar em cima dele.\n5. Para apagar uma peça, clique no ícone de (X) no canto dela.");
+        }
+
+        function showToast(message, type='info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            if(type === 'error') toast.style.borderLeftColor = '#ef4444';
+            toast.innerText = message;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease-out forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Inicializar aplicação
+        window.onload = () => {
+            initPalette();
+            // Lida com resize da tela para recalcular caminhos dos fios
+            window.addEventListener('resize', updateAllWires);
+        };
+    </script>
 </body>
 </html>
