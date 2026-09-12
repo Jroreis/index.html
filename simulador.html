@@ -17,10 +17,10 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Previne scroll da página inteira */
+            overflow: hidden; 
             background-color: var(--bg-color);
             color: #f8fafc;
-            touch-action: none; /* Desabilita pull-to-refresh no mobile */
+            touch-action: none; 
         }
 
         #workspace {
@@ -40,7 +40,6 @@
             cursor: grabbing;
         }
 
-        /* Nova camada para controle de Pan e Zoom */
         #canvas-pan-zoom {
             position: absolute;
             top: 0;
@@ -56,17 +55,17 @@
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none; /* Deixa os cliques passarem para os componentes */
+            pointer-events: none; 
             z-index: 10;
             overflow: visible;
         }
 
         .wire-path {
             fill: none;
-            stroke: #ef4444; /* Cor vermelha para os cabos de força/comando padrão */
+            stroke: #ef4444; 
             stroke-width: 4;
             stroke-linecap: round;
-            pointer-events: stroke; /* Permite clicar no cabo para deletar */
+            pointer-events: stroke; 
             cursor: pointer;
             transition: stroke 0.2s, stroke-width 0.2s;
             filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));
@@ -140,7 +139,6 @@
         .ports-container.top { top: -6px; }
         .ports-container.bottom { bottom: -6px; }
         
-        /* Ajuste específico para o Inversor e CLP onde os bornes ficam em recuos */
         .inset-ports.top { top: 12px; }
         .inset-ports.bottom { bottom: 12px; }
 
@@ -160,7 +158,6 @@
             cursor: crosshair;
             position: relative;
             transition: all 0.2s;
-            /* Textura de parafuso Phillips realista */
             background-image: 
                 linear-gradient(45deg, transparent 42%, #475569 45%, #475569 55%, transparent 58%),
                 linear-gradient(-45deg, transparent 42%, #475569 45%, #475569 55%, transparent 58%);
@@ -170,7 +167,7 @@
         .port:hover, .port.active {
             background-color: #fbbf24;
             transform: scale(1.3);
-            background-image: none; /* Destaca a bolinha de conexão ao passar o mouse */
+            background-image: none; 
             box-shadow: 0 0 10px #f59e0b, inset 0 -1px 2px rgba(0,0,0,0.4);
             z-index: 40;
         }
@@ -204,7 +201,6 @@
             background-color: #334155;
         }
         
-        /* Sistema de colapso da barra lateral */
         #sidebar {
             transition: width 0.3s ease, min-width 0.3s ease, opacity 0.2s;
         }
@@ -277,6 +273,16 @@
         }
 
         .digital-font { font-family: 'JetBrains Mono', monospace; font-weight: bold; }
+        
+        /* Estilos do Modal da Apostila */
+        #manual-modal {
+            backdrop-filter: blur(5px);
+        }
+        .manual-step {
+            border-left: 2px solid #3b82f6;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen">
@@ -302,23 +308,25 @@
     </header>
 
     <div class="flex flex-1 overflow-hidden relative">
-        <!-- Sidebar Esquerda -->
-        <aside id="sidebar" class="w-64 sm:w-72 min-w-[16rem] sm:min-w-[18rem] bg-slate-900 border-r border-slate-800 flex flex-col z-30 shrink-0 shadow-2xl">
-            <div class="p-4 border-b border-slate-800 bg-slate-800/50 flex justify-between items-center">
-                <div>
-                    <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Biblioteca</h2>
-                    <p class="text-[10px] text-slate-500 mt-0.5">Arraste para a bancada</p>
+        <aside id="sidebar" class="w-64 sm:w-72 min-w-[16rem] sm:min-w-[18rem] bg-slate-900 border-r border-slate-800 flex flex-col z-30 shrink-0 shadow-2xl relative">
+            <div class="p-4 border-b border-slate-800 bg-slate-800/50 flex flex-col">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Biblioteca</h2>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Arraste para a bancada</p>
+                    </div>
                 </div>
+                <!-- NOVO BOTÃO DA APOSTILA/MANUAL -->
+                <button onclick="openManual()" class="w-full mt-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white text-xs font-bold py-2.5 px-3 rounded shadow flex justify-center items-center gap-2 transition-all border border-blue-500/50">
+                    <i class="fa-solid fa-book-open"></i> Apostila de Montagens (Passo a Passo)
+                </button>
             </div>
             <div id="component-palette" class="flex-1 overflow-y-auto p-3 space-y-2 pb-20 scrollbar-hide">
                 <!-- Os itens serão gerados via JS aqui -->
             </div>
         </aside>
 
-        <!-- Área de Projeto (Canvas) -->
         <main id="workspace" class="flex-1 relative">
-            
-            <!-- Barra de Ferramentas da Bancada (Zoom e Save) -->
             <div class="canvas-toolbar">
                 <button onclick="zoomIn()" title="Aumentar Zoom (Scroll Up)"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
                 <button onclick="zoomOut()" title="Diminuir Zoom (Scroll Down)"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
@@ -329,36 +337,56 @@
                 <input type="file" id="import-file" style="display: none;" accept=".json" onchange="importCircuit(event)">
             </div>
 
-            <!-- Camada que sofre Zoom e Pan -->
             <div id="canvas-pan-zoom">
-                <!-- Camada SVG para desenhar os fios -->
                 <svg id="wire-layer"></svg>
-                
-                <!-- Linha indicadora enquanto desenha um fio -->
                 <svg id="drawing-layer" class="absolute top-0 left-0 w-full h-full pointer-events-none z-10" style="display: none; overflow: visible;">
                     <path id="drawing-wire" class="wire-path" stroke-dasharray="5,5" opacity="0.6"></path>
                 </svg>
-                
-                <!-- Container para as caixas de ferramentas/componentes -->
                 <div id="components-container" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
             </div>
             
-            <!-- Instrução inicial na tela -->
             <div id="welcome-text" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
                 <div class="text-center">
                     <i class="fa-solid fa-arrows-up-down-left-right text-5xl mb-4"></i>
-                    <h2 class="text-2xl font-bold">Use SHIFT + Clique para mover a tela</h2>
-                    <p class="text-md mt-2">Scroll do mouse para Zoom In/Out</p>
+                    <h2 class="text-2xl font-bold">Use SHIFT + Clique ou Toque (1 dedo) para mover a tela</h2>
+                    <p class="text-md mt-2">Scroll do mouse ou Pinça (2 dedos) para Zoom</p>
                 </div>
             </div>
         </main>
     </div>
 
+    <div id="manual-modal" class="fixed inset-0 bg-slate-900/95 z-[1000] hidden flex items-center justify-center p-4 sm:p-6">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-5xl h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <!-- Cabeçalho do Modal -->
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800 shrink-0">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-blue-500"></i> Apostila: Laboratório de Comandos Elétricos</h2>
+                <button onclick="closeManual()" class="text-slate-400 hover:text-red-400 transition-colors p-2 text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <!-- Corpo do Modal -->
+            <div class="flex flex-1 overflow-hidden">
+                <!-- Menu Lateral de Lições -->
+                <div class="w-1/3 min-w-[200px] border-r border-slate-700 bg-slate-900/50 overflow-y-auto p-3 space-y-2" id="manual-lessons-list">
+                    <!-- Gerado via JS -->
+                </div>
+                <!-- Conteúdo da Lição Selecionada -->
+                <div class="w-2/3 flex-1 overflow-y-auto p-6 bg-slate-800" id="manual-lesson-content">
+                    <div class="h-full flex flex-col items-center justify-center text-slate-500 text-center">
+                        <i class="fa-solid fa-book-open text-6xl mb-4 opacity-50"></i>
+                        <p class="text-lg font-medium">Selecione uma lição no menu lateral para iniciar.</p>
+                        <p class="text-sm mt-2">Aprenda o passo a passo e replique na bancada interativa.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="toast-container"></div>
 
     <script>
-        // Aqui mantemos TODAS as peças originais rigorosamente e adicionamos as 4 novas solicitadas.
         const componentLibrary = [
+            // COMPONENTES ORIGINAIS MANTIDOS INTACTOS
             {
                 type: 'rede_trifasica', name: 'Barramento 380V (3F+T)', category: 'ALIMENTAÇÃO',
                 width: 160, height: 40,
@@ -410,7 +438,6 @@
                     <line x1="20" y1="80" x2="23" y2="77" stroke="#334155" stroke-width="1"/>
                 </svg>`
             },
-            // NOVOS COMPONENTES COMEÇAM AQUI
             {
                 type: 'disjuntor_bipolar', name: 'Disjuntor Bipolar', category: 'PROTEÇÃO',
                 width: 50, height: 90,
@@ -421,7 +448,7 @@
                     <rect x="0" y="0" width="50" height="90" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
                     <rect x="0" y="20" width="50" height="50" fill="#e2e8f0" />
                     <rect x="15" y="35" width="20" height="20" fill="#0f172a" rx="1"/>
-                    <rect x="15" y="35" width="20" height="10" fill="#3b82f6" rx="1"/> <!-- Alavanca ON -->
+                    <rect x="15" y="35" width="20" height="10" fill="#3b82f6" rx="1"/>
                     <text x="25" y="75" font-size="6" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">C10</text>
                 </svg>`
             },
@@ -433,18 +460,17 @@
                 svg: `
                 <svg viewBox="0 0 70 90" width="100%" height="100%">
                     <rect x="0" y="0" width="70" height="90" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
-                    <circle cx="20" cy="45" r="8" fill="#f8fafc" stroke="#64748b" /> <!-- Dial -->
+                    <circle cx="20" cy="45" r="8" fill="#f8fafc" stroke="#64748b" />
                     <line x1="20" y1="45" x2="25" y2="40" stroke="#ef4444" stroke-width="1.5" />
-                    <rect x="40" y="35" width="10" height="8" fill="#3b82f6" rx="1" /> <!-- Reset -->
-                    <rect x="40" y="50" width="10" height="8" fill="#ef4444" rx="1" /> <!-- Stop -->
+                    <rect x="40" y="35" width="10" height="8" fill="#3b82f6" rx="1" />
+                    <rect x="40" y="50" width="10" height="8" fill="#ef4444" rx="1" />
                     <text x="20" y="65" font-size="5" fill="#64748b" font-family="sans-serif" text-anchor="middle">AMP</text>
                 </svg>`
             },
-            // FIM NOVOS COMPONENTES (Mas tem mais abaixo)
             {
                 type: 'contator', name: 'Contator K1', category: 'MANOBRA',
                 width: 70, height: 100,
-                inputs: ['L1', 'L2', 'L3', '13', 'A1'], outputs: ['T1', 'T2', 'T3', '14', 'A2'], // Adicionado 13/14 auxiliar
+                inputs: ['L1', 'L2', 'L3', '13', 'A1'], outputs: ['T1', 'T2', 'T3', '14', 'A2'], 
                 portStyle: 'edge',
                 svg: `
                 <svg viewBox="0 0 70 100" width="100%" height="100%">
@@ -457,7 +483,7 @@
                 </svg>`
             },
             {
-                type: 'inversor', name: 'Inversor VFD', category: 'CONTROLE',
+                type: 'inversor', name: 'Inversor VFD', category: 'CONTROLE AVANÇADO',
                 width: 90, height: 150,
                 inputs: ['R', 'S', 'T', 'DI1', 'DI2'], outputs: ['U', 'V', 'W', 'PE'],
                 portStyle: 'inset',
@@ -536,7 +562,7 @@
                 </svg>`
             },
             {
-                type: 'sinaleiro_verde', name: 'Lâmpada (Sinaleiro)', category: 'COMANDO',
+                type: 'sinaleiro_verde', name: 'Lâmpada Verde', category: 'COMANDO',
                 width: 50, height: 50,
                 inputs: ['X1'], outputs: ['X2'],
                 portStyle: 'edge',
@@ -544,7 +570,6 @@
                 <svg viewBox="0 0 50 50" width="100%" height="100%">
                     <rect x="0" y="0" width="50" height="50" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1" rx="4"/>
                     <circle cx="25" cy="25" r="18" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
-                    <!-- Lente verde translúcida -->
                     <circle cx="25" cy="25" r="14" fill="#4ade80" stroke="#22c55e" stroke-width="1" filter="drop-shadow(0 0 4px #4ade80)"/>
                     <path d="M 17 17 Q 25 13 33 17 Q 25 20 17 17 Z" fill="#ffffff" opacity="0.8"/>
                 </svg>`
@@ -585,23 +610,179 @@
                     <circle cx="40" cy="120" r="3" fill="#1e293b"/>
                     <circle cx="110" cy="120" r="3" fill="#1e293b"/>
                     <rect x="130" y="65" width="20" height="14" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
-                    
-                    <!-- Corpo -->
-                    <rect x="25" y="40" width="105" height="65" fill="#0f766e" rx="8" /> <!-- Cor Teal para diferenciar -->
-                    <!-- Aletas -->
+                    <rect x="25" y="40" width="105" height="65" fill="#0f766e" rx="8" />
                     <line x1="30" y1="50" x2="125" y2="50" stroke="#115e59" stroke-width="3"/>
                     <line x1="30" y1="60" x2="125" y2="60" stroke="#115e59" stroke-width="3"/>
                     <line x1="30" y1="70" x2="125" y2="70" stroke="#115e59" stroke-width="3"/>
                     <line x1="30" y1="80" x2="125" y2="80" stroke="#115e59" stroke-width="3"/>
                     <line x1="30" y1="90" x2="125" y2="90" stroke="#115e59" stroke-width="3"/>
-                    
                     <path d="M 25 40 Q 10 72 25 105 L 15 100 L 15 45 Z" fill="#042f2e"/>
-                    
-                    <!-- Capacitor em cima -->
                     <rect x="55" y="15" width="40" height="25" fill="#cbd5e1" rx="4" stroke="#94a3b8" stroke-width="1"/>
                     <rect x="50" y="38" width="50" height="5" fill="#0f766e" />
-                    
-                    <rect x="0" y="0" width="150" height="15" fill="transparent" /> <!-- Caixa borne -->
+                    <rect x="0" y="0" width="150" height="15" fill="transparent" />
+                </svg>`
+            },
+
+            {
+                type: 'soft_starter', name: 'Soft-Starter', category: 'CONTROLE AVANÇADO',
+                width: 90, height: 160,
+                inputs: ['L1', 'L2', 'L3', 'DI1', 'DI2'], outputs: ['T1', 'T2', 'T3', 'PE'],
+                portStyle: 'inset',
+                svg: `
+                <svg viewBox="0 0 90 160" width="100%" height="100%">
+                    <rect x="5" y="0" width="80" height="160" fill="#475569" rx="2"/>
+                    <rect x="15" y="5" width="60" height="150" fill="#cbd5e1" rx="2"/>
+                    <rect x="15" y="5" width="60" height="25" fill="#0f172a" />
+                    <rect x="15" y="130" width="60" height="25" fill="#0f172a" />
+                    <rect x="25" y="40" width="40" height="20" fill="#000" rx="1"/>
+                    <text class="digital-font" x="45" y="54" font-size="10" fill="#3b82f6" text-anchor="middle" filter="drop-shadow(0 0 2px #3b82f6)">RDY</text>
+                    <!-- Aletas centrais -->
+                    <line x1="20" y1="70" x2="70" y2="70" stroke="#94a3b8" stroke-width="2"/>
+                    <line x1="20" y1="80" x2="70" y2="80" stroke="#94a3b8" stroke-width="2"/>
+                    <line x1="20" y1="90" x2="70" y2="90" stroke="#94a3b8" stroke-width="2"/>
+                    <line x1="20" y1="100" x2="70" y2="100" stroke="#94a3b8" stroke-width="2"/>
+                </svg>`
+            },
+            {
+                type: 'rele_temporizador', name: 'Relé Temporizador', category: 'MANOBRA',
+                width: 50, height: 100,
+                inputs: ['A1', '15'], outputs: ['A2', '16', '18'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 50 100" width="100%" height="100%">
+                    <rect x="0" y="0" width="50" height="100" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="0" y="15" width="50" height="70" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+                    <circle cx="25" cy="40" r="12" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+                    <circle cx="25" cy="40" r="10" fill="#fff" />
+                    <line x1="25" y1="40" x2="30" y2="35" stroke="#ef4444" stroke-width="1.5" />
+                    <circle cx="15" cy="70" r="3" fill="#22c55e" />
+                    <text x="25" y="73" font-size="6" fill="#64748b" font-family="sans-serif">ON</text>
+                    <text x="25" y="90" font-size="7" font-weight="bold" fill="#64748b" font-family="sans-serif" text-anchor="middle">TIMER</text>
+                </svg>`
+            },
+            {
+                type: 'rele_falta_fase', name: 'Relé Falta de Fase', category: 'PROTEÇÃO',
+                width: 50, height: 100,
+                inputs: ['L1', 'L2', 'L3', '11'], outputs: ['12', '14'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 50 100" width="100%" height="100%">
+                    <rect x="0" y="0" width="50" height="100" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="0" y="15" width="50" height="70" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+                    <circle cx="15" cy="35" r="3" fill="#22c55e" />
+                    <text x="25" y="38" font-size="6" fill="#64748b" font-family="sans-serif">L1</text>
+                    <circle cx="15" cy="50" r="3" fill="#22c55e" />
+                    <text x="25" y="53" font-size="6" fill="#64748b" font-family="sans-serif">L2</text>
+                    <circle cx="15" cy="65" r="3" fill="#22c55e" />
+                    <text x="25" y="68" font-size="6" fill="#64748b" font-family="sans-serif">L3</text>
+                    <text x="25" y="85" font-size="7" font-weight="bold" fill="#ef4444" font-family="sans-serif" text-anchor="middle">FF</text>
+                </svg>`
+            },
+            {
+                type: 'botoeira_emergencia', name: 'Botão Emergência', category: 'COMANDO',
+                width: 60, height: 60,
+                inputs: ['11'], outputs: ['12'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 60 60" width="100%" height="100%">
+                    <rect x="0" y="0" width="60" height="60" fill="#fde047" stroke="#eab308" stroke-width="1" rx="4"/>
+                    <circle cx="30" cy="30" r="22" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
+                    <circle cx="30" cy="30" r="16" fill="#dc2626" />
+                    <!-- Seta de rotação branca -->
+                    <path d="M 22 22 A 10 10 0 0 1 38 22" fill="none" stroke="#fff" stroke-width="2" />
+                    <polygon points="38,20 42,24 36,24" fill="#fff" />
+                </svg>`
+            },
+            {
+                type: 'fim_de_curso', name: 'Fim de Curso (Limit Switch)', category: 'COMANDO',
+                width: 40, height: 90,
+                inputs: ['13', '11'], outputs: ['14', '12'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 40 90" width="100%" height="100%">
+                    <rect x="5" y="30" width="30" height="60" fill="#3b82f6" rx="2" stroke="#1e40af" stroke-width="1"/>
+                    <!-- Haste e roldana -->
+                    <rect x="18" y="10" width="4" height="20" fill="#94a3b8" />
+                    <circle cx="20" cy="8" r="6" fill="#cbd5e1" stroke="#64748b" stroke-width="2"/>
+                    <text x="20" y="60" font-size="6" font-weight="bold" fill="#fff" font-family="sans-serif" text-anchor="middle">LIMIT</text>
+                </svg>`
+            },
+            {
+                type: 'sensor_indutivo', name: 'Sensor Indutivo PNP', category: 'AUTOMAÇÃO',
+                width: 40, height: 80,
+                inputs: ['+24V', '0V'], outputs: ['OUT'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 40 80" width="100%" height="100%">
+                    <!-- Corpo roscado -->
+                    <rect x="10" y="10" width="20" height="70" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="10" y1="20" x2="30" y2="20" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="10" y1="30" x2="30" y2="30" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="10" y1="40" x2="30" y2="40" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="10" y1="50" x2="30" y2="50" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="10" y1="60" x2="30" y2="60" stroke="#94a3b8" stroke-width="1"/>
+                    <!-- Cabeça sensora azul -->
+                    <rect x="10" y="0" width="20" height="10" fill="#3b82f6" rx="2" />
+                    <circle cx="20" cy="70" r="3" fill="#ef4444" />
+                </svg>`
+            },
+            {
+                type: 'sinaleiro_vermelho', name: 'Lâmpada Vermelha', category: 'COMANDO',
+                width: 50, height: 50,
+                inputs: ['X1'], outputs: ['X2'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 50 50" width="100%" height="100%">
+                    <rect x="0" y="0" width="50" height="50" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1" rx="4"/>
+                    <circle cx="25" cy="25" r="18" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+                    <circle cx="25" cy="25" r="14" fill="#ef4444" stroke="#dc2626" stroke-width="1" filter="drop-shadow(0 0 4px #ef4444)"/>
+                    <path d="M 17 17 Q 25 13 33 17 Q 25 20 17 17 Z" fill="#ffffff" opacity="0.8"/>
+                </svg>`
+            },
+            {
+                type: 'sinaleiro_amarelo', name: 'Lâmpada Amarela', category: 'COMANDO',
+                width: 50, height: 50,
+                inputs: ['X1'], outputs: ['X2'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 50 50" width="100%" height="100%">
+                    <rect x="0" y="0" width="50" height="50" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1" rx="4"/>
+                    <circle cx="25" cy="25" r="18" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+                    <circle cx="25" cy="25" r="14" fill="#eab308" stroke="#ca8a04" stroke-width="1" filter="drop-shadow(0 0 4px #eab308)"/>
+                    <path d="M 17 17 Q 25 13 33 17 Q 25 20 17 17 Z" fill="#ffffff" opacity="0.8"/>
+                </svg>`
+            },
+            {
+                type: 'fusivel_seccionadora', name: 'Base Fusível 3F', category: 'PROTEÇÃO',
+                width: 80, height: 100,
+                inputs: ['1', '3', '5'], outputs: ['2', '4', '6'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 80 100" width="100%" height="100%">
+                    <rect x="0" y="0" width="80" height="100" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1" rx="2"/>
+                    <rect x="10" y="20" width="15" height="60" fill="#f8fafc" stroke="#cbd5e1" />
+                    <rect x="32" y="20" width="15" height="60" fill="#f8fafc" stroke="#cbd5e1" />
+                    <rect x="54" y="20" width="15" height="60" fill="#f8fafc" stroke="#cbd5e1" />
+                    <!-- Fusíveis de vidro/cerâmica -->
+                    <rect x="13" y="30" width="9" height="40" fill="#cbd5e1" rx="4" />
+                    <rect x="35" y="30" width="9" height="40" fill="#cbd5e1" rx="4" />
+                    <rect x="57" y="30" width="9" height="40" fill="#cbd5e1" rx="4" />
+                    <line x1="0" y1="50" x2="80" y2="50" stroke="#ef4444" stroke-width="4" stroke-dasharray="8,4" opacity="0.5"/> <!-- Alavanca -->
+                </svg>`
+            },
+            {
+                type: 'trafo_comando', name: 'Trafo Comando 24V', category: 'ALIMENTAÇÃO',
+                width: 80, height: 80,
+                inputs: ['H1(L)', 'H2(N)'], outputs: ['X1(+)', 'X2(-)'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 80 80" width="100%" height="100%">
+                    <rect x="10" y="10" width="60" height="60" fill="#94a3b8" stroke="#64748b" stroke-width="2"/>
+                    <rect x="20" y="20" width="40" height="40" fill="#f8fafc" />
+                    <!-- Bobinas -->
+                    <rect x="25" y="15" width="10" height="50" fill="#b45309" rx="2" />
+                    <rect x="45" y="15" width="10" height="50" fill="#b45309" rx="2" />
+                    <text x="40" y="43" font-size="6" font-weight="bold" fill="#0f172a" text-anchor="middle">24V</text>
                 </svg>`
             }
         ];
@@ -612,7 +793,6 @@
         let wireIdCounter = 0;
         let drawingWire = null; 
         
-        // Variaveis da expansão de tela (Pan & Zoom)
         let scale = 1;
         let panX = 0;
         let panY = 0;
@@ -628,22 +808,19 @@
 
         function updateTransform() {
             canvasPanZoom.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
-            updateAllWires(); // Recalcula bezier se a escala mudar visualmente
+            updateAllWires(); 
         }
 
-        // Função de Zoom (Wheel)
         workspace.addEventListener('wheel', (e) => {
             e.preventDefault();
             const zoomSensitivity = 0.1;
             const delta = e.deltaY > 0 ? -1 : 1;
             const newScale = Math.min(Math.max(0.4, scale + delta * zoomSensitivity), 2.5);
             
-            // Zoom em direção ao cursor do mouse
             const rect = workspace.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
             const mouseY = e.clientY - rect.top;
             
-            // Ajusta o Pan para manter o mouse fixo no mesmo ponto do grid
             panX = mouseX - (mouseX - panX) * (newScale / scale);
             panY = mouseY - (mouseY - panY) * (newScale / scale);
             
@@ -651,9 +828,7 @@
             updateTransform();
         }, { passive: false });
 
-        // Função de Pan (Arrastar Tela)
         workspace.addEventListener('pointerdown', (e) => {
-            // Inicia Pan se clicar com botão do meio (1) ou com Shift
             if (e.button === 1 || (e.button === 0 && e.shiftKey)) { 
                 isPanning = true;
                 startPanX = e.clientX - panX;
@@ -677,14 +852,67 @@
             }
         });
 
-        // Controles de barra
-        function zoomIn() { scale = Math.min(scale + 0.2, 2.5); centerPan(); }
-        function zoomOut() { scale = Math.max(scale - 0.2, 0.4); centerPan(); }
+        let initialPinchDistance = null;
+        let initialScale = 1;
+        
+        workspace.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                isPanning = false; 
+                initialPinchDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                initialScale = scale;
+            } else if (e.touches.length === 1) {
+                if (e.target === workspace || e.target === wireLayer || e.target === canvasPanZoom || e.target.id === 'welcome-text') {
+                    isPanning = true;
+                    startPanX = e.touches[0].clientX - panX;
+                    startPanY = e.touches[0].clientY - panY;
+                }
+            }
+        }, {passive: false});
+
+        workspace.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && initialPinchDistance) {
+                e.preventDefault();
+                const currentDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                const zoomFactor = currentDistance / initialPinchDistance;
+                let newScale = Math.min(Math.max(0.4, initialScale * zoomFactor), 2.5);
+                
+                const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                const rect = workspace.getBoundingClientRect();
+                const mouseX = centerX - rect.left;
+                const mouseY = centerY - rect.top;
+                
+                panX = mouseX - (mouseX - panX) * (newScale / scale);
+                panY = mouseY - (mouseY - panY) * (newScale / scale);
+                
+                scale = newScale;
+                updateTransform();
+            } else if (e.touches.length === 1 && isPanning) {
+                e.preventDefault();
+                panX = e.touches[0].clientX - startPanX;
+                panY = e.touches[0].clientY - startPanY;
+                updateTransform();
+            }
+        }, {passive: false});
+
+        workspace.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) {
+                initialPinchDistance = null;
+            }
+            if (e.touches.length === 0) {
+                isPanning = false;
+            }
+        });
+
+        function zoomIn() { scale = Math.min(scale + 0.2, 2.5); updateTransform(); }
+        function zoomOut() { scale = Math.max(scale - 0.2, 0.4); updateTransform(); }
         function resetZoomPan() { scale = 1; panX = 0; panY = 0; updateTransform(); }
-        function centerPan() {
-            // Aproximação pro centro (melhoria futura: centralizar base no bounding box)
-            updateTransform();
-        }
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -718,7 +946,7 @@
                     svgWrap.innerHTML = miniSvg;
                     
                     const nameWrap = document.createElement('div');
-                    nameWrap.className = 'text-xs font-medium';
+                    nameWrap.className = 'text-xs font-medium leading-tight';
                     nameWrap.innerText = comp.name;
 
                     item.appendChild(svgWrap);
@@ -748,7 +976,6 @@
                 document.getElementById('welcome-text').style.display = 'none';
                 const rect = workspace.getBoundingClientRect();
                 
-                // Matemática ajustada para considerar Pan e Zoom da nova tela infinita
                 const x = (e.clientX - rect.left - panX) / scale - 35;
                 const y = (e.clientY - rect.top - panY) / scale - 20;
                 
@@ -756,7 +983,6 @@
             }
         });
 
-        // Touch Móvel da paleta
         let touchDragType = null;
         let touchDragElement = null;
 
@@ -806,7 +1032,6 @@
                     touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
                     
                     document.getElementById('welcome-text').style.display = 'none';
-                    // Matemática ajustada
                     const x = (touch.clientX - rect.left - panX) / scale - 35;
                     const y = (touch.clientY - rect.top - panY) / scale - 20;
                     createComponent(touchDragType, x, y);
@@ -822,7 +1047,6 @@
             let id;
             if (idForce) {
                 id = idForce;
-                // Atualizar contador para evitar conflitos na importação
                 const num = parseInt(id.split('_')[1]);
                 if (num >= nodeIdCounter) nodeIdCounter = num;
             } else {
@@ -904,7 +1128,7 @@
 
         function handlePortClick(e) {
             e.stopPropagation();
-            if(isPanning) return; // Não iniciar fio se tiver arrastando tela
+            if(isPanning) return; 
 
             const portEl = e.target;
             const nodeId = portEl.dataset.node;
@@ -937,7 +1161,6 @@
             if (!drawingWire) return;
             const startPos = getPortCenter(drawingWire.sourceEl);
             
-            // Mouse posição relativa ao Canvas com Zoom (Importante)
             const panZoomRect = canvasPanZoom.getBoundingClientRect();
             const mouseX = (clientX - panZoomRect.left) / scale;
             const mouseY = (clientY - panZoomRect.top) / scale;
@@ -998,7 +1221,6 @@
             const rect = portEl.getBoundingClientRect();
             const panZoomRect = canvasPanZoom.getBoundingClientRect();
             
-            // Calcula centro do Borne desfazendo a escala da tela pra caber no SVG (que sofre o scale inteiro)
             return {
                 x: (rect.left - panZoomRect.left + (rect.width / 2)) / scale,
                 y: (rect.top - panZoomRect.top + (rect.height / 2)) / scale
@@ -1026,10 +1248,9 @@
                 
                 const p1Str = wire.sourcePort;
                 const p2Str = wire.targetPort;
-                // Coloração profissional avançada
-                if(['L1', 'R', 'U', 'U1', '1(L1)', '2(T1)'].includes(p1Str) || ['L1', 'R', 'U', 'U1', '1(L1)', '2(T1)'].includes(p2Str)) wire.pathEl.style.stroke = '#3b82f6';
-                else if(['L2', 'S', 'V', 'V1', '3(L2)', '4(T2)'].includes(p1Str) || ['L2', 'S', 'V', 'V1', '3(L2)', '4(T2)'].includes(p2Str)) wire.pathEl.style.stroke = '#f97316';
-                else if(['L3', 'T', 'W', 'W1', '5(L3)', '6(T3)'].includes(p1Str) || ['L3', 'T', 'W', 'W1', '5(L3)', '6(T3)'].includes(p2Str)) wire.pathEl.style.stroke = '#8b5cf6';
+                if(['L1', 'R', 'U', 'U1', '1(L1)', '2(T1)', '1'].includes(p1Str) || ['L1', 'R', 'U', 'U1', '1(L1)', '2(T1)', '1'].includes(p2Str)) wire.pathEl.style.stroke = '#3b82f6';
+                else if(['L2', 'S', 'V', 'V1', '3(L2)', '4(T2)', '3'].includes(p1Str) || ['L2', 'S', 'V', 'V1', '3(L2)', '4(T2)', '3'].includes(p2Str)) wire.pathEl.style.stroke = '#f97316';
+                else if(['L3', 'T', 'W', 'W1', '5(L3)', '6(T3)', '5'].includes(p1Str) || ['L3', 'T', 'W', 'W1', '5(L3)', '6(T3)', '5'].includes(p2Str)) wire.pathEl.style.stroke = '#8b5cf6';
                 else if(['PE'].includes(p1Str) || ['PE'].includes(p2Str)) wire.pathEl.style.stroke = '#22c55e';
                 else if(['N', 'N\'', '0V', 'M', 'Neutro'].includes(p1Str) || ['N', 'N\'', '0V', 'M', 'Neutro'].includes(p2Str)) wire.pathEl.style.stroke = '#0ea5e9';
                 else wire.pathEl.style.stroke = '#ef4444';
@@ -1045,29 +1266,33 @@
             let startX, startY, initialX, initialY;
 
             function onPointerDown(e) {
-                if(e.target.closest('button')) return; // Não arrasta se clicou botão X
-                if(e.shiftKey) return; // Deixa o shift livre pro Pan
+                if(e.target.closest('button')) return; 
+                if(e.shiftKey) return; 
                 
                 isDragging = true;
                 nodeEl.classList.add('dragging');
                 
-                startX = e.clientX;
-                startY = e.clientY;
+                startX = e.clientX || (e.touches && e.touches[0].clientX);
+                startY = e.clientY || (e.touches && e.touches[0].clientY);
                 initialX = parseFloat(nodeEl.style.left) || 0;
                 initialY = parseFloat(nodeEl.style.top) || 0;
                 
                 document.addEventListener('pointermove', onPointerMove);
                 document.addEventListener('pointerup', onPointerUp);
+                document.addEventListener('touchmove', onPointerMove, {passive: false});
+                document.addEventListener('touchend', onPointerUp);
                 
-                e.preventDefault();
+                if(!e.touches) e.preventDefault(); 
             }
 
             function onPointerMove(e) {
                 if (!isDragging) return;
                 
-                // Dividir pelo scale faz o mouse acompanhar a caixa independente do zoom
-                const dx = (e.clientX - startX) / scale;
-                const dy = (e.clientY - startY) / scale;
+                let currentX = e.clientX || (e.touches && e.touches[0].clientX);
+                let currentY = e.clientY || (e.touches && e.touches[0].clientY);
+
+                const dx = (currentX - startX) / scale;
+                const dy = (currentY - startY) / scale;
                 
                 let newX = initialX + dx;
                 let newY = initialY + dy;
@@ -1090,9 +1315,12 @@
                 nodeEl.classList.remove('dragging');
                 document.removeEventListener('pointermove', onPointerMove);
                 document.removeEventListener('pointerup', onPointerUp);
+                document.removeEventListener('touchmove', onPointerMove);
+                document.removeEventListener('touchend', onPointerUp);
             }
 
             handleEl.addEventListener('pointerdown', onPointerDown);
+            handleEl.addEventListener('touchstart', onPointerDown, {passive: false});
         }
 
         function deleteComponent(id) {
@@ -1154,19 +1382,17 @@
                     const data = JSON.parse(e.target.result);
                     clearWorkspace(true);
                     
-                    // Restaura Nodes
                     data.nodes.forEach(n => {
                         createComponent(n.type, n.x, n.y, n.id);
                     });
                     
-                    // Restaura Fios com delay leve pro DOM renderizar posições
                     setTimeout(() => {
                         data.wires.forEach(w => {
                             createWire(w.srcN, w.srcP, w.tgtN, w.tgtP, w.id);
                         });
                         document.getElementById('welcome-text').style.display = 'none';
                         showToast("Projeto Carregado!", 'success');
-                        event.target.value = ''; // Limpa input
+                        event.target.value = ''; 
                     }, 50);
                     
                 } catch(err) {
@@ -1178,7 +1404,7 @@
         }
 
         function showHelp() {
-            alert("CAD Pro - Instruções:\n\n1. Oculte a biblioteca no botão do menu superior.\n2. Zoom: Role o scroll do mouse.\n3. Pan (Mover tela): Segure SHIFT + Clique e arraste o fundo.\n4. Salve e carregue seus arquivos na barra de ferramentas da área de trabalho.\n5. O sistema salva em .json localmente em seu PC.");
+            alert("CAD Pro - Instruções:\n\n1. Oculte a biblioteca no botão do menu superior.\n2. Zoom: Role o scroll do mouse ou faça movimento de pinça no celular.\n3. Pan (Mover tela): Segure SHIFT + Clique, ou toque com 1 dedo no fundo e arraste.\n4. Apostila: Clique no botão da biblioteca para abrir as lições de montagem.\n5. O sistema salva em .json localmente em seu PC.");
         }
 
         function showToast(message, type='info') {
@@ -1194,6 +1420,147 @@
             }, 3000);
         }
 
+        const manualLessons = [
+            {
+                id: 'partida_direta',
+                title: 'Partida Direta de Motor 3~',
+                icon: 'fa-bolt',
+                content: `
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">1. Partida Direta (Circuito de Força e Comando)</h3>
+                    <p class="text-slate-300 mb-6">A Partida Direta é o método mais simples para ligar um motor à rede elétrica. É dividida em Força (alta corrente) e Comando (baixa corrente para a lógica).</p>
+                    
+                    <h4 class="text-lg font-semibold text-blue-400 mb-3">Peças Necessárias:</h4>
+                    <ul class="list-disc pl-5 text-slate-300 mb-6 space-y-1">
+                        <li>Barramento 380V (Alimentação)</li>
+                        <li>Disjuntor-Motor (Proteção contra curto)</li>
+                        <li>Contator K1 (Chave principal)</li>
+                        <li>Motor 3~ (Carga)</li>
+                        <li>Botão Verde (Liga - NA) e Botão Vermelho (Desliga - NF)</li>
+                    </ul>
+
+                    <h4 class="text-lg font-semibold text-blue-400 mb-3">Passo a Passo de Ligação:</h4>
+                    <div class="manual-step">
+                        <strong class="text-white">Passo 1 (Força):</strong> Arraste o Barramento e ligue L1, L2, L3 nas entradas 1, 3, 5 do Disjuntor-Motor.
+                    </div>
+                    <div class="manual-step">
+                        <strong class="text-white">Passo 2 (Força):</strong> Ligue as saídas 2, 4, 6 do Disjuntor-Motor nas entradas L1, L2, L3 do Contator K1.
+                    </div>
+                    <div class="manual-step">
+                        <strong class="text-white">Passo 3 (Força):</strong> Ligue as saídas T1, T2, T3 do Contator K1 nos bornes U1, V1, W1 do Motor. Não esqueça o aterramento (PE).
+                    </div>
+                    <div class="manual-step">
+                        <strong class="text-white">Passo 4 (Comando - Botões):</strong> Arraste o botão Liga e Desliga. Pegue a fase L1 do Barramento e ligue na entrada '11' do Botão Desliga.
+                    </div>
+                    <div class="manual-step">
+                        <strong class="text-white">Passo 5 (Comando - Bobina):</strong> Ligue a saída '12' do botão Desliga na entrada '13' do Botão Liga. A saída '14' do botão Liga vai no terminal 'A1' do Contator K1. Ligue 'A2' ao Neutro (ou Fase 2 dependendo da rede).
+                    </div>
+                `
+            },
+            {
+                id: 'contato_selo',
+                title: 'O Famoso Contato de Selo',
+                icon: 'fa-lock',
+                content: `
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">2. Contato de Selo</h3>
+                    <p class="text-slate-300 mb-6">O contato de selo é usado para manter a bobina do contator ligada mesmo após você tirar o dedo do botão Liga.</p>
+                    
+                    <h4 class="text-lg font-semibold text-blue-400 mb-3">O que você fará:</h4>
+                    <p class="text-slate-300 mb-6">Você usará os contatos auxiliares NA (13 e 14) do próprio Contator K1 em paralelo com o botão Liga.</p>
+
+                    <h4 class="text-lg font-semibold text-blue-400 mb-3">Passo a Passo de Ligação:</h4>
+                    <div class="manual-step">
+                        <strong class="text-white">Passo 1:</strong> Monte o esquema básico do comando da lição anterior (Partida Direta).
+                    </div>
+                    <div class="manual-step">
+                        <strong class="text-white">Passo 2:</strong> Puxe um fio da <strong>entrada (13)</strong> do Botão Liga (Verde) e conecte ao borne <strong>13 (NA)</strong> do Contator K1.
+                    </div>
+                    <div class="manual-step">
+                        <strong class="text-white">Passo 3:</strong> Puxe um fio da <strong>saída (14)</strong> do Botão Liga e conecte ao borne <strong>14 (NA)</strong> do Contator K1.
+                    </div>
+                    <div class="bg-blue-900/30 border border-blue-500/50 rounded p-4 mt-4">
+                        <strong class="text-blue-300">Como funciona:</strong> Quando você aperta o botão, a energia passa para A1 e atrai a bobina. Ao atrair a bobina, o contato 13-14 fecha. Ao soltar o botão, a energia continua fluindo pelo 13-14 direto para o A1!
+                    </div>
+                `
+            },
+            {
+                id: 'estrela_triangulo',
+                title: 'Partida Estrela-Triângulo',
+                icon: 'fa-star',
+                content: `
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">3. Partida Estrela-Triângulo</h3>
+                    <p class="text-slate-300 mb-6">Reduz o pico de corrente durante o arranque de motores grandes. O motor parte em configuração Estrela (recebendo menor tensão nas bobinas) e após alguns segundos muda para Triângulo (tensão plena).</p>
+                    
+                    <h4 class="text-lg font-semibold text-blue-400 mb-3">Peças Necessárias:</h4>
+                    <ul class="list-disc pl-5 text-slate-300 mb-6 space-y-1">
+                        <li>3 Contatores (K1: Principal, K2: Triângulo, K3: Estrela)</li>
+                        <li>1 Relé Temporizador (Para fazer a transição K3 -> K2)</li>
+                        <li>Motor com 6 terminais (disponível no simulador como modelo padrão)</li>
+                    </ul>
+
+                    <div class="bg-yellow-900/30 border border-yellow-500/50 text-yellow-200 rounded p-4">
+                        <strong>Dica de Prática:</strong> Coloque os 3 contatores lado a lado. Use o Relé Temporizador alimentado pelo botão Liga. A saída fechada do temporizador liga K3. A saída aberta liga K2. 
+                    </div>
+                `
+            },
+            {
+                id: 'clp_basico',
+                title: 'Automação com CLP',
+                icon: 'fa-microchip',
+                content: `
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">4. Lógica de Automação com CLP</h3>
+                    <p class="text-slate-300 mb-6">Em vez de usar contato de selo e botões físicos ligados diretamente à bobina (Lógica a Relé), usamos um Computador Lógico Programável (CLP) para ler as entradas e decidir quando ligar as saídas.</p>
+                    
+                    <h4 class="text-lg font-semibold text-blue-400 mb-3">Passo a Passo de Ligação (Hardware):</h4>
+                    <div class="manual-step">
+                        <strong class="text-white">Passo 1 (Alimentação):</strong> Arraste a Fonte 24V. Ligue o +24V na entrada L+ do CLP. Ligue o 0V na entrada M do CLP.
+                    </div>
+                    <div class="manual-step">
+                        <strong class="text-white">Passo 2 (Entradas - DI):</strong> Ligue o +24V da fonte em um lado dos Botões. O outro lado do Botão Liga vai na entrada I0.0 do CLP. O botão Desliga vai no I0.1.
+                    </div>
+                    <div class="manual-step">
+                        <strong class="text-white">Passo 3 (Saídas - DQ):</strong> Ligue a saída Q0.0 do CLP na bobina A1 do Contator.
+                    </div>
+                `
+            }
+        ];
+
+        function initManual() {
+            const listContainer = document.getElementById('manual-lessons-list');
+            listContainer.innerHTML = '';
+            
+            manualLessons.forEach((lesson, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-3 rounded-lg hover:bg-slate-700 transition-colors flex items-center gap-3 text-slate-300 hover:text-white border border-transparent hover:border-slate-600';
+                btn.innerHTML = `<div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700"><i class="fa-solid ${lesson.icon}"></i></div> <div><div class="font-bold text-sm leading-tight">${lesson.title}</div><div class="text-xs text-slate-500">Lição 0${index + 1}</div></div>`;
+                
+                btn.onclick = () => loadLesson(lesson.id, btn);
+                listContainer.appendChild(btn);
+            });
+        }
+
+        function loadLesson(id, btnElement) {
+            // Highlight button
+            document.querySelectorAll('#manual-lessons-list button').forEach(b => b.classList.remove('bg-blue-600/20', 'border-blue-500/50'));
+            if(btnElement) btnElement.classList.add('bg-blue-600/20', 'border-blue-500/50');
+            
+            const lesson = manualLessons.find(l => l.id === id);
+            if(lesson) {
+                document.getElementById('manual-lesson-content').innerHTML = lesson.content;
+            }
+        }
+
+        function openManual() {
+            document.getElementById('manual-modal').classList.remove('hidden');
+            if(document.getElementById('manual-lessons-list').children.length === 0) {
+                initManual();
+            }
+        }
+
+        function closeManual() {
+            document.getElementById('manual-modal').classList.add('hidden');
+        }
+
+        // STARTUP
         window.onload = () => {
             initPalette();
             window.addEventListener('resize', updateAllWires);
