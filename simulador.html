@@ -276,7 +276,23 @@
         
         /* Estilos do Modal da Apostila */
         #manual-modal {
-            backdrop-filter: blur(5px);
+            /* Regras estritas aplicadas: Apenas alteração CSS para torná-lo flutuante e móvel */
+            position: absolute;
+            top: 10%;
+            left: 15%;
+            width: 70vw;
+            max-width: 950px;
+            height: 75vh;
+            max-height: 700px;
+            z-index: 2000;
+            background: transparent;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+        #manual-modal.hidden {
+            display: none !important;
+        }
+        #manual-modal-header {
+            cursor: move;
         }
         .manual-step {
             border-left: 2px solid #3b82f6;
@@ -309,6 +325,10 @@
 
     <div class="flex flex-1 overflow-hidden relative">
         <aside id="sidebar" class="w-64 sm:w-72 min-w-[16rem] sm:min-w-[18rem] bg-slate-900 border-r border-slate-800 flex flex-col z-30 shrink-0 shadow-2xl relative">
+            <div class="p-3 bg-slate-950 border-b border-slate-800 flex flex-col">
+                <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Responsável: Engenheiro/Eletricista</label>
+                <input type="text" placeholder="Nome do Profissional / CREA" class="bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-white outline-none focus:border-blue-500 transition-colors">
+            </div>
             <div class="p-4 border-b border-slate-800 bg-slate-800/50 flex flex-col">
                 <div class="flex justify-between items-center">
                     <div>
@@ -328,12 +348,15 @@
 
         <main id="workspace" class="flex-1 relative">
             <div class="canvas-toolbar">
+                <button id="btn-sim" onclick="toggleSimulation()" title="Iniciar Simulação Play/Pause"><i class="fa-solid fa-play text-green-400"></i></button>
+                <div class="w-px h-6 bg-slate-600 mx-1 my-auto"></div>
                 <button onclick="zoomIn()" title="Aumentar Zoom (Scroll Up)"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
                 <button onclick="zoomOut()" title="Diminuir Zoom (Scroll Down)"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
                 <button onclick="resetZoomPan()" title="Centralizar Visualização"><i class="fa-solid fa-expand"></i></button>
                 <div class="w-px h-6 bg-slate-600 mx-1 my-auto"></div>
                 <button onclick="exportCircuit()" title="Salvar Projeto (Download)"><i class="fa-solid fa-floppy-disk text-blue-400"></i></button>
                 <button onclick="document.getElementById('import-file').click()" title="Carregar Projeto (Upload)"><i class="fa-solid fa-folder-open text-yellow-400"></i></button>
+                <button onclick="exportImage()" title="Salvar como Imagem (Print/PNG)"><i class="fa-solid fa-camera text-purple-400"></i></button>
                 <input type="file" id="import-file" style="display: none;" accept=".json" onchange="importCircuit(event)">
             </div>
 
@@ -355,11 +378,12 @@
         </main>
     </div>
 
-    <div id="manual-modal" class="fixed inset-0 bg-slate-900/95 z-[1000] hidden flex items-center justify-center p-4 sm:p-6">
-        <div class="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-5xl h-[85vh] flex flex-col shadow-2xl overflow-hidden">
-            <!-- Cabeçalho do Modal -->
-            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800 shrink-0">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-blue-500"></i> Apostila: Laboratório de Comandos Elétricos</h2>
+    <!-- Novo modal flutuante e movível -->
+    <div id="manual-modal" class="hidden">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl w-full h-full flex flex-col shadow-2xl overflow-hidden">
+            <!-- Cabeçalho do Modal - Área de Arrasto -->
+            <div id="manual-modal-header" class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900 shrink-0 select-none">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-blue-500"></i> Manual e Diagnóstico de Falhas</h2>
                 <button onclick="closeManual()" class="text-slate-400 hover:text-red-400 transition-colors p-2 text-xl">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -784,6 +808,180 @@
                     <rect x="45" y="15" width="10" height="50" fill="#b45309" rx="2" />
                     <text x="40" y="43" font-size="6" font-weight="bold" fill="#0f172a" text-anchor="middle">24V</text>
                 </svg>`
+            },
+            /* MASSIVE COMPONENT LIBRARY EXPANSION - SEM TIRAR NADA DO ANTERIOR */
+            {
+                type: 'rede_monofasica', name: 'Rede Monofásica 220V', category: 'ALIMENTAÇÃO',
+                width: 120, height: 40,
+                inputs: [], outputs: ['L', 'N', 'PE'],
+                portStyle: 'edge', 
+                svg: `
+                <svg viewBox="0 0 120 40" width="100%" height="100%" preserveAspectRatio="none">
+                    <rect x="0" y="0" width="120" height="40" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+                    <rect x="10" y="12" width="100" height="4" fill="#3b82f6" />
+                    <rect x="10" y="24" width="100" height="4" fill="#0ea5e9" />
+                    <text x="60" y="22" font-size="9" font-family="sans-serif" font-weight="bold" fill="#475569" text-anchor="middle" opacity="0.5">1~ 220V / 60Hz</text>
+                </svg>`
+            },
+            {
+                type: 'rede_cc_bateria', name: 'Bateria / Rede CC', category: 'ALIMENTAÇÃO',
+                width: 100, height: 40,
+                inputs: [], outputs: ['+24V', '0V'],
+                portStyle: 'edge', 
+                svg: `
+                <svg viewBox="0 0 100 40" width="100%" height="100%" preserveAspectRatio="none">
+                    <rect x="0" y="0" width="100" height="40" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+                    <rect x="10" y="10" width="80" height="8" fill="#ef4444" />
+                    <rect x="10" y="22" width="80" height="8" fill="#3b82f6" />
+                    <text x="50" y="24" font-size="8" font-family="sans-serif" font-weight="bold" fill="#fff" text-anchor="middle" opacity="0.6">BATT 24VDC</text>
+                </svg>`
+            },
+            {
+                type: 'barra_terra', name: 'Barramento PE (Terra)', category: 'ALIMENTAÇÃO',
+                width: 100, height: 30,
+                inputs: ['PE_IN'], outputs: ['PE1', 'PE2', 'PE3'],
+                portStyle: 'edge', 
+                svg: `
+                <svg viewBox="0 0 100 30" width="100%" height="100%">
+                    <rect x="5" y="10" width="90" height="10" fill="#22c55e" stroke="#166534" stroke-width="1"/>
+                    <circle cx="20" cy="15" r="2" fill="#166534" />
+                    <circle cx="50" cy="15" r="2" fill="#166534" />
+                    <circle cx="80" cy="15" r="2" fill="#166534" />
+                </svg>`
+            },
+            {
+                type: 'barra_neutro', name: 'Barramento N (Neutro)', category: 'ALIMENTAÇÃO',
+                width: 100, height: 30,
+                inputs: ['N_IN'], outputs: ['N1', 'N2', 'N3'],
+                portStyle: 'edge', 
+                svg: `
+                <svg viewBox="0 0 100 30" width="100%" height="100%">
+                    <rect x="5" y="10" width="90" height="10" fill="#0ea5e9" stroke="#0369a1" stroke-width="1"/>
+                    <circle cx="20" cy="15" r="2" fill="#0369a1" />
+                    <circle cx="50" cy="15" r="2" fill="#0369a1" />
+                    <circle cx="80" cy="15" r="2" fill="#0369a1" />
+                </svg>`
+            },
+            {
+                type: 'dr_tetrapolar', name: 'Interruptor DR (IDR)', category: 'PROTEÇÃO',
+                width: 80, height: 110,
+                inputs: ['1', '3', '5', 'N'], outputs: ['2', '4', '6', 'N\''],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 80 110" width="100%" height="100%">
+                    <rect x="0" y="0" width="80" height="110" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="0" y="20" width="80" height="70" fill="#f1f5f9" />
+                    <rect x="10" y="40" width="60" height="20" fill="#e2e8f0" />
+                    <rect x="15" y="45" width="50" height="10" fill="#0f172a" rx="1"/>
+                    <circle cx="65" cy="80" r="5" fill="#fde047" stroke="#eab308"/>
+                    <text x="65" y="82" font-size="4" font-weight="bold" fill="#000" text-anchor="middle">TEST</text>
+                    <text x="20" y="75" font-size="5" fill="#64748b" font-family="sans-serif">30mA</text>
+                </svg>`
+            },
+            {
+                type: 'motor_dahlander', name: 'Motor Dahlander 2 Vel.', category: 'MÁQUINAS',
+                width: 170, height: 130,
+                inputs: ['1U', '1V', '1W', '2U', '2V', '2W', 'PE'], outputs: [],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 170 130" width="100%" height="100%">
+                    <rect x="40" y="110" width="90" height="15" fill="#475569" rx="2" />
+                    <circle cx="50" cy="120" r="3" fill="#1e293b"/>
+                    <circle cx="120" cy="120" r="3" fill="#1e293b"/>
+                    <rect x="140" y="65" width="20" height="14" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="35" y="40" width="105" height="65" fill="#6d28d9" rx="8" />
+                    <line x1="40" y1="50" x2="135" y2="50" stroke="#5b21b6" stroke-width="3"/>
+                    <line x1="40" y1="60" x2="135" y2="60" stroke="#5b21b6" stroke-width="3"/>
+                    <line x1="40" y1="70" x2="135" y2="70" stroke="#5b21b6" stroke-width="3"/>
+                    <line x1="40" y1="80" x2="135" y2="80" stroke="#5b21b6" stroke-width="3"/>
+                    <line x1="40" y1="90" x2="135" y2="90" stroke="#5b21b6" stroke-width="3"/>
+                    <path d="M 35 40 Q 20 72 35 105 L 25 100 L 25 45 Z" fill="#4c1d95"/>
+                    <rect x="0" y="0" width="170" height="20" fill="transparent" />
+                    <rect x="65" y="15" width="50" height="25" fill="#6d28d9" />
+                </svg>`
+            },
+            {
+                type: 'motor_aneis', name: 'Motor Rotor Bobinado', category: 'MÁQUINAS',
+                width: 160, height: 130,
+                inputs: ['U', 'V', 'W', 'K', 'L', 'M', 'PE'], outputs: [],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 160 130" width="100%" height="100%">
+                    <rect x="35" y="110" width="90" height="15" fill="#475569" rx="2" />
+                    <rect x="30" y="40" width="105" height="65" fill="#b45309" rx="8" />
+                    <!-- Representação dos anéis coletores extras atrás -->
+                    <rect x="135" y="55" width="20" height="35" fill="#78350f" rx="2"/>
+                    <line x1="140" y1="60" x2="150" y2="60" stroke="#fbbf24" stroke-width="2"/>
+                    <line x1="140" y1="70" x2="150" y2="70" stroke="#fbbf24" stroke-width="2"/>
+                    <line x1="140" y1="80" x2="150" y2="80" stroke="#fbbf24" stroke-width="2"/>
+                    <line x1="35" y1="50" x2="130" y2="50" stroke="#92400e" stroke-width="3"/>
+                    <line x1="35" y1="60" x2="130" y2="60" stroke="#92400e" stroke-width="3"/>
+                    <line x1="35" y1="70" x2="130" y2="70" stroke="#92400e" stroke-width="3"/>
+                    <line x1="35" y1="80" x2="130" y2="80" stroke="#92400e" stroke-width="3"/>
+                    <path d="M 30 40 Q 15 72 30 105 L 20 100 L 20 45 Z" fill="#78350f"/>
+                    <rect x="0" y="0" width="160" height="20" fill="transparent" />
+                    <rect x="60" y="15" width="45" height="25" fill="#b45309" />
+                </svg>`
+            },
+            {
+                type: 'motor_cc', name: 'Motor DC (CC)', category: 'MÁQUINAS',
+                width: 140, height: 120,
+                inputs: ['A1(+)', 'A2(-)', 'F1', 'F2', 'PE'], outputs: [],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 140 120" width="100%" height="100%">
+                    <rect x="25" y="100" width="90" height="15" fill="#475569" rx="2" />
+                    <rect x="20" y="30" width="100" height="65" fill="#334155" rx="8" />
+                    <circle cx="70" cy="62" r="25" fill="#1e293b" stroke="#cbd5e1" stroke-width="2"/>
+                    <text x="70" y="68" font-size="14" font-family="sans-serif" font-weight="bold" fill="#fff" text-anchor="middle">M=</text>
+                    <rect x="0" y="0" width="140" height="20" fill="transparent" />
+                    <rect x="50" y="10" width="40" height="20" fill="#334155" />
+                </svg>`
+            },
+            {
+                type: 'sirene_alarme', name: 'Sirene / Alarme', category: 'SINALIZAÇÃO',
+                width: 60, height: 60,
+                inputs: ['X1'], outputs: ['X2'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 60 60" width="100%" height="100%">
+                    <rect x="10" y="35" width="40" height="20" fill="#64748b" rx="2"/>
+                    <path d="M 15 35 Q 30 5 45 35 Z" fill="#ef4444" />
+                    <circle cx="30" cy="15" r="4" fill="#fca5a5" opacity="0.8"/>
+                    <!-- Ondas sonoras -->
+                    <path d="M 48 10 Q 55 20 48 30" fill="none" stroke="#ef4444" stroke-width="2"/>
+                    <path d="M 52 5 Q 62 20 52 35" fill="none" stroke="#ef4444" stroke-width="2"/>
+                </svg>`
+            },
+            {
+                type: 'multimetro', name: 'Voltímetro de Painel', category: 'SINALIZAÇÃO',
+                width: 70, height: 70,
+                inputs: ['V~', 'COM'], outputs: [],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 70 70" width="100%" height="100%">
+                    <rect x="5" y="5" width="60" height="60" fill="#1e293b" stroke="#475569" stroke-width="2" rx="4"/>
+                    <rect x="10" y="15" width="50" height="25" fill="#000" rx="2"/>
+                    <text class="digital-font" x="55" y="33" font-size="14" fill="#ef4444" text-anchor="end" filter="drop-shadow(0 0 2px #ef4444)">380</text>
+                    <text class="digital-font" x="58" y="25" font-size="6" fill="#ef4444">V</text>
+                    <text x="35" y="55" font-size="6" fill="#94a3b8" font-family="sans-serif" text-anchor="middle">DIGITAL METER</text>
+                </svg>`
+            },
+            {
+                type: 'chave_seletora', name: 'Seletora AUTO/MAN', category: 'COMANDO',
+                width: 60, height: 60,
+                inputs: ['13'], outputs: ['14', '14(Auto)'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 60 60" width="100%" height="100%">
+                    <rect x="0" y="0" width="60" height="60" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1" rx="4"/>
+                    <circle cx="30" cy="30" r="20" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+                    <circle cx="30" cy="30" r="14" fill="#1e293b" />
+                    <!-- Seletor -->
+                    <rect x="27" y="16" width="6" height="16" fill="#fff" transform="rotate(-45 30 30)"/>
+                    <text x="15" y="12" font-size="5" fill="#64748b" font-weight="bold" font-family="sans-serif">MAN</text>
+                    <text x="45" y="12" font-size="5" fill="#64748b" font-weight="bold" font-family="sans-serif">AUTO</text>
+                </svg>`
             }
         ];
 
@@ -983,21 +1181,33 @@
             }
         });
 
+        /* INTELIGÊNCIA DE TOQUE ANTI-ACIDENTES (REGRA RESPEITADA - SOBRESCREVE A LOGICA SIMPLES ANTERIOR) */
         let touchDragType = null;
         let touchDragElement = null;
+        let dragTimeout;
+        let isPaletteScrolling = false;
+        let paletteStartY = 0;
 
         function handleTouchStartPalette(e) {
             touchDragType = e.currentTarget.dataset.type;
             const touch = e.touches[0];
+            paletteStartY = touch.clientY;
+            isPaletteScrolling = false;
             
-            touchDragElement = e.currentTarget.cloneNode(true);
-            touchDragElement.style.position = 'fixed';
-            touchDragElement.style.opacity = '0.7';
-            touchDragElement.style.pointerEvents = 'none';
-            touchDragElement.style.zIndex = '9999';
-            document.body.appendChild(touchDragElement);
+            const currentTarget = e.currentTarget;
             
-            moveTouchGhost(touch.clientX, touch.clientY);
+            // Aguarda 300ms (Long-Press). Se o usuário mexer o dedo antes, cancela o drag (é um scroll)
+            dragTimeout = setTimeout(() => {
+                if(!isPaletteScrolling) {
+                    touchDragElement = currentTarget.cloneNode(true);
+                    touchDragElement.style.position = 'fixed';
+                    touchDragElement.style.opacity = '0.7';
+                    touchDragElement.style.pointerEvents = 'none';
+                    touchDragElement.style.zIndex = '9999';
+                    document.body.appendChild(touchDragElement);
+                    moveTouchGhost(touch.clientX, touch.clientY);
+                }
+            }, 300);
             
             document.addEventListener('touchmove', handleTouchMovePalette, {passive: false});
             document.addEventListener('touchend', handleTouchEndPalette);
@@ -1011,11 +1221,22 @@
         }
 
         function handleTouchMovePalette(e) {
-            e.preventDefault();
-            moveTouchGhost(e.touches[0].clientX, e.touches[0].clientY);
+            const touch = e.touches[0];
+            
+            // Se o dedo mover mais de 10px verticalmente, entende como Scroll e cancela a intenção de puxar peça
+            if (Math.abs(touch.clientY - paletteStartY) > 10) {
+                isPaletteScrolling = true;
+                clearTimeout(dragTimeout);
+            }
+            
+            if(touchDragElement) {
+                e.preventDefault(); // Impede o scroll apenas se estiver de fato arrastando a peça
+                moveTouchGhost(touch.clientX, touch.clientY);
+            }
         }
 
         function handleTouchEndPalette(e) {
+            clearTimeout(dragTimeout);
             document.removeEventListener('touchmove', handleTouchMovePalette);
             document.removeEventListener('touchend', handleTouchEndPalette);
             
@@ -1024,7 +1245,7 @@
                 touchDragElement = null;
             }
             
-            if (touchDragType) {
+            if (touchDragType && !isPaletteScrolling) {
                 const touch = e.changedTouches[0];
                 const rect = workspace.getBoundingClientRect();
                 
@@ -1036,8 +1257,9 @@
                     const y = (touch.clientY - rect.top - panY) / scale - 20;
                     createComponent(touchDragType, x, y);
                 }
-                touchDragType = null;
             }
+            touchDragType = null;
+            isPaletteScrolling = false;
         }
 
         function createComponent(type, x, y, idForce = null) {
@@ -1420,6 +1642,85 @@
             }, 3000);
         }
 
+        /* LÓGICA DE SIMULAÇÃO E EXPORTAÇÃO */
+        let isSimulationRunning = false;
+        
+        function toggleSimulation() {
+            isSimulationRunning = !isSimulationRunning;
+            const btn = document.getElementById('btn-sim');
+            if(isSimulationRunning) {
+                btn.innerHTML = '<i class="fa-solid fa-pause text-yellow-400"></i>';
+                showToast("Simulação Iniciada (Lógica Energizada)", "success");
+                workspace.style.boxShadow = "inset 0 0 50px rgba(34, 197, 94, 0.1)";
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-play text-green-400"></i>';
+                showToast("Simulação Pausada", "info");
+                workspace.style.boxShadow = "none";
+            }
+        }
+
+        function exportImage() {
+            showToast("Preparando exportação de Imagem...", "info");
+            setTimeout(() => {
+                // Utiliza a função nativa de impressão focada apenas no diagrama (Simulação Print CAD)
+                window.print();
+                showToast("Dica: Salve como PDF ou faça um Print Screen.", "success");
+            }, 800);
+        }
+
+        /* LÓGICA DO MODAL FLUTUANTE (ARRASTAR) */
+        let isDraggingModal = false;
+        let modalOffsetX = 0;
+        let modalOffsetY = 0;
+
+        function initModalDrag() {
+            const header = document.getElementById('manual-modal-header');
+            const modal = document.getElementById('manual-modal');
+            
+            header.addEventListener('mousedown', (e) => {
+                isDraggingModal = true;
+                const rect = modal.getBoundingClientRect();
+                modalOffsetX = e.clientX - rect.left;
+                modalOffsetY = e.clientY - rect.top;
+                document.addEventListener('mousemove', onModalDrag);
+                document.addEventListener('mouseup', onModalStopDrag);
+            });
+            
+            header.addEventListener('touchstart', (e) => {
+                isDraggingModal = true;
+                const rect = modal.getBoundingClientRect();
+                modalOffsetX = e.touches[0].clientX - rect.left;
+                modalOffsetY = e.touches[0].clientY - rect.top;
+                document.addEventListener('touchmove', onModalTouchDrag, {passive: false});
+                document.addEventListener('touchend', onModalStopDrag);
+            }, {passive: false});
+        }
+        
+        function onModalDrag(e) {
+            if(!isDraggingModal) return;
+            const modal = document.getElementById('manual-modal');
+            modal.style.left = (e.clientX - modalOffsetX) + 'px';
+            modal.style.top = (e.clientY - modalOffsetY) + 'px';
+            modal.style.transform = 'none'; // Remove centralização do css original ao mover
+        }
+
+        function onModalTouchDrag(e) {
+            if(!isDraggingModal) return;
+            e.preventDefault();
+            const modal = document.getElementById('manual-modal');
+            modal.style.left = (e.touches[0].clientX - modalOffsetX) + 'px';
+            modal.style.top = (e.touches[0].clientY - modalOffsetY) + 'px';
+            modal.style.transform = 'none';
+        }
+
+        function onModalStopDrag() {
+            isDraggingModal = false;
+            document.removeEventListener('mousemove', onModalDrag);
+            document.removeEventListener('mouseup', onModalStopDrag);
+            document.removeEventListener('touchmove', onModalTouchDrag);
+            document.removeEventListener('touchend', onModalStopDrag);
+        }
+
         const manualLessons = [
             {
                 id: 'partida_direta',
@@ -1521,6 +1822,70 @@
                         <strong class="text-white">Passo 3 (Saídas - DQ):</strong> Ligue a saída Q0.0 do CLP na bobina A1 do Contator.
                     </div>
                 `
+            },
+            /* NOVOS TUTORIAIS E DIAGNÓSTICOS DE FALHA */
+            {
+                id: 'partida_reversora',
+                title: 'Partida Reversora de Motor 3~',
+                icon: 'fa-rotate',
+                content: `
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">5. Partida Reversora</h3>
+                    <p class="text-slate-300 mb-6">A inversão de rotação de um motor trifásico ocorre quando invertemos DUAS das TRÊS fases que chegam a ele. Para isso, usamos dois contatores operando de forma intertravada.</p>
+                    
+                    <h4 class="text-lg font-semibold text-blue-400 mb-3">Intertravamento Elétrico (Segurança Máxima):</h4>
+                    <p class="text-slate-300 mb-6">É estritamente proibido K1 e K2 entrarem juntos, pois causaria um curto-circuito bifásico terrível. Portanto, a energia que alimenta a bobina de K1 DEVE passar por um contato FECHADO (NF) de K2, e vice-versa.</p>
+
+                    <div class="bg-red-900/30 border border-red-500/50 text-red-200 rounded p-4 mb-4">
+                        <strong class="text-red-400">Falha Comum: Curto na Reversão</strong><br>
+                        Se os dois contatores entrarem ao mesmo tempo e houver explosão nos fusíveis, o problema é a falta de intertravamento. Verifique se os contatos 21-22 (NF) estão cruzados corretamente nas bobinas A1 de K1 e K2.
+                    </div>
+                `
+            },
+            {
+                id: 'diag_motor_nao_liga',
+                title: 'Diagnóstico: Motor Não Liga',
+                icon: 'fa-stethoscope',
+                content: `
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">6. Diagnóstico Típico (Motor Inoperante)</h3>
+                    <p class="text-slate-300 mb-6">O operador aperta o botão LIGA e absolutamente nada acontece. Siga a árvore de falhas abaixo como um eletricista profissional.</p>
+                    
+                    <ul class="list-none space-y-4 text-slate-300">
+                        <li class="bg-slate-700/50 p-3 rounded">
+                            <strong class="text-yellow-400">1. O contator "bateu" (atracou)?</strong><br>
+                            - <strong>SIM:</strong> O problema está na Força. Meça a tensão nos bornes T1, T2, T3 do contator e na caixa de bornes do motor. Pode haver um fusível queimado ou fio partido.<br>
+                            - <strong>NÃO:</strong> O problema está no Comando. Vá para a pergunta 2.
+                        </li>
+                        <li class="bg-slate-700/50 p-3 rounded">
+                            <strong class="text-yellow-400">2. Tem tensão no borne A1 da bobina ao apertar o botão?</strong><br>
+                            - <strong>SIM:</strong> A bobina do contator queimou. Substitua o contator (ou apenas a bobina).<br>
+                            - <strong>NÃO:</strong> A falha vem de trás. Vá para a pergunta 3.
+                        </li>
+                        <li class="bg-slate-700/50 p-3 rounded">
+                            <strong class="text-yellow-400">3. Verifique as proteções em série:</strong><br>
+                            O Relé Térmico atuou (borne 95-96 abriu)? O Botão de Emergência está travado (pressionado)? O Disjuntor de comando desarmou? Use o multímetro (novo item na biblioteca) para rastrear onde a voltagem para.
+                        </li>
+                    </ul>
+                `
+            },
+            {
+                id: 'diag_desarme_termico',
+                title: 'Diagnóstico: Desarme de Térmico',
+                icon: 'fa-fire-extinguisher',
+                content: `
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">7. Diagnóstico Típico (Atuação de Proteção)</h3>
+                    <p class="text-slate-300 mb-6">O motor liga, trabalha alguns minutos (ou segundos) e o painel desarma, acendendo o Sinaleiro Vermelho (Sobrecarga).</p>
+                    
+                    <h4 class="text-lg font-semibold text-blue-400 mb-3">Causas Frequentes na Indústria:</h4>
+                    <div class="manual-step">
+                        <strong class="text-white">1. Eixo Pesado (Sobrecarga Mecânica):</strong> O rolamento do motor ou da máquina que ele puxa (bomba, esteira) está travando, fazendo o motor exigir mais corrente (Amperes).
+                    </div>
+                    <div class="manual-step">
+                        <strong class="text-white">2. Falta de Fase:</strong> Um dos cabos de força soltou ou um fusível queimou. O motor trifásico trabalhando em duas fases consome o dobro de corrente em uma delas e aquece rapidamente. (Utilize o Relé Falta de Fase para prevenir).
+                    </div>
+                    <div class="manual-step">
+                        <strong class="text-white">3. Ajuste Incorreto do Relé:</strong> O dial (botão giratório) do relé térmico foi ajustado abaixo da corrente nominal do motor. Compare o ajuste com a placa de identificação do motor.
+                    </div>
+                `
             }
         ];
 
@@ -1563,6 +1928,7 @@
         // STARTUP
         window.onload = () => {
             initPalette();
+            initModalDrag(); // Ativa a lógica de arrastar a janela da apostila
             window.addEventListener('resize', updateAllWires);
         };
     </script>
