@@ -1556,8 +1556,8 @@
             header.className = 'component-header';
             header.innerHTML = `
                 <span class="truncate pointer-events-none">${template.name}</span>
-                <button class="text-slate-400 hover:text-red-400 ml-2" title="Remover" onclick="deleteComponent('${id}')">
-                    <i class="fa-solid fa-xmark"></i>
+                <button class="text-slate-400 hover:text-red-400 ml-2 z-50 relative" title="Remover" onclick="deleteComponent('${id}')" ontouchstart="deleteComponent('${id}'); event.stopPropagation();" onpointerdown="deleteComponent('${id}'); event.stopPropagation();">
+                    <i class="fa-solid fa-xmark pointer-events-none"></i>
                 </button>
             `;
 
@@ -1569,11 +1569,8 @@
             body.style.height = template.height + 'px';
             body.innerHTML = template.svg;
 
-            if (isBusbar) {
-                setupNodeDragging(body, el, id); // O corpo arrasta o barramento
-            } else {
-                setupNodeDragging(header, el, id); // O header arrasta componentes normais
-            }
+            // FIX: Agora o componente inteiro (el) serve como alça de arraste, permitindo pegar pelo meio/corpo
+            setupNodeDragging(el, el, id);
 
             const portClass = template.portStyle === 'inset' ? 'inset-ports' : 'ports-container';
             
@@ -1905,7 +1902,8 @@
             let startX, startY, initialX, initialY;
 
             function onPointerDown(e) {
-                if(e.target.closest('button') || e.target.classList.contains('resize-handle')) return; 
+                // FIX: Ignora cliques em botões, redimensionadores e bornes/portas para não conflitar com o arraste pelo meio
+                if(e.target.closest('button') || e.target.classList.contains('resize-handle') || e.target.classList.contains('port') || e.target.closest('.port-wrapper')) return; 
                 if(e.shiftKey) return; 
                 if(isDragging) return; // FIX: Previne bug louco e tremida no arraste
                 
