@@ -76,6 +76,13 @@
             stroke-width: 6;
         }
 
+        /* EFEITO FIO ENERGIZADO (SIMULAÇÃO) */
+        .wire-energized {
+            stroke: #f59e0b !important;
+            filter: drop-shadow(0 0 6px #fbbf24) !important;
+            stroke-width: 5 !important;
+        }
+
         .component-node {
             position: absolute;
             border-radius: 8px;
@@ -85,7 +92,8 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
-            transition: box-shadow 0.2s;
+            transition: box-shadow 0.2s, border-color 0.2s;
+            border: 2px solid transparent;
         }
 
         .component-node.dragging {
@@ -94,19 +102,48 @@
             opacity: 0.9;
         }
         
+        /* EFEITO COMPONENTE LIGADO/ATIVO (SIMULAÇÃO) */
+        .component-active-glow {
+            box-shadow: 0 0 25px rgba(251, 191, 36, 0.5), inset 0 0 10px rgba(251, 191, 36, 0.3) !important;
+            border-color: #fbbf24 !important;
+        }
+        .component-active-glow .component-header {
+            background: linear-gradient(180deg, #b45309 0%, #78350f 100%) !important;
+            border-color: #f59e0b !important;
+        }
+
+        /* EFEITO ROTAÇÃO MOTOR (SIMULAÇÃO) */
+        @keyframes spinCW { from { transform: rotate(0deg) translate(-50%, -50%); } to { transform: rotate(360deg) translate(-50%, -50%); } }
+        @keyframes spinCCW { from { transform: rotate(0deg) translate(-50%, -50%); } to { transform: rotate(-360deg) translate(-50%, -50%); } }
+        
+        .sim-gear {
+            transform-origin: top left;
+        }
+        .spin-cw {
+            animation: spinCW 1.5s linear infinite;
+            color: #4ade80 !important;
+            filter: drop-shadow(0 0 8px #22c55e);
+        }
+        .spin-ccw {
+            animation: spinCCW 1.5s linear infinite;
+            color: #f87171 !important;
+            filter: drop-shadow(0 0 8px #ef4444);
+        }
+
         .component-header {
             background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
             padding: 4px 8px;
             font-size: 0.7rem;
             font-weight: 700;
             color: #f1f5f9;
-            border-radius: 8px 8px 0 0;
+            border-radius: 6px 6px 0 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border: 1px solid #475569;
             border-bottom: none;
             cursor: grab;
+            transition: all 0.2s;
         }
 
         .component-header:active {
@@ -119,12 +156,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 0 0 8px 8px;
+            border-radius: 0 0 6px 6px;
         }
         
         .component-body svg {
             display: block;
-            border-radius: 0 0 8px 8px;
+            border-radius: 0 0 6px 6px;
         }
 
         .ports-container {
@@ -276,7 +313,6 @@
         
         /* Estilos do Modal da Apostila */
         #manual-modal {
-            /* Regras estritas aplicadas: Apenas alteração CSS para torná-lo flutuante e móvel */
             position: absolute;
             top: 10%;
             left: 15%;
@@ -336,9 +372,8 @@
                         <p class="text-[10px] text-slate-500 mt-0.5">Arraste para a bancada</p>
                     </div>
                 </div>
-                <!-- NOVO BOTÃO DA APOSTILA/MANUAL -->
                 <button onclick="openManual()" class="w-full mt-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white text-xs font-bold py-2.5 px-3 rounded shadow flex justify-center items-center gap-2 transition-all border border-blue-500/50">
-                    <i class="fa-solid fa-book-open"></i> Apostila de Montagens (Passo a Passo)
+                    <i class="fa-solid fa-book-open"></i> Apostila e Componentes
                 </button>
             </div>
             <div id="component-palette" class="flex-1 overflow-y-auto p-3 space-y-2 pb-20 scrollbar-hide">
@@ -378,23 +413,19 @@
         </main>
     </div>
 
-    <!-- Novo modal flutuante e movível -->
+    <!-- Modal flutuante e movível -->
     <div id="manual-modal" class="hidden">
         <div class="bg-slate-800 border border-slate-600 rounded-xl w-full h-full flex flex-col shadow-2xl overflow-hidden">
-            <!-- Cabeçalho do Modal - Área de Arrasto -->
             <div id="manual-modal-header" class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900 shrink-0 select-none">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-blue-500"></i> Manual e Diagnóstico de Falhas</h2>
+                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-blue-500"></i> Manual, Componentes e Falhas</h2>
                 <button onclick="closeManual()" class="text-slate-400 hover:text-red-400 transition-colors p-2 text-xl">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            <!-- Corpo do Modal -->
             <div class="flex flex-1 overflow-hidden">
-                <!-- Menu Lateral de Lições -->
                 <div class="w-1/3 min-w-[200px] border-r border-slate-700 bg-slate-900/50 overflow-y-auto p-3 space-y-2" id="manual-lessons-list">
                     <!-- Gerado via JS -->
                 </div>
-                <!-- Conteúdo da Lição Selecionada -->
                 <div class="w-2/3 flex-1 overflow-y-auto p-6 bg-slate-800" id="manual-lesson-content">
                     <div class="h-full flex flex-col items-center justify-center text-slate-500 text-center">
                         <i class="fa-solid fa-book-open text-6xl mb-4 opacity-50"></i>
@@ -410,7 +441,6 @@
 
     <script>
         const componentLibrary = [
-            // COMPONENTES ORIGINAIS MANTIDOS INTACTOS
             {
                 type: 'rede_trifasica', name: 'Barramento 380V (3F+T)', category: 'ALIMENTAÇÃO',
                 width: 160, height: 40,
@@ -463,7 +493,21 @@
                 </svg>`
             },
             {
-                type: 'disjuntor_bipolar', name: 'Disjuntor Bipolar', category: 'PROTEÇÃO',
+                type: 'disjuntor_monofasico', name: 'Disjuntor Monofásico', category: 'PROTEÇÃO',
+                width: 40, height: 90,
+                inputs: ['L'], outputs: ['L\''],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 40 90" width="100%" height="100%">
+                    <rect x="0" y="0" width="40" height="90" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="0" y="20" width="40" height="50" fill="#e2e8f0" />
+                    <rect x="10" y="35" width="20" height="20" fill="#0f172a" rx="1"/>
+                    <rect x="10" y="35" width="20" height="10" fill="#3b82f6" rx="1"/>
+                    <text x="20" y="75" font-size="6" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">C16</text>
+                </svg>`
+            },
+            {
+                type: 'disjuntor_bipolar', name: 'Disjuntor Bifásico', category: 'PROTEÇÃO',
                 width: 50, height: 90,
                 inputs: ['L', 'N'], outputs: ['L\'', 'N\''],
                 portStyle: 'edge',
@@ -474,6 +518,34 @@
                     <rect x="15" y="35" width="20" height="20" fill="#0f172a" rx="1"/>
                     <rect x="15" y="35" width="20" height="10" fill="#3b82f6" rx="1"/>
                     <text x="25" y="75" font-size="6" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">C10</text>
+                </svg>`
+            },
+            {
+                type: 'disjuntor_trifasico', name: 'Disjuntor Trifásico DIN', category: 'PROTEÇÃO',
+                width: 70, height: 90,
+                inputs: ['L1', 'L2', 'L3'], outputs: ['T1', 'T2', 'T3'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 70 90" width="100%" height="100%">
+                    <rect x="0" y="0" width="70" height="90" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="0" y="20" width="70" height="50" fill="#e2e8f0" />
+                    <rect x="10" y="35" width="50" height="20" fill="#0f172a" rx="1"/>
+                    <rect x="10" y="35" width="50" height="10" fill="#3b82f6" rx="1"/>
+                    <text x="35" y="75" font-size="6" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">C32 3~</text>
+                </svg>`
+            },
+            {
+                type: 'dps', name: 'Protetor Surto (DPS)', category: 'PROTEÇÃO',
+                width: 50, height: 90,
+                inputs: ['L', 'N'], outputs: ['PE'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 50 90" width="100%" height="100%">
+                    <rect x="0" y="0" width="50" height="90" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="5" y="20" width="40" height="50" fill="#ef4444" rx="2"/>
+                    <rect x="10" y="25" width="30" height="15" fill="#fca5a5" />
+                    <text x="25" y="55" font-size="8" font-family="sans-serif" font-weight="bold" fill="#fff" text-anchor="middle">DPS</text>
+                    <text x="25" y="65" font-size="5" font-family="sans-serif" fill="#fff" text-anchor="middle">40kA</text>
                 </svg>`
             },
             {
@@ -646,7 +718,6 @@
                     <rect x="0" y="0" width="150" height="15" fill="transparent" />
                 </svg>`
             },
-
             {
                 type: 'soft_starter', name: 'Soft-Starter', category: 'CONTROLE AVANÇADO',
                 width: 90, height: 160,
@@ -712,7 +783,6 @@
                     <rect x="0" y="0" width="60" height="60" fill="#fde047" stroke="#eab308" stroke-width="1" rx="4"/>
                     <circle cx="30" cy="30" r="22" fill="#ef4444" stroke="#991b1b" stroke-width="2"/>
                     <circle cx="30" cy="30" r="16" fill="#dc2626" />
-                    <!-- Seta de rotação branca -->
                     <path d="M 22 22 A 10 10 0 0 1 38 22" fill="none" stroke="#fff" stroke-width="2" />
                     <polygon points="38,20 42,24 36,24" fill="#fff" />
                 </svg>`
@@ -809,7 +879,6 @@
                     <text x="40" y="43" font-size="6" font-weight="bold" fill="#0f172a" text-anchor="middle">24V</text>
                 </svg>`
             },
-            /* MASSIVE COMPONENT LIBRARY EXPANSION - SEM TIRAR NADA DO ANTERIOR */
             {
                 type: 'rede_monofasica', name: 'Rede Monofásica 220V', category: 'ALIMENTAÇÃO',
                 width: 120, height: 40,
@@ -948,7 +1017,6 @@
                     <rect x="10" y="35" width="40" height="20" fill="#64748b" rx="2"/>
                     <path d="M 15 35 Q 30 5 45 35 Z" fill="#ef4444" />
                     <circle cx="30" cy="15" r="4" fill="#fca5a5" opacity="0.8"/>
-                    <!-- Ondas sonoras -->
                     <path d="M 48 10 Q 55 20 48 30" fill="none" stroke="#ef4444" stroke-width="2"/>
                     <path d="M 52 5 Q 62 20 52 35" fill="none" stroke="#ef4444" stroke-width="2"/>
                 </svg>`
@@ -1282,6 +1350,7 @@
             el.style.left = x + 'px';
             el.style.top = y + 'px';
             el.style.width = template.width + 'px';
+            el.dataset.simActive = "false";
             
             const header = document.createElement('div');
             header.className = 'component-header';
@@ -1432,7 +1501,7 @@
 
             wireLayer.appendChild(path);
 
-            const wireObj = { id: wireId, sourceNode: srcNode, sourcePort: srcPort, targetNode: tgtNode, targetPort: tgtPort, pathEl: path };
+            const wireObj = { id: wireId, sourceNode: srcNode, sourcePort: srcPort, targetNode: tgtNode, targetPort: tgtPort, pathEl: path, energized: false };
             wires.push(wireObj);
             
             updateWirePath(wireObj);
@@ -1642,27 +1711,222 @@
             }, 3000);
         }
 
-        /* LÓGICA DE SIMULAÇÃO E EXPORTAÇÃO */
+        /* LÓGICA DE SIMULAÇÃO DINÂMICA ELÉTRICA E VISUAL */
         let isSimulationRunning = false;
+        let simInterval = null;
         
         function toggleSimulation() {
             isSimulationRunning = !isSimulationRunning;
             const btn = document.getElementById('btn-sim');
+            
             if(isSimulationRunning) {
                 btn.innerHTML = '<i class="fa-solid fa-pause text-yellow-400"></i>';
-                showToast("Simulação Iniciada (Lógica Energizada)", "success");
+                showToast("Simulação Iniciada! Clique nos botões/chaves para ligar.", "success");
                 workspace.style.boxShadow = "inset 0 0 50px rgba(34, 197, 94, 0.1)";
+                
+                // Ativar Eventos de Clique nos componentes
+                nodes.forEach(n => {
+                    const body = n.el.querySelector('.component-body');
+                    body.style.cursor = 'pointer';
+                    body.onclick = (e) => {
+                        if(!isSimulationRunning) return;
+                        e.stopPropagation();
+                        // Alterna estado interno (ON/OFF)
+                        const isActive = n.el.dataset.simActive === "true";
+                        n.el.dataset.simActive = isActive ? "false" : "true";
+                        
+                        // Força override manual (Ex: Forçar contator com o dedo)
+                        if(n.type === 'contator') n.el.classList.add('manual-override');
+                        
+                        if(!isActive) n.el.classList.add('component-active-glow');
+                        else n.el.classList.remove('component-active-glow', 'manual-override');
+                    };
+                });
+                
+                // Inicia Engine Elétrica (Loop Rápido)
+                simInterval = setInterval(simulateElectricalNetwork, 100);
+                
             } else {
                 btn.innerHTML = '<i class="fa-solid fa-play text-green-400"></i>';
-                showToast("Simulação Pausada", "info");
+                showToast("Simulação Pausada e Zerada.", "info");
                 workspace.style.boxShadow = "none";
+                
+                clearInterval(simInterval);
+                
+                // Limpar todos os visuais da Simulação
+                nodes.forEach(n => {
+                    const body = n.el.querySelector('.component-body');
+                    body.style.cursor = 'default';
+                    body.onclick = null;
+                    n.el.dataset.simActive = "false";
+                    n.el.classList.remove('component-active-glow', 'manual-override');
+                    
+                    const gear = n.el.querySelector('.sim-gear');
+                    if(gear) gear.remove();
+                });
+                
+                wires.forEach(w => {
+                    w.energized = false;
+                    w.pathEl.classList.remove('wire-energized');
+                });
             }
+        }
+
+        // MOTOR DA SIMULAÇÃO (Rastreamento de Tensão)
+        function simulateElectricalNetwork() {
+            let portSignals = {}; 
+            wires.forEach(w => { w.energized = false; });
+            
+            const getSignals = (nId, pName) => {
+                const key = `${nId}_${pName}`;
+                if(!portSignals[key]) portSignals[key] = new Set();
+                return portSignals[key];
+            };
+            
+            let changed = true;
+            const addSignal = (nId, pName, signal) => {
+                const sigs = getSignals(nId, pName);
+                if(!sigs.has(signal)) { sigs.add(signal); changed = true; }
+            };
+
+            // Injetar Fontes de Alimentação Primárias
+            nodes.forEach(n => {
+                if(n.type === 'rede_trifasica') { addSignal(n.id, 'L1', 'L1'); addSignal(n.id, 'L2', 'L2'); addSignal(n.id, 'L3', 'L3'); addSignal(n.id, 'PE', 'PE'); }
+                if(n.type === 'rede_monofasica') { addSignal(n.id, 'L', 'L1'); addSignal(n.id, 'N', 'N'); addSignal(n.id, 'PE', 'PE'); }
+                if(n.type === 'fonte_24v') { addSignal(n.id, '+24V', '+24V'); addSignal(n.id, '0V', '0V'); }
+                if(n.type === 'rede_cc_bateria') { addSignal(n.id, '+24V', '+24V'); addSignal(n.id, '0V', '0V'); }
+                if(n.type === 'barra_terra') { addSignal(n.id, 'PE_IN', 'PE'); }
+                if(n.type === 'barra_neutro') { addSignal(n.id, 'N_IN', 'N'); }
+            });
+
+            // Loop de Propagação BFS Elétrica
+            let maxLoops = 50; 
+            while(changed && maxLoops > 0) {
+                changed = false;
+                maxLoops--;
+
+                // Propagação nos Fios
+                wires.forEach(w => {
+                    const srcSigs = getSignals(w.sourceNode, w.sourcePort);
+                    const tgtSigs = getSignals(w.targetNode, w.targetPort);
+                    srcSigs.forEach(sig => { if(!tgtSigs.has(sig)){ tgtSigs.add(sig); changed=true; w.energized=true;} });
+                    tgtSigs.forEach(sig => { if(!srcSigs.has(sig)){ srcSigs.add(sig); changed=true; w.energized=true;} });
+                });
+
+                // Propagação nos Equipamentos
+                nodes.forEach(n => {
+                    let isActive = n.el.dataset.simActive === "true";
+                    
+                    // Contator Atracando Automaticamente pela Bobina A1/A2
+                    if (n.type === 'contator' && !n.el.classList.contains('manual-override')) {
+                        const a1 = getSignals(n.id, 'A1');
+                        const a2 = getSignals(n.id, 'A2');
+                        // Se receber energia na bobina
+                        const coilPowered = (a1.has('+24V') || a1.has('L1') || a1.has('L2') || a1.has('L3') || a1.has('L')) && 
+                                            (a2.has('0V') || a2.has('N') || a2.has('L2') || a2.has('L3'));
+                        
+                        if (coilPowered && !isActive) {
+                            n.el.dataset.simActive = "true";
+                            n.el.classList.add('component-active-glow');
+                            isActive = true;
+                            changed = true;
+                        } else if(!coilPowered && isActive) {
+                            n.el.dataset.simActive = "false";
+                            n.el.classList.remove('component-active-glow');
+                            isActive = false;
+                            changed = true;
+                        }
+                    }
+
+                    const passThrough = (inPort, outPort) => {
+                        const inSigs = getSignals(n.id, inPort);
+                        const outSigs = getSignals(n.id, outPort);
+                        inSigs.forEach(sig => addSignal(n.id, outPort, sig));
+                        outSigs.forEach(sig => addSignal(n.id, inPort, sig)); 
+                    };
+
+                    // Lógicas de Passagem de Energia
+                    if (isActive || ['barra_terra', 'barra_neutro', 'fusivel_seccionadora', 'rele_termico', 'dps', 'dr_tetrapolar'].includes(n.type)) {
+                        const template = componentLibrary.find(c => c.type === n.type);
+                        if (template) {
+                            const ins = template.inputs;
+                            const outs = template.outputs;
+                            const min = Math.min(ins.length, outs.length);
+                            for(let i=0; i<min; i++) {
+                                // Excluir bobinas e auxiliares da passagem direta 1 pra 1
+                                if(ins[i] !== 'A1' && outs[i] !== 'A2' && ins[i] !== '95' && ins[i] !== '13') passThrough(ins[i], outs[i]);
+                            }
+                            if (n.type === 'contator' || n.type === 'botoeira_na' || n.type === 'chave_seletora') passThrough('13', '14');
+                            if (n.type === 'dr_tetrapolar') passThrough('N', 'N\'');
+                        }
+                    }
+
+                    // Lógicas de Contato Fechado (NF)
+                    if (!isActive) {
+                        if (n.type === 'botoeira_nf' || n.type === 'botoeira_emergencia' || n.type === 'fim_de_curso') passThrough('11', '12');
+                        if (n.type === 'rele_termico') passThrough('95', '96');
+                    } else {
+                        if (n.type === 'rele_termico') passThrough('97', '98');
+                        if (n.type === 'chave_seletora') passThrough('13', '14(Auto)');
+                    }
+                });
+            }
+
+            // Atualização Visual (Energização de Fios e Rotação de Motores)
+            wires.forEach(w => {
+                if(w.energized) w.pathEl.classList.add('wire-energized');
+                else w.pathEl.classList.remove('wire-energized');
+            });
+
+            nodes.forEach(n => {
+                // Animação de Motores
+                if (n.type.includes('motor')) {
+                    const u = getSignals(n.id, 'U1') || getSignals(n.id, 'U') || getSignals(n.id, '1U') || getSignals(n.id, 'Fase') || getSignals(n.id, 'A1(+)');
+                    const v = getSignals(n.id, 'V1') || getSignals(n.id, 'V') || getSignals(n.id, '1V');
+                    const w = getSignals(n.id, 'W1') || getSignals(n.id, 'W') || getSignals(n.id, '1W') || getSignals(n.id, 'Neutro') || getSignals(n.id, 'A2(-)');
+                    
+                    let spinning = false;
+                    let dir = 'cw';
+
+                    if (n.type === 'motor_1f' || n.type === 'motor_cc') {
+                        if (u.size > 0 && w.size > 0) spinning = true;
+                    } else {
+                        // Trifásico requer as 3 energias
+                        if (u.size > 0 && v.size > 0 && w.size > 0) {
+                            spinning = true;
+                            // Checa inversão de fase na chegada (L3 no borne V) - Anti-horário
+                            if (v.has('L3') || w.has('L2')) dir = 'ccw';
+                        }
+                    }
+
+                    let gear = n.el.querySelector('.sim-gear');
+                    if (spinning) {
+                        if (!gear) {
+                            gear = document.createElement('i');
+                            gear.className = `fa-solid fa-gear sim-gear absolute text-4xl opacity-90`;
+                            gear.style.top = '50%';
+                            gear.style.left = '50%';
+                            gear.style.pointerEvents = 'none';
+                            n.el.querySelector('.component-body').appendChild(gear);
+                        }
+                        gear.className = `fa-solid fa-gear sim-gear absolute text-4xl opacity-90 ${dir === 'cw' ? 'spin-cw' : 'spin-ccw'}`;
+                    } else {
+                        if (gear) gear.remove();
+                    }
+                }
+                
+                // Animação Sinaleiros/Lâmpadas
+                if (n.type.includes('sinaleiro') || n.type === 'sirene_alarme') {
+                    const x1 = getSignals(n.id, 'X1');
+                    if (x1.size > 0) n.el.classList.add('component-active-glow');
+                    else n.el.classList.remove('component-active-glow');
+                }
+            });
         }
 
         function exportImage() {
             showToast("Preparando exportação de Imagem...", "info");
             setTimeout(() => {
-                // Utiliza a função nativa de impressão focada apenas no diagrama (Simulação Print CAD)
                 window.print();
                 showToast("Dica: Salve como PDF ou faça um Print Screen.", "success");
             }, 800);
@@ -1701,7 +1965,7 @@
             const modal = document.getElementById('manual-modal');
             modal.style.left = (e.clientX - modalOffsetX) + 'px';
             modal.style.top = (e.clientY - modalOffsetY) + 'px';
-            modal.style.transform = 'none'; // Remove centralização do css original ao mover
+            modal.style.transform = 'none'; 
         }
 
         function onModalTouchDrag(e) {
@@ -1723,6 +1987,16 @@
 
         const manualLessons = [
             {
+                id: 'dicionario_equipamentos',
+                title: 'Dicionário da Biblioteca',
+                icon: 'fa-list-ul',
+                content: `
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Dicionário e Equipamentos</h3>
+                    <p class="text-slate-300 mb-6">Consulte abaixo a lista completa e atualizada de todos os componentes disponíveis na biblioteca, sua função e as ligações dos bornes.</p>
+                    <div id="dic-content" class="space-y-4 pb-10"></div>
+                `
+            },
+            {
                 id: 'partida_direta',
                 title: 'Partida Direta de Motor 3~',
                 icon: 'fa-bolt',
@@ -1740,21 +2014,11 @@
                     </ul>
 
                     <h4 class="text-lg font-semibold text-blue-400 mb-3">Passo a Passo de Ligação:</h4>
-                    <div class="manual-step">
-                        <strong class="text-white">Passo 1 (Força):</strong> Arraste o Barramento e ligue L1, L2, L3 nas entradas 1, 3, 5 do Disjuntor-Motor.
-                    </div>
-                    <div class="manual-step">
-                        <strong class="text-white">Passo 2 (Força):</strong> Ligue as saídas 2, 4, 6 do Disjuntor-Motor nas entradas L1, L2, L3 do Contator K1.
-                    </div>
-                    <div class="manual-step">
-                        <strong class="text-white">Passo 3 (Força):</strong> Ligue as saídas T1, T2, T3 do Contator K1 nos bornes U1, V1, W1 do Motor. Não esqueça o aterramento (PE).
-                    </div>
-                    <div class="manual-step">
-                        <strong class="text-white">Passo 4 (Comando - Botões):</strong> Arraste o botão Liga e Desliga. Pegue a fase L1 do Barramento e ligue na entrada '11' do Botão Desliga.
-                    </div>
-                    <div class="manual-step">
-                        <strong class="text-white">Passo 5 (Comando - Bobina):</strong> Ligue a saída '12' do botão Desliga na entrada '13' do Botão Liga. A saída '14' do botão Liga vai no terminal 'A1' do Contator K1. Ligue 'A2' ao Neutro (ou Fase 2 dependendo da rede).
-                    </div>
+                    <div class="manual-step"><strong class="text-white">Passo 1 (Força):</strong> Arraste o Barramento e ligue L1, L2, L3 nas entradas 1, 3, 5 do Disjuntor-Motor.</div>
+                    <div class="manual-step"><strong class="text-white">Passo 2 (Força):</strong> Ligue as saídas 2, 4, 6 do Disjuntor-Motor nas entradas L1, L2, L3 do Contator K1.</div>
+                    <div class="manual-step"><strong class="text-white">Passo 3 (Força):</strong> Ligue as saídas T1, T2, T3 do Contator K1 nos bornes U1, V1, W1 do Motor.</div>
+                    <div class="manual-step"><strong class="text-white">Passo 4 (Comando):</strong> Pegue a fase L1 do Barramento e ligue na entrada '11' do Botão Desliga.</div>
+                    <div class="manual-step"><strong class="text-white">Passo 5 (Comando):</strong> Ligue a saída '12' do botão Desliga na entrada '13' do Botão Liga. A saída '14' vai no 'A1' do Contator. Ligue 'A2' ao Neutro ou L2.</div>
                 `
             },
             {
@@ -1765,126 +2029,53 @@
                     <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">2. Contato de Selo</h3>
                     <p class="text-slate-300 mb-6">O contato de selo é usado para manter a bobina do contator ligada mesmo após você tirar o dedo do botão Liga.</p>
                     
-                    <h4 class="text-lg font-semibold text-blue-400 mb-3">O que você fará:</h4>
-                    <p class="text-slate-300 mb-6">Você usará os contatos auxiliares NA (13 e 14) do próprio Contator K1 em paralelo com o botão Liga.</p>
-
                     <h4 class="text-lg font-semibold text-blue-400 mb-3">Passo a Passo de Ligação:</h4>
-                    <div class="manual-step">
-                        <strong class="text-white">Passo 1:</strong> Monte o esquema básico do comando da lição anterior (Partida Direta).
-                    </div>
-                    <div class="manual-step">
-                        <strong class="text-white">Passo 2:</strong> Puxe um fio da <strong>entrada (13)</strong> do Botão Liga (Verde) e conecte ao borne <strong>13 (NA)</strong> do Contator K1.
-                    </div>
-                    <div class="manual-step">
-                        <strong class="text-white">Passo 3:</strong> Puxe um fio da <strong>saída (14)</strong> do Botão Liga e conecte ao borne <strong>14 (NA)</strong> do Contator K1.
-                    </div>
+                    <div class="manual-step"><strong class="text-white">Passo 1:</strong> Monte a Partida Direta.</div>
+                    <div class="manual-step"><strong class="text-white">Passo 2:</strong> Puxe um fio da <strong>entrada (13)</strong> do Botão Liga (Verde) e conecte ao borne <strong>13 (NA)</strong> do Contator K1.</div>
+                    <div class="manual-step"><strong class="text-white">Passo 3:</strong> Puxe um fio da <strong>saída (14)</strong> do Botão Liga e conecte ao borne <strong>14 (NA)</strong> do Contator K1.</div>
                     <div class="bg-blue-900/30 border border-blue-500/50 rounded p-4 mt-4">
-                        <strong class="text-blue-300">Como funciona:</strong> Quando você aperta o botão, a energia passa para A1 e atrai a bobina. Ao atrair a bobina, o contato 13-14 fecha. Ao soltar o botão, a energia continua fluindo pelo 13-14 direto para o A1!
+                        <strong class="text-blue-300">Como funciona:</strong> Ao apertar o botão, o contator atraca fechando o contato 13-14. A energia então "passa por fora" direto para o A1, mantendo o circuito energizado após soltar o botão!
                     </div>
                 `
             },
-            {
-                id: 'estrela_triangulo',
-                title: 'Partida Estrela-Triângulo',
-                icon: 'fa-star',
-                content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">3. Partida Estrela-Triângulo</h3>
-                    <p class="text-slate-300 mb-6">Reduz o pico de corrente durante o arranque de motores grandes. O motor parte em configuração Estrela (recebendo menor tensão nas bobinas) e após alguns segundos muda para Triângulo (tensão plena).</p>
-                    
-                    <h4 class="text-lg font-semibold text-blue-400 mb-3">Peças Necessárias:</h4>
-                    <ul class="list-disc pl-5 text-slate-300 mb-6 space-y-1">
-                        <li>3 Contatores (K1: Principal, K2: Triângulo, K3: Estrela)</li>
-                        <li>1 Relé Temporizador (Para fazer a transição K3 -> K2)</li>
-                        <li>Motor com 6 terminais (disponível no simulador como modelo padrão)</li>
-                    </ul>
-
-                    <div class="bg-yellow-900/30 border border-yellow-500/50 text-yellow-200 rounded p-4">
-                        <strong>Dica de Prática:</strong> Coloque os 3 contatores lado a lado. Use o Relé Temporizador alimentado pelo botão Liga. A saída fechada do temporizador liga K3. A saída aberta liga K2. 
-                    </div>
-                `
-            },
-            {
-                id: 'clp_basico',
-                title: 'Automação com CLP',
-                icon: 'fa-microchip',
-                content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">4. Lógica de Automação com CLP</h3>
-                    <p class="text-slate-300 mb-6">Em vez de usar contato de selo e botões físicos ligados diretamente à bobina (Lógica a Relé), usamos um Computador Lógico Programável (CLP) para ler as entradas e decidir quando ligar as saídas.</p>
-                    
-                    <h4 class="text-lg font-semibold text-blue-400 mb-3">Passo a Passo de Ligação (Hardware):</h4>
-                    <div class="manual-step">
-                        <strong class="text-white">Passo 1 (Alimentação):</strong> Arraste a Fonte 24V. Ligue o +24V na entrada L+ do CLP. Ligue o 0V na entrada M do CLP.
-                    </div>
-                    <div class="manual-step">
-                        <strong class="text-white">Passo 2 (Entradas - DI):</strong> Ligue o +24V da fonte em um lado dos Botões. O outro lado do Botão Liga vai na entrada I0.0 do CLP. O botão Desliga vai no I0.1.
-                    </div>
-                    <div class="manual-step">
-                        <strong class="text-white">Passo 3 (Saídas - DQ):</strong> Ligue a saída Q0.0 do CLP na bobina A1 do Contator.
-                    </div>
-                `
-            },
-            /* NOVOS TUTORIAIS E DIAGNÓSTICOS DE FALHA */
             {
                 id: 'partida_reversora',
-                title: 'Partida Reversora de Motor 3~',
+                title: 'Partida Reversora de Motor',
                 icon: 'fa-rotate',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">5. Partida Reversora</h3>
-                    <p class="text-slate-300 mb-6">A inversão de rotação de um motor trifásico ocorre quando invertemos DUAS das TRÊS fases que chegam a ele. Para isso, usamos dois contatores operando de forma intertravada.</p>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">3. Partida Reversora (Girar para os 2 lados)</h3>
+                    <p class="text-slate-300 mb-6">A inversão de rotação de um motor trifásico ocorre quando invertemos DUAS das TRÊS fases que chegam a ele. O simulador CAD Pro consegue reconhecer isso se você apertar o Play!</p>
                     
                     <h4 class="text-lg font-semibold text-blue-400 mb-3">Intertravamento Elétrico (Segurança Máxima):</h4>
-                    <p class="text-slate-300 mb-6">É estritamente proibido K1 e K2 entrarem juntos, pois causaria um curto-circuito bifásico terrível. Portanto, a energia que alimenta a bobina de K1 DEVE passar por um contato FECHADO (NF) de K2, e vice-versa.</p>
-
+                    <p class="text-slate-300 mb-6">É estritamente proibido K1 (Horário) e K2 (Anti-horário) entrarem juntos. A energia do A1 de K1 DEVE passar por um contato FECHADO de K2.</p>
+                    
                     <div class="bg-red-900/30 border border-red-500/50 text-red-200 rounded p-4 mb-4">
-                        <strong class="text-red-400">Falha Comum: Curto na Reversão</strong><br>
-                        Se os dois contatores entrarem ao mesmo tempo e houver explosão nos fusíveis, o problema é a falta de intertravamento. Verifique se os contatos 21-22 (NF) estão cruzados corretamente nas bobinas A1 de K1 e K2.
+                        <strong class="text-red-400">Teste Visual na Simulação:</strong><br>
+                        Se K1 jogar L1, L2, L3 para U1, V1, W1, a engrenagem no motor rodará Verde (Horário). Se K2 jogar L1, L3, L2, a engrenagem rodará Vermelha (Anti-horário).
                     </div>
                 `
             },
             {
-                id: 'diag_motor_nao_liga',
-                title: 'Diagnóstico: Motor Não Liga',
+                id: 'diag_falhas',
+                title: 'Diagnóstico de Falhas Industriais',
                 icon: 'fa-stethoscope',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">6. Diagnóstico Típico (Motor Inoperante)</h3>
-                    <p class="text-slate-300 mb-6">O operador aperta o botão LIGA e absolutamente nada acontece. Siga a árvore de falhas abaixo como um eletricista profissional.</p>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">4. Diagnóstico Rápido de Falhas</h3>
                     
                     <ul class="list-none space-y-4 text-slate-300">
                         <li class="bg-slate-700/50 p-3 rounded">
-                            <strong class="text-yellow-400">1. O contator "bateu" (atracou)?</strong><br>
-                            - <strong>SIM:</strong> O problema está na Força. Meça a tensão nos bornes T1, T2, T3 do contator e na caixa de bornes do motor. Pode haver um fusível queimado ou fio partido.<br>
-                            - <strong>NÃO:</strong> O problema está no Comando. Vá para a pergunta 2.
+                            <strong class="text-yellow-400">1. Motor ronca mas não gira (Aquece muito rápido)</strong><br>
+                            - <strong>Causa:</strong> Falta de Fase. Verifique se o Relé Falta de Fase atuou ou se um Fusível da Seccionadora rompeu.
                         </li>
                         <li class="bg-slate-700/50 p-3 rounded">
-                            <strong class="text-yellow-400">2. Tem tensão no borne A1 da bobina ao apertar o botão?</strong><br>
-                            - <strong>SIM:</strong> A bobina do contator queimou. Substitua o contator (ou apenas a bobina).<br>
-                            - <strong>NÃO:</strong> A falha vem de trás. Vá para a pergunta 3.
+                            <strong class="text-yellow-400">2. Motor liga, mas desarma após alguns minutos</strong><br>
+                            - <strong>Causa:</strong> Sobrecarga Mecânica. O Relé Térmico atuou cortando o circuito de comando (Borne 95-96). Revise a carga no eixo do motor.
                         </li>
                         <li class="bg-slate-700/50 p-3 rounded">
-                            <strong class="text-yellow-400">3. Verifique as proteções em série:</strong><br>
-                            O Relé Térmico atuou (borne 95-96 abriu)? O Botão de Emergência está travado (pressionado)? O Disjuntor de comando desarmou? Use o multímetro (novo item na biblioteca) para rastrear onde a voltagem para.
+                            <strong class="text-yellow-400">3. Botão Liga pressionado, mas contator não "bate"</strong><br>
+                            - <strong>Causa:</strong> O comando perdeu tensão. O Neutro (ou 0V) no A2 do contator pode estar partido, ou o Botão de Emergência está travado apertado.
                         </li>
                     </ul>
-                `
-            },
-            {
-                id: 'diag_desarme_termico',
-                title: 'Diagnóstico: Desarme de Térmico',
-                icon: 'fa-fire-extinguisher',
-                content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">7. Diagnóstico Típico (Atuação de Proteção)</h3>
-                    <p class="text-slate-300 mb-6">O motor liga, trabalha alguns minutos (ou segundos) e o painel desarma, acendendo o Sinaleiro Vermelho (Sobrecarga).</p>
-                    
-                    <h4 class="text-lg font-semibold text-blue-400 mb-3">Causas Frequentes na Indústria:</h4>
-                    <div class="manual-step">
-                        <strong class="text-white">1. Eixo Pesado (Sobrecarga Mecânica):</strong> O rolamento do motor ou da máquina que ele puxa (bomba, esteira) está travando, fazendo o motor exigir mais corrente (Amperes).
-                    </div>
-                    <div class="manual-step">
-                        <strong class="text-white">2. Falta de Fase:</strong> Um dos cabos de força soltou ou um fusível queimou. O motor trifásico trabalhando em duas fases consome o dobro de corrente em uma delas e aquece rapidamente. (Utilize o Relé Falta de Fase para prevenir).
-                    </div>
-                    <div class="manual-step">
-                        <strong class="text-white">3. Ajuste Incorreto do Relé:</strong> O dial (botão giratório) do relé térmico foi ajustado abaixo da corrente nominal do motor. Compare o ajuste com a placa de identificação do motor.
-                    </div>
                 `
             }
         ];
@@ -1896,7 +2087,7 @@
             manualLessons.forEach((lesson, index) => {
                 const btn = document.createElement('button');
                 btn.className = 'w-full text-left p-3 rounded-lg hover:bg-slate-700 transition-colors flex items-center gap-3 text-slate-300 hover:text-white border border-transparent hover:border-slate-600';
-                btn.innerHTML = `<div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700"><i class="fa-solid ${lesson.icon}"></i></div> <div><div class="font-bold text-sm leading-tight">${lesson.title}</div><div class="text-xs text-slate-500">Lição 0${index + 1}</div></div>`;
+                btn.innerHTML = `<div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700"><i class="fa-solid ${lesson.icon}"></i></div> <div><div class="font-bold text-sm leading-tight">${lesson.title}</div><div class="text-xs text-slate-500">Documentação</div></div>`;
                 
                 btn.onclick = () => loadLesson(lesson.id, btn);
                 listContainer.appendChild(btn);
@@ -1904,13 +2095,35 @@
         }
 
         function loadLesson(id, btnElement) {
-            // Highlight button
             document.querySelectorAll('#manual-lessons-list button').forEach(b => b.classList.remove('bg-blue-600/20', 'border-blue-500/50'));
             if(btnElement) btnElement.classList.add('bg-blue-600/20', 'border-blue-500/50');
             
             const lesson = manualLessons.find(l => l.id === id);
             if(lesson) {
                 document.getElementById('manual-lesson-content').innerHTML = lesson.content;
+                
+                // Gerador dinâmico do Dicionário (Enciclopédia) da Biblioteca
+                if (id === 'dicionario_equipamentos') {
+                    let html = '';
+                    componentLibrary.forEach(c => {
+                        let miniSvg = c.svg.replace('width="100%"', 'width="50"').replace('height="100%"', 'height="50"');
+                        html += `
+                        <div class="bg-slate-700/40 p-4 rounded-lg flex items-center gap-4 border border-slate-600">
+                            <div class="w-16 h-16 shrink-0 bg-slate-800 rounded flex items-center justify-center border border-slate-700 shadow-inner">
+                                ${miniSvg}
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-lg font-bold text-blue-400 mb-0.5">${c.name}</h4>
+                                <span class="px-2 py-0.5 bg-slate-800 border border-slate-600 text-[10px] font-bold text-slate-400 rounded uppercase tracking-widest">${c.category}</span>
+                                <div class="mt-2 grid grid-cols-2 gap-2 text-xs text-slate-300">
+                                    <div><strong class="text-slate-400">Entradas:</strong> ${c.inputs.length > 0 ? c.inputs.join(', ') : '-'}</div>
+                                    <div><strong class="text-slate-400">Saídas:</strong> ${c.outputs.length > 0 ? c.outputs.join(', ') : '-'}</div>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                    document.getElementById('dic-content').innerHTML = html;
+                }
             }
         }
 
@@ -1918,6 +2131,8 @@
             document.getElementById('manual-modal').classList.remove('hidden');
             if(document.getElementById('manual-lessons-list').children.length === 0) {
                 initManual();
+                // Auto click no primeiro
+                setTimeout(() => document.querySelector('#manual-lessons-list button').click(), 50);
             }
         }
 
@@ -1928,7 +2143,7 @@
         // STARTUP
         window.onload = () => {
             initPalette();
-            initModalDrag(); // Ativa a lógica de arrastar a janela da apostila
+            initModalDrag(); 
             window.addEventListener('resize', updateAllWires);
         };
     </script>
