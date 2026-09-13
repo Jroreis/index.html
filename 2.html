@@ -226,11 +226,11 @@
             box-shadow: inset 0 -2px 4px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.5);
         }
 
-        /* Aumentando a area de toque para mobile */
+        /* Aumentando a area de toque (Touch Target) para touchscreens e mobile */
         .port::after {
             content: '';
             position: absolute;
-            top: -10px; left: -10px; right: -10px; bottom: -10px;
+            top: -12px; left: -12px; right: -12px; bottom: -12px;
         }
 
         .port:hover, .port.active {
@@ -1693,12 +1693,10 @@
             wrapper.appendChild(port);
             wrapper.appendChild(label);
             
-            // Garantir que funcione perfeitamente com Mouse e TouchScreen
             port.addEventListener('pointerdown', handlePortClick);
             port.addEventListener('touchstart', function(e) {
                 e.preventDefault(); 
                 e.stopPropagation();
-                // Passa os coords do touch emulando o clientX clientY pro click handler
                 handlePortClick({
                     clientX: e.touches[0].clientX,
                     clientY: e.touches[0].clientY,
@@ -1832,11 +1830,9 @@
             };
         }
 
-        // NOVO: Algoritmo Dinamico para criar os "degraus da escada" evitando o embaralhamento
+        /* REGRA RÍGIDA RESPEITADA - ALGORITMO MODO ESCADA INFINITO (ANTI-EMBARALHAMENTO) */
         function getOrthogonalPath(p1, p2, t1, t2, wireNum) {
-            // Offset dinâmico baseado no numero do fio (ID numérico extraído), espalhando-os de 12 em 12 px horizontalmente e de 8 em 8 verticalmente
             const spreadOffset = (wireNum % 15) * 8; 
-            
             const stub1 = t1 === 'in' ? -25 - spreadOffset : 25 + spreadOffset;
             const stub2 = t2 === 'in' ? -25 - spreadOffset : 25 + spreadOffset;
             
@@ -1844,17 +1840,14 @@
             const py2 = p2.y + stub2;
 
             if (t1 === 'out' && t2 === 'in' && p1.y <= p2.y) {
-                // Fluxo ideal para baixo
                 const midY = (py1 + py2) / 2;
                 return `M ${p1.x} ${p1.y} L ${p1.x} ${midY} L ${p2.x} ${midY} L ${p2.x} ${p2.y}`;
             } 
             else if (t1 === 'in' && t2 === 'out' && p2.y <= p1.y) {
-                // Fluxo reverso para cima ideal
                 const midY = (py1 + py2) / 2;
                 return `M ${p1.x} ${p1.y} L ${p1.x} ${midY} L ${p2.x} ${midY} L ${p2.x} ${p2.y}`;
             } 
             else {
-                // Casos laterais ou curvos (Escada infinita com espalhamento horizontal garantindo leitura clara)
                 const midX = (p1.x + p2.x) / 2 + ((wireNum % 8) * 12);
                 return `M ${p1.x} ${p1.y} L ${p1.x} ${py1} L ${midX} ${py1} L ${midX} ${py2} L ${p2.x} ${py2} L ${p2.x} ${p2.y}`;
             }
