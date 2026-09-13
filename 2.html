@@ -2086,19 +2086,17 @@
                 nodes.forEach(n => {
                     const body = n.el.querySelector('.component-body');
                     body.style.cursor = 'pointer';
-                    body.onclick = (e) => {
+                    body.onpointerdown = (e) => {
                         if(!isSimulationRunning) return;
                         e.stopPropagation();
+                        e.preventDefault();
                         const isActive = n.el.dataset.simActive === "true";
                         n.el.dataset.simActive = isActive ? "false" : "true";
                         
-                        // Permite travar com clique para testes basicos sem cabos, senao depende das bobinas
-                        if(n.type.includes('contator') || n.type === 'rele_temporizador') {
-                            n.el.dataset.manualOverride = isActive ? "false" : "true"; 
-                        }
+                        if(n.type === 'contator') n.el.classList.add('manual-override');
                         
                         if(!isActive) n.el.classList.add('component-active-glow');
-                        else n.el.classList.remove('component-active-glow');
+                        else n.el.classList.remove('component-active-glow', 'manual-override');
                     };
                 });
                 
@@ -2115,9 +2113,9 @@
                     const body = n.el.querySelector('.component-body');
                     body.style.cursor = 'default';
                     body.onclick = null;
+                    body.onpointerdown = null;
                     n.el.dataset.simActive = "false";
-                    n.el.dataset.manualOverride = "false";
-                    n.el.classList.remove('component-active-glow');
+                    n.el.classList.remove('component-active-glow', 'manual-override');
                     
                     const gear = n.el.querySelector('.sim-gear');
                     if(gear) gear.remove();
@@ -2188,18 +2186,17 @@
                         };
 
                         // Pass-through elements (Disjuntores agora tem passagem de tensão garantida)
-                        if (isActive || ['barra_terra', 'barra_neutro', 'fusivel_seccionadora', 'rele_termico', 'dps', 'dr_tetrapolar', 'disjuntor_motor', 'disjuntor_monofasico', 'disjuntor_bipolar', 'disjuntor_trifasico'].includes(n.type)) {
+                        if (isActive || ['barra_terra', 'barra_neutro', 'fusivel_seccionadora', 'rele_termico', 'dps', 'dr_tetrapolar'].includes(n.type)) {
                             const template = componentLibrary.find(c => c.type === n.type);
                             if (template) {
                                 const ins = template.inputs;
                                 const outs = template.outputs;
                                 const min = Math.min(ins.length, outs.length);
                                 for(let i=0; i<min; i++) {
-                                    // Bloqueia as portas de logica e comando separadas
-                                    if(ins[i] !== 'A1' && outs[i] !== 'A2' && ins[i] !== '95' && ins[i] !== '13' && ins[i] !== '21' && ins[i] !== '43') passThrough(ins[i], outs[i]);
+                                    if(ins[i] !== 'A1' && outs[i] !== 'A2' && ins[i] !== '95' && ins[i] !== '13' && ins[i] !== '21' && ins[i] !== '43' && ins[i] !== '11' && ins[i] !== '15') passThrough(ins[i], outs[i]);
                                 }
-                                if (n.type.includes('contator') || n.type === 'botoeira_na' || n.type === 'chave_seletora' || n.type === 'rele_temporizador') passThrough('13', '14');
-                                if (n.type.includes('contator')) passThrough('43', '44');
+                                if (n.type === 'contator' || n.type === 'botoeira_na' || n.type === 'rele_temporizador') passThrough('13', '14');
+                                if (n.type === 'contator') passThrough('43', '44');
                                 if (n.type === 'dr_tetrapolar') passThrough('N', 'N\'');
                             }
                         }
@@ -2208,7 +2205,8 @@
                             if (['botoeira_nf', 'botoeira_emergencia', 'fim_de_curso'].includes(n.type)) passThrough('11', '12');
                             if (n.type === 'rele_termico') passThrough('95', '96');
                             if (n.type === 'rele_temporizador') passThrough('15', '16');
-                            if (n.type.includes('contator')) passThrough('21', '22'); // NF extra
+                            if (n.type === 'contator') passThrough('21', '22');
+                            if (n.type === 'chave_seletora') passThrough('13', '14');
                         } else {
                             if (n.type === 'rele_termico') passThrough('97', '98');
                             if (n.type === 'chave_seletora') passThrough('13', '14(Auto)');
