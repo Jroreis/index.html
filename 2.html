@@ -65,14 +65,13 @@
             stroke: #3b82f6; 
             stroke-width: 4;
             stroke-linecap: square;
-            stroke-linejoin: miter;
+            stroke-linejoin: round;
             pointer-events: stroke; 
             cursor: pointer;
             transition: stroke 0.2s, stroke-width 0.2s;
             filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));
         }
 
-        /* Melhoria: Feedback claro para exclusão de fios */
         .wire-path:hover {
             stroke: #ef4444 !important;
             stroke-width: 8 !important;
@@ -80,7 +79,6 @@
             filter: drop-shadow(0 0 4px #ef4444) !important;
         }
 
-        /* EFEITO FIO ENERGIZADO (SIMULAÇÃO) */
         .wire-energized {
             stroke: #f59e0b !important;
             filter: drop-shadow(0 0 6px #fbbf24) !important;
@@ -106,7 +104,6 @@
             opacity: 0.9;
         }
         
-        /* EFEITO COMPONENTE LIGADO/ATIVO (SIMULAÇÃO) */
         .component-active-glow {
             box-shadow: 0 0 25px rgba(251, 191, 36, 0.5), inset 0 0 10px rgba(251, 191, 36, 0.3) !important;
             border-color: #fbbf24 !important;
@@ -116,7 +113,6 @@
             border-color: #f59e0b !important;
         }
 
-        /* EFEITO ROTAÇÃO MOTOR (SIMULAÇÃO) */
         @keyframes spinCW { from { transform: rotate(0deg) translate(-50%, -50%); } to { transform: rotate(360deg) translate(-50%, -50%); } }
         @keyframes spinCCW { from { transform: rotate(0deg) translate(-50%, -50%); } to { transform: rotate(-360deg) translate(-50%, -50%); } }
         
@@ -315,8 +311,142 @@
 
         .digital-font { font-family: 'JetBrains Mono', monospace; font-weight: bold; }
         
-        /* Estilos do Modal da Apostila */
-        #manual-modal {
+        #manual-modal, #tutorial-modal {
+            position: absolute;
+            top: 10%;
+            left: 15%;
+            width: 70vw;
+            max-width: 950px;
+            height: 75vh;
+            max-height: 700px;
+            z-index: 2000;
+            background: transparent;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+        #tutorial-modal {
+            top: 15%;
+            left: 20%;
+            z-index: 2001;
+            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.9);
+        }
+        #manual-modal.hidden, #tutorial-modal.hidden {
+            display: none !important;
+        }
+        #manual-modal-header, #tutorial-modal-header {
+            cursor: move;
+        }
+        .manual-step {
+            border-left: 2px solid #3b82f6;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <header class="bg-slate-800 border-b border-slate-700 h-14 flex items-center justify-between px-4 sm:px-6 shrink-0 z-40">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white mr-2 transition-colors p-2 rounded hover:bg-slate-700" title="Mostrar/Ocultar Biblioteca">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.5)]">
+                <i class="fa-solid fa-bolt text-white"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight text-white hidden sm:block">Simulador Industrial CAD Pro</h1>
+        </div>
+        <div class="flex items-center gap-2 sm:gap-4">
+            <button onclick="clearWorkspace()" class="bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded text-sm font-medium transition-colors border border-red-500/20 flex items-center gap-2">
+                <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline">Limpar Bancada</span>
+            </button>
+            <button onclick="showHelp()" class="text-slate-400 hover:text-white transition-colors p-2">
+                <i class="fa-solid fa-circle-info text-xl"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative">
+        <aside id="sidebar" class="w-64 sm:w-72 min-w-[16rem] sm:min-w-[18rem] bg-slate-900 border-r border-slate-800 flex flex-col z-30 shrink-0 shadow-2xl relative">
+            <div class="p-3 bg-slate-950 border-b border-slate-800 flex flex-col">
+                <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Responsável: Engenheiro/Eletricista</label>
+                <input type="text" placeholder="Nome do Profissional / CREA" class="bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-white outline-none focus:border-blue-500 transition-colors">
+            </div>
+            <div class="p-4 border-b border-slate-800 bg-slate-800/50 flex flex-col">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Biblioteca</h2>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Arraste para a bancada</p>
+                    </div>
+                </div>
+                <button onclick="openManual()" class="w-full mt-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white text-xs font-bold py-2.5 px-3 rounded shadow flex justify-center items-center gap-2 transition-all border border-blue-500/50">
+                    <i class="fa-solid fa-book-open"></i> Apostila e Componentes
+                </button>
+                <button onclick="openTutorial()" class="w-full mt-2 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white text-xs font-bold py-2.5 px-3 rounded shadow flex justify-center items-center gap-2 transition-all border border-emerald-500/50">
+                    <i class="fa-solid fa-plug-circle-bolt"></i> Tutorial Completo de Ligações
+                </button>
+            </div>
+            <div id="component-palette" class="flex-1 overflow-y-auto p-3 space-y-2 pb-20 scrollbar-hide">
+                <!-- Os itens serão gerados via JS aqui -->
+            </div>
+        </aside>
+
+        <main id="workspace" class="flex-1 relative">
+            <div class="canvas-toolbar">
+                <button id="btn-sim" onclick="toggleSimulation()" title="Iniciar Simulação Play/Pause"><i class="fa-solid fa-play text-green-400"></i></button>
+                <div class="w-px h-6 bg-slate-600 mx-1 my-auto"></div>
+                <button onclick="zoomIn()" title="Aumentar Zoom (Scroll Up)"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                <button onclick="zoomOut()" title="Diminuir Zoom (Scroll Down)"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                <button onclick="resetZoomPan()" title="Centralizar Visualização"><i class="fa-solid fa-expand"></i></button>
+                <div class="w-px h-6 bg-slate-600 mx-1 my-auto"></div>
+                <button onclick="exportCircuit()" title="Salvar Projeto (Download)"><i class="fa-solid fa-floppy-disk text-blue-400"></i></button>
+                <button onclick="document.getElementById('import-file').click()" title="Carregar Projeto (Upload)"><i class="fa-solid fa-folder-open text-yellow-400"></i></button>
+                <button onclick="exportImage()" title="Salvar como Imagem (Print/PNG)"><i class="fa-solid fa-camera text-purple-400"></i></button>
+                <input type="file" id="import-file" style="display: none;" accept=".json" onchange="importCircuit(event)">
+            </div>
+
+            <div id="canvas-pan-zoom">
+                <svg id="wire-layer"></svg>
+                <svg id="drawing-layer" class="absolute top-0 left-0 w-full h-full pointer-events-none z-10" style="display: none; overflow: visible;">
+                    <path id="drawing-wire" class="wire-path" stroke-dasharray="5,5" opacity="0.6"></path>
+                </svg>
+                <div id="components-container" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
+            </div>
+            
+            <div id="welcome-text" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                <div class="text-center">
+                    <i class="fa-solid fa-arrows-up-down-left-right text-5xl mb-4"></i>
+                    <h2 class="text-2xl font-bold">Use SHIFT + Clique ou Toque (1 dedo) para mover a tela</h2>
+                    <p class="text-md mt-2">Scroll do mouse ou Pinça (2 dedos) para Zoom</p>
+                    <p class="text-sm mt-4 text-slate-400 font-bold bg-slate-900/50 p-2 rounded">Para excluir um fio, basta clicar em cima dele.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal flutuante e movível da Apostila -->
+    <div id="manual-modal" class="hidden">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl w-full h-full flex flex-col shadow-2xl overflow-hidden">
+            <div id="manual-modal-header" class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900 shrink-0 select-none">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-blue-500"></i> Manual Completo, Componentes e Falhas</h2>
+                <button onclick="closeManual()" class="text-slate-400 hover:text-red-400 transition-colors p-2 text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="flex flex-1 overflow-hidden">
+                <div class="w-1/3 min-w-[200px] border-r border-slate-700 bg-slate-900/50 overflow-y-auto p-3 space-y-2" id="manual-lessons-list">
+                    <!-- Gerado via JS -->
+                </div>
+                <div class="w-2/3 flex-1 overflow-y-auto p-6 bg-slate-800" id="manual-lesson-content">
+                    <div class="h-full flex flex-col items-center justify-center text-slate-500 text-center">
+                        <i class="fa-solid fa-book-open text-6xl mb-4 opacity-50"></i>
+                        <p class="text-lg font-medium">Selecione uma lição no menu lateral para iniciar.</p>
+                        <p class="text-sm mt-2">Aprenda o passo a passo e replique na bancada interativa.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FLUTUANTE DO TUTORIAL COMPLETO DE LIGAÇÕES E AUTOMAÇÃO -->
     <div id="tutorial-modal" class="hidden">
         <div class="bg-slate-900 border border-emerald-600 rounded-xl w-full h-full flex flex-col shadow-2xl overflow-hidden">
             <div id="tutorial-modal-header" class="p-4 border-b border-emerald-700 flex justify-between items-center bg-slate-950 shrink-0 select-none cursor-move">
@@ -328,57 +458,39 @@
             <div class="flex-1 overflow-y-auto p-6 bg-slate-900 text-slate-300 leading-relaxed space-y-8" id="tutorial-content">
                 
                 <section>
-                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">1. DISJUNTORES, RELÉS E PROTEÇÃO</h3>
-                    <p class="mb-3">A proteção é o primeiro passo em qualquer painel elétrico. Siga rigorosamente a ordem de montagem:</p>
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">1. COMO INSTALAR ILUMINAÇÃO, EMERGÊNCIA E SINALIZAÇÕES (NA / NF)</h3>
+                    <p class="mb-3">Aprenda a utilizar os contatos auxiliares do novo Contator K1 (que agora possui 2NA e 1NF) para criar painéis de sinalização profissionais e lâmpadas de emergência:</p>
                     <ul class="list-disc pl-6 space-y-2">
-                        <li><strong>Disjuntor Termomagnético (Tripolar/Motor):</strong> Deve receber a alimentação principal (L1, L2, L3) diretamente do barramento nos seus bornes superiores (1, 3, 5). As saídas inferiores (2, 4, 6) alimentam o próximo equipamento de força.</li>
-                        <li><strong>Relé Térmico (Sobrecarga):</strong> É acoplado fisicamente ou eletricamente logo abaixo do contator. Ligue as saídas do contator (2, 4, 6) nas entradas do relé (1, 3, 5). <strong>Ligação de Comando:</strong> Utilize os contatos auxiliares 95 e 96 (Normalmente Fechado - NF) em série no início do circuito de comando. Se o motor aquecer excessivamente, o contato 95-96 abre, cortando a energia de toda a lógica e protegendo o motor.</li>
+                        <li><strong>Sinaleiro de Motor Ligado (Verde / Iluminação Run):</strong> Conecte a energia (+24V ou Fase) no borne <strong>43 (NA)</strong> ou <strong>13 (NA)</strong> do Contator K1. A saída (44 ou 14) deve ir para o terminal X1 do sinaleiro Verde. Quando o contator atracar, o contato NA fecha, e a luz verde acende indicando funcionamento normal.</li>
+                        <li><strong>Lâmpada de Emergência ou Painel Desligado (Vermelha):</strong> Conecte a energia (+24V ou Fase) no borne <strong>21 (NF - Normalmente Fechado)</strong> do Contator K1. A saída <strong>22</strong> deve ir para o terminal X1 da lâmpada de Emergência/Vermelha. Quando o motor estiver parado (contator desatracado), a energia passa direto pelo NF e a luz fica acesa alertando o estado de repouso ou emergência de parada. Ao ligar o motor, o contato NF abre e a luz vermelha apaga.</li>
+                        <li><strong>Sinaleiro de Falha (Amarelo / Sobrecarga):</strong> Utilize o contato auxiliar do Relé Térmico. A energia entra no <strong>97 (NA)</strong> e sai pelo <strong>98</strong> para o X1 do sinaleiro Amarelo. Acende apenas se houver sobrecarga, momento em que você também pode plugar a sirene de alarme em paralelo.</li>
                     </ul>
                 </section>
 
                 <section>
-                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">2. CONTATORES E COMANDOS</h3>
-                    <p class="mb-3">O Contator é a chave magnética que liga cargas pesadas através de um sinal de baixa potência.</p>
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">2. COMO INSTALAR A AUTOMAÇÃO E CONTROLE AVANÇADO</h3>
+                    <p class="mb-3">Integração do CLP, Inversor de Frequência e Sensores na prática industrial:</p>
                     <ul class="list-disc pl-6 space-y-2">
-                        <li><strong>Circuito de Força:</strong> Entradas L1, L2, L3 recebem energia; saídas T1, T2, T3 vão para a carga (motor).</li>
-                        <li><strong>Circuito de Comando (Bobina):</strong> Os bornes A1 e A2 acionam o eletroímã interno. Conecte a fase (ou +24V) vinda da lógica dos botões no A1. O borne A2 deve ser ligado diretamente ao Neutro (ou 0V).</li>
-                        <li><strong>Contatos Auxiliares:</strong> O borne 13-14 (NA) é usado para o "Contato de Selo", enquanto os contatos 21-22 (NF) são usados para intertravamento e sinalização de emergência.</li>
+                        <li><strong>Ligando o CLP (Cérebro da Automação):</strong> Alimente L+ com +24V e M com 0V da Fonte 24V. O CLP agora está pronto para processar a lógica.</li>
+                        <li><strong>Instalação do Sensor Indutivo na Automação:</strong> Alimente o sensor com +24V e 0V. O cabo de saída (OUT) envia um pulso positivo. Conecte o OUT na entrada <strong>I0.0</strong> do CLP. Quando uma peça metálica passar na esteira, o CLP recebe o sinal.</li>
+                        <li><strong>Acionamento via CLP (Comando de Máquinas):</strong> A saída programada do CLP (ex: <strong>Q0.0</strong>) emite +24V. Conecte este borne diretamente ao <strong>A1</strong> de um contator de comando para automatizar a partida do motor. O A2 vai para o 0V.</li>
+                        <li><strong>Instalação do Inversor de Frequência:</strong> As fases da rede (R, S, T) vão direto do disjuntor para os bornes de entrada do Inversor. As saídas (U, V, W) vão DIRETAMENTE para o motor. <strong>NUNCA</strong> coloque contatores entre o inversor e o motor. Para variar a velocidade do motor automaticamente, conecte a saída (Q0.1) do CLP na entrada digital (DI1) do Inversor.</li>
                     </ul>
                 </section>
 
                 <section>
-                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">3. ILUMINAÇÃO E SINALIZAÇÕES (Passo a Passo)</h3>
-                    <p class="mb-3">A sinalização visual e de emergência é vital. O Contator possui contatos auxiliares NA (13-14) e NF (21-22) exclusivos para essas lógicas.</p>
-                    <ul class="list-disc pl-6 space-y-4">
-                        <li class="bg-slate-800 p-3 rounded border border-slate-700"><strong>Sinalização de Motor Rodando (Sinaleiro Verde - NA):</strong> 
-                            <br>1. Puxe um fio da fase (+24V ou L1 de comando) para o borne <strong>13 (NA)</strong> do Contator.
-                            <br>2. Do borne <strong>14</strong> do Contator, leve o fio para a entrada <strong>X1</strong> do Sinaleiro Verde.
-                            <br>3. Ligue o borne <strong>X2</strong> do sinaleiro no 0V/Neutro. 
-                            <br><em class="text-emerald-300">Resultado:</em> Quando o contator atraca (liga o motor), o contato 13-14 fecha e a luz verde acende indicando operação normal.
-                        </li>
-                        <li class="bg-slate-800 p-3 rounded border border-slate-700"><strong>Sinalização de Motor Parado / Emergência (Sinaleiro Vermelho - NF):</strong> 
-                            <br>1. Puxe um fio da fase (+24V ou L1 de comando) DIRETO para o borne <strong>21 (NF)</strong> do Contator.
-                            <br>2. Da saída <strong>22 (NF)</strong> do Contator, leve até o borne <strong>X1</strong> do Sinaleiro Vermelho ou Lâmpada de Alerta.
-                            <br>3. Conecte o <strong>X2</strong> ao 0V/Neutro.
-                            <br><em class="text-emerald-300">Resultado:</em> O contato 21-22 conduz energia apenas quando a bobina do contator está DESLIGADA. A luz vermelha ficará acesa indicando "PARADO" ou "EMERGÊNCIA". Ao ligar o motor, o contator atraca, o contato 21-22 ABRE, e a luz apaga.
-                        </li>
-                        <li class="bg-slate-800 p-3 rounded border border-slate-700"><strong>Iluminação Simples de Painel:</strong> 
-                            <br>Puxe a fase para a entrada de um <strong>Interruptor Simples</strong>. Da saída do interruptor, vá direto para o borne <strong>X1</strong> de uma Lâmpada Comum de Iluminação (sinaleiro branco/amarelo). O <strong>X2</strong> vai para o Neutro.
-                        </li>
-                        <li class="bg-slate-800 p-3 rounded border border-slate-700"><strong>Sinalização de Falha Térmica (Sirene / Sinaleiro Amarelo):</strong> 
-                            <br>1. Leve energia direta para o borne <strong>97 (NA)</strong> do Relé Térmico.
-                            <br>2. Da saída <strong>98</strong>, ligue no <strong>X1</strong> da Sirene ou Sinaleiro Amarelo.
-                            <br>3. Conecte o <strong>X2</strong> ao Neutro.
-                            <br><em class="text-emerald-300">Resultado:</em> Se houver sobrecarga, o relé desarma o circuito (abrindo o 95-96) e IMEDIATAMENTE fecha o 97-98, ativando a luz amarela e/ou tocando a sirene de alarme de falha na máquina.
-                        </li>
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">3. DISJUNTORES, RELÉS E PROTEÇÃO</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><strong>Disjuntor Termomagnético (Tripolar/Motor):</strong> Deve receber a alimentação principal (L1, L2, L3) diretamente do barramento nos seus bornes superiores (1, 3, 5). As saídas inferiores (2, 4, 6) alimentam o contator.</li>
+                        <li><strong>Relé Térmico (Sobrecarga):</strong> É acoplado logo abaixo do contator. Ligue as saídas do contator (2, 4, 6) nas entradas do relé (1, 3, 5). <strong>Ligação de Comando:</strong> Utilize os contatos auxiliares 95 e 96 (NF) em série no início do circuito de comando para proteger o motor contra superaquecimento.</li>
                     </ul>
                 </section>
 
                 <section>
-                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">4. CONTATO DE SELO (RETENÇÃO)</h3>
-                    <p class="mb-3">É o circuito lógico mais essencial. Ele substitui o dedo do operador no botão de ligar (que é apenas um pulso).</p>
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">4. PARTIDA DIRETA E CONTATO DE SELO (RETENÇÃO)</h3>
+                    <p class="mb-3">O Contato de Selo é o circuito lógico essencial que substitui o dedo do operador no botão (que é apenas um pulso).</p>
                     <ol class="list-decimal pl-6 space-y-2">
-                        <li>Puxe a energia da fase de comando (após o relé térmico 95-96) e ligue na entrada <strong>11 do Botão NF (Vermelho - Desliga)</strong>.</li>
+                        <li>Puxe a energia da fase de comando e ligue na entrada <strong>11 do Botão NF (Vermelho - Desliga)</strong>.</li>
                         <li>Da saída <strong>12 do Botão NF</strong>, puxe DOIS fios paralelos:
                             <br>- O primeiro fio vai para a entrada <strong>13 do Botão NA (Verde - Liga)</strong>.
                             <br>- O segundo fio vai para a entrada <strong>13 (NA Auxiliar) do Contator K1</strong>.
@@ -386,67 +498,15 @@
                         <li>Na saída <strong>14 do Botão NA</strong>, puxe um fio que se unirá com a saída <strong>14 do Contator K1</strong>.</li>
                         <li>Desta união (nó), conecte o fio no borne <strong>A1 (Bobina do Contator K1)</strong>. O borne A2 vai para o Neutro/0V.</li>
                     </ol>
-                    <p class="mt-3 text-emerald-200"><strong>Resultado:</strong> O pulso no botão Verde energiza A1. O contator atraca e fecha seu próprio contato 13-14, criando uma rota alternativa para a corrente. Ao soltar o botão, a energia continua passando pelo 13-14, mantendo a bobina ligada.</p>
                 </section>
 
                 <section>
-                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">5. PARTIDA DIRETA E MÁQUINAS</h3>
-                    <p class="mb-3">Ligação completa para acionar um motor elétrico de indução trifásico em sua tensão plena (aplicável a motores menores).</p>
-                    <ul class="list-disc pl-6 space-y-2">
-                        <li><strong>Potência:</strong> Barramento 3~ 380V -> Entradas do Disjuntor-Motor -> Saídas para Contator K1 (L1, L2, L3). Saídas de K1 (T1, T2, T3) -> Motor Trifásico (U1, V1, W1). O PE (Terra) vai na carcaça.</li>
-                        <li><strong>Comando:</strong> O mesmo circuito de "Contato de Selo" descrito no item 4, controlando a bobina A1 do contator K1.</li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">6. LIGAÇÃO ESTRELA-TRIÂNGULO (Avançado)</h3>
-                    <p class="mb-3">Método utilizado para amenizar o pico de corrente durante a partida do motor. O motor deve ter obrigatoriamente 6 terminais expostos (U1, V1, W1 e W2, U2, V2) e suportar a tensão de fechamento em triângulo.</p>
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">5. LIGAÇÃO ESTRELA-TRIÂNGULO</h3>
                     <ul class="list-disc pl-6 space-y-2">
                         <li><strong>Componentes Necessários:</strong> 3 Contatores (K1 Principal, K2 Triângulo, K3 Estrela) e 1 Relé Temporizador.</li>
-                        <li><strong>Força (Potência):</strong> 
-                            <br>A rede (L1, L2, L3) alimenta simultaneamente as entradas de K1 e K2.
-                            <br>As saídas de K1 ligam em U1, V1, W1 do motor.
-                            <br>As saídas de K2 ligam em W2, U2, V2 do motor.
-                            <br>O Contator K3 (Estrela) possui suas saídas (T1, T2, T3) curto-circuitadas entre si com fios jumpers. As entradas de K3 (L1, L2, L3) são conectadas junto às saídas de K2 (ou aos cabos W2, U2, V2).
-                        </li>
-                        <li><strong>Comando e Temporização:</strong>
-                            <br>O pulso no botão Liga aciona K1, K3 e o Relé Temporizador simultaneamente.
-                            <br>Neste primeiro estágio, K1 envia tensão e K3 curto-circuita a outra ponta, formando a <strong>ligação Estrela</strong> (Tensão por bobina reduzida em raiz de 3).
-                            <br>Após o tempo configurado (ex: 5 segundos), o Temporizador atua. Seu contato abre, desenergizando K3. Logo em seguida, outro contato fecha, energizando K2.
-                            <br>Agora, K1 e K2 estão atracados, injetando a fase correta nas pontas opostas das bobinas, fechando o motor em <strong>Triângulo</strong> e aplicando tensão plena.
-                        </li>
-                        <li><strong class="text-red-400">Intertravamento Vital:</strong> No circuito de comando, a energia que vai para a bobina de K3 DEVE passar por um contato Fechado (NF 21-22) de K2. A energia de K2 DEVE passar por um contato NF 21-22 de K3. Isso impede que os dois atraquem juntos, o que causaria um curto-circuito trifásico explosivo.</li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">7. INVERSOR DE FREQUÊNCIA E SOFT-STARTER</h3>
-                    <p class="mb-3">Equipamentos eletrônicos modernos que substituem chaves de partida pesadas, oferecendo controle total de velocidade, rampa de aceleração e frenagem suave.</p>
-                    <ul class="list-disc pl-6 space-y-2">
-                        <li><strong>Força:</strong> As fases da rede (R, S, T) vão direto do disjuntor para os bornes de entrada do Inversor. As saídas do inversor (U, V, W) vão DIRETAMENTE para o motor. <strong>NUNCA</strong> coloque contatores ou chaves secionadoras entre o inversor e o motor para interromper carga, há risco severo de queima do IGBT.</li>
-                        <li><strong>Comando a 2 Fios:</strong> Utilize a fonte interna de 24V do próprio inversor. Ligue o +24V numa Chave Seletora AUTO/MAN. O retorno (sinal) da chave conecte no terminal DI1 (Entrada Digital 1). Parametrize o inversor para DI1 atuar como Gira/Para (RUN/STOP). Para reverter rotação, ligue outra chave em DI2.</li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">8. AUTOMAÇÃO: CLP, SENSORES E CONTROLE AVANÇADO</h3>
-                    <p class="mb-3">O Controlador Lógico Programável (CLP) é o cérebro da automação industrial pesada. Ele coordena a operação de todos os motores, contatores e sinaleiros através de sensores industriais em rede de baixa tensão (24VDC).</p>
-                    <ul class="list-disc pl-6 space-y-4">
-                        <li class="bg-slate-800 p-3 rounded border border-slate-700"><strong>Alimentação Segura:</strong> 
-                            <br>Conecte uma Fonte 24V DC nos bornes <strong>L+ (Positivo)</strong> e <strong>M (Negativo/0V)</strong> do CLP para ligar a CPU principal. Todo o painel de automação opera em 24V, isolando o operador do risco de choque elétrico.
-                        </li>
-                        <li class="bg-slate-800 p-3 rounded border border-slate-700"><strong>Ligar Entradas (Sensores de Automação Industriais):</strong>
-                            <br>- <em>Sensor Indutivo PNP:</em> Ligue o +24V e 0V no corpo do sensor. A saída dele (OUT) manda um pulso de 24V positivo quando detecta a aproximação de metal na esteira. Ligue esse fio <strong>OUT</strong> no borne <strong>I0.0</strong> do CLP.
-                            <br>- <em>Boia de Nível / Pressostato:</em> Jogue +24V no borne 11 do sensor de nível do tanque. A saída 14 (NA) você liga no borne <strong>I0.1</strong> do CLP. Quando a água encher e levantar a boia, o CLP recebe o pulso de nível alto.
-                        </li>
-                        <li class="bg-slate-800 p-3 rounded border border-slate-700"><strong>Ligar Saídas (Atuadores e Lâmpadas via CLP):</strong>
-                            <br>O software interno varre as entradas e, se a lógica de programa permitir, ele emite 24V nas portas de saída (Q).
-                            <br>- <em>Acionar Motor da Esteira:</em> Pegue o cabo do borne <strong>Q0.0</strong> do CLP e ligue DIRETAMENTE no borne <strong>A1</strong> do Contator K1 de manobra. (O A2 do contator vai no 0V). O CLP comanda a bobina 24VDC de forma automatizada.
-                            <br>- <em>Acionar Sinaleiro de Máquina Operante:</em> Pegue a porta <strong>Q0.1</strong> e ligue no <strong>X1</strong> de um Sinaleiro de painel (luz branca/azul). <strong>ATENÇÃO: NUNCA LIGUE CARGAS DE POTÊNCIA (COMO O PRÓPRIO MOTOR) DIRETAMENTE NO CLP.</strong>
-                        </li>
-                        <li class="bg-slate-800 p-3 rounded border border-slate-700"><strong>Substituição de Lógicas Físicas por Software:</strong> 
-                            <br>Em sistemas de Automação Avançada, você não precisa fazer a "fiação do contato de selo" nas botoeiras (abordado no passo 4). Basta ligar um Botão Físico NA na entrada I0.0 e um Botão Físico NF na entrada I0.1. O CLP recebe os sinais brutos e o programador faz a função <em>SET/RESET</em> ou <em>LATCH</em> via programação Ladder interna, acionando de forma contínua a saída Q0.0.
-                        </li>
+                        <li><strong>Força (Potência):</strong> A rede (L1, L2, L3) alimenta as entradas de K1 e K2. Saídas de K1 ligam em U1, V1, W1. Saídas de K2 ligam em W2, U2, V2. O Contator K3 tem as saídas (T1, T2, T3) curto-circuitadas, e as entradas (L1, L2, L3) conectadas nas saídas de K2.</li>
+                        <li><strong>Comando:</strong> O pulso liga K1, K3 e o Temporizador (Fechamento Estrela). Após o tempo, K3 abre e K2 fecha (Fechamento Triângulo).</li>
+                        <li><strong class="text-red-400">Intertravamento Vital:</strong> A energia da bobina de K3 DEVE passar pelo contato NF (21-22) de K2. A energia de K2 DEVE passar pelo NF (21-22) de K3.</li>
                     </ul>
                 </section>
                 
@@ -698,20 +758,18 @@
                 </svg>`
             },
             {
-                type: 'contator', name: 'Contator K1', category: 'MANOBRA',
-                width: 80, height: 100,
-                inputs: ['L1', 'L2', 'L3', '13', '21', 'A1'], outputs: ['T1', 'T2', 'T3', '14', '22', 'A2'], 
+                type: 'contator', name: 'Contator K1 (2NA+1NF)', category: 'MANOBRA',
+                width: 150, height: 100,
+                inputs: ['L1', 'L2', 'L3', '13', '21', '43', 'A1'], outputs: ['T1', 'T2', 'T3', '14', '22', '44', 'A2'], 
                 portStyle: 'edge',
                 svg: `
-                <svg viewBox="0 0 80 100" width="100%" height="100%">
-                    <rect x="0" y="0" width="80" height="100" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
-                    <rect x="0" y="15" width="80" height="70" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
-                    <rect x="10" y="35" width="60" height="30" fill="#3b82f6" rx="2" />
-                    <rect x="30" y="40" width="20" height="20" fill="#1e293b" />
-                    <line x1="10" y1="50" x2="70" y2="50" stroke="#60a5fa" stroke-width="1" opacity="0.5"/>
-                    <text x="40" y="90" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">Siemens</text>
-                    <text x="65" y="25" font-size="5" font-weight="bold" fill="#ef4444">NF</text>
-                    <text x="50" y="25" font-size="5" font-weight="bold" fill="#22c55e">NA</text>
+                <svg viewBox="0 0 150 100" width="100%" height="100%">
+                    <rect x="0" y="0" width="150" height="100" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="0" y="15" width="150" height="70" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+                    <rect x="15" y="35" width="120" height="30" fill="#3b82f6" rx="2" />
+                    <rect x="65" y="40" width="20" height="20" fill="#1e293b" />
+                    <line x1="20" y1="50" x2="130" y2="50" stroke="#60a5fa" stroke-width="1" opacity="0.5"/>
+                    <text x="75" y="90" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">Siemens Pro</text>
                 </svg>`
             },
             {
@@ -1060,94 +1118,6 @@
                     <line x1="10" y1="60" x2="30" y2="60" stroke="#94a3b8" stroke-width="1"/>
                     <rect x="10" y="0" width="20" height="10" fill="#3b82f6" rx="2" />
                     <circle cx="20" cy="70" r="3" fill="#ef4444" />
-                </svg>`
-            },
-            // NOVOS COMPONENTES ADICIONADOS CONFORME SOLICITADO NO TUTORIAL
-            {
-                type: 'interruptor_simples', name: 'Interruptor Simples', category: 'COMANDO',
-                width: 60, height: 60,
-                inputs: ['1'], outputs: ['2'],
-                portStyle: 'edge',
-                svg: `
-                <svg viewBox="0 0 60 60" width="100%" height="100%">
-                    <rect x="0" y="0" width="60" height="60" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1" rx="4"/>
-                    <circle cx="30" cy="30" r="20" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
-                    <rect x="25" y="20" width="10" height="20" fill="#cbd5e1" stroke="#64748b" rx="2"/>
-                </svg>`
-            },
-            {
-                type: 'interruptor_paralelo', name: 'Interruptor Paralelo', category: 'COMANDO',
-                width: 60, height: 70,
-                inputs: ['C'], outputs: ['L1', 'L2'],
-                portStyle: 'edge',
-                svg: `
-                <svg viewBox="0 0 60 70" width="100%" height="100%">
-                    <rect x="0" y="0" width="60" height="70" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1" rx="4"/>
-                    <circle cx="30" cy="35" r="20" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
-                    <text x="30" y="38" font-size="8" font-weight="bold" fill="#64748b" text-anchor="middle">THREE-WAY</text>
-                </svg>`
-            },
-            {
-                type: 'interruptor_intermediario', name: 'Int. Intermediário', category: 'COMANDO',
-                width: 70, height: 70,
-                inputs: ['E1', 'E2'], outputs: ['S1', 'S2'],
-                portStyle: 'edge',
-                svg: `
-                <svg viewBox="0 0 70 70" width="100%" height="100%">
-                    <rect x="0" y="0" width="70" height="70" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1" rx="4"/>
-                    <circle cx="35" cy="35" r="22" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
-                    <text x="35" y="38" font-size="8" font-weight="bold" fill="#64748b" text-anchor="middle">FOUR-WAY</text>
-                </svg>`
-            },
-            {
-                type: 'lampada_simples', name: 'Lâmpada de Iluminação', category: 'SINALIZAÇÃO',
-                width: 50, height: 50,
-                inputs: ['F'], outputs: ['N'],
-                portStyle: 'edge',
-                svg: `
-                <svg viewBox="0 0 50 50" width="100%" height="100%">
-                    <rect x="0" y="0" width="50" height="50" fill="#f8fafc" stroke="#94a3b8" stroke-width="1" rx="25"/>
-                    <circle cx="25" cy="25" r="20" fill="#fff" stroke="#eab308" stroke-width="2"/>
-                    <line x1="15" y1="15" x2="35" y2="35" stroke="#94a3b8" stroke-width="2"/>
-                    <line x1="15" y1="35" x2="35" y2="15" stroke="#94a3b8" stroke-width="2"/>
-                </svg>`
-            },
-            {
-                type: 'rele_auxiliar', name: 'Relé Auxiliar', category: 'MANOBRA',
-                width: 70, height: 100,
-                inputs: ['13', '21', 'A1'], outputs: ['14', '22', 'A2'], 
-                portStyle: 'edge',
-                svg: `
-                <svg viewBox="0 0 70 100" width="100%" height="100%">
-                    <rect x="0" y="0" width="70" height="100" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
-                    <rect x="0" y="15" width="70" height="70" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
-                    <rect x="15" y="30" width="40" height="40" fill="#fff" stroke="#cbd5e1" rx="2" />
-                    <text x="35" y="55" font-size="10" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">RELÉ</text>
-                </svg>`
-            },
-            {
-                type: 'boia_nivel', name: 'Boia de Nível', category: 'COMANDO',
-                width: 50, height: 70,
-                inputs: ['11'], outputs: ['12', '14'],
-                portStyle: 'edge',
-                svg: `
-                <svg viewBox="0 0 50 70" width="100%" height="100%">
-                    <rect x="10" y="10" width="30" height="50" fill="#3b82f6" rx="15" stroke="#1e40af" stroke-width="2"/>
-                    <circle cx="25" cy="50" r="5" fill="#1e40af"/>
-                    <text x="25" y="35" font-size="8" font-weight="bold" fill="#fff" text-anchor="middle">BOIA</text>
-                </svg>`
-            },
-            {
-                type: 'pressostato', name: 'Pressostato', category: 'COMANDO',
-                width: 50, height: 70,
-                inputs: ['11'], outputs: ['12', '14'],
-                portStyle: 'edge',
-                svg: `
-                <svg viewBox="0 0 50 70" width="100%" height="100%">
-                    <rect x="5" y="5" width="40" height="40" fill="#cbd5e1" stroke="#64748b" stroke-width="2" rx="4"/>
-                    <circle cx="25" cy="25" r="12" fill="#fff" stroke="#94a3b8"/>
-                    <rect x="20" y="45" width="10" height="20" fill="#94a3b8" />
-                    <text x="25" y="28" font-size="8" font-weight="bold" fill="#64748b" text-anchor="middle">P</text>
                 </svg>`
             }
         ];
@@ -1612,9 +1582,8 @@
             };
         }
 
-        /* REGRA RÍGIDA RESPEITADA - ALTERANDO O ROUTING PARA ORTOGONAL (ESCADA) */
         function getWirePath(x1, y1, x2, y2) {
-            const midY = (y1 + y2) / 2;
+            const midY = y1 + (y2 - y1) / 2;
             return `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
         }
 
@@ -1804,7 +1773,6 @@
             }, 3000);
         }
 
-        /* LÓGICA DE SIMULAÇÃO DINÂMICA ELÉTRICA E VISUAL ATUALIZADA (LATCH FIX) */
         let isSimulationRunning = false;
         let simInterval = null;
         
@@ -1826,7 +1794,7 @@
                         const isActive = n.el.dataset.simActive === "true";
                         n.el.dataset.simActive = isActive ? "false" : "true";
                         
-                        if(n.type === 'contator' || n.type === 'rele_auxiliar') n.el.classList.add('manual-override');
+                        if(n.type === 'contator') n.el.classList.add('manual-override');
                         
                         if(!isActive) n.el.classList.add('component-active-glow');
                         else n.el.classList.remove('component-active-glow', 'manual-override');
@@ -1860,7 +1828,6 @@
             }
         }
 
-        // NOVO MOTOR DA SIMULAÇÃO MULTI-PASS (Resolve o problema do Botão Desliga no Contato de Selo)
         function simulateElectricalNetwork() {
             let networkStabilized = false;
             let outerLoops = 10; 
@@ -1894,7 +1861,6 @@
                     if(n.type === 'barra_neutro') { addSignal(n.id, 'N_IN', 'N'); }
                 });
 
-                // 2. Loop de Propagação Elétrica (Até estabilizar a tensão)
                 let changed = true;
                 let maxLoops = 50; 
                 while(changed && maxLoops > 0) {
@@ -1924,9 +1890,10 @@
                                 const outs = template.outputs;
                                 const min = Math.min(ins.length, outs.length);
                                 for(let i=0; i<min; i++) {
-                                    if(ins[i] !== 'A1' && outs[i] !== 'A2' && ins[i] !== '95' && ins[i] !== '13' && ins[i] !== '21') passThrough(ins[i], outs[i]);
+                                    if(ins[i] !== 'A1' && outs[i] !== 'A2' && ins[i] !== '95' && ins[i] !== '13' && ins[i] !== '21' && ins[i] !== '43') passThrough(ins[i], outs[i]);
                                 }
                                 if (n.type === 'contator' || n.type === 'botoeira_na' || n.type === 'chave_seletora' || n.type === 'rele_temporizador') passThrough('13', '14');
+                                if (n.type === 'contator') passThrough('43', '44');
                                 if (n.type === 'dr_tetrapolar') passThrough('N', 'N\'');
                             }
                         }
@@ -1946,8 +1913,8 @@
                 }
 
                 nodes.forEach(n => {
-                    if (n.type === 'contator' || n.type === 'rele_temporizador' || n.type === 'rele_auxiliar') {
-                        if (n.el.classList.contains('manual-override')) return; // Usuário forçou com o dedo
+                    if (n.type === 'contator' || n.type === 'rele_temporizador') {
+                        if (n.el.classList.contains('manual-override')) return; 
 
                         const a1 = getSignals(n.id, 'A1');
                         const a2 = getSignals(n.id, 'A2');
@@ -1957,30 +1924,26 @@
                         
                         const currentlyActive = n.el.dataset.simActive === "true";
 
-                        // Atraca o contator
                         if (coilPowered && !currentlyActive) {
                             n.el.dataset.simActive = "true";
                             n.el.classList.add('component-active-glow');
-                            networkStabilized = false; // Como o contator atracou, precisamos recalcular a energia (Contatos 13-14 fecharam)
+                            networkStabilized = false; 
                         } 
-                        // Desatraca o contator
                         else if (!coilPowered && currentlyActive) {
                             n.el.dataset.simActive = "false";
                             n.el.classList.remove('component-active-glow');
-                            networkStabilized = false; // Recalcular energia sem a passagem do contator
+                            networkStabilized = false; 
                         }
                     }
                 });
             }
 
-            // ATUALIZAÇÃO VISUAL (Depois da engine matemática rodar completamente)
             wires.forEach(w => {
                 if(w.energized) w.pathEl.classList.add('wire-energized');
                 else w.pathEl.classList.remove('wire-energized');
             });
 
             nodes.forEach(n => {
-                // Rotação de Motores
                 if (n.type.includes('motor')) {
                     const u = portSignals[`${n.id}_U1`] || portSignals[`${n.id}_U`] || portSignals[`${n.id}_1U`] || portSignals[`${n.id}_Fase`] || portSignals[`${n.id}_A1(+)`];
                     const v = portSignals[`${n.id}_V1`] || portSignals[`${n.id}_V`] || portSignals[`${n.id}_1V`];
@@ -2013,9 +1976,8 @@
                     }
                 }
                 
-                // Lâmpadas, Sirene
-                if (n.type.includes('sinaleiro') || n.type === 'sirene_alarme' || n.type === 'lampada_simples') {
-                    const x1 = portSignals[`${n.id}_X1`] || portSignals[`${n.id}_F`];
+                if (n.type.includes('sinaleiro') || n.type === 'sirene_alarme') {
+                    const x1 = portSignals[`${n.id}_X1`];
                     if (x1 && x1.size > 0) n.el.classList.add('component-active-glow');
                     else n.el.classList.remove('component-active-glow');
                 }
@@ -2030,53 +1992,55 @@
             }, 800);
         }
 
-        /* LÓGICA DO MODAL FLUTUANTE (ARRASTAR) */
         let isDraggingModal = false;
+        let activeModal = null;
         let modalOffsetX = 0;
         let modalOffsetY = 0;
 
         function initModalDrag() {
-            const header = document.getElementById('manual-modal-header');
-            const modal = document.getElementById('manual-modal');
-            
-            header.addEventListener('mousedown', (e) => {
-                isDraggingModal = true;
-                const rect = modal.getBoundingClientRect();
-                modalOffsetX = e.clientX - rect.left;
-                modalOffsetY = e.clientY - rect.top;
-                document.addEventListener('mousemove', onModalDrag);
-                document.addEventListener('mouseup', onModalStopDrag);
-            });
-            
-            header.addEventListener('touchstart', (e) => {
-                isDraggingModal = true;
-                const rect = modal.getBoundingClientRect();
-                modalOffsetX = e.touches[0].clientX - rect.left;
-                modalOffsetY = e.touches[0].clientY - rect.top;
-                document.addEventListener('touchmove', onModalTouchDrag, {passive: false});
-                document.addEventListener('touchend', onModalStopDrag);
-            }, {passive: false});
+            const setupDrag = (modalId, headerId) => {
+                const header = document.getElementById(headerId);
+                const modal = document.getElementById(modalId);
+                
+                const startDrag = (clientX, clientY) => {
+                    isDraggingModal = true;
+                    activeModal = modal;
+                    const rect = modal.getBoundingClientRect();
+                    modalOffsetX = clientX - rect.left;
+                    modalOffsetY = clientY - rect.top;
+                    
+                    document.addEventListener('mousemove', onModalDrag);
+                    document.addEventListener('mouseup', onModalStopDrag);
+                    document.addEventListener('touchmove', onModalTouchDrag, {passive: false});
+                    document.addEventListener('touchend', onModalStopDrag);
+                };
+
+                header.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
+                header.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX, e.touches[0].clientY), {passive: false});
+            };
+
+            setupDrag('manual-modal', 'manual-modal-header');
+            setupDrag('tutorial-modal', 'tutorial-modal-header');
         }
         
         function onModalDrag(e) {
-            if(!isDraggingModal) return;
-            const modal = document.getElementById('manual-modal');
-            modal.style.left = (e.clientX - modalOffsetX) + 'px';
-            modal.style.top = (e.clientY - modalOffsetY) + 'px';
-            modal.style.transform = 'none'; 
+            if(!isDraggingModal || !activeModal) return;
+            activeModal.style.left = (e.clientX - modalOffsetX) + 'px';
+            activeModal.style.top = (e.clientY - modalOffsetY) + 'px';
+            activeModal.style.transform = 'none'; 
         }
 
         function onModalTouchDrag(e) {
-            if(!isDraggingModal) return;
+            if(!isDraggingModal || !activeModal) return;
             e.preventDefault();
-            const modal = document.getElementById('manual-modal');
-            modal.style.left = (e.touches[0].clientX - modalOffsetX) + 'px';
-            modal.style.top = (e.touches[0].clientY - modalOffsetY) + 'px';
-            modal.style.transform = 'none';
+            activeModal.style.left = (e.touches[0].clientX - modalOffsetX) + 'px';
+            activeModal.style.top = (e.touches[0].clientY - modalOffsetY) + 'px';
+            activeModal.style.transform = 'none';
         }
 
         function onModalStopDrag() {
             isDraggingModal = false;
+            activeModal = null;
             document.removeEventListener('mousemove', onModalDrag);
             document.removeEventListener('mouseup', onModalStopDrag);
             document.removeEventListener('touchmove', onModalTouchDrag);
@@ -2085,276 +2049,69 @@
 
         const manualLessons = [
             {
-                id: 'indice_curso',
-                title: 'Índice do Curso (1 a 40)',
+                id: 'curso_completo_40_topicos',
+                title: 'Curso Completo (40 Tópicos)',
                 icon: 'fa-list-ol',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Conteúdo Programático</h3>
-                    <ol class="list-decimal list-inside space-y-2 text-slate-300 text-sm">
-                        <li>Principais tópicos de um curso de Comandos Elétricos</li>
-                        <li>Fundamentos de comandos elétricos</li>
-                        <li>Segurança em instalações e comandos</li>
-                        <li>Símbolos e diagramas elétricos</li>
-                        <li>Identificação de componentes</li>
-                        <li>Lâmpadas e circuitos de iluminação</li>
-                        <li>Interruptores simples, paralelo e intermediário</li>
-                        <li>Botoeiras NA e NF</li>
-                        <li>Relés auxiliares</li>
-                        <li>Contatores</li>
-                        <li>Selagem e retenção de contatores</li>
-                        <li>Comando liga/desliga</li>
-                        <li>Comando com duas ou mais botoeiras</li>
-                        <li>Sinalização elétrica</li>
-                        <li>Lâmpadas piloto</li>
-                        <li>Sinaleiros de LED</li>
-                        <li>Relés temporizadores</li>
-                        <li>Relé térmico</li>
-                        <li>Proteção contra curto-circuito e sobrecarga</li>
-                        <li>Comandos de motores monofásicos</li>
-                        <li>Comandos de motores trifásicos</li>
-                        <li>Partida direta</li>
-                        <li>Reversão de motores</li>
-                        <li>Partida estrela-triângulo</li>
-                        <li>Intertravamento elétrico</li>
-                        <li>Sensores e chaves de comando</li>
-                        <li>Boias de nível</li>
-                        <li>Pressostatos</li>
-                        <li>Fim de curso</li>
-                        <li>Comando automático e manual</li>
-                        <li>Diagramas de força e comando</li>
-                        <li>Leitura e interpretação de esquemas</li>
-                        <li>Montagem de painéis</li>
-                        <li>Identificação e organização de fios</li>
-                        <li>Diagnóstico de falhas</li>
-                        <li>Medições com multímetro e alicate amperímetro</li>
-                        <li>NR-10 e segurança para trabalhos elétricos</li>
-                        <li>Dimensionamento básico dos componentes</li>
-                        <li>Aplicações industriais</li>
-                        <li>Automação básica</li>
-                        <li>Projetos práticos completos</li>
-                    </ol>
-                `
-            },
-            {
-                id: 'modulo_1_fundamentos',
-                title: 'Fundamentos e Iluminação',
-                icon: 'fa-bolt',
-                content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">CURSO DE COMANDOS ELÉTRICOS</h3>
-                    <p class="text-slate-400 mb-6 font-bold uppercase tracking-widest text-xs">Do Básico à Sinalização e Aplicações Práticas</p>
-                    
-                    <div class="space-y-6 text-slate-300">
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">1. INTRODUÇÃO AOS COMANDOS ELÉTRICOS</h4>
-                            <p>Comandos elétricos são circuitos utilizados para controlar, acionar, desligar, proteger e sinalizar equipamentos elétricos.</p>
-                            <p class="mt-2">Um sistema de comando normalmente possui: Alimentação; Dispositivos de proteção; Dispositivos de comando; Dispositivos de acionamento; Dispositivos de sinalização; Carga elétrica.</p>
-                            <p class="mt-2">Exemplos de cargas: Lâmpadas; Motores; Ventiladores; Bombas; Resistências; Máquinas industriais. Os circuitos de comando permitem controlar uma carga de maneira segura e organizada.</p>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">2. SEGURANÇA</h4>
-                            <p>Antes de realizar qualquer montagem ou manutenção elétrica, o circuito deve ser desenergizado e protegido contra uma reenergização acidental. Os procedimentos de segurança devem considerar as exigências aplicáveis da NR-10 e das normas técnicas pertinentes.</p>
-                            <p class="mt-2 text-red-400 font-bold">Nunca realize testes em circuito energizado sem capacitação, autorização, procedimentos adequados e equipamentos de proteção apropriados.</p>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">3. CONCEITOS FUNDAMENTAIS</h4>
-                            <ul class="list-disc list-inside mt-2 space-y-1">
-                                <li><strong>Tensão:</strong> É a diferença de potencial elétrico entre dois pontos. Unidade: V = volt</li>
-                                <li><strong>Corrente:</strong> É o fluxo de cargas elétricas através de um condutor. Unidade: A = ampere</li>
-                                <li><strong>Resistência:</strong> É a oposição à passagem da corrente elétrica. Unidade: Ω = ohm</li>
-                                <li><strong>Potência:</strong> Representa a taxa de consumo ou transferência de energia elétrica. Unidade: W = watt (Para uma carga resistiva: P = V × I)</li>
-                            </ul>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">4. LÂMPADA — CIRCUITO DE ACIONAMENTO SIMPLES</h4>
-                            <p>O circuito mais básico de comando de iluminação utiliza: Fonte de alimentação; Dispositivo de proteção; Interruptor; Lâmpada.</p>
-                            <p class="mt-2"><strong>Funcionamento:</strong> Quando o interruptor fecha o circuito, a corrente percorre a lâmpada e ela acende. Quando o interruptor abre o circuito, a corrente é interrompida e a lâmpada apaga.</p>
-                            <p class="mt-2 bg-slate-700/50 p-2 rounded">FASE → PROTEÇÃO → INTERRUPTOR → LÂMPADA → NEUTRO</p>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">5. INTERRUPTOR SIMPLES</h4>
-                            <p>O interruptor simples possui dois estados principais: Aberto (O circuito fica interrompido e lâmpada permanece desligada) e Fechado (O circuito é completado e a lâmpada recebe alimentação e acende).</p>
-                            <p class="mt-2"><strong>Aplicação:</strong> É utilizado quando uma lâmpada ou grupo de lâmpadas precisa ser controlado a partir de um único ponto.</p>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">6. INTERRUPTOR PARALELO</h4>
-                            <p>O interruptor paralelo permite controlar uma mesma lâmpada a partir de dois pontos diferentes. É muito utilizado em: Corredores; Escadas; Quartos; Ambientes com duas entradas.</p>
-                            <p class="mt-2"><strong>Funcionamento:</strong> Dois interruptores trabalham em conjunto permitindo alterar o estado da lâmpada a partir de qualquer um dos dois pontos.</p>
-                            <p class="mt-2 bg-slate-700/50 p-2 rounded">FASE → INTERRUPTOR PARALELO 1 → COMUTAÇÃO → INTERRUPTOR PARALELO 2 → LÂMPADA → NEUTRO</p>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">7. INTERRUPTOR INTERMEDIÁRIO</h4>
-                            <p>O interruptor intermediário permite controlar uma mesma lâmpada a partir de três ou mais pontos. Normalmente é utilizado entre dois interruptores paralelos.</p>
-                            <p class="mt-2 bg-slate-700/50 p-2 rounded">FASE → PARALELO → INTERMEDIÁRIO → PARALELO → LÂMPADA → NEUTRO</p>
-                        </div>
-                    </div>
-                `
-            },
-            {
-                id: 'modulo_2_contatores_reles',
-                title: 'Contatores e Relés',
-                icon: 'fa-microchip',
-                content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Botoeiras, Contatores e Selagem</h3>
-                    <div class="space-y-6 text-slate-300">
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">8. BOTOEIRAS</h4>
-                            <p>Em comandos elétricos industriais, as botoeiras são muito utilizadas. Existem dois contatos básicos:</p>
-                            <ul class="list-disc list-inside mt-2 space-y-1">
-                                <li><strong>NA (Normalmente Aberto):</strong> Em condição normal, o contato está aberto. Quando a botoeira é pressionada, o contato fecha. Aplicação: Liga, Partida.</li>
-                                <li><strong>NF (Normalmente Fechado):</strong> Em condição normal, o contato está fechado. Quando a botoeira é pressionada, o contato abre. Aplicação: Desliga, Parada, Emergência.</li>
-                            </ul>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">9. CONTATOR</h4>
-                            <p>O contator é um dispositivo eletromecânico utilizado para realizar manobras de circuitos de potência. Possui: Bobina; Contatos principais; Contatos auxiliares.</p>
-                            <p class="mt-2 bg-slate-700/50 p-2 rounded">Ao pressionar a botoeira LIGA: Botoeira → Bobina do contator → Contator energiza → Contatos principais fecham → Carga é alimentada.</p>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">10. CONTATOS AUXILIARES</h4>
-                            <p>Os contatos auxiliares são utilizados principalmente no circuito de comando. Podem ser NA ou NF. São utilizados para: Selagem; Intertravamento; Sinalização; Lógica de comando; Acionamento de relés auxiliares.</p>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">11. CIRCUITO DE SELAGEM</h4>
-                            <p>A selagem permite que um contator continue energizado depois que o operador solta a botoeira LIGA. Quando o contator energiza, seu contato auxiliar NA fecha. Esse contato mantém a alimentação da bobina.</p>
-                            <ol class="list-decimal list-inside mt-2 bg-slate-700/30 p-4 rounded space-y-1">
-                                <li>Pressiona LIGA.</li>
-                                <li>Bobina energiza.</li>
-                                <li>Contator fecha.</li>
-                                <li>Contato auxiliar fecha.</li>
-                                <li>Contato auxiliar mantém a bobina energizada.</li>
-                                <li>Operador solta LIGA.</li>
-                                <li>Contator continua energizado.</li>
-                            </ol>
-                            <p class="mt-2">Para desligar: PRESSIONA DESLIGA → circuito da bobina abre → contator desenergiza.</p>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">12. CIRCUITO LIGA/DESLIGA</h4>
-                            <p>Componentes: Proteção; Botoeira DESLIGA — NF; Botoeira LIGA — NA; Contator; Contato auxiliar de retenção; Carga.</p>
-                            <p class="mt-2 bg-slate-700/50 p-2 rounded">DESLIGA NF → LIGA NA → BOBINA DO CONTATOR<br>Em paralelo com a botoeira LIGA: CONTATO AUXILIAR NA (Esse contato realiza a retenção).</p>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">13. RELÉ AUXILIAR</h4>
-                            <p>O relé auxiliar permite ampliar as possibilidades de comando. Possui: Bobina; Contatos NA; Contatos NF. Pode ser utilizado para lógicas de comando, multiplicação de contatos, intertravamentos, etc.</p>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">14. RELÉ TÉRMICO e 15. PROTEÇÃO</h4>
-                            <p>O relé térmico é utilizado principalmente para proteção contra sobrecarga de motores. Ele atua quando a corrente permanece acima do valor ajustado. Um circuito de comando deve possuir proteção adequada (Disjuntores, Fusíveis).</p>
-                        </div>
-                    </div>
-                `
-            },
-            {
-                id: 'modulo_3_sinalizacao_sensores',
-                title: 'Sinalização e Sensores',
-                icon: 'fa-lightbulb',
-                content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Sinalização Elétrica e Automação</h3>
-                    <div class="space-y-6 text-slate-300">
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">16 a 21. SINALIZAÇÃO ELÉTRICA, LÂMPADAS E SIRENES</h4>
-                            <p>A sinalização permite informar ao operador o estado de funcionamento de um sistema. Pode indicar: Equipamento ligado/desligado; Falha; Sobrecarga; Modo automático/manual.</p>
-                            <p class="mt-2">Exemplos práticos:</p>
-                            <ul class="list-disc list-inside mt-2 space-y-1 bg-slate-700/30 p-4 rounded">
-                                <li><strong>LIGADO:</strong> Contato auxiliar NA fecha e acende a lâmpada indicando motor ligado.</li>
-                                <li><strong>FALHA DE SOBRECARGA:</strong> Motor em sobrecarga → Relé térmico atua → Contator desenergiza → Contato auxiliar de sinalização do relé muda de estado → Sinaleiro/Sirene de falha é acionado.</li>
-                            </ul>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">22. COMANDO MANUAL E AUTOMÁTICO</h4>
-                            <p><strong>MANUAL:</strong> O operador controla diretamente (pressiona LIGA).<br><strong>AUTOMÁTICO:</strong> O equipamento é acionado por sensores ou condições programadas (ex: boia envia comando).</p>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">23 a 27. CHAVES SELETORAS, SENSORES E TEMPORIZADORES</h4>
-                            <ul class="list-disc list-inside mt-2 space-y-2">
-                                <li><strong>Chave Seletora:</strong> Permite escolher o modo MANUAL / DESLIGADO / AUTOMÁTICO.</li>
-                                <li><strong>Sensor de Nível (Boia):</strong> Controla bombas (ex: Nível baixo → liga; Nível adequado → desliga).</li>
-                                <li><strong>Fim de Curso:</strong> Detecta a posição de um mecanismo (portões, esteiras).</li>
-                                <li><strong>Pressostato:</strong> Utiliza a pressão de um sistema para realizar uma função (compressores).</li>
-                                <li><strong>Temporizador:</strong> Cria atrasos no circuito (ligar/desligar após tempo, alternar cargas).</li>
-                            </ul>
-                        </div>
-                    </div>
-                `
-            },
-            {
-                id: 'modulo_4_motores_pratica',
-                title: 'Motores e Diagnóstico',
-                icon: 'fa-cogs',
-                content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Motores, Acionamentos e Práticas</h3>
-                    <div class="space-y-6 text-slate-300">
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">28 e 29. COMANDO DE MOTOR E PARTIDA DIRETA</h4>
-                            <p>Um circuito de comando de motor separa o CIRCUITO DE POTÊNCIA e o CIRCUITO DE COMANDO.</p>
-                            <p class="mt-2 bg-slate-700/50 p-2 rounded text-sm">REDE → PROTEÇÃO → CONTATOR → RELÉ TÉRMICO → MOTOR</p>
-                            <p class="mt-2">A partida direta é simples: O operador pressiona LIGA → bobina energiza → contatos fecham → motor liga e o selo o mantém. Para desligar, pressione DESLIGA.</p>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">30. REVERSÃO DE MOTOR e 31. INTERTRAVAMENTO</h4>
-                            <p>A reversão permite alterar o sentido de rotação de um motor trifásico. Normalmente utiliza dois contatores, onde um realiza o sentido contrário alterando a sequência de fases.</p>
-                            <p class="mt-2 text-red-400 font-bold">IMPORTANTE: Os dois contatores não podem fechar simultaneamente. Deve existir intertravamento elétrico: CONTATOR K1 possui contato NF de K2 no comando, impedindo o acionamento simultâneo.</p>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">36. COMO INTERPRETAR UM COMANDO ELÉTRICO</h4>
-                            <ol class="list-decimal list-inside mt-2 bg-slate-700/30 p-4 rounded space-y-1 text-sm text-slate-300">
-                                <li>Identifique a alimentação e as proteções.</li>
-                                <li>Localize o circuito de comando e botoeiras.</li>
-                                <li>Identifique os contatos NA, NF e as bobinas.</li>
-                                <li>Acompanhe o circuito desde a alimentação até o retorno.</li>
-                                <li>Analise o que acontece quando cada dispositivo muda de estado.</li>
-                            </ol>
-                        </div>
-                        
-                        <div>
-                            <h4 class="text-lg font-bold text-blue-400 mb-2">37. PRINCÍPIO FUNDAMENTAL (As 3 Perguntas)</h4>
-                            <p><strong>1. QUEM COMANDA?</strong> (Botoeira, sensor, controlador).<br>
-                            <strong>2. QUEM EXECUTA?</strong> (Relé ou contator).<br>
-                            <strong>3. O QUE É CONTROLADO?</strong> (Motor, lâmpada, carga).</p>
-                        </div>
-
-                        <div class="bg-blue-900/40 border border-blue-500/50 p-4 rounded-lg mt-6">
-                            <h4 class="text-lg font-bold text-white mb-2">CONCLUSÃO E OBJETIVO</h4>
-                            <p class="text-sm">Os comandos elétricos constituem uma das principais bases da instalação e automação elétrica. O domínio dos circuitos começa com comandos simples, como uma lâmpada acionada por interruptor, e evolui para sistemas com contatores, relés, temporizadores, sensores, motores e sinalização. Lembre-se sempre da segurança e normas vigentes.</p>
-                        </div>
-                    </div>
-                `
-            },
-            {
-                id: 'diagramas_img',
-                title: 'Diagramas Visuais (Imagens)',
-                icon: 'fa-images',
-                content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Diagramas de Força e Comando</h3>
-                    <p class="text-slate-300 mb-4">Utilize as imagens abaixo como base de referência definitiva para montar suas ligações no painel do simulador interativo.</p>
-                    
-                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700 mb-6">
-                        <img src="1000497362.png" class="w-full h-auto rounded shadow-lg mx-auto" alt="Diagramas de Força e Comando Parte 1">
-                    </div>
-                    
-                    <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
-                        <img src="1000497361.png" class="w-full h-auto rounded shadow-lg mx-auto" alt="Diagramas de Força e Comando Parte 2">
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Conteúdo Programático - 40 Tópicos</h3>
+                    <div class="text-slate-300 mb-6 space-y-4">
+                        <ol class="list-decimal pl-5 space-y-1">
+                            <li>Principais tópicos de um curso de Comandos Elétricos</li>
+                            <li>Fundamentos de comandos elétricos</li>
+                            <li>Segurança em instalações e comandos</li>
+                            <li>Símbolos e diagramas elétricos</li>
+                            <li>Identificação de componentes</li>
+                            <li>Lâmpadas e circuitos de iluminação</li>
+                            <li>Interruptores simples, paralelo e intermediário</li>
+                            <li>Botoeiras NA e NF</li>
+                            <li>Relés auxiliares</li>
+                            <li>Contatores</li>
+                            <li>Selagem e retenção de contatores</li>
+                            <li>Comando liga/desliga</li>
+                            <li>Comando com duas ou mais botoeiras</li>
+                            <li>Sinalização elétrica</li>
+                            <li>Lâmpadas piloto</li>
+                            <li>Sinaleiros de LED</li>
+                            <li>Relés temporizadores</li>
+                            <li>Relé térmico</li>
+                            <li>Proteção contra curto-circuito e sobrecarga</li>
+                            <li>Comandos de motores monofásicos</li>
+                            <li>Comandos de motores trifásicos</li>
+                            <li>Partida direta</li>
+                            <li>Reversão de motores</li>
+                            <li>Partida estrela-triângulo</li>
+                            <li>Intertravamento elétrico</li>
+                            <li>Sensores e chaves de comando</li>
+                            <li>Boias de nível</li>
+                            <li>Pressostatos</li>
+                            <li>Fim de curso</li>
+                            <li>Comando automático e manual</li>
+                            <li>Diagramas de força e comando</li>
+                            <li>Leitura e interpretação de esquemas</li>
+                            <li>Montagem de painéis</li>
+                            <li>Identificação e organização de fios</li>
+                            <li>Diagnóstico de falhas</li>
+                            <li>Medições com multímetro e alicate amperímetro</li>
+                            <li>NR-10 e segurança para trabalhos elétricos</li>
+                            <li>Dimensionamento básico dos componentes</li>
+                            <li>Aplicações industriais</li>
+                            <li>Automação básica</li>
+                            <li>Projetos práticos completos</li>
+                        </ol>
+                        <hr class="border-slate-600 my-4">
+                        <h4 class="text-xl font-bold text-blue-400">CURSO DE COMANDOS ELÉTRICOS - Do Básico à Sinalização</h4>
+                        <p>Comandos elétricos são circuitos utilizados para controlar, acionar, desligar, proteger e sinalizar equipamentos elétricos. Um sistema de comando normalmente possui: Alimentação, Proteção, Comando, Acionamento, Sinalização e Carga.</p>
+                        <p><strong>Segurança:</strong> Antes de realizar qualquer montagem, o circuito deve ser desenergizado. Nunca realize testes em circuito energizado sem capacitação NR-10.</p>
+                        <p><strong>Lâmpada / Iluminação:</strong> FASE → PROTEÇÃO → INTERRUPTOR → LÂMPADA → NEUTRO. Use interruptores paralelos para controle em 2 pontos, e intermediários para 3+ pontos.</p>
+                        <p><strong>Botoeiras e Contatores:</strong> NA (Normal Aberto) e NF (Normal Fechado). O Contator aciona cargas de potência usando uma bobina de baixa corrente.</p>
+                        <p><strong>Selo (Retenção):</strong> O contato auxiliar NA em paralelo com o botão LIGA mantém a bobina energizada após soltar o botão. DESLIGA NF quebra essa corrente.</p>
+                        <p><strong>Sinalização:</strong> Um contato NA do contator acende um sinaleiro de "Motor Ligado". Um contato NA (97-98) do Relé Térmico acende o sinaleiro de "Falha".</p>
                     </div>
                 `
             },
             {
                 id: 'dicionario_equipamentos',
-                title: 'Dicionário de Biblioteca',
+                title: 'Dicionário Completo',
                 icon: 'fa-list-ul',
                 content: `
                     <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Dicionário da Biblioteca Industrial</h3>
@@ -2386,7 +2143,6 @@
             if(lesson) {
                 document.getElementById('manual-lesson-content').innerHTML = lesson.content;
                 
-                // Gerador dinâmico do Dicionário Completo de Equipamentos da Biblioteca
                 if (id === 'dicionario_equipamentos') {
                     let html = '';
                     componentLibrary.forEach(c => {
@@ -2423,11 +2179,22 @@
             document.getElementById('manual-modal').classList.add('hidden');
         }
 
-        // STARTUP
+        function openTutorial() {
+            document.getElementById('tutorial-modal').classList.remove('hidden');
+        }
+
+        function closeTutorial() {
+            document.getElementById('tutorial-modal').classList.add('hidden');
+        }
+
         window.onload = () => {
             initPalette();
             initModalDrag(); 
             window.addEventListener('resize', updateAllWires);
+
+            setTimeout(() => {
+                alert("BEM VINDO AO MELHOR CURSO E COMPLETO CURSO DE COMANDOS ELÉTRICOS");
+            }, 500);
         };
     </script>
 </body>
