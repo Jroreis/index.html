@@ -65,7 +65,7 @@
             stroke: #3b82f6; 
             stroke-width: 4;
             stroke-linecap: square;
-            stroke-linejoin: round;
+            stroke-linejoin: round; /* Acabamento suave para modo escada */
             pointer-events: stroke; 
             cursor: pointer;
             transition: stroke 0.2s, stroke-width 0.2s;
@@ -77,6 +77,7 @@
             stroke-width: 8 !important;
             stroke-dasharray: 8,4;
             filter: drop-shadow(0 0 4px #ef4444) !important;
+            z-index: 999;
         }
 
         .wire-energized {
@@ -111,6 +112,29 @@
         .component-active-glow .component-header {
             background: linear-gradient(180deg, #b45309 0%, #78350f 100%) !important;
             border-color: #f59e0b !important;
+        }
+
+        /* Puxadores laterais para barramentos esticaveis */
+        .resize-handle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            cursor: ew-resize;
+            z-index: 45;
+            background: rgba(255,255,255,0.0);
+            transition: background 0.2s;
+        }
+        .resize-handle:hover {
+            background: rgba(59, 130, 246, 0.4);
+        }
+        .left-handle {
+            left: -10px;
+            border-radius: 6px 0 0 6px;
+        }
+        .right-handle {
+            right: -10px;
+            border-radius: 0 6px 6px 0;
         }
 
         @keyframes spinCW { from { transform: rotate(0deg) translate(-50%, -50%); } to { transform: rotate(360deg) translate(-50%, -50%); } }
@@ -157,6 +181,7 @@
             justify-content: center;
             align-items: center;
             border-radius: 0 0 6px 6px;
+            overflow: visible;
         }
         
         .component-body svg {
@@ -199,6 +224,13 @@
                 linear-gradient(45deg, transparent 42%, #475569 45%, #475569 55%, transparent 58%),
                 linear-gradient(-45deg, transparent 42%, #475569 45%, #475569 55%, transparent 58%);
             box-shadow: inset 0 -2px 4px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* Aumentando a area de toque para mobile */
+        .port::after {
+            content: '';
+            position: absolute;
+            top: -10px; left: -10px; right: -10px; bottom: -10px;
         }
 
         .port:hover, .port.active {
@@ -284,7 +316,7 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            z-index: 1000;
+            z-index: 10000;
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -378,10 +410,10 @@
                     </div>
                 </div>
                 <button onclick="openManual()" class="w-full mt-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white text-xs font-bold py-2.5 px-3 rounded shadow flex justify-center items-center gap-2 transition-all border border-blue-500/50">
-                    <i class="fa-solid fa-book-open"></i> Apostila e Componentes
+                    <i class="fa-solid fa-book-open"></i> Apostila de Estudo (Curso)
                 </button>
                 <button onclick="openTutorial()" class="w-full mt-2 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white text-xs font-bold py-2.5 px-3 rounded shadow flex justify-center items-center gap-2 transition-all border border-emerald-500/50">
-                    <i class="fa-solid fa-plug-circle-bolt"></i> Tutorial Completo de Ligações
+                    <i class="fa-solid fa-plug-circle-bolt"></i> Tutorial Passo a Passo
                 </button>
             </div>
             <div id="component-palette" class="flex-1 overflow-y-auto p-3 space-y-2 pb-20 scrollbar-hide">
@@ -422,11 +454,29 @@
         </main>
     </div>
 
-    <!-- Modal flutuante e movível da Apostila -->
+    <div id="welcome-modal-pro" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/90 backdrop-blur-sm transition-opacity duration-500">
+        <div class="bg-slate-800 border-2 border-blue-500 rounded-3xl shadow-[0_0_80px_rgba(59,130,246,0.6)] p-10 max-w-4xl text-center transform scale-100 transition-transform duration-500 w-11/12 relative overflow-hidden">
+            <div class="absolute -top-20 -right-20 w-64 h-64 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-emerald-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+            
+            <i class="fa-solid fa-bolt text-7xl text-yellow-400 mb-6 drop-shadow-[0_0_20px_rgba(250,204,21,0.8)]"></i>
+            <h1 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 mb-6 tracking-tight uppercase leading-tight">BEM VINDO AO MELHOR E MAIS COMPLETO CURSO DE COMANDOS ELÉTRICOS</h1>
+            <p class="text-xl md:text-2xl text-slate-300 mb-10 font-medium">Aprenda na prática com nosso Simulador Industrial Avançado, com mais de 40 Tópicos e ligações passo a passo!</p>
+            <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-700 mb-10 inline-block shadow-inner">
+                <p class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Oferecido oficialmente por:</p>
+                <p class="text-3xl font-black text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]">VOLTCALCPRO.COM</p>
+            </div>
+            <br>
+            <button onclick="closeWelcomeModal()" class="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-bold py-4 px-12 rounded-full text-xl shadow-[0_10px_25px_rgba(59,130,246,0.5)] hover:shadow-[0_15px_35px_rgba(16,185,129,0.6)] transition-all transform hover:scale-105 border border-white/20">
+                INICIAR SIMULADOR <i class="fa-solid fa-play ml-3"></i>
+            </button>
+        </div>
+    </div>
+
     <div id="manual-modal" class="hidden">
         <div class="bg-slate-800 border border-slate-600 rounded-xl w-full h-full flex flex-col shadow-2xl overflow-hidden">
-            <div id="manual-modal-header" class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900 shrink-0 select-none">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-blue-500"></i> Mega Apostila de Comandos Elétricos</h2>
+            <div id="manual-modal-header" class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900 shrink-0 select-none cursor-move">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-blue-500"></i> Mega Apostila - Comandos Elétricos</h2>
                 <button onclick="closeManual()" class="text-slate-400 hover:text-red-400 transition-colors p-2 text-xl">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -438,140 +488,114 @@
                 <div class="w-2/3 flex-1 overflow-y-auto p-6 bg-slate-800" id="manual-lesson-content">
                     <div class="h-full flex flex-col items-center justify-center text-slate-500 text-center">
                         <i class="fa-solid fa-book-open text-6xl mb-4 opacity-50"></i>
-                        <p class="text-lg font-medium">Selecione um Módulo no menu lateral para iniciar.</p>
-                        <p class="text-sm mt-2">Aprenda a teoria completa e replique na bancada interativa.</p>
+                        <p class="text-lg font-medium">Selecione uma lição no menu lateral para iniciar.</p>
+                        <p class="text-sm mt-2">Leia a teoria extraída da apostila técnica oficial e pratique.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL FLUTUANTE DO TUTORIAL COMPLETO DE LIGAÇÕES E AUTOMAÇÃO -->
     <div id="tutorial-modal" class="hidden">
         <div class="bg-slate-900 border border-emerald-600 rounded-xl w-full h-full flex flex-col shadow-2xl overflow-hidden">
             <div id="tutorial-modal-header" class="p-4 border-b border-emerald-700 flex justify-between items-center bg-slate-950 shrink-0 select-none cursor-move">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-plug-circle-bolt text-emerald-500"></i> Tutorial Mestre: Instalações Práticas Passo a Passo</h2>
+                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-plug-circle-bolt text-emerald-500"></i> Tutorial Completo de Ligações Avançadas</h2>
                 <button onclick="closeTutorial()" class="text-slate-400 hover:text-red-400 transition-colors p-2 text-xl">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            <div class="flex-1 overflow-y-auto p-8 bg-slate-900 text-slate-300 leading-relaxed space-y-10" id="tutorial-content">
+            <div class="flex-1 overflow-y-auto p-6 bg-slate-900 text-slate-300 leading-relaxed space-y-8" id="tutorial-content">
+                <h2 class="text-3xl font-black text-emerald-400 mb-6 text-center uppercase tracking-widest">Guia Definitivo de Ligações Passo a Passo</h2>
                 
-                <section>
-                    <h3 class="text-3xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">1. PARTIDA DIRETA DE MOTOR TRIFÁSICO (O BÁSICO)</h3>
-                    <p class="mb-3 text-lg font-semibold">A Partida Direta aplica tensão plena aos terminais do motor instantaneamente. Utilizada em motores de baixa potência devido ao alto pico de corrente de partida (Ip/In).</p>
+                <div class="mb-8 p-4 bg-slate-800 rounded-xl border border-slate-600 shadow-xl">
+                    <h3 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-map"></i> Mapas de Ligação e Diagramas Práticos</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <img src="1000497361.png" alt="Passo a Passo de Montagem" class="w-full rounded border border-slate-700 hover:scale-[1.02] transition-transform">
+                        <img src="1000497362.png" alt="Diagramas de Força e Comando" class="w-full rounded border border-slate-700 hover:scale-[1.02] transition-transform">
+                    </div>
+                    <p class="text-sm text-slate-400 mt-2 text-center">Referência visual oficial para montagem na bancada.</p>
+                </div>
+
+                <section class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">1. PARTIDA DIRETA DE MOTORES (PASSO A PASSO COMPLETO)</h3>
+                    <p class="mb-4">A partida direta é a base de todos os comandos elétricos. Siga estritamente esta ordem na sua bancada virtual:</p>
                     
-                    <h4 class="text-xl text-emerald-300 mt-4 mb-2">A. Circuito de Força (Potência)</h4>
-                    <ul class="list-disc pl-6 space-y-2 mb-4">
-                        <li>Inicie com a <strong>Rede Trifásica 380V</strong>.</li>
-                        <li>Conecte as fases <strong>L1, L2, L3</strong> aos bornes superiores <strong>1, 3, 5</strong> do <strong>Disjuntor-Motor</strong> (Proteção contra curto-circuito e manobra primária).</li>
-                        <li>Das saídas <strong>2, 4, 6</strong> do Disjuntor-Motor, conecte aos bornes <strong>L1, L2, L3</strong> do <strong>Contator K1</strong>.</li>
-                        <li>Das saídas <strong>T1, T2, T3</strong> de K1, conecte aos bornes de entrada <strong>1, 3, 5</strong> do <strong>Relé Térmico</strong> (Apesar de no simulador muitas vezes ser integrado, respeite a ordem: Disjuntor -> Contator -> Relé Térmico).</li>
-                        <li>Das saídas <strong>2, 4, 6</strong> do Relé Térmico, conecte diretamente aos bornes <strong>U1, V1, W1</strong> do <strong>Motor Trifásico</strong>. Ligue o terminal <strong>PE</strong> à malha de aterramento.</li>
+                    <h4 class="text-lg font-bold text-white mb-2 text-blue-400">PASSO 1: CIRCUITO DE FORÇA (ALTA TENSÃO)</h4>
+                    <ul class="list-decimal pl-6 space-y-2 mb-4">
+                        <li>Arraste para a bancada: <strong>Barramento 380V</strong>, <strong>Disjuntor-Motor</strong>, <strong>Contator K1</strong> e <strong>Motor 3~</strong>.</li>
+                        <li>Ligue as fases <strong>L1, L2, L3</strong> do Barramento nos bornes <strong>1, 3, 5</strong> do Disjuntor-Motor.</li>
+                        <li>Ligue as saídas <strong>2, 4, 6</strong> do Disjuntor-Motor nas entradas <strong>L1, L2, L3</strong> do Contator K1.</li>
+                        <li>Ligue as saídas <strong>T1, T2, T3</strong> do Contator K1 nos bornes <strong>U1, V1, W1</strong> do Motor.</li>
+                        <li>Ligue o <strong>PE (Terra)</strong> do Barramento no <strong>PE</strong> do Motor.</li>
                     </ul>
 
-                    <h4 class="text-xl text-emerald-300 mt-4 mb-2">B. Circuito de Comando e Lógica (24VDC ou 220VAC)</h4>
-                    <ul class="list-disc pl-6 space-y-2 mb-4">
-                        <li>Utilize a <strong>Fonte 24V</strong> (Ligar L e N da fonte à rede monofásica).</li>
-                        <li>Puxe o cabo <strong>+24V</strong> e conecte no borne <strong>95</strong> (Contato NF) do <strong>Relé Térmico</strong>.</li>
-                        <li>Saia do borne <strong>96</strong> do Relé Térmico e entre no borne <strong>11</strong> da <strong>Botoeira NF (Desliga / Botão Vermelho)</strong>.</li>
-                        <li>Do borne <strong>12</strong> do Botão Vermelho, faça uma derivação (nó) enviando um fio para o borne <strong>13</strong> da <strong>Botoeira NA (Liga / Botão Verde)</strong> e outro fio para o borne <strong>13</strong> do <strong>Contator K1</strong> (Este é o famoso Contato de Selo).</li>
-                        <li>Una a saída <strong>14</strong> do Botão Verde com a saída <strong>14</strong> do Contator K1. Desse fechamento, leve um fio direto para o borne <strong>A1</strong> da bobina do Contator K1.</li>
-                        <li>Finalize conectando o borne <strong>A2</strong> de K1 ao terminal <strong>0V</strong> da Fonte 24V.</li>
-                    </ul>
-
-                    <h4 class="text-xl text-emerald-300 mt-4 mb-2">C. Instalação de Sinalização para Partida Direta</h4>
-                    <ul class="list-disc pl-6 space-y-2">
-                        <li><strong>Motor Ligado (Sinaleiro Verde):</strong> Puxe energia (+24V antes das botoeiras) para o borne <strong>43 (NA)</strong> do Contator K1. Da saída <strong>44</strong>, ligue no <strong>X1</strong> do Sinaleiro Verde. X2 vai no 0V.</li>
-                        <li><strong>Motor Parado/Pronto (Sinaleiro Vermelho):</strong> Puxe energia para o borne <strong>21 (NF)</strong> de K1. Da saída <strong>22</strong>, ligue no <strong>X1</strong> do Sinaleiro Vermelho. X2 no 0V.</li>
-                        <li><strong>Falha Térmica (Sinaleiro Amarelo + Sirene):</strong> Puxe energia para o borne <strong>97 (NA)</strong> do Relé Térmico. Da saída <strong>98</strong>, ligue no <strong>X1</strong> do Sinaleiro Amarelo e no X1 da Sirene em paralelo. X2 no 0V.</li>
+                    <h4 class="text-lg font-bold text-white mb-2 text-blue-400">PASSO 2: CIRCUITO DE COMANDO (BAIXA TENSÃO)</h4>
+                    <ul class="list-decimal pl-6 space-y-2 mb-4">
+                        <li>Arraste: <strong>Fonte 24V DC</strong>, <strong>Botão Vermelho (NF)</strong>, <strong>Botão Verde (NA)</strong> e um <strong>Relé Térmico</strong>.</li>
+                        <li>Ligue o <strong>+24V</strong> da fonte na entrada <strong>95</strong> do Relé Térmico.</li>
+                        <li>Da saída <strong>96</strong> do Relé Térmico, ligue na entrada <strong>11</strong> do Botão Vermelho.</li>
+                        <li>Da saída <strong>12</strong> do Botão Vermelho, ligue na entrada <strong>13</strong> do Botão Verde.</li>
+                        <li>Da saída <strong>14</strong> do Botão Verde, ligue no borne <strong>A1</strong> da bobina do Contator K1.</li>
+                        <li>Ligue o borne <strong>A2</strong> do Contator K1 no <strong>0V</strong> da Fonte 24V.</li>
                     </ul>
                 </section>
 
-                <section>
-                    <h3 class="text-3xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">2. PARTIDA COM REVERSÃO DE ROTAÇÃO</h3>
-                    <p class="mb-3 text-lg font-semibold">Exige dois contatores (K1 para sentido horário, K2 para sentido anti-horário). O intertravamento é obrigatório para evitar o fechamento de um curto-circuito bifásico franco.</p>
-                    
-                    <h4 class="text-xl text-emerald-300 mt-4 mb-2">A. Força da Reversão</h4>
-                    <ul class="list-disc pl-6 space-y-2 mb-4">
-                        <li>Alimente as entradas L1, L2, L3 de K1 e K2 a partir do mesmo Disjuntor.</li>
-                        <li>Na saída para o motor (T1, T2, T3): A saída de K1 vai direto para o Relé Térmico mantendo a sequência R-S-T.</li>
-                        <li>Para K2: Cruze duas fases. Ligue a saída T1 de K2 no T1 de K1. Ligue a saída <strong>T2 de K2 no T3 de K1</strong>. Ligue a saída <strong>T3 de K2 no T2 de K1</strong>.</li>
-                    </ul>
-
-                    <h4 class="text-xl text-emerald-300 mt-4 mb-2">B. Comando Intertravado Eletricamente</h4>
-                    <ul class="list-disc pl-6 space-y-2">
-                        <li>Após o botão Desliga (NF), separe o circuito para dois botões Liga (S1 para Direita, S2 para Esquerda).</li>
-                        <li><strong>Linha Direita (K1):</strong> Saia do botão S1 (14) -> Entre no borne <strong>21 (NF) do Contator K2</strong>. Saia do <strong>22 de K2</strong> -> Entre no <strong>A1 do Contator K1</strong>. Faça o selo no 13-14 de K1.</li>
-                        <li><strong>Linha Esquerda (K2):</strong> Saia do botão S2 (14) -> Entre no borne <strong>21 (NF) do Contator K1</strong>. Saia do <strong>22 de K1</strong> -> Entre no <strong>A1 do Contator K2</strong>. Faça o selo no 13-14 de K2.</li>
-                        <li>Com isso, se K1 estiver dentro, seu contato 21-22 abre, cortando fisicamente a energia que iria para a bobina de K2, tornando impossível atracar os dois juntos.</li>
+                <section class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">2. CONTATO DE SELO (A MÁGICA DA RETENÇÃO)</h3>
+                    <p class="mb-4">Se você fez apenas a Partida Direta acima, o motor só vai girar enquanto você segurar o dedo no botão verde. Para ele continuar ligado, adicione o Selo:</p>
+                    <ul class="list-decimal pl-6 space-y-2">
+                        <li>Puxe um fio extra da <strong>saída 12 do Botão Vermelho</strong> e ligue na entrada <strong>13 (Contato Auxiliar NA)</strong> do Contator K1.</li>
+                        <li>Puxe um fio da <strong>saída 14 do Botão Verde</strong> (ou direto do A1) e ligue na saída <strong>14 (Contato Auxiliar NA)</strong> do Contator K1.</li>
+                        <li class="text-emerald-300 mt-2 font-bold">Teste: Dê o Play na simulação. Aperte o Verde e solte. A energia agora viaja pelo 13-14 do próprio Contator K1, mantendo-o atracado!</li>
                     </ul>
                 </section>
 
-                <section>
-                    <h3 class="text-3xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">3. PARTIDA ESTRELA-TRIÂNGULO (AMENIZAÇÃO DE PICO)</h3>
-                    <p class="mb-3 text-lg font-semibold">Reduz a corrente de partida a 1/3 do valor nominal. Utiliza 3 contatores: K1 (Principal), K2 (Triângulo) e K3 (Estrela), além de um Relé Temporizador.</p>
-                    
-                    <h4 class="text-xl text-emerald-300 mt-4 mb-2">A. Ligação de Força Múltipla</h4>
-                    <ul class="list-disc pl-6 space-y-2 mb-4">
-                        <li><strong>Motor 6 Pontas:</strong> O motor deve expor U1, V1, W1 e W2, U2, V2 na caixa de ligação e não ter as chapinhas internas.</li>
-                        <li>K1 recebe a rede e injeta nas pontas U1, V1, W1. K1 é o contator de linha.</li>
-                        <li>K2 recebe a MESMA rede em sua entrada e injeta nas pontas W2, U2, V2. <strong>Atenção ao fechamento:</strong> L1 deve fechar a bobina que começa em U1 e termina em U2, mas K2 deve enviar a fase L2 ou L3 para U2 para criar a DDP de 380V (Triângulo). Siga o padrão de placa do motor (ex: U1 com W2, V1 com U2, W1 com V2).</li>
-                        <li>K3 é o contator Estrela. Suas saídas T1, T2, T3 são interligadas (curto-circuitadas com cabos). Suas entradas L1, L2, L3 são conectadas na mesma linha que vai para as pontas W2, U2, V2 do motor. Quando K3 atraca, ele une os finais das bobinas formando o ponto neutro da estrela.</li>
-                    </ul>
-
-                    <h4 class="text-xl text-emerald-300 mt-4 mb-2">B. Comando Sequencial</h4>
-                    <ul class="list-disc pl-6 space-y-2">
-                        <li>Aperte o botão Liga. Energize o Temporizador e, simultaneamente, o Contator Estrela K3.</li>
-                        <li>Ao mesmo tempo, passe o sinal por um contato NA (13-14) do próprio K3 que acaba de fechar, para energizar o Contator de Linha K1. (O motor começa a girar fraco, recebendo tensão V/√3).</li>
-                        <li>Após o tempo (ex: 5s), o contato 15-16 (NF temporizado) abre, desatracando K3 (Estrela sai).</li>
-                        <li>O contato 15-18 (NA temporizado) fecha, atracando o Contator K2 (Triângulo entra). K1 permanece atracado através do seu próprio selo.</li>
-                        <li><strong>Intertravamento:</strong> A bobina de K2 deve obrigatoriamente passar por um contato 21-22 (NF) de K3, e a bobina de K3 deve passar pelo 21-22 (NF) de K2. Fechamento simultâneo é falha crítica.</li>
+                <section class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">3. ILUMINAÇÃO DE PAINEL E SINALIZAÇÕES</h3>
+                    <p class="mb-4">Sinaleiros visuais e sonoros (Sirene) informam o status da máquina. Use os contatos extras do Contator e do Relé Térmico:</p>
+                    <ul class="list-decimal pl-6 space-y-2">
+                        <li><strong>Sinaleiro Verde (Motor Ligado):</strong> Puxe energia (+24V) direto da fonte para o borne <strong>43 (NA)</strong> do Contator K1. Da saída <strong>44</strong>, ligue no <strong>X1</strong> do Sinaleiro Verde. Ligue <strong>X2</strong> no 0V.</li>
+                        <li><strong>Sinaleiro Vermelho (Painel Energizado / Motor Parado):</strong> Puxe energia (+24V) para o borne <strong>21 (NF)</strong> do Contator K1. Da saída <strong>22</strong>, ligue no <strong>X1</strong> do Sinaleiro Vermelho. Ligue <strong>X2</strong> no 0V.</li>
+                        <li><strong>Sinaleiro Amarelo + Sirene (Falha/Sobrecarga):</strong> Puxe energia (+24V) para a entrada <strong>97 (NA)</strong> do Relé Térmico. Da saída <strong>98</strong>, leve para o <strong>X1</strong> do Sinaleiro Amarelo e também para o <strong>X1</strong> da Sirene. O 0V vai nos respectivos X2. Se o motor travar e aquecer, o relé desarma e a sirene toca!</li>
                     </ul>
                 </section>
 
-                <section>
-                    <h3 class="text-3xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">4. INVERSOR DE FREQUÊNCIA E SOFT-STARTER (CONTROLE ELETRÔNICO)</h3>
-                    <p class="mb-3 text-lg font-semibold">Tecnologia de estado sólido para controle absoluto de motores, dispensando contatores de manobra para Estrela-Triângulo ou Compensadora.</p>
-                    
-                    <h4 class="text-xl text-emerald-300 mt-4 mb-2">Instalação do Inversor de Frequência (VFD)</h4>
-                    <ul class="list-disc pl-6 space-y-2 mb-4">
-                        <li><strong>Força:</strong> As Fases R, S, T vêm do Disjuntor-Motor direto para as entradas de potência do Inversor (R/L1, S/L2, T/L3).</li>
-                        <li><strong>Saída:</strong> Dos terminais U, V, W do Inversor, vá DIRETAMENTE para as pontas U1, V1, W1 do motor (previamente fechado em Triângulo ou Estrela nas chapinhas, conforme a tensão do inversor). <strong>NUNCA insira contatores ou chaves fim-de-curso entre o Inversor e o Motor. O corte de carga no chaveamento PWM queima os módulos IGBT.</strong></li>
-                        <li><strong>Comando em Borneira (2 Fios):</strong> O Inversor possui sua própria fonte de 24V. Pegue o terminal <strong>+24V (ou 10V em alguns)</strong> do Inversor, passe por uma Chave Seletora Simples. O retorno da chave conecte no terminal <strong>DI1 (Entrada Digital 1)</strong>. Programe o parâmetro correspondente no Inversor para "Controle a 2 fios - Gira/Para em DI1". A rampa de aceleração, desaceleração e frequência máxima são definidos via software na IHM.</li>
+                <section class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">4. REVERSÃO DE GIRO (COM INTERTRAVAMENTO)</h3>
+                    <p class="mb-4">Inverte o sentido de giro trocando 2 fases. Exige segurança total para não fechar curto-circuito entre as fases da rede.</p>
+                    <ul class="list-decimal pl-6 space-y-2">
+                        <li>Use dois contatores: <strong>K1 (Frente)</strong> e <strong>K2 (Trás)</strong>.</li>
+                        <li>No circuito de FORÇA de K2: Entre com L1, L2, L3 normais. Na SAÍDA de K2, inverta: T1 de K2 vai no U1 do motor (L1 com L1). T2 de K2 vai no W1 do motor (Cruzamento L2 com L3). T3 de K2 vai no V1 do motor (Cruzamento L3 com L2).</li>
+                        <li><strong>Intertravamento Elétrico (Obrigatório):</strong> A energia que sai do Botão Verde de FRENTE, antes de chegar no A1 do K1, <strong>TEM QUE PASSAR</strong> pelo contato <strong>21-22 (NF) do K2</strong>. E a energia do Botão Verde de TRÁS, deve passar pelo <strong>21-22 (NF) do K1</strong> antes de chegar no A1 do K2. Se K1 estiver ligado, K2 não liga de jeito nenhum, e vice-versa.</li>
                     </ul>
                 </section>
 
-                <section>
-                    <h3 class="text-3xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">5. INTEGRAÇÃO CLP E SENSORES (AUTOMAÇÃO INDUSTRIAL)</h3>
-                    <p class="mb-3 text-lg font-semibold">Como substituir quadros imensos de reles por lógicas de programação baseadas em PLC.</p>
-                    
-                    <ul class="list-disc pl-6 space-y-4">
-                        <li class="bg-slate-800 p-4 rounded border border-slate-700">
-                            <strong>1. Alimentação Segura e Isolamento:</strong> 
-                            O CLP Siemens S7 (ou similar) no painel é alimentado nos bornes <strong>L+ e M</strong> com uma Fonte estabilizada de 24VDC. Isso isola o circuito de controle de 24V do circuito de potência de 380V, garantindo total segurança ao operador que manipulará os sensores na máquina.
-                        </li>
-                        <li class="bg-slate-800 p-4 rounded border border-slate-700">
-                            <strong>2. Instalação de Sensores (Inputs):</strong>
-                            Todo e qualquer sinal de campo que seja "leitura de condição" vai para os canais <strong>I (Input) / DI</strong>. 
-                            <br>Exemplo 1: <strong>Sensor Indutivo PNP</strong>. Conecte o Marrom no +24V, o Azul no 0V. O cabo Preto (Sinal/OUT) irá mandar um pulso de 24V positivo ao detectar metal. Ligue este cabo na entrada <strong>I0.0</strong> do CLP.
-                            <br>Exemplo 2: <strong>Boia de Nível de Tanque</strong>. Envie 24V para o contato comum da boia. O retorno NA da boia vai para a entrada <strong>I0.1</strong>.
-                        </li>
-                        <li class="bg-slate-800 p-4 rounded border border-slate-700">
-                            <strong>3. Atuadores e Bobinas (Outputs):</strong>
-                            O programa ladder varre os sinais I0.0 e I0.1. Se a lógica ditar que o motor deve ligar, a saída <strong>Q0.0 (DQ)</strong> emite 24V.
-                            <br>Pegue um fio do borne <strong>Q0.0</strong> e leve <strong>DIRETAMENTE</strong> ao borne <strong>A1</strong> de um Relé Auxiliar ou de um Contator de Comando de 24VDC. O borne A2 do contator vai ao 0V. Quando Q0.0 ligar, o CLP atraca fisicamente o contator, e a carga pesada de 380V gira na fábrica.
-                        </li>
-                        <li class="bg-slate-800 p-4 rounded border border-slate-700">
-                            <strong>4. Fim do Contato de Selo Físico:</strong>
-                            Usando o CLP, você não faz mais fiações cruzadas de contato de selo na porta do painel. Ligue a botoeira Liga na entrada I0.2 e a Desliga na I0.3. A função de manter a carga ligada (Selo / Latch / Set-Reset) é desenhada no software. Isso economiza dezenas de metros de cabos e reduz manutenções em fios rompidos.
-                        </li>
+                <section class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">5. PARTIDA ESTRELA-TRIÂNGULO (REDUÇÃO DE PICO)</h3>
+                    <p class="mb-4">Usada para motores grandes. Reduz a corrente de partida a um terço. Exige Motor de 6 pontas (U1, V1, W1 e W2, U2, V2), três Contatores (K1, K2, K3) e um Relé Temporizador.</p>
+                    <ul class="list-decimal pl-6 space-y-2">
+                        <li><strong>K1 (Contator Principal):</strong> Liga a rede nas pontas U1, V1, W1.</li>
+                        <li><strong>K3 (Contator Estrela):</strong> Curto-circuita T1, T2, T3 entre si. Recebe energia pelas pontas W2, U2, V2. Liga PRIMEIRO junto com K1 para partida suave.</li>
+                        <li><strong>Relé Temporizador:</strong> Conta 5 a 10 segundos. Desliga K3 e liga K2.</li>
+                        <li><strong>K2 (Contator Triângulo):</strong> Liga a rede (L1, L2, L3) nas pontas opostas (W2, U2, V2). Fornece tensão plena de 380V por bobina.</li>
                     </ul>
                 </section>
-                
+
+                <section class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">6. AUTOMAÇÃO: CLP, INVERSOR E SENSORES</h3>
+                    <p class="mb-4">Técnicas de controle moderno sem contatores complexos:</p>
+                    <ul class="list-decimal pl-6 space-y-2">
+                        <li><strong>Inversor VFD:</strong> Alimente R, S, T. Ligue U, V, W direto no motor. Use as entradas digitais (DI1 e DI2) alimentadas pela fonte do inversor para girar/parar. Não use contatores na saída!</li>
+                        <li><strong>Sensor Indutivo (PNP):</strong> Ligue +24V e 0V da fonte. O terminal OUT vai emitir +24V quando detectar metal. Ligue este OUT diretamente no A1 de um microcontator, ou na entrada (Ex: I0.0) de um CLP.</li>
+                        <li><strong>CLP:</strong> O cérebro da automação. Entradas I0.0, I0.1 recebem sinais de botões e sensores (24V). O programa interno decide a ação e energiza as saídas Q0.0, Q0.1 com 24V. Use as saídas Q para atracar a bobina A1 dos contatores K1, K2. Nunca ligue motores diretos nas saídas do CLP.</li>
+                    </ul>
+                </section>
             </div>
         </div>
     </div>
+
+    <!-- Container de Toasts para Alertas -->
+    <div id="toast-container"></div>
 
     <script>
         const componentLibrary = [
@@ -582,11 +606,11 @@
                 portStyle: 'edge', 
                 svg: `
                 <svg viewBox="0 0 160 40" width="100%" height="100%" preserveAspectRatio="none">
-                    <rect x="0" y="0" width="160" height="40" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
-                    <rect x="10" y="8" width="140" height="4" fill="#b45309" />
-                    <rect x="10" y="18" width="140" height="4" fill="#b45309" />
-                    <rect x="10" y="28" width="140" height="4" fill="#b45309" />
-                    <text x="80" y="22" font-size="10" font-family="sans-serif" font-weight="bold" fill="#475569" text-anchor="middle" opacity="0.5">3~ 380V / 60Hz</text>
+                    <rect x="0" y="0" width="100%" height="100%" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+                    <rect x="5%" y="20%" width="90%" height="10%" fill="#b45309" />
+                    <rect x="5%" y="45%" width="90%" height="10%" fill="#b45309" />
+                    <rect x="5%" y="70%" width="90%" height="10%" fill="#b45309" />
+                    <text x="50%" y="55%" font-size="10" font-family="sans-serif" font-weight="bold" fill="#475569" text-anchor="middle" opacity="0.5">3~ 380V / 60Hz</text>
                 </svg>`
             },
             {
@@ -596,10 +620,10 @@
                 portStyle: 'edge', 
                 svg: `
                 <svg viewBox="0 0 120 40" width="100%" height="100%" preserveAspectRatio="none">
-                    <rect x="0" y="0" width="120" height="40" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
-                    <rect x="10" y="12" width="100" height="4" fill="#3b82f6" />
-                    <rect x="10" y="24" width="100" height="4" fill="#0ea5e9" />
-                    <text x="60" y="22" font-size="9" font-family="sans-serif" font-weight="bold" fill="#475569" text-anchor="middle" opacity="0.5">1~ 220V / 60Hz</text>
+                    <rect x="0" y="0" width="100%" height="100%" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+                    <rect x="5%" y="30%" width="90%" height="10%" fill="#3b82f6" />
+                    <rect x="5%" y="60%" width="90%" height="10%" fill="#0ea5e9" />
+                    <text x="50%" y="55%" font-size="9" font-family="sans-serif" font-weight="bold" fill="#475569" text-anchor="middle" opacity="0.5">1~ 220V / 60Hz</text>
                 </svg>`
             },
             {
@@ -628,10 +652,10 @@
                 portStyle: 'edge', 
                 svg: `
                 <svg viewBox="0 0 100 40" width="100%" height="100%" preserveAspectRatio="none">
-                    <rect x="0" y="0" width="100" height="40" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
-                    <rect x="10" y="10" width="80" height="8" fill="#ef4444" />
-                    <rect x="10" y="22" width="80" height="8" fill="#3b82f6" />
-                    <text x="50" y="24" font-size="8" font-family="sans-serif" font-weight="bold" fill="#fff" text-anchor="middle" opacity="0.6">BATT 24VDC</text>
+                    <rect x="0" y="0" width="100%" height="100%" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+                    <rect x="5%" y="25%" width="90%" height="20%" fill="#ef4444" />
+                    <rect x="5%" y="55%" width="90%" height="20%" fill="#3b82f6" />
+                    <text x="50%" y="60%" font-size="8" font-family="sans-serif" font-weight="bold" fill="#fff" text-anchor="middle" opacity="0.6">BATT 24VDC</text>
                 </svg>`
             },
             {
@@ -651,27 +675,29 @@
             {
                 type: 'barra_terra', name: 'Barramento PE (Terra)', category: 'ALIMENTAÇÃO',
                 width: 100, height: 30,
-                inputs: ['PE_IN'], outputs: ['PE1', 'PE2', 'PE3'],
+                inputs: ['PE_IN'], outputs: ['PE1', 'PE2', 'PE3', 'PE4'],
                 portStyle: 'edge', 
                 svg: `
-                <svg viewBox="0 0 100 30" width="100%" height="100%">
-                    <rect x="5" y="10" width="90" height="10" fill="#22c55e" stroke="#166534" stroke-width="1"/>
-                    <circle cx="20" cy="15" r="2" fill="#166534" />
-                    <circle cx="50" cy="15" r="2" fill="#166534" />
-                    <circle cx="80" cy="15" r="2" fill="#166534" />
+                <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+                    <rect x="5%" y="30%" width="90%" height="40%" fill="#22c55e" stroke="#166534" stroke-width="1"/>
+                    <circle cx="20%" cy="50%" r="2" fill="#166534" />
+                    <circle cx="40%" cy="50%" r="2" fill="#166534" />
+                    <circle cx="60%" cy="50%" r="2" fill="#166534" />
+                    <circle cx="80%" cy="50%" r="2" fill="#166534" />
                 </svg>`
             },
             {
                 type: 'barra_neutro', name: 'Barramento N (Neutro)', category: 'ALIMENTAÇÃO',
                 width: 100, height: 30,
-                inputs: ['N_IN'], outputs: ['N1', 'N2', 'N3'],
+                inputs: ['N_IN'], outputs: ['N1', 'N2', 'N3', 'N4'],
                 portStyle: 'edge', 
                 svg: `
-                <svg viewBox="0 0 100 30" width="100%" height="100%">
-                    <rect x="5" y="10" width="90" height="10" fill="#0ea5e9" stroke="#0369a1" stroke-width="1"/>
-                    <circle cx="20" cy="15" r="2" fill="#0369a1" />
-                    <circle cx="50" cy="15" r="2" fill="#0369a1" />
-                    <circle cx="80" cy="15" r="2" fill="#0369a1" />
+                <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+                    <rect x="5%" y="30%" width="90%" height="40%" fill="#0ea5e9" stroke="#0369a1" stroke-width="1"/>
+                    <circle cx="20%" cy="50%" r="2" fill="#0369a1" />
+                    <circle cx="40%" cy="50%" r="2" fill="#0369a1" />
+                    <circle cx="60%" cy="50%" r="2" fill="#0369a1" />
+                    <circle cx="80%" cy="50%" r="2" fill="#0369a1" />
                 </svg>`
             },
             {
@@ -814,6 +840,7 @@
                     <text x="25" y="85" font-size="7" font-weight="bold" fill="#ef4444" font-family="sans-serif" text-anchor="middle">FF</text>
                 </svg>`
             },
+            // Contatores K1 a K5 conforme solicitado (Mais largos e com contatos extras para Sinalização)
             {
                 type: 'contator_k1', name: 'Contator K1 (2NA+1NF)', category: 'MANOBRA',
                 width: 150, height: 100,
@@ -1131,21 +1158,6 @@
                     <path d="M 30 40 Q 15 72 30 105 L 20 100 L 20 45 Z" fill="#78350f"/>
                     <rect x="0" y="0" width="160" height="20" fill="transparent" />
                     <rect x="60" y="15" width="45" height="25" fill="#b45309" />
-                </svg>`
-            },
-            {
-                type: 'motor_cc', name: 'Motor DC (CC)', category: 'MÁQUINAS',
-                width: 140, height: 120,
-                inputs: ['A1(+)', 'A2(-)', 'F1', 'F2', 'PE'], outputs: [],
-                portStyle: 'edge',
-                svg: `
-                <svg viewBox="0 0 140 120" width="100%" height="100%">
-                    <rect x="25" y="100" width="90" height="15" fill="#475569" rx="2" />
-                    <rect x="20" y="30" width="100" height="65" fill="#334155" rx="8" />
-                    <circle cx="70" cy="62" r="25" fill="#1e293b" stroke="#cbd5e1" stroke-width="2"/>
-                    <text x="70" y="68" font-size="14" font-family="sans-serif" font-weight="bold" fill="#fff" text-anchor="middle">M=</text>
-                    <rect x="0" y="0" width="140" height="20" fill="transparent" />
-                    <rect x="50" y="10" width="40" height="20" fill="#334155" />
                 </svg>`
             },
             {
@@ -1536,19 +1548,26 @@
             const header = document.createElement('div');
             header.className = 'component-header';
             header.innerHTML = `
-                <span class="truncate">${template.name}</span>
+                <span class="truncate pointer-events-none">${template.name}</span>
                 <button class="text-slate-400 hover:text-red-400 ml-2" title="Remover" onclick="deleteComponent('${id}')">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             `;
 
-            setupNodeDragging(header, el, id);
+            // Identificar barramentos que podem ser esticados
+            const isBusbar = ['rede_trifasica', 'rede_monofasica', 'rede_cc_bateria', 'barra_terra', 'barra_neutro'].includes(type);
 
             const body = document.createElement('div');
             body.className = 'component-body';
-            body.style.width = template.width + 'px';
+            body.style.width = '100%';
             body.style.height = template.height + 'px';
             body.innerHTML = template.svg;
+
+            if (isBusbar) {
+                setupNodeDragging(body, el, id); // O corpo arrasta o barramento
+            } else {
+                setupNodeDragging(header, el, id); // O header arrasta componentes normais
+            }
 
             const portClass = template.portStyle === 'inset' ? 'inset-ports' : 'ports-container';
             
@@ -1569,12 +1588,92 @@
             if(template.inputs.length > 0) el.appendChild(inputsContainer);
             if(template.outputs.length > 0) el.appendChild(outputsContainer);
 
+            // Se for barramento, anexar manipuladores de redimensionamento laterais (esticar)
+            if (isBusbar) {
+                const leftHandle = document.createElement('div');
+                leftHandle.className = 'resize-handle left-handle';
+                const rightHandle = document.createElement('div');
+                rightHandle.className = 'resize-handle right-handle';
+                
+                el.appendChild(leftHandle);
+                el.appendChild(rightHandle);
+                
+                setupBusbarResizing(leftHandle, rightHandle, el, id, template);
+            }
+
             componentsContainer.appendChild(el);
 
-            nodes.push({ id, type, el, x, y });
+            nodes.push({ id, type, el, x, y, width: template.width });
             
             if(!idForce) showToast(`${template.name} adicionado.`, 'success');
             return id;
+        }
+
+        function setupBusbarResizing(lHandle, rHandle, nodeEl, id, template) {
+            let isResizing = false;
+            let startX, startWidth, startLeft;
+            let handleType = '';
+
+            function onDown(e, type) {
+                e.stopPropagation();
+                isResizing = true;
+                handleType = type;
+                startX = e.clientX || (e.touches && e.touches[0].clientX);
+                startWidth = parseFloat(nodeEl.style.width) || template.width;
+                startLeft = parseFloat(nodeEl.style.left);
+                workspace.style.cursor = 'ew-resize';
+                
+                document.addEventListener('pointermove', onMove);
+                document.addEventListener('pointerup', onUp);
+                document.addEventListener('touchmove', onMove, {passive: false});
+                document.addEventListener('touchend', onUp);
+            }
+
+            function onMove(e) {
+                if (!isResizing) return;
+                let currentX = e.clientX || (e.touches && e.touches[0].clientX);
+                const dx = (currentX - startX) / scale;
+                
+                let newWidth = startWidth;
+                let newLeft = startLeft;
+
+                if (handleType === 'right') {
+                    newWidth = Math.max(template.width, startWidth + dx);
+                } else if (handleType === 'left') {
+                    newWidth = Math.max(template.width, startWidth - dx);
+                    if (newWidth > template.width) {
+                        newLeft = startLeft + dx;
+                    } else {
+                        newLeft = startLeft + (startWidth - template.width);
+                        newWidth = template.width;
+                    }
+                }
+
+                nodeEl.style.width = newWidth + 'px';
+                nodeEl.style.left = newLeft + 'px';
+                
+                const nodeData = nodes.find(n => n.id === id);
+                if(nodeData) {
+                    nodeData.x = newLeft;
+                    nodeData.width = newWidth;
+                }
+
+                updateAllWires(); 
+            }
+
+            function onUp() {
+                isResizing = false;
+                workspace.style.cursor = 'grab';
+                document.removeEventListener('pointermove', onMove);
+                document.removeEventListener('pointerup', onUp);
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('touchend', onUp);
+            }
+
+            lHandle.addEventListener('pointerdown', (e) => onDown(e, 'left'));
+            rHandle.addEventListener('pointerdown', (e) => onDown(e, 'right'));
+            lHandle.addEventListener('touchstart', (e) => onDown(e, 'left'), {passive: false});
+            rHandle.addEventListener('touchstart', (e) => onDown(e, 'right'), {passive: false});
         }
 
         function createPortElement(nodeId, portName, type) {
@@ -1593,13 +1692,26 @@
 
             wrapper.appendChild(port);
             wrapper.appendChild(label);
+            
+            // Garantir que funcione perfeitamente com Mouse e TouchScreen
             port.addEventListener('pointerdown', handlePortClick);
+            port.addEventListener('touchstart', function(e) {
+                e.preventDefault(); 
+                e.stopPropagation();
+                // Passa os coords do touch emulando o clientX clientY pro click handler
+                handlePortClick({
+                    clientX: e.touches[0].clientX,
+                    clientY: e.touches[0].clientY,
+                    target: port,
+                    stopPropagation: () => {}
+                });
+            }, {passive: false});
             
             return wrapper;
         }
 
         function handlePortClick(e) {
-            e.stopPropagation();
+            if(e.stopPropagation) e.stopPropagation();
             if(isPanning) return; 
 
             const portEl = e.target;
@@ -1614,7 +1726,12 @@
                 updateDrawingWire(e.clientX, e.clientY);
                 
                 document.addEventListener('pointermove', onPointerMoveDraw);
-                setTimeout(() => { workspace.addEventListener('pointerdown', cancelDrawing); }, 10);
+                document.addEventListener('touchmove', onPointerMoveDrawTouch, {passive: false});
+                
+                setTimeout(() => { 
+                    workspace.addEventListener('pointerdown', cancelDrawing); 
+                    workspace.addEventListener('touchstart', cancelDrawing, {passive: false});
+                }, 10);
             } else {
                 if (drawingWire.sourceNode === nodeId && drawingWire.sourcePort === portName) {
                     cancelDrawing();
@@ -1628,26 +1745,37 @@
         function onPointerMoveDraw(e) {
             updateDrawingWire(e.clientX, e.clientY);
         }
+        
+        function onPointerMoveDrawTouch(e) {
+            if(e.cancelable) e.preventDefault();
+            updateDrawingWire(e.touches[0].clientX, e.touches[0].clientY);
+        }
 
         function updateDrawingWire(clientX, clientY) {
             if (!drawingWire) return;
-            const startPos = getPortCenter(drawingWire.sourceEl);
+            const p1 = getPortCenter(drawingWire.sourceEl);
+            const t1 = drawingWire.sourceEl.dataset.type;
             
             const panZoomRect = canvasPanZoom.getBoundingClientRect();
             const mouseX = (clientX - panZoomRect.left) / scale;
             const mouseY = (clientY - panZoomRect.top) / scale;
             
-            drawingWirePath.setAttribute('d', getWirePath(startPos.x, startPos.y, mouseX, mouseY));
+            const p2 = { x: mouseX, y: mouseY };
+            const t2 = t1 === 'in' ? 'out' : 'in'; 
+            
+            drawingWirePath.setAttribute('d', getOrthogonalPath(p1, p2, t1, t2, 0));
         }
 
         function cancelDrawing(e) {
-            if(e && e.target.classList.contains('port')) return;
+            if(e && e.target && e.target.classList && e.target.classList.contains('port')) return;
             
             if(drawingWire && drawingWire.sourceEl) drawingWire.sourceEl.classList.remove('active');
             drawingWire = null;
             drawingLayer.style.display = 'none';
             document.removeEventListener('pointermove', onPointerMoveDraw);
+            document.removeEventListener('touchmove', onPointerMoveDrawTouch);
             workspace.removeEventListener('pointerdown', cancelDrawing);
+            workspace.removeEventListener('touchstart', cancelDrawing);
         }
 
         function createWire(srcNode, srcPort, tgtNode, tgtPort, idForce = null) {
@@ -1679,6 +1807,11 @@
                 e.stopPropagation();
                 deleteWire(wireId);
             });
+            path.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+                if(e.cancelable) e.preventDefault();
+                deleteWire(wireId);
+            }, {passive: false});
 
             wireLayer.appendChild(path);
 
@@ -1699,9 +1832,32 @@
             };
         }
 
-        function getWirePath(x1, y1, x2, y2) {
-            const midY = y1 + (y2 - y1) / 2;
-            return `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
+        // NOVO: Algoritmo Dinamico para criar os "degraus da escada" evitando o embaralhamento
+        function getOrthogonalPath(p1, p2, t1, t2, wireNum) {
+            // Offset dinâmico baseado no numero do fio (ID numérico extraído), espalhando-os de 12 em 12 px horizontalmente e de 8 em 8 verticalmente
+            const spreadOffset = (wireNum % 15) * 8; 
+            
+            const stub1 = t1 === 'in' ? -25 - spreadOffset : 25 + spreadOffset;
+            const stub2 = t2 === 'in' ? -25 - spreadOffset : 25 + spreadOffset;
+            
+            const py1 = p1.y + stub1;
+            const py2 = p2.y + stub2;
+
+            if (t1 === 'out' && t2 === 'in' && p1.y <= p2.y) {
+                // Fluxo ideal para baixo
+                const midY = (py1 + py2) / 2;
+                return `M ${p1.x} ${p1.y} L ${p1.x} ${midY} L ${p2.x} ${midY} L ${p2.x} ${p2.y}`;
+            } 
+            else if (t1 === 'in' && t2 === 'out' && p2.y <= p1.y) {
+                // Fluxo reverso para cima ideal
+                const midY = (py1 + py2) / 2;
+                return `M ${p1.x} ${p1.y} L ${p1.x} ${midY} L ${p2.x} ${midY} L ${p2.x} ${p2.y}`;
+            } 
+            else {
+                // Casos laterais ou curvos (Escada infinita com espalhamento horizontal garantindo leitura clara)
+                const midX = (p1.x + p2.x) / 2 + ((wireNum % 8) * 12);
+                return `M ${p1.x} ${p1.y} L ${p1.x} ${py1} L ${midX} ${py1} L ${midX} ${py2} L ${p2.x} ${py2} L ${p2.x} ${p2.y}`;
+            }
         }
 
         function updateWirePath(wire) {
@@ -1714,7 +1870,12 @@
             if (srcEl && tgtEl) {
                 const p1 = getPortCenter(srcEl);
                 const p2 = getPortCenter(tgtEl);
-                wire.pathEl.setAttribute('d', getWirePath(p1.x, p1.y, p2.x, p2.y));
+                
+                const t1 = srcEl.dataset.type;
+                const t2 = tgtEl.dataset.type;
+                const wireNum = parseInt(wire.id.split('_')[1]) || 0;
+
+                wire.pathEl.setAttribute('d', getOrthogonalPath(p1, p2, t1, t2, wireNum));
                 
                 const p1Str = wire.sourcePort;
                 const p2Str = wire.targetPort;
@@ -1736,7 +1897,7 @@
             let startX, startY, initialX, initialY;
 
             function onPointerDown(e) {
-                if(e.target.closest('button')) return; 
+                if(e.target.closest('button') || e.target.classList.contains('resize-handle')) return; 
                 if(e.shiftKey) return; 
                 
                 isDragging = true;
@@ -1774,9 +1935,7 @@
                 if(nodeData) {
                     nodeData.x = newX;
                     nodeData.y = newY;
-                    wires.forEach(w => {
-                        if (w.sourceNode === id || w.targetNode === id) updateWirePath(w);
-                    });
+                    updateAllWires();
                 }
             }
 
@@ -1830,7 +1989,7 @@
             }
             
             const data = {
-                nodes: nodes.map(n => ({ id: n.id, type: n.type, x: n.x, y: n.y })),
+                nodes: nodes.map(n => ({ id: n.id, type: n.type, x: n.x, y: n.y, width: n.width })),
                 wires: wires.map(w => ({ id: w.id, srcN: w.sourceNode, srcP: w.sourcePort, tgtN: w.targetNode, tgtP: w.targetPort }))
             };
             
@@ -1853,7 +2012,17 @@
                     clearWorkspace(true);
                     
                     data.nodes.forEach(n => {
-                        createComponent(n.type, n.x, n.y, n.id);
+                        const newId = createComponent(n.type, n.x, n.y, n.id);
+                        if (newId && n.width) {
+                            const el = document.getElementById(newId);
+                            if (el && ['rede_trifasica', 'rede_monofasica', 'rede_cc_bateria', 'barra_terra', 'barra_neutro'].includes(n.type)) {
+                                el.style.width = n.width + 'px';
+                                const body = el.querySelector('.component-body');
+                                if (body) body.style.width = n.width + 'px';
+                                const nodeObj = nodes.find(nd => nd.id === newId);
+                                if(nodeObj) nodeObj.width = n.width;
+                            }
+                        }
                     });
                     
                     setTimeout(() => {
@@ -1877,8 +2046,10 @@
             alert("CAD Pro - Instruções:\n\n1. Oculte a biblioteca no botão do menu superior.\n2. Zoom: Role o scroll do mouse ou faça movimento de pinça no celular.\n3. Pan (Mover tela): Segure SHIFT + Clique, ou toque com 1 dedo no fundo e arraste.\n4. Apostila: Clique no botão da biblioteca para abrir as lições de montagem.\n5. O sistema salva em .json localmente em seu PC.");
         }
 
+        // FIXED: Toast container safety check
         function showToast(message, type='info') {
             const container = document.getElementById('toast-container');
+            if(!container) return; // Evita erro se o dom nao estiver pronto
             const toast = document.createElement('div');
             toast.className = 'toast';
             if(type === 'error') toast.style.borderLeftColor = '#ef4444';
@@ -1911,10 +2082,13 @@
                         const isActive = n.el.dataset.simActive === "true";
                         n.el.dataset.simActive = isActive ? "false" : "true";
                         
-                        if(n.type.includes('contator')) n.el.classList.add('manual-override');
+                        // Permite travar com clique para testes basicos sem cabos, senao depende das bobinas
+                        if(n.type.includes('contator') || n.type === 'rele_temporizador') {
+                            n.el.dataset.manualOverride = isActive ? "false" : "true"; 
+                        }
                         
                         if(!isActive) n.el.classList.add('component-active-glow');
-                        else n.el.classList.remove('component-active-glow', 'manual-override');
+                        else n.el.classList.remove('component-active-glow');
                     };
                 });
                 
@@ -1932,7 +2106,8 @@
                     body.style.cursor = 'default';
                     body.onclick = null;
                     n.el.dataset.simActive = "false";
-                    n.el.classList.remove('component-active-glow', 'manual-override');
+                    n.el.dataset.manualOverride = "false";
+                    n.el.classList.remove('component-active-glow');
                     
                     const gear = n.el.querySelector('.sim-gear');
                     if(gear) gear.remove();
@@ -1945,6 +2120,7 @@
             }
         }
 
+        // MOTOR ELÉTRICO MATEMÁTICO - Correção dos Fluxos de Tensão pelos Disjuntores e Contatores
         function simulateElectricalNetwork() {
             let networkStabilized = false;
             let outerLoops = 10; 
@@ -1969,13 +2145,14 @@
                     return false;
                 };
 
+                // Power Sources explicitly seed the network
                 nodes.forEach(n => {
                     if(n.type === 'rede_trifasica') { addSignal(n.id, 'L1', 'L1'); addSignal(n.id, 'L2', 'L2'); addSignal(n.id, 'L3', 'L3'); addSignal(n.id, 'PE', 'PE'); }
                     if(n.type === 'rede_monofasica') { addSignal(n.id, 'L', 'L1'); addSignal(n.id, 'N', 'N'); addSignal(n.id, 'PE', 'PE'); }
                     if(n.type === 'fonte_24v') { addSignal(n.id, '+24V', '+24V'); addSignal(n.id, '0V', '0V'); }
                     if(n.type === 'rede_cc_bateria') { addSignal(n.id, '+24V', '+24V'); addSignal(n.id, '0V', '0V'); }
-                    if(n.type === 'barra_terra') { addSignal(n.id, 'PE_IN', 'PE'); }
-                    if(n.type === 'barra_neutro') { addSignal(n.id, 'N_IN', 'N'); }
+                    if(n.type === 'barra_terra') { addSignal(n.id, 'PE_IN', 'PE'); addSignal(n.id, 'PE1', 'PE'); addSignal(n.id, 'PE2', 'PE'); addSignal(n.id, 'PE3', 'PE'); addSignal(n.id, 'PE4', 'PE'); }
+                    if(n.type === 'barra_neutro') { addSignal(n.id, 'N_IN', 'N'); addSignal(n.id, 'N1', 'N'); addSignal(n.id, 'N2', 'N'); addSignal(n.id, 'N3', 'N'); addSignal(n.id, 'N4', 'N'); }
                 });
 
                 let changed = true;
@@ -2000,13 +2177,15 @@
                             outSigs.forEach(sig => { if(addSignal(n.id, inPort, sig)) changed=true; }); 
                         };
 
-                        if (isActive || ['barra_terra', 'barra_neutro', 'fusivel_seccionadora', 'rele_termico', 'dps', 'dr_tetrapolar'].includes(n.type)) {
+                        // Pass-through elements (Disjuntores agora tem passagem de tensão garantida)
+                        if (isActive || ['barra_terra', 'barra_neutro', 'fusivel_seccionadora', 'rele_termico', 'dps', 'dr_tetrapolar', 'disjuntor_motor', 'disjuntor_monofasico', 'disjuntor_bipolar', 'disjuntor_trifasico'].includes(n.type)) {
                             const template = componentLibrary.find(c => c.type === n.type);
                             if (template) {
                                 const ins = template.inputs;
                                 const outs = template.outputs;
                                 const min = Math.min(ins.length, outs.length);
                                 for(let i=0; i<min; i++) {
+                                    // Bloqueia as portas de logica e comando separadas
                                     if(ins[i] !== 'A1' && outs[i] !== 'A2' && ins[i] !== '95' && ins[i] !== '13' && ins[i] !== '21' && ins[i] !== '43') passThrough(ins[i], outs[i]);
                                 }
                                 if (n.type.includes('contator') || n.type === 'botoeira_na' || n.type === 'chave_seletora' || n.type === 'rele_temporizador') passThrough('13', '14');
@@ -2019,7 +2198,7 @@
                             if (['botoeira_nf', 'botoeira_emergencia', 'fim_de_curso'].includes(n.type)) passThrough('11', '12');
                             if (n.type === 'rele_termico') passThrough('95', '96');
                             if (n.type === 'rele_temporizador') passThrough('15', '16');
-                            if (n.type.includes('contator')) passThrough('21', '22');
+                            if (n.type.includes('contator')) passThrough('21', '22'); // NF extra
                         } else {
                             if (n.type === 'rele_termico') passThrough('97', '98');
                             if (n.type === 'chave_seletora') passThrough('13', '14(Auto)');
@@ -2031,7 +2210,7 @@
 
                 nodes.forEach(n => {
                     if (n.type.includes('contator') || n.type === 'rele_temporizador') {
-                        if (n.el.classList.contains('manual-override')) return; 
+                        if (n.el.dataset.manualOverride === "true") return; 
 
                         const a1 = getSignals(n.id, 'A1');
                         const a2 = getSignals(n.id, 'A2');
@@ -2055,6 +2234,7 @@
                 });
             }
 
+            // Visual updates
             wires.forEach(w => {
                 if(w.energized) w.pathEl.classList.add('wire-energized');
                 else w.pathEl.classList.remove('wire-energized');
@@ -2119,6 +2299,8 @@
                 const header = document.getElementById(headerId);
                 const modal = document.getElementById(modalId);
                 
+                if (!header || !modal) return; // FIX CRITICO: Impede falhas caso o HTML nao carregue o modal corretamente
+                
                 const startDrag = (clientX, clientY) => {
                     isDraggingModal = true;
                     activeModal = modal;
@@ -2166,138 +2348,131 @@
 
         const manualLessons = [
             {
-                id: 'mod_1',
-                title: 'Módulo 1: Fundamentos (Tópico 1 ao 5)',
+                id: 'mod1_intro',
+                title: 'Módulo 1: Introdução e Alimentação',
                 icon: 'fa-bolt',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Módulo 1: Introdução e Fundamentos (Tópicos 1 a 5)</h3>
-                    <div class="text-slate-300 mb-6 space-y-4">
-                        <h4 class="text-xl font-bold text-blue-400">1 a 2. Principais Tópicos e Fundamentos</h4>
-                        <p>Comandos elétricos formam a base da automação industrial. Diferente das instalações residenciais que operam de forma direta (interruptor físico ligando lâmpada de mesma potência), comandos separam o circuito de Alta Potência (Força) do circuito de Baixa Potência (Comando/Lógica). Isso confere durabilidade ao equipamento e segurança ao operador.</p>
-                        
-                        <h4 class="text-xl font-bold text-blue-400 mt-6">3. Segurança (NR-10 e Normativas)</h4>
-                        <p>A Norma Regulamentadora 10 rege que não existe "trabalho rápido com painel ligado". O sistema requer Secionamento, Bloqueio/Travamento por cadeado, Teste de Ausência de Tensão (TAT), e Aterramento Temporário (Sempre ligue a porta "PE" dos barramentos em todas as carcaças metálicas na simulação e na vida real).</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6">4 e 5. Símbolos, Diagramas e Identificação</h4>
-                        <p>Pelas normas (ex: NBR 528 / DIN / IEC), equipamentos possuem numerações padronizadas. O simulador segue este padrão industrial rigoroso:</p>
-                        <ul class="list-disc pl-5 mt-2 space-y-1 bg-slate-700/30 p-4 rounded">
-                            <li><strong>Alimentação Trifásica:</strong> L1, L2, L3. Saídas de contator para motor: T1, T2, T3 (ou U1, V1, W1 no motor).</li>
-                            <li><strong>Terminais Final 1 e 2 (Ex: 11-12, 21-22):</strong> Contato Normalmente Fechado (NF / NC). Usado para parada, emergência e intertravamento de segurança.</li>
-                            <li><strong>Terminais Final 3 e 4 (Ex: 13-14, 43-44):</strong> Contato Normalmente Aberto (NA / NO). Usado para ligar, retenção (selo) e acionamento verde.</li>
-                            <li><strong>Bobinas:</strong> A1 e A2 (Alimentação do eletroímã do contator ou relé).</li>
-                        </ul>
-                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Comandos Elétricos e Alimentação</h3>
+                    <p class="text-slate-300 mb-4">Projetar sistemas de distribuição de energia elétrica dentro de uma planta industrial é um grande diferencial no mercado de trabalho. Projetar significa: dimensionar condutores, desenvolver sistemas de proteção eficazes, dispositivos de comandos e circuitos clássicos de acionamento de motores.</p>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">Tipos de Alimentação</h4>
+                    <p class="text-slate-300 mb-4">A energia elétrica passa por três etapas: geração, transmissão e distribuição. A transmissão pode variar de 69 kV a 750 kV. Na distribuição, reduz-se para 13,8 kV. Nas indústrias, utiliza-se a "baixa tensão" trifásica, que varia de 208V a 630V.</p>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">Chave Seccionadora</h4>
+                    <p class="text-slate-300 mb-4">A chave seccionadora de entrada tem duas funções principais: proteção e medição. Não se deve utilizá-la para desligar a energia de uma indústria no final do expediente, sob o risco de formação de arco-voltaico. Desligue cada disjuntor individualmente.</p>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">Dimensionamento dos Condutores</h4>
+                    <p class="text-slate-300 mb-4">O dimensionamento baseia-se na NBR 5410. A capacidade do cabo deve respeitar o limite térmico (ex: PVC/70°C). Se houver Fator de Serviço (FS) maior que 1, a corrente total It = FS × In. A queda de tensão na partida não deve ultrapassar 7%, e a seção mínima de cabos de força é 2,5mm².</p>
                 `
             },
             {
-                id: 'mod_2',
-                title: 'Módulo 2: Componentes B. (Tópico 6 ao 10)',
-                icon: 'fa-microchip',
-                content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Módulo 2: Componentes Básicos (Tópicos 6 a 10)</h3>
-                    <div class="text-slate-300 mb-6 space-y-4">
-                        <h4 class="text-xl font-bold text-blue-400">6. Lâmpadas, Iluminação e Interruptores (Simples, Paralelo, Intermediário)</h4>
-                        <p>No nível mais básico, você comanda iluminação. Um Interruptor Simples corta apenas a fase. Em escadas extensas, o sistema Three-Way (Paralelo) e Four-Way (Intermediário) formam rotas elétricas alternativas que permitem mudar o estado da lâmpada de múltiplos andares sem usar contatores complexos.</p>
-                        
-                        <h4 class="text-xl font-bold text-blue-400 mt-6">7. Botoeiras NA e NF Industrial</h4>
-                        <p>Na indústria, a cor determina a função de risco. Botoeiras Verdes são <strong>NA (13-14)</strong> e enviam o pulso elétrico para iniciar o processo. Botoeiras Vermelhas são <strong>NF (11-12)</strong> e mantêm o circuito energizado até serem pressionadas, momento em que cortam fisicamente a passagem dos elétrons, parando o processo imediatamente (fail-safe).</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6">8. Relés Auxiliares</h4>
-                        <p>Quando você precisa multiplicar os contatos do painel (ex: um único botão precisar ligar 5 luzes e 3 sirenes sem sobrecarregar a botoeira), usa-se o Relé Auxiliar. Ele é um mini-contator que processa apenas sinais de controle lógico (não liga motor, apenas comanda lógicas).</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6">9 e 10. Contatores K1 a K5</h4>
-                        <p>O coração do painel. Ao injetar energia em <strong>A1</strong> e referenciar <strong>A2</strong>, uma bobina eletromagnética interna gera um forte campo que atrai os contatos metálicos pesados (L1-T1, L2-T2, L3-T3), ligando a máquina. Na biblioteca, disponibilizamos contatores de K1 a K5, pois projetos avançados (como uma ponte rolante) exigirão múltiplas lógicas de força para as pontas dos motores.</p>
-                    </div>
-                `
-            },
-            {
-                id: 'mod_3',
-                title: 'Módulo 3: Lógicas (Tópico 11 ao 15)',
-                icon: 'fa-project-diagram',
-                content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Módulo 3: Lógica e Acionamento (Tópicos 11 a 15)</h3>
-                    <div class="text-slate-300 mb-6 space-y-4">
-                        <h4 class="text-xl font-bold text-blue-400">11. Selagem e Retenção de Contatores</h4>
-                        <p>O Contato de Selo é o divisor de águas entre a elétrica residencial e a de comandos. O operador aperta o botão NA (verde) -> O contator recebe o pulso -> Ele atraca. Nesse momento de atracamento, um dos seus próprios contatos auxiliares (ex: 13 e 14 de K1) fecha junto. Ligando esse contato em paralelo com o botão verde, a energia ganha um "atalho" por dentro do contator. Ao soltar o botão, o atalho de 13-14 continua alimentando a bobina (A1) eternamente, até a linha ser rompida.</p>
-                        
-                        <h4 class="text-xl font-bold text-blue-400 mt-6">12. Comando Liga/Desliga</h4>
-                        <p>A estrutura imutável de comando se dá em SÉRIE e PARALELO: A fase passa primeiro pela proteção (Relé Térmico NF 95-96) -> Botão Emergência NF -> Botão Parada NF (11-12) -> E então chega ao paralelo formado pelo Botão de Partida NA (13-14) e o Selo de K1 (13-14). Da união do paralelo, sai para o A1. Isso forma a lida de comando universal LATCH (Selo).</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6">13. Comando com 2 ou mais Botoeiras (Multiponto)</h4>
-                        <p>Regra de Ouro: Para adicionar mais botões DESLIGA (Vermelhos), você os conecta sempre em <strong>SÉRIE</strong> no início do circuito. Se qualquer um abrir, tudo para. Para adicionar mais botões LIGA (Verdes), você os conecta em <strong>PARALELO</strong>. Se qualquer um fechar, a máquina parte.</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6">14 e 15. Sinalização Elétrica / Lâmpadas Piloto / LED</h4>
-                        <p>Máquinas operantes não podem depender de som. Painéis NR-10 exibem o status do processo. Para a iluminação indicativa de "Em Marcha", pega-se a fase de comando (sem interrupções), passa pelo contato Auxiliar NA (ex: 43-44 do Contator) e entra na Lâmpada (X1-X2). Motor atracou? Luz acende. Para indicação de "Motor Parado", passa-se a energia pelo contato NF (ex: 21-22 do Contator).</p>
-                    </div>
-                `
-            },
-            {
-                id: 'mod_4',
-                title: 'Módulo 4: Proteção (Tópico 16 ao 22)',
+                id: 'mod2_protecao',
+                title: 'Módulo 2: Proteção Elétrica',
                 icon: 'fa-shield-halved',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Módulo 4: Proteção e Motores Básicos (Tópicos 16 a 22)</h3>
-                    <div class="text-slate-300 mb-6 space-y-4">
-                        <h4 class="text-xl font-bold text-blue-400">16 e 17. Relés Temporizadores e Relé Térmico</h4>
-                        <p>O Relé Térmico protege contra <strong>Sobrecarga Lenta</strong> (eixo preso, rolamento travado). Suas lâminas bimetálicas curvam-se pelo calor gerado na alta corrente contínua, desarmando o contato mecânico 95-96 do comando e salvando as bobinas do motor de derreterem. Temporizadores atrasam o fechamento (On-Delay) ou a abertura (Off-Delay) para evitar partidas simultâneas de grandes cargas.</p>
-                        
-                        <h4 class="text-xl font-bold text-blue-400 mt-6">18 e 19. Proteção Curto-Circuito vs Sobrecarga</h4>
-                        <p>Curto-circuito é o fechamento franco entre duas fases (ex: cabos descascados tocando um no outro). Isso gera picos de 10.000A. A proteção responsável por desarmar no milissegundo de um curto é o Disjuntor-Motor ou Fusível (manutenção da malha e integridade dos cabos). O Relé Térmico não desarma curto-circuito, e o Disjuntor nem sempre detecta uma sobrecarga de 15% acima do valor nominal. Use ambos em cascata.</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6">20 a 22. Motores Monofásicos, Trifásicos e Partida Direta</h4>
-                        <p>Motores Monofásicos dependem de um Capacitor para criar defasagem magnética falsa e iniciar o giro. Motores Trifásicos (Indução Gaiola de Esquilo) utilizam as fases L1, L2, L3 rotacionadas naturalmente a 120º da concessionária, gerando um campo girante forte e sem atrito nos anéis. A partida direta (como detalhado na teoria) apenas interliga contator à rede sem atenuação.</p>
-                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Proteção Elétrica</h3>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">Curto-circuito e Fusíveis</h4>
+                    <p class="text-slate-300 mb-4">O curto-circuito eleva a corrente ao infinito e zera a tensão. Utilizamos Fusíveis tipo "g" (com retardo) para motores, como os NH e D (Diazed). Cuidado: nunca troque por um fusível tipo Silized (rápido, usado para eletrônica), sob pena de torrar a máquina inteira.</p>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">Sobrecarga e Relé Térmico</h4>
+                    <p class="text-slate-300 mb-4">A sobrecarga é uma sobrecorrente prolongada acima da nominal. O Relé Térmico atua por meio de hastes bimetálicas de dilatação diferente. Ao aquecer, a haste curva e abre o contato de proteção (geralmente o 95-96) que corta a bobina do contator. A corrente de ajuste = FS × In.</p>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">Relé de Falta de Fase e Termistor</h4>
+                    <p class="text-slate-300 mb-4">O relé de falta de fase desarma o comando se uma fase cair (evita a queima por operação bifásica de motor trifásico). O Termistor (PTC) fica na cabeça da bobina do motor e aumenta sua resistência com o calor, atuando no comando para desligamento térmico interno.</p>
                 `
             },
             {
-                id: 'mod_5',
-                title: 'Módulo 5: Motores Avançados (Top 23-28)',
-                icon: 'fa-gear',
+                id: 'mod3_comandos',
+                title: 'Módulo 3: Comandos e Acionamentos',
+                icon: 'fa-toggle-on',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Módulo 5: Partidas Avançadas e Intertravamento (Tópicos 23 a 28)</h3>
-                    <div class="text-slate-300 mb-6 space-y-4">
-                        <h4 class="text-xl font-bold text-blue-400">23 e 24. Reversão de Motores e Intertravamento</h4>
-                        <p>Mudar o sentido da rotação na indústria pesada se faz invertendo qualquer duas fases de entrada (ex: trocando L2 por L3 no terminal V e W). Ao usar contatores de reversão K1 e K2, o <strong>Intertravamento Elétrico</strong> impede explosões se o operador pressionar Direita e Esquerda ao mesmo tempo. Passamos o sinal da bobina de K1 através do contato Fechado (NF) de K2 e vice-versa. Se um contator está dentro, ele abre o contato do oponente.</p>
-                        
-                        <h4 class="text-xl font-bold text-blue-400 mt-6">25. Partida Estrela-Triângulo</h4>
-                        <p>Técnica onde o motor (com 6 terminais expostos) inicia recebendo tensão menor por bobina configurando seu fechamento interno por contatores em "Estrela" (K3). O pico elétrico despenca. Após o eixo embalar (~5 segundos via Temporizador), o painel desliga a Estrela e religa em "Triângulo" (K2), aplicando tensão nominal completa (380V/220V dependendo da rede e motor).</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6">26 a 28. Sensores, Chaves, Boias e Pressostatos</h4>
-                        <p>Estes são os "olhos" do sistema. A boia dentro da caixa d'água possui um contato elétrico mecânico. Pressostatos fecham contato ao atingir a pressão da mola em compressores de ar industriais. O Fim de Curso (Limit Switch) atua como um botão acionado pela máquina física, cortando K1 se um guindaste passar do limite de segurança.</p>
-                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Comandos e Acionamentos</h3>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">O Contator</h4>
+                    <p class="text-slate-300 mb-4">Dispositivo fundamental para realizar manobras de circuitos sob carga. Possui uma bobina (A1 e A2) que, ao ser energizada (CA ou CC), atrai um núcleo e fecha os contatos principais (L1-T1, L2-T2, L3-T3) e auxiliares. Categorias principais: AC1, AC2, AC3 (motores) e AC4.</p>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">Botoeiras e Acionadores</h4>
+                    <p class="text-slate-300 mb-4">Dispositivos de pulso mecânico com retorno por mola. <br><br><strong>NA (Normalmente Aberto):</strong> Condição normal aberto, fecha ao pulsar. Usado para comandos LIGA. Numeração final 3-4.<br><br><strong>NF (Normalmente Fechado):</strong> Condição normal fechado, abre ao pulsar. Usado para comandos DESLIGA e EMERGÊNCIA. Numeração final 1-2.</p>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">Chaves Fim-de-Curso e Sensores</h4>
+                    <p class="text-slate-300 mb-4"><strong>Mecânicos:</strong> Fim-de-curso tipo rolete ou haste para detectar posições de peças e transmitir sinais ao comando. <br><br><strong>Sem Contato (Sensores):</strong> Indutivos (detectam apenas metais usando campo eletromagnético), Capacitivos (detectam qualquer material usando alteração no dielétrico), Magnéticos (Contato Reed) e Ópticos (Barreiras fotoelétricas e reflexivos).</p>
                 `
             },
             {
-                id: 'mod_6',
-                title: 'Módulo 6: Leitura e Falhas (Top 29-35)',
-                icon: 'fa-magnifying-glass',
+                id: 'mod4_circuitos',
+                title: 'Módulo 4: Circuitos Clássicos',
+                icon: 'fa-gears',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Módulo 6: Leitura, Montagem e Falhas (Tópicos 29 a 35)</h3>
-                    <div class="text-slate-300 mb-6 space-y-4">
-                        <h4 class="text-xl font-bold text-blue-400">29. Comando Automático vs Manual</h4>
-                        <p>Através da Chave Seletora AUTO/MAN, a indústria consegue operar. No modo manual, a tensão flui apenas para os botões pulsadores no painel (para manutenção e teste local). Se comutado para AUTO, o sinal 24V desvia toda a energia para a linha das Boias, CLPs ou Fim-de-Curso, operando a fábrica 24x7 sem humanos apertando botões.</p>
-                        
-                        <h4 class="text-xl font-bold text-blue-400 mt-6">30 a 33. Diagramas de Força e Leitura, Montagem</h4>
-                        <p>O Diagrama de Força contém cabos grossos, Disjuntores e Contatos Principais de K1 até a Carga (U,V,W). O Diagrama de Comando lê-se de cima para baixo: Tensão (+V) no topo, passando pelas "regras lógicas" (chaves NF e NA em sequência lógica de portas E/OU) até a Bobina A1, terminando no Neutro/0V em baixo.</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6">34 e 35. Falhas e Multímetro</h4>
-                        <p>Diagnóstico (Troubleshooting) em painéis complexos começa verificando a presença das 3 Fases (Relé Falta de Fase evita a queima de motores atuando em segundos). O multímetro (escala Tensão AC) deve ler 380V entre fases L1/L2 e 220V (Fase/Neutro). Alicates amperímetros aferem se a carga do motor está dentro da "Corrente Nominal In" inscrita na plaqueta metálica. Acima do In, o Relé Térmico atuará iminentemente.</p>
-                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Circuitos Clássicos Industriais</h3>
+                    <p class="text-slate-300 mb-4">Devemos separar mentalmente e esquematicamente todo projeto em <strong>Circuito de Comando</strong> (lógica, botões, bobinas) e <strong>Circuito de Força</strong> (alta corrente, rede, motor).</p>
+                    <div class="mb-4 text-center"><img src="1000497362.png" alt="Circuitos Clássicos" class="mx-auto rounded border border-slate-600 max-w-full"></div>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">1. Partida Direta e Contato de Selo</h4>
+                    <p class="text-slate-300 mb-4">Circuito base com botão Desliga (NF) em série com botão Liga (NA) e bobina do Contator. Em paralelo com o Liga, usa-se o contato auxiliar NA (13-14) do contator para manter a máquina selada e operando após soltar o botão.</p>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">2. Reversão Automática</h4>
+                    <p class="text-slate-300 mb-4">Inverte duas fases do motor trifásico utilizando dois contatores intertravados eletricamente. O contato NF (21-22) de um contator corta a alimentação da bobina do outro, impedindo curtos-circuitos explosivos.</p>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">3. Partida Estrela-Triângulo</h4>
+                    <p class="text-slate-300 mb-4">Reduz os picos de corrente na partida. Usa três contatores e um relé de tempo. K1 e K3 ligam o motor em configuração Estrela. Após o tempo, K3 abre e K2 fecha, mudando o fechamento do motor para Triângulo (tensão nominal por bobina).</p>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">4. Partida Compensada</h4>
+                    <p class="text-slate-300 mb-4">Utiliza um autotransformador para fornecer tensão reduzida (tap de 65%) na partida, aliviando a rede. Contatores atuam na estrela do trafo e, posteriormente, contornam a linha com 100% de tensão.</p>
                 `
             },
             {
-                id: 'mod_7',
-                title: 'Módulo 7: Projetos Práticos (Top 36-40)',
-                icon: 'fa-laptop-code',
+                id: 'mod5_simbologia',
+                title: 'Módulo 5: Elaboração e Simbologia',
+                icon: 'fa-pencil',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Módulo 7: Normas e Automação (Tópicos 36 a 40)</h3>
-                    <div class="text-slate-300 mb-6 space-y-4">
-                        <h4 class="text-xl font-bold text-blue-400">36 e 37. NR-10 e Dimensionamento</h4>
-                        <p>Contatores são selecionados pelas categorias de emprego (Ex: Categoria AC-3 para Motores de Gaiola e partidas severas, Categoria AC-1 para Fornos e Lâmpadas resistivas). Fios devem ser bitolados via ampacidade (tabela AWG/mm2), onde 2.5mm² serve a tomadas comuns, mas para 50A de um motor demanda-se cabeamentos de 10mm² a 16mm² blindados nas grelhas (eletrocalhas).</p>
-                        
-                        <h4 class="text-xl font-bold text-blue-400 mt-6">38 a 40. Aplicações Industriais, Automação e PLC</h4>
-                        <p>Quando lógicas de painel superam 5 contatores, painéis gigantes baseados apenas em Reles Auxiliares ficam instáveis e perigosos. Adota-se o Controlador Lógico Programável (CLP/PLC). As Botoeiras deixam de ligar a bobina de K1 diretamente; elas informam o canal I0.0 do CLP com um fraco pulso de 24V. O CLP avalia o software interno e decide se emite sinal no seu canal Q0.0 (Output), comandando com enorme segurança o contator final ou o Inversor de Frequência VFD em regime pesado. No tutorial emulador, aponte a linha DI1 do inversor para o CLP e viva a Automação Básica na prática.</p>
-                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Elaboração de Esquemas e Símbolos</h3>
+                    <div class="mb-4 text-center"><img src="1000497361.png" alt="Passos Simbologia" class="mx-auto rounded border border-slate-600 max-w-full"></div>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">Letras de Caracterização DIN 40 719</h4>
+                    <ul class="list-disc pl-6 space-y-2 text-slate-300 mb-4">
+                        <li><strong>a:</strong> Chaves seccionadoras, disjuntores.</li>
+                        <li><strong>b:</strong> Botoeiras de comando, chaves fim-de-curso.</li>
+                        <li><strong>c / k:</strong> Contatores de potência (Ex: K1, K2).</li>
+                        <li><strong>d:</strong> Contatores auxiliares e Relés de tempo.</li>
+                        <li><strong>e:</strong> Relés térmicos, fusíveis, elementos de segurança.</li>
+                        <li><strong>h:</strong> Sinalizadores luminosos e acústicos (lâmpadas, sirenes).</li>
+                        <li><strong>m:</strong> Motores e conversores.</li>
+                    </ul>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">Numeração Lógica de Contatos Auxiliares</h4>
+                    <p class="text-slate-300 mb-4"><strong>NA (Normal Aberto):</strong> Finais 3 e 4. Ex: 13-14 (primeiro NA), 43-44 (quarto NA).<br><strong>NF (Normal Fechado):</strong> Finais 1 e 2. Ex: 21-22 (segundo NF), 31-32 (terceiro NF).</p>
+                `
+            },
+            {
+                id: 'mod6_reles',
+                title: 'Módulo 6: Relés Especiais',
+                icon: 'fa-microchip',
+                content: `
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Relés Especiais e Processamento</h3>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">Relés de Comando de Corrente Contínua e Alternada</h4>
+                    <p class="text-slate-300 mb-4">A tecnologia de CC exige diodos supressores de arco e redes R-C para proteger os contatos do chicote contra picos de tensão no desligamento. A tecnologia de CA possui imãs laminados rápidos, sem necessidade de supressor, mas geram maior ruído térmico e zumbido mecânico.</p>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">Família dos Relés</h4>
+                    <ul class="list-disc pl-6 space-y-2 text-slate-300 mb-4">
+                        <li><strong>Relé de Remanência:</strong> O núcleo possui magnetismo residual. Após o pulso desligar, os contatos permanecem colados. Um pulso inverso no segundo borne desarma.</li>
+                        <li><strong>Relé de Impulso (Passo):</strong> Um pulso na bobina vira o contato mecanicamente. Fica travado. Outro pulso destrava (age como um divisor binário).</li>
+                        <li><strong>Relés de Tempo:</strong> Atraso no fechamento (On-Delay) ou atraso na abertura (Off-Delay). O circuito interno, utilizando transistores RC ou pneumática, dita quando o comutador atracará.</li>
+                        <li><strong>Contadores Industriais:</strong> Configura-se uma cota predeterminada. Eles acumulam pulsos mecânicos ou lógicos. Quando atingem o número, disparam o relé final.</li>
+                    </ul>
+                `
+            },
+            {
+                id: 'mod7_normas',
+                title: 'Módulo 7: Normas e Segurança VDE',
+                icon: 'fa-hard-hat',
+                content: `
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Normas de Segurança VDE 0113 e DIN</h3>
+                    <p class="text-slate-300 mb-4">Os equipamentos elétricos devem respeitar medidas severas de isolamento, colocação a zero (aterramento PE) e desligamentos instantâneos. O botão de emergência é em formato cogumelo e sua cor é estritamente vermelha com espelho amarelo (bloqueio mecânico de proteção).</p>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">Padrão Operacional de Cores</h4>
+                    <ul class="list-disc pl-6 space-y-2 text-slate-300 mb-4">
+                        <li><strong>Vermelho:</strong> Aciona parada, emergência e indica estado anormal grave, erro extremo.</li>
+                        <li><strong>Amarelo:</strong> Botão de correção ou sinalizador visual de alerta e aproximação de limite perigoso térmico/corrente.</li>
+                        <li><strong>Verde:</strong> Botões de arranque seguro e acendimento indicativo de liberação ou funcionamento em rotação da máquina.</li>
+                        <li><strong>Branco, Azul, Preto:</strong> Funções genéricas (Zerar falha, ativar exaustão, seleção de modo Auto/Man).</li>
+                    </ul>
+                `
+            },
+            {
+                id: 'mod8_sequencial',
+                title: 'Módulo 8: Partida Sequencial Avançada',
+                icon: 'fa-arrow-down-1-9',
+                content: `
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Comando Sequencial de Motores em Cascata</h3>
+                    <p class="text-slate-300 mb-4">Comando projetado exclusivamente para impedir o arranque instantâneo de dezenas de motores em uma linha de produção, o que derrubaria a infraestrutura elétrica ou o transformador principal devido ao somatório dos picos de corrente.</p>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">Acionamento Retido por Botoeiras</h4>
+                    <p class="text-slate-300 mb-4">K1 atraca o Motor 1. Somente após K1 atracar, a energia de comando flui pelo seu bloco auxiliar permitindo o clique do botão do Motor 2 (K2). Assim o operador obedece a lógica de ligar na ordem exata (Ex: Exaustor antes da Britadeira). Se uma falha térmica atingir M1, um intertravamento serial desarma a fábrica inteira por segurança.</p>
+                    <h4 class="text-xl font-bold text-blue-400 mb-2">Automatizado por Relés de Tempo</h4>
+                    <p class="text-slate-300 mb-4">O operador clica um único botão (Play). K1 entra e energiza T1 (Temporizador de 5s). Após o relógio esgotar, K2 e T2 recebem energia. Após 5s, K3 liga a etapa final. A corrente total na rede fabril atinge níveis de segurança com escalonamento gradual e programado.</p>
                 `
             },
             {
@@ -2358,6 +2533,15 @@
             }
         }
 
+        function closeWelcomeModal() {
+            const modal = document.getElementById('welcome-modal-pro');
+            if (modal) {
+                modal.style.opacity = '0';
+                modal.querySelector('div').style.transform = 'scale(0.9)';
+                setTimeout(() => modal.remove(), 500);
+            }
+        }
+
         function openManual() {
             document.getElementById('manual-modal').classList.remove('hidden');
             if(document.getElementById('manual-lessons-list').children.length === 0) {
@@ -2382,10 +2566,6 @@
             initPalette();
             initModalDrag(); 
             window.addEventListener('resize', updateAllWires);
-
-            setTimeout(() => {
-                alert("BEM VINDO AO MELHOR CURSO E COMPLETO CURSO DE COMANDOS ELÉTRICOS");
-            }, 500);
         };
     </script>
 </body>
