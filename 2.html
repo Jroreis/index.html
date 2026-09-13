@@ -1452,6 +1452,7 @@
         let dragTimeout;
         let isPaletteScrolling = false;
         let paletteStartY = 0;
+        let lastComponentCreateTime = 0;
 
         function handleTouchStartPalette(e) {
             touchDragType = e.currentTarget.dataset.type;
@@ -1524,6 +1525,12 @@
         }
 
         function createComponent(type, x, y, idForce = null) {
+            const now = Date.now();
+            if (!idForce && now - lastComponentCreateTime < 300) {
+                return null; // FIX: Previne bug de duplicação do item 
+            }
+            lastComponentCreateTime = now;
+
             const template = componentLibrary.find(c => c.type === type);
             if (!template) return null;
 
@@ -1554,7 +1561,6 @@
                 </button>
             `;
 
-            // Identificar barramentos que podem ser esticados
             const isBusbar = ['rede_trifasica', 'rede_monofasica', 'rede_cc_bateria', 'barra_terra', 'barra_neutro'].includes(type);
 
             const body = document.createElement('div');
@@ -1588,7 +1594,6 @@
             if(template.inputs.length > 0) el.appendChild(inputsContainer);
             if(template.outputs.length > 0) el.appendChild(outputsContainer);
 
-            // Se for barramento, anexar manipuladores de redimensionamento laterais (esticar)
             if (isBusbar) {
                 const leftHandle = document.createElement('div');
                 leftHandle.className = 'resize-handle left-handle';
@@ -1615,7 +1620,8 @@
             let handleType = '';
 
             function onDown(e, type) {
-                e.stopPropagation();
+                if(e.stopPropagation) e.stopPropagation();
+                if (isResizing) return; // FIX: Previne bug duplo
                 isResizing = true;
                 handleType = type;
                 startX = e.clientX || (e.touches && e.touches[0].clientX);
@@ -1662,6 +1668,7 @@
             }
 
             function onUp() {
+                if (!isResizing) return;
                 isResizing = false;
                 workspace.style.cursor = 'grab';
                 document.removeEventListener('pointermove', onMove);
@@ -1692,24 +1699,32 @@
 
             wrapper.appendChild(port);
             wrapper.appendChild(label);
-            
             port.addEventListener('pointerdown', handlePortClick);
             port.addEventListener('touchstart', function(e) {
-                e.preventDefault(); 
+                if(e.cancelable) e.preventDefault(); 
                 e.stopPropagation();
                 handlePortClick({
                     clientX: e.touches[0].clientX,
                     clientY: e.touches[0].clientY,
                     target: port,
-                    stopPropagation: () => {}
+                    stopPropagation: () => {},
+                    preventDefault: () => {}
                 });
             }, {passive: false});
             
             return wrapper;
         }
 
+        let lastPortClickTime = 0;
+
         function handlePortClick(e) {
             if(e.stopPropagation) e.stopPropagation();
+            if(e.preventDefault) e.preventDefault();
+
+            const now = Date.now();
+            if (now - lastPortClickTime < 150) return; // FIX: Previne bug de duplo disparo touch/mouse
+            lastPortClickTime = now;
+
             if(isPanning) return; 
 
             const portEl = e.target;
@@ -1743,7 +1758,7 @@
         function onPointerMoveDraw(e) {
             updateDrawingWire(e.clientX, e.clientY);
         }
-        
+
         function onPointerMoveDrawTouch(e) {
             if(e.cancelable) e.preventDefault();
             updateDrawingWire(e.touches[0].clientX, e.touches[0].clientY);
@@ -1761,7 +1776,7 @@
             const p2 = { x: mouseX, y: mouseY };
             const t2 = t1 === 'in' ? 'out' : 'in'; 
             
-            drawingWirePath.setAttribute('d', getOrthogonalPath(p1, p2, t1, t2, 0));
+            drawingWirePath.setAttribute('d', getWirePath(startPos.x, startPos.y, mouseX, mouseY));
         }
 
         function cancelDrawing(e) {
@@ -1771,7 +1786,7 @@
             drawingWire = null;
             drawingLayer.style.display = 'none';
             document.removeEventListener('pointermove', onPointerMoveDraw);
-            document.removeEventListener('touchmove', onPointerMoveDrawTouch);
+            if (typeof onPointerMoveDrawTouch !== 'undefined') document.removeEventListener('touchmove', onPointerMoveDrawTouch);
             workspace.removeEventListener('pointerdown', cancelDrawing);
             workspace.removeEventListener('touchstart', cancelDrawing);
         }
@@ -1892,6 +1907,9 @@
             function onPointerDown(e) {
                 if(e.target.closest('button') || e.target.classList.contains('resize-handle')) return; 
                 if(e.shiftKey) return; 
+                if(isDragging) return; // FIX: Previne bug louco e tremida no arraste
+                
+                if(e.stopPropagation) e.stopPropagation();
                 
                 isDragging = true;
                 nodeEl.classList.add('dragging');
@@ -1928,11 +1946,14 @@
                 if(nodeData) {
                     nodeData.x = newX;
                     nodeData.y = newY;
-                    updateAllWires();
+                    wires.forEach(w => {
+                        if (w.sourceNode === id || w.targetNode === id) updateWirePath(w);
+                    });
                 }
             }
 
-            function onPointerUp() {
+            function onPointerUp(e) {
+                if (!isDragging) return; // FIX
                 isDragging = false;
                 nodeEl.classList.remove('dragging');
                 document.removeEventListener('pointermove', onPointerMove);
@@ -2010,8 +2031,6 @@
                             const el = document.getElementById(newId);
                             if (el && ['rede_trifasica', 'rede_monofasica', 'rede_cc_bateria', 'barra_terra', 'barra_neutro'].includes(n.type)) {
                                 el.style.width = n.width + 'px';
-                                const body = el.querySelector('.component-body');
-                                if (body) body.style.width = n.width + 'px';
                                 const nodeObj = nodes.find(nd => nd.id === newId);
                                 if(nodeObj) nodeObj.width = n.width;
                             }
