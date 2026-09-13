@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Simulador Industrial - Sistemas de Motores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --grid-color: rgba(255, 255, 255, 0.05);
+            --bg-color: #0f172a;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; 
+            background-color: var(--bg-color);
+            color: #f8fafc;
+            touch-action: none; 
+        }
+
+        #workspace {
+            position: relative;
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 20px 20px;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            cursor: grab;
+        }
+        
+        #workspace:active {
+            cursor: grabbing;
+        }
+
+        #canvas-pan-zoom {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform-origin: 0 0;
+        }
+
+        #wire-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; 
+            z-index: 10;
+            overflow: visible;
+        }
+
+        /* Estilo do fio atualizado */
+        .wire-path {
+            fill: none;
+            stroke: #ef4444; 
+            stroke-width: 3.5;
+            stroke-linejoin: round;
+            pointer-events: stroke; 
+            cursor: pointer;
+            transition: stroke 0.1s, stroke-width 0.1s, filter 0.1s;
+            filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));
+        }
+
+        /* Área de clique maior invisível no fio */
+        .wire-path-hitbox {
+            fill: none;
+            stroke: transparent;
+            stroke-width: 15;
+            pointer-events: stroke;
+            cursor: pointer;
+        }
+
+        .wire-path:hover, .wire-path-hitbox:hover + .wire-path {
+            stroke: #fbbf24 !important;
+            stroke-width: 5;
+        }
+
+        .wire-powered {
+            stroke-width: 4.5;
+            filter: drop-shadow(0 0 6px currentColor);
+            animation: pulse-glow 1.5s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            from { filter: drop-shadow(0 0 4px currentColor); }
+            to { filter: drop-shadow(0 0 10px currentColor); }
+        }
+
+        .component-node {
+            position: absolute;
+            border-radius: 8px;
+            user-select: none;
+            touch-action: none;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
+            transition: box-shadow 0.2s, filter 0.2s;
+        }
+
+        .component-active {
+            filter: drop-shadow(0 0 10px #fbbf24) brightness(1.2);
+        }
+
+        .component-node.dragging {
+            z-index: 50;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+            opacity: 0.9;
+        }
+        
+        .component-header {
+            background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #475569;
+            border-bottom: none;
+            cursor: grab;
+        }
+
+        .component-header:active {
+            cursor: grabbing;
+        }
+
+        .component-body {
+            position: relative;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .component-body svg {
+            display: block;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .ports-container {
+            display: flex;
+            justify-content: space-evenly;
+            width: 100%;
+            position: absolute;
+            z-index: 30;
+            left: 0;
+        }
+        
+        .ports-container.top { top: -6px; }
+        .ports-container.bottom { bottom: -6px; }
+        
+        .inset-ports.top { top: 12px; }
+        .inset-ports.bottom { bottom: 12px; }
+
+        .port-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .port {
+            width: 14px;
+            height: 14px;
+            background-color: #cbd5e1;
+            border: 1px solid #334155;
+            border-radius: 50%;
+            cursor: crosshair;
+            position: relative;
+            transition: all 0.2s;
+            background-image: 
+                linear-gradient(45deg, transparent 42%, #475569 45%, #475569 55%, transparent 58%),
+                linear-gradient(-45deg, transparent 42%, #475569 45%, #475569 55%, transparent 58%);
+            box-shadow: inset 0 -2px 4px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .port:hover, .port.active {
+            background-color: #fbbf24;
+            transform: scale(1.3);
+            background-image: none; 
+            box-shadow: 0 0 10px #f59e0b, inset 0 -1px 2px rgba(0,0,0,0.4);
+            z-index: 40;
+        }
+
+        .port-label {
+            position: absolute;
+            font-size: 0.55rem;
+            font-weight: 700;
+            color: #0f172a;
+            background: rgba(241, 245, 249, 0.9);
+            padding: 1px 3px;
+            border-radius: 3px;
+            border: 1px solid #94a3b8;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 35;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .ports-container.top .port-label { top: -18px; }
+        .ports-container.bottom .port-label { bottom: -18px; }
+        
+        .inset-ports.top .port-label { top: -14px; background: transparent; color: #fff; border: none; text-shadow: 0 1px 2px #000;}
+        .inset-ports.bottom .port-label { bottom: -14px; background: transparent; color: #fff; border: none; text-shadow: 0 1px 2px #000;}
+
+        .sidebar-item {
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .sidebar-item:hover {
+            transform: translateY(-2px);
+            background-color: #334155;
+        }
+        
+        #sidebar {
+            transition: width 0.3s ease, min-width 0.3s ease, opacity 0.2s;
+        }
+        #sidebar.collapsed {
+            width: 0;
+            min-width: 0;
+            overflow: hidden;
+            opacity: 0;
+            border-right: none;
+        }
+
+        .canvas-toolbar {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(4px);
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 4px;
+            display: flex;
+            gap: 4px;
+            z-index: 50;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .canvas-toolbar button {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            color: #cbd5e1;
+            transition: all 0.2s;
+        }
+        
+        .canvas-toolbar button:hover {
+            background: #334155;
+            color: #fff;
+        }
+
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .toast {
+            background: #1e293b;
+            border-left: 4px solid #3b82f6;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out forwards;
+            font-size: 0.875rem;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .digital-font { font-family: 'JetBrains Mono', monospace; font-weight: bold; }
+        
+        #manual-modal {
+            position: absolute;
+            top: 10%;
+            left: 15%;
+            width: 70vw;
+            max-width: 950px;
+            height: 75vh;
+            max-height: 700px;
+            z-index: 2000;
+            background: transparent;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+        #manual-modal.hidden {
+            display: none !important;
+        }
+        #manual-modal-header {
+            cursor: move;
+        }
+        .manual-step {
+            border-left: 2px solid #3b82f6;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .gear-spin {
+            animation: spin 2s linear infinite;
+            transform-origin: center;
+        }
+        .gear-spin-reverse {
+            animation: spin-reverse 2s linear infinite;
+            transform-origin: center;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
+
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <header class="bg-slate-800 border-b border-slate-700 h-14 flex items-center justify-between px-4 sm:px-6 shrink-0 z-40">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white mr-2 transition-colors p-2 rounded hover:bg-slate-700" title="Mostrar/Ocultar Biblioteca">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.5)]">
+                <i class="fa-solid fa-bolt text-white"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight text-white hidden sm:block">Simulador Industrial CAD Pro</h1>
+        </div>
+        <div class="flex items-center gap-2 sm:gap-4">
+            <button onclick="clearWorkspace()" class="bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded text-sm font-medium transition-colors border border-red-500/20 flex items-center gap-2">
+                <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline">Limpar Bancada</span>
+            </button>
+            <button onclick="showHelp()" class="text-slate-400 hover:text-white transition-colors p-2">
+                <i class="fa-solid fa-circle-info text-xl"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative">
+        <aside id="sidebar" class="w-64 sm:w-72 min-w-[16rem] sm:min-w-[18rem] bg-slate-900 border-r border-slate-800 flex flex-col z-30 shrink-0 shadow-2xl relative">
+            <div class="p-3 bg-slate-950 border-b border-slate-800 flex flex-col">
+                <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Responsável: Engenheiro/Eletricista</label>
+                <input type="text" placeholder="Nome do Profissional / CREA" class="bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-white outline-none focus:border-blue-500 transition-colors">
+            </div>
+            <div class="p-4 border-b border-slate-800 bg-slate-800/50 flex flex-col">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Biblioteca</h2>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Arraste para a bancada</p>
+                    </div>
+                </div>
+                <button onclick="openManual()" class="w-full mt-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white text-xs font-bold py-2.5 px-3 rounded shadow flex justify-center items-center gap-2 transition-all border border-blue-500/50">
+                    <i class="fa-solid fa-book-open"></i> Apostila de Montagens e Dicionário
+                </button>
+            </div>
+            <div id="component-palette" class="flex-1 overflow-y-auto p-3 space-y-2 pb-20 scrollbar-hide">
+                <!-- Gerado via JS -->
+            </div>
+        </aside>
+
+        <main id="workspace" class="flex-1 relative">
+            <div class="canvas-toolbar">
+                <button id="btn-sim" onclick="toggleSimulation()" title="Iniciar Simulação Play/Pause"><i class="fa-solid fa-play text-green-400"></i></button>
+                <div class="w-px h-6 bg-slate-600 mx-1 my-auto"></div>
+                <button onclick="zoomIn()" title="Aumentar Zoom"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                <button onclick="zoomOut()" title="Diminuir Zoom"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                <button onclick="resetZoomPan()" title="Centralizar Visualização"><i class="fa-solid fa-expand"></i></button>
+                <div class="w-px h-6 bg-slate-600 mx-1 my-auto"></div>
+                <button onclick="exportCircuit()" title="Salvar Projeto"><i class="fa-solid fa-floppy-disk text-blue-400"></i></button>
+                <button onclick="document.getElementById('import-file').click()" title="Carregar Projeto"><i class="fa-solid fa-folder-open text-yellow-400"></i></button>
+                <button onclick="exportImage()" title="Salvar como Imagem"><i class="fa-solid fa-camera text-purple-400"></i></button>
+                <input type="file" id="import-file" style="display: none;" accept=".json" onchange="importCircuit(event)">
+            </div>
+
+            <div id="canvas-pan-zoom">
+                <svg id="wire-layer"></svg>
+                <svg id="drawing-layer" class="absolute top-0 left-0 w-full h-full pointer-events-none z-10" style="display: none; overflow: visible;">
+                    <path id="drawing-wire" class="wire-path" stroke-dasharray="5,5" opacity="0.6"></path>
+                </svg>
+                <div id="components-container" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
+            </div>
+            
+            <div id="welcome-text" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                <div class="text-center">
+                    <i class="fa-solid fa-arrows-up-down-left-right text-5xl mb-4"></i>
+                    <h2 class="text-2xl font-bold">Use SHIFT + Clique ou Toque (1 dedo) para mover a tela</h2>
+                    <p class="text-md mt-2">Dica: Clique num borne já conectado para desconectar o fio!</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Apostila -->
+    <div id="manual-modal" class="hidden">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl w-full h-full flex flex-col shadow-2xl overflow-hidden">
+            <div id="manual-modal-header" class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900 shrink-0 select-none">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-blue-500"></i> Manual, Diagnóstico e Dicionário</h2>
+                <button onclick="closeManual()" class="text-slate-400 hover:text-red-400 transition-colors p-2 text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="flex flex-1 overflow-hidden">
+                <div class="w-1/3 min-w-[200px] border-r border-slate-700 bg-slate-900/50 overflow-y-auto p-3 space-y-2" id="manual-lessons-list"></div>
+                <div class="w-2/3 flex-1 overflow-y-auto p-6 bg-slate-800" id="manual-lesson-content">
+                    <div class="h-full flex flex-col items-center justify-center text-slate-500 text-center">
+                        <i class="fa-solid fa-book-open text-6xl mb-4 opacity-50"></i>
+                        <p class="text-lg font-medium">Selecione uma lição ou o dicionário no menu lateral.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script>
+        const componentLibrary = [
+            {
+                type: 'rede_trifasica', name: 'Barramento 380V (3F+T)', category: 'ALIMENTAÇÃO',
+                width: 160, height: 40, inputs: [], outputs: ['L1', 'L2', 'L3', 'PE'], portStyle: 'edge', 
+                svg: `
+                <svg viewBox="0 0 160 40" width="100%" height="100%" preserveAspectRatio="none">
+                    <rect x="0" y="0" width="160" height="40" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+                    <rect x="10" y="8" width="140" height="4" fill="#b45309" />
+                    <rect x="10" y="18" width="140" height="4" fill="#b45309" />
+                    <rect x="10" y="28" width="140" height="4" fill="#b45309" />
+                    <text x="80" y="22" font-size="10" font-family="sans-serif" font-weight="bold" fill="#475569" text-anchor="middle" opacity="0.5">3~ 380V / 60Hz</text>
+                </svg>`
+            },
+            {
+                type: 'rede_monofasica', name: 'Rede Monofásica 220V', category: 'ALIMENTAÇÃO',
+                width: 120, height: 40, inputs: [], outputs: ['L', 'N', 'PE'], portStyle: 'edge', 
+                svg: `
+                <svg viewBox="0 0 120 40" width="100%" height="100%" preserveAspectRatio="none">
+                    <rect x="0" y="0" width="120" height="40" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+                    <rect x="10" y="12" width="100" height="4" fill="#3b82f6" />
+                    <rect x="10" y="24" width="100" height="4" fill="#0ea5e9" />
+                    <text x="60" y="22" font-size="9" font-family="sans-serif" font-weight="bold" fill="#475569" text-anchor="middle" opacity="0.5">1~ 220V / 60Hz</text>
+                </svg>`
+            },
+            {
+                type: 'fonte_24v', name: 'Fonte 24V DC', category: 'ALIMENTAÇÃO',
+                width: 70, height: 110, inputs: ['L', 'N', 'PE'], outputs: ['+24V', '0V'], portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 70 110" width="100%" height="100%">
+                    <rect x="0" y="0" width="70" height="110" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="5" y="5" width="60" height="15" fill="#e2e8f0" />
+                    <line x1="10" y1="30" x2="60" y2="30" stroke="#cbd5e1" stroke-width="2"/>
+                    <line x1="10" y1="38" x2="60" y2="38" stroke="#cbd5e1" stroke-width="2"/>
+                    <text x="35" y="75" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">MEAN WELL</text>
+                    <circle cx="15" cy="98" r="3" fill="#22c55e"/>
+                    <text x="22" y="100" font-size="6" font-family="sans-serif" fill="#64748b">DC OK</text>
+                </svg>`
+            },
+            {
+                type: 'disjuntor_motor', name: 'Disjuntor-Motor 3F', category: 'PROTEÇÃO',
+                width: 70, height: 110, inputs: ['1', '3', '5'], outputs: ['2', '4', '6'], portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 70 110" width="100%" height="100%">
+                    <rect x="0" y="0" width="70" height="110" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="0" y="20" width="70" height="70" fill="#f8fafc" />
+                    <circle cx="35" cy="55" r="18" fill="#1e293b" />
+                    <circle cx="35" cy="55" r="12" fill="#334155" />
+                    <rect class="btn-indicator" x="32" y="38" width="6" height="17" fill="#ef4444" rx="2"/>
+                    <text x="12" y="58" font-size="8" font-weight="bold" font-family="sans-serif" fill="#64748b">O</text>
+                    <text x="54" y="58" font-size="8" font-weight="bold" font-family="sans-serif" fill="#64748b">I</text>
+                </svg>`
+            },
+            {
+                type: 'disjuntor_monofasico', name: 'Disjuntor Monofásico', category: 'PROTEÇÃO',
+                width: 40, height: 90, inputs: ['L'], outputs: ['L\''], portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 40 90" width="100%" height="100%">
+                    <rect x="0" y="0" width="40" height="90" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="0" y="20" width="40" height="50" fill="#e2e8f0" />
+                    <rect x="10" y="35" width="20" height="20" fill="#0f172a" rx="1"/>
+                    <rect class="btn-indicator" x="10" y="35" width="20" height="10" fill="#ef4444" rx="1"/>
+                    <text x="20" y="75" font-size="6" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">C10</text>
+                </svg>`
+            },
+            {
+                type: 'contator', name: 'Contator K1', category: 'MANOBRA',
+                width: 70, height: 100, inputs: ['L1', 'L2', 'L3', '13', 'A1'], outputs: ['T1', 'T2', 'T3', '14', 'A2'], portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 70 100" width="100%" height="100%">
+                    <rect x="0" y="0" width="70" height="100" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+                    <rect class="contator-core" x="10" y="35" width="50" height="30" fill="#3b82f6" rx="2" />
+                    <rect x="25" y="40" width="20" height="20" fill="#1e293b" />
+                    <text x="35" y="90" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">Siemens</text>
+                </svg>`
+            },
+            {
+                type: 'botoeira_na', name: 'Botão LIGA (Verde)', category: 'COMANDO',
+                width: 60, height: 60, inputs: ['13'], outputs: ['14'], portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 60 60" width="100%" height="100%">
+                    <rect x="0" y="0" width="60" height="60" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1" rx="4"/>
+                    <circle cx="30" cy="30" r="20" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+                    <circle class="btn-indicator" cx="30" cy="30" r="16" fill="#22c55e" stroke="#166534" stroke-width="1" />
+                    <path d="M 20 20 Q 30 15 40 20 Q 30 25 20 20 Z" fill="#4ade80" opacity="0.6"/>
+                </svg>`
+            },
+            {
+                type: 'botoeira_nf', name: 'Botão DESLIGA (Verm.)', category: 'COMANDO',
+                width: 60, height: 60, inputs: ['11'], outputs: ['12'], portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 60 60" width="100%" height="100%">
+                    <rect x="0" y="0" width="60" height="60" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1" rx="4"/>
+                    <circle cx="30" cy="30" r="20" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+                    <circle class="btn-indicator" cx="30" cy="30" r="16" fill="#ef4444" stroke="#991b1b" stroke-width="1" />
+                    <path d="M 20 20 Q 30 15 40 20 Q 30 25 20 20 Z" fill="#f87171" opacity="0.6"/>
+                </svg>`
+            },
+            {
+                type: 'chave_seletora', name: 'Seletora AUTO/MAN', category: 'COMANDO',
+                width: 60, height: 60, inputs: ['13'], outputs: ['14', '14(A)'], portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 60 60" width="100%" height="100%">
+                    <rect x="0" y="0" width="60" height="60" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1" rx="4"/>
+                    <circle cx="30" cy="30" r="20" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+                    <circle cx="30" cy="30" r="14" fill="#1e293b" />
+                    <rect class="btn-indicator" x="27" y="16" width="6" height="16" fill="#fff" transform="rotate(-45 30 30)"/>
+                    <text x="15" y="12" font-size="5" fill="#64748b" font-weight="bold" font-family="sans-serif">MAN</text>
+                    <text x="45" y="12" font-size="5" fill="#64748b" font-weight="bold" font-family="sans-serif">AUTO</text>
+                </svg>`
+            },
+            {
+                type: 'sinaleiro_verde', name: 'Sinaleiro Verde', category: 'SINALIZAÇÃO',
+                width: 50, height: 50, inputs: ['X1'], outputs: ['X2'], portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 50 50" width="100%" height="100%">
+                    <rect x="0" y="0" width="50" height="50" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1" rx="4"/>
+                    <circle cx="25" cy="25" r="18" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+                    <circle class="lamp-indicator" cx="25" cy="25" r="14" fill="#166534" stroke="#22c55e" stroke-width="1"/>
+                </svg>`
+            },
+            {
+                type: 'sirene_alarme', name: 'Sirene / Alarme', category: 'SINALIZAÇÃO',
+                width: 60, height: 60, inputs: ['X1'], outputs: ['X2'], portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 60 60" width="100%" height="100%">
+                    <rect x="10" y="35" width="40" height="20" fill="#64748b" rx="2"/>
+                    <path class="lamp-indicator" d="M 15 35 Q 30 5 45 35 Z" fill="#991b1b" />
+                    <path d="M 48 10 Q 55 20 48 30" fill="none" stroke="#ef4444" stroke-width="2"/>
+                    <path d="M 52 5 Q 62 20 52 35" fill="none" stroke="#ef4444" stroke-width="2"/>
+                </svg>`
+            },
+            {
+                type: 'motor_3f', name: 'Motor 3~ (Gaiola)', category: 'MÁQUINAS',
+                width: 150, height: 120, inputs: ['U1', 'V1', 'W1', 'PE'], outputs: [], portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 150 120" width="100%" height="100%">
+                    <rect x="30" y="100" width="90" height="15" fill="#475569" rx="2" />
+                    <circle cx="40" cy="110" r="3" fill="#1e293b"/>
+                    <circle cx="110" cy="110" r="3" fill="#1e293b"/>
+                    <rect x="130" y="55" width="20" height="14" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="25" y="30" width="105" height="65" fill="#1e3a8a" rx="8" />
+                    <line x1="30" y1="40" x2="125" y2="40" stroke="#1e40af" stroke-width="3"/>
+                    <line x1="30" y1="50" x2="125" y2="50" stroke="#1e40af" stroke-width="3"/>
+                    <line x1="30" y1="60" x2="125" y2="60" stroke="#1e40af" stroke-width="3"/>
+                    <path d="M 25 30 Q 10 62 25 95 L 15 90 L 15 35 Z" fill="#172554"/>
+                    <rect x="0" y="0" width="150" height="15" fill="transparent" />
+                    <g class="motor-gear" style="transform-origin: 75px 62px; opacity: 0; transition: opacity 0.3s;">
+                        <circle cx="75" cy="62" r="15" fill="#fbbf24" />
+                        <path d="M 75 35 L 80 47 L 70 47 Z" fill="#fbbf24"/>
+                        <path d="M 75 89 L 80 77 L 70 77 Z" fill="#fbbf24"/>
+                        <path d="M 48 62 L 60 57 L 60 67 Z" fill="#fbbf24"/>
+                        <path d="M 102 62 L 90 57 L 90 67 Z" fill="#fbbf24"/>
+                        <circle cx="75" cy="62" r="5" fill="#1e293b" />
+                    </g>
+                </svg>`
+            },
+            {
+                type: 'clp', name: 'CLP (Siemens S7)', category: 'AUTOMAÇÃO',
+                width: 140, height: 110, inputs: ['L+', 'M', 'I0.0', 'I0.1'], outputs: ['Q0.0', 'Q0.1'], portStyle: 'inset',
+                svg: `
+                <svg viewBox="0 0 140 110" width="100%" height="100%">
+                    <rect x="0" y="0" width="140" height="110" fill="#f8fafc" stroke="#94a3b8" stroke-width="1" rx="2"/>
+                    <rect x="10" y="30" width="120" height="50" fill="#0f172a" rx="2" />
+                    <circle cx="20" cy="40" r="3" fill="#22c55e" filter="drop-shadow(0 0 2px #22c55e)"/>
+                    <text x="28" y="43" font-size="6" fill="#94a3b8" font-family="sans-serif">RUN</text>
+                    <rect x="50" y="35" width="80" height="15" fill="#1e293b" />
+                    <text x="52" y="45" font-size="6" fill="#fff" font-family="sans-serif">DI</text>
+                    <rect x="50" y="60" width="80" height="15" fill="#1e293b" />
+                    <text x="52" y="70" font-size="6" fill="#fff" font-family="sans-serif">DQ</text>
+                </svg>`
+            }
+        ];
+
+        let nodes = []; 
+        let wires = []; 
+        let nodeIdCounter = 0;
+        let wireIdCounter = 0;
+        let drawingWire = null; 
+        
+        let scale = 1;
+        let panX = 0;
+        let panY = 0;
+        let isPanning = false;
+        let startPanX, startPanY;
+        
+        const workspace = document.getElementById('workspace');
+        const canvasPanZoom = document.getElementById('canvas-pan-zoom');
+        const wireLayer = document.getElementById('wire-layer');
+        const drawingLayer = document.getElementById('drawing-layer');
+        const drawingWirePath = document.getElementById('drawing-wire');
+        const componentsContainer = document.getElementById('components-container');
+
+        // REGRA RÍGIDA MANTIDA: Zoom e Movimentação intactos
+        function updateTransform() {
+            canvasPanZoom.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+            updateAllWires(); 
+        }
+
+        workspace.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const zoomSensitivity = 0.1;
+            const delta = e.deltaY > 0 ? -1 : 1;
+            const newScale = Math.min(Math.max(0.4, scale + delta * zoomSensitivity), 2.5);
+            const rect = workspace.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            panX = mouseX - (mouseX - panX) * (newScale / scale);
+            panY = mouseY - (mouseY - panY) * (newScale / scale);
+            scale = newScale;
+            updateTransform();
+        }, { passive: false });
+
+        workspace.addEventListener('pointerdown', (e) => {
+            if (e.button === 1 || (e.button === 0 && e.shiftKey)) { 
+                isPanning = true;
+                startPanX = e.clientX - panX;
+                startPanY = e.clientY - panY;
+                workspace.style.cursor = 'grabbing';
+            }
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            if (isPanning) {
+                panX = e.clientX - startPanX;
+                panY = e.clientY - startPanY;
+                updateTransform();
+            }
+        });
+
+        window.addEventListener('pointerup', () => {
+            if (isPanning) {
+                isPanning = false;
+                workspace.style.cursor = 'grab';
+            }
+        });
+
+        let initialPinchDistance = null;
+        let initialScale = 1;
+        workspace.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                isPanning = false; 
+                initialPinchDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                initialScale = scale;
+            } else if (e.touches.length === 1) {
+                if (e.target === workspace || e.target === wireLayer || e.target === canvasPanZoom || e.target.id === 'welcome-text') {
+                    isPanning = true;
+                    startPanX = e.touches[0].clientX - panX;
+                    startPanY = e.touches[0].clientY - panY;
+                }
+            }
+        }, {passive: false});
+
+        workspace.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && initialPinchDistance) {
+                e.preventDefault();
+                const currentDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                const zoomFactor = currentDistance / initialPinchDistance;
+                let newScale = Math.min(Math.max(0.4, initialScale * zoomFactor), 2.5);
+                const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                const rect = workspace.getBoundingClientRect();
+                const mouseX = centerX - rect.left;
+                const mouseY = centerY - rect.top;
+                panX = mouseX - (mouseX - panX) * (newScale / scale);
+                panY = mouseY - (mouseY - panY) * (newScale / scale);
+                scale = newScale;
+                updateTransform();
+            } else if (e.touches.length === 1 && isPanning) {
+                e.preventDefault();
+                panX = e.touches[0].clientX - startPanX;
+                panY = e.touches[0].clientY - startPanY;
+                updateTransform();
+            }
+        }, {passive: false});
+
+        workspace.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) initialPinchDistance = null;
+            if (e.touches.length === 0) isPanning = false;
+        });
+
+        function zoomIn() { scale = Math.min(scale + 0.2, 2.5); updateTransform(); }
+        function zoomOut() { scale = Math.max(scale - 0.2, 0.4); updateTransform(); }
+        function resetZoomPan() { scale = 1; panX = 0; panY = 0; updateTransform(); }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
+
+        function initPalette() {
+            const palette = document.getElementById('component-palette');
+            const categories = {};
+            componentLibrary.forEach(comp => {
+                if(!categories[comp.category]) categories[comp.category] = [];
+                categories[comp.category].push(comp);
+            });
+            for(let cat in categories) {
+                const title = document.createElement('div');
+                title.className = 'text-[10px] font-bold text-slate-500 mt-4 mb-2';
+                title.innerText = cat;
+                palette.appendChild(title);
+                categories[cat].forEach(comp => {
+                    const item = document.createElement('div');
+                    item.className = 'sidebar-item bg-slate-800 border border-slate-700 rounded-lg p-2 flex items-center gap-3 cursor-grab text-white select-none';
+                    item.draggable = true;
+                    item.dataset.type = comp.type;
+                    const svgWrap = document.createElement('div');
+                    svgWrap.className = 'w-10 h-10 flex items-center justify-center shrink-0';
+                    svgWrap.innerHTML = comp.svg.replace('width="100%"', 'width="30"').replace('height="100%"', 'height="30"');
+                    const nameWrap = document.createElement('div');
+                    nameWrap.className = 'text-xs font-medium leading-tight';
+                    nameWrap.innerText = comp.name;
+                    item.appendChild(svgWrap);
+                    item.appendChild(nameWrap);
+                    item.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('text/plain', comp.type);
+                    });
+                    item.addEventListener('touchstart', handleTouchStartPalette, {passive: false});
+                    palette.appendChild(item);
+                });
+            }
+        }
+
+        workspace.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+        workspace.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const type = e.dataTransfer.getData('text/plain');
+            if (type) {
+                document.getElementById('welcome-text').style.display = 'none';
+                const rect = workspace.getBoundingClientRect();
+                const x = (e.clientX - rect.left - panX) / scale - 35;
+                const y = (e.clientY - rect.top - panY) / scale - 20;
+                createComponent(type, x, y);
+            }
+        });
+
+        let touchDragType = null;
+        let touchDragElement = null;
+        let dragTimeout;
+        let isPaletteScrolling = false;
+        let paletteStartY = 0;
+
+        function handleTouchStartPalette(e) {
+            touchDragType = e.currentTarget.dataset.type;
+            const touch = e.touches[0];
+            paletteStartY = touch.clientY;
+            isPaletteScrolling = false;
+            const currentTarget = e.currentTarget;
+            dragTimeout = setTimeout(() => {
+                if(!isPaletteScrolling) {
+                    touchDragElement = currentTarget.cloneNode(true);
+                    touchDragElement.style.position = 'fixed';
+                    touchDragElement.style.opacity = '0.7';
+                    touchDragElement.style.pointerEvents = 'none';
+                    touchDragElement.style.zIndex = '9999';
+                    document.body.appendChild(touchDragElement);
+                    if(touchDragElement) { touchDragElement.style.left = (touch.clientX - 20) + 'px'; touchDragElement.style.top = (touch.clientY - 20) + 'px'; }
+                }
+            }, 300);
+            document.addEventListener('touchmove', handleTouchMovePalette, {passive: false});
+            document.addEventListener('touchend', handleTouchEndPalette);
+        }
+
+        function handleTouchMovePalette(e) {
+            const touch = e.touches[0];
+            if (Math.abs(touch.clientY - paletteStartY) > 10) { isPaletteScrolling = true; clearTimeout(dragTimeout); }
+            if(touchDragElement) {
+                e.preventDefault(); 
+                touchDragElement.style.left = (touch.clientX - 20) + 'px'; touchDragElement.style.top = (touch.clientY - 20) + 'px';
+            }
+        }
+
+        function handleTouchEndPalette(e) {
+            clearTimeout(dragTimeout);
+            document.removeEventListener('touchmove', handleTouchMovePalette);
+            document.removeEventListener('touchend', handleTouchEndPalette);
+            if (touchDragElement) { touchDragElement.remove(); touchDragElement = null; }
+            if (touchDragType && !isPaletteScrolling) {
+                const touch = e.changedTouches[0];
+                const rect = workspace.getBoundingClientRect();
+                if (touch.clientX >= rect.left && touch.clientX <= rect.right && touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+                    document.getElementById('welcome-text').style.display = 'none';
+                    const x = (touch.clientX - rect.left - panX) / scale - 35;
+                    const y = (touch.clientY - rect.top - panY) / scale - 20;
+                    createComponent(touchDragType, x, y);
+                }
+            }
+            touchDragType = null;
+            isPaletteScrolling = false;
+        }
+
+        function createComponent(type, x, y, idForce = null) {
+            const template = componentLibrary.find(c => c.type === type);
+            if (!template) return null;
+
+            let id = idForce ? idForce : 'node_' + (++nodeIdCounter);
+
+            const el = document.createElement('div');
+            el.className = 'component-node pointer-events-auto';
+            el.id = id;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            el.style.width = template.width + 'px';
+            
+            const header = document.createElement('div');
+            header.className = 'component-header';
+            header.innerHTML = `
+                <span class="truncate">${template.name}</span>
+                <button class="text-slate-400 hover:text-red-400 ml-2" title="Remover" onclick="deleteComponent('${id}')"><i class="fa-solid fa-xmark"></i></button>
+            `;
+
+            setupNodeDragging(header, el, id);
+
+            const body = document.createElement('div');
+            body.className = 'component-body';
+            body.style.width = template.width + 'px';
+            body.style.height = template.height + 'px';
+            body.innerHTML = template.svg;
+
+            // Interação no Modo Simulação
+            body.addEventListener('click', () => {
+                if(!isSimulationRunning) return;
+                const nodeObj = nodes.find(n => n.id === id);
+                if(nodeObj) {
+                    // Toggle para botões e disjuntores
+                    if(nodeObj.type.includes('botoeira') || nodeObj.type.includes('disjuntor') || nodeObj.type.includes('chave')) {
+                        nodeObj.toggled = !nodeObj.toggled;
+                        runSimulationLogic();
+                    }
+                }
+            });
+
+            const portClass = template.portStyle === 'inset' ? 'inset-ports' : 'ports-container';
+            const inputsContainer = document.createElement('div');
+            inputsContainer.className = `ports-container ${portClass} top`;
+            template.inputs.forEach(portName => inputsContainer.appendChild(createPortElement(id, portName, 'in')));
+
+            const outputsContainer = document.createElement('div');
+            outputsContainer.className = `ports-container ${portClass} bottom`;
+            template.outputs.forEach(portName => outputsContainer.appendChild(createPortElement(id, portName, 'out')));
+
+            el.appendChild(header);
+            el.appendChild(body);
+            if(template.inputs.length > 0) el.appendChild(inputsContainer);
+            if(template.outputs.length > 0) el.appendChild(outputsContainer);
+
+            componentsContainer.appendChild(el);
+            nodes.push({ id, type, el, x, y, toggled: false, active: false });
+            
+            if(!idForce) showToast(`${template.name} adicionado.`, 'success');
+            return id;
+        }
+
+        function createPortElement(nodeId, portName, type) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'port-wrapper';
+            const port = document.createElement('div');
+            port.className = 'port';
+            port.dataset.node = nodeId;
+            port.dataset.port = portName;
+            port.dataset.type = type;
+            const label = document.createElement('div');
+            label.className = 'port-label';
+            label.innerText = portName;
+            wrapper.appendChild(port);
+            wrapper.appendChild(label);
+            port.addEventListener('pointerdown', handlePortClick);
+            return wrapper;
+        }
+
+        function handlePortClick(e) {
+            e.stopPropagation();
+            if(isPanning || isSimulationRunning) return; 
+
+            const portEl = e.target;
+            const nodeId = portEl.dataset.node;
+            const portName = portEl.dataset.port;
+
+            // REGRA: Tirar Fio do Borne
+            const existingWires = wires.filter(w => (w.sourceNode === nodeId && w.sourcePort === portName) || (w.targetNode === nodeId && w.targetPort === portName));
+            if (existingWires.length > 0 && !drawingWire) {
+                existingWires.forEach(w => deleteWire(w.id));
+                showToast("Fio desconectado do borne.", "info");
+                return;
+            }
+
+            if (!drawingWire) {
+                drawingWire = { sourceNode: nodeId, sourcePort: portName, sourceEl: portEl };
+                portEl.classList.add('active');
+                drawingLayer.style.display = 'block';
+                updateDrawingWire(e.clientX, e.clientY);
+                document.addEventListener('pointermove', onPointerMoveDraw);
+                setTimeout(() => { workspace.addEventListener('pointerdown', cancelDrawing); }, 10);
+            } else {
+                if (drawingWire.sourceNode === nodeId && drawingWire.sourcePort === portName) {
+                    cancelDrawing();
+                } else {
+                    createWire(drawingWire.sourceNode, drawingWire.sourcePort, nodeId, portName);
+                    cancelDrawing();
+                }
+            }
+        }
+
+        function onPointerMoveDraw(e) { updateDrawingWire(e.clientX, e.clientY); }
+
+        function getOrthogonalPath(x1, y1, x2, y2) {
+            const midY = y1 + (y2 - y1) / 2;
+            return `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
+        }
+
+        function updateDrawingWire(clientX, clientY) {
+            if (!drawingWire) return;
+            const startPos = getPortCenter(drawingWire.sourceEl);
+            const panZoomRect = canvasPanZoom.getBoundingClientRect();
+            const mouseX = (clientX - panZoomRect.left) / scale;
+            const mouseY = (clientY - panZoomRect.top) / scale;
+            // Usa o novo sistema de escada (Ortogonal)
+            drawingWirePath.setAttribute('d', getOrthogonalPath(startPos.x, startPos.y, mouseX, mouseY));
+        }
+
+        function cancelDrawing(e) {
+            if(e && e.target.classList.contains('port')) return;
+            if(drawingWire && drawingWire.sourceEl) drawingWire.sourceEl.classList.remove('active');
+            drawingWire = null;
+            drawingLayer.style.display = 'none';
+            document.removeEventListener('pointermove', onPointerMoveDraw);
+            workspace.removeEventListener('pointerdown', cancelDrawing);
+        }
+
+        function createWire(srcNode, srcPort, tgtNode, tgtPort, idForce = null) {
+            const exists = wires.find(w => 
+                (w.sourceNode === srcNode && w.sourcePort === srcPort && w.targetNode === tgtNode && w.targetPort === tgtPort) ||
+                (w.sourceNode === tgtNode && w.sourcePort === tgtPort && w.targetNode === srcNode && w.targetPort === srcPort)
+            );
+            if(exists) { if(!idForce) showToast("Esses bornes já estão conectados.", 'error'); return; }
+
+            let wireId = idForce ? idForce : 'wire_' + (++wireIdCounter);
+            
+            // Área de clique maior invisível (Hitbox)
+            const hitbox = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            hitbox.setAttribute('class', 'wire-path-hitbox');
+            
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.id = wireId;
+            path.setAttribute('class', 'wire-path');
+            
+            const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            group.id = 'group_' + wireId;
+            group.appendChild(hitbox);
+            group.appendChild(path);
+
+            const onClickDelete = (e) => { e.stopPropagation(); deleteWire(wireId); };
+            hitbox.addEventListener('click', onClickDelete);
+            path.addEventListener('click', onClickDelete);
+
+            wireLayer.appendChild(group);
+
+            const wireObj = { id: wireId, sourceNode: srcNode, sourcePort: srcPort, targetNode: tgtNode, targetPort: tgtPort, pathEl: path, hitboxEl: hitbox, groupEl: group };
+            wires.push(wireObj);
+            
+            updateWirePath(wireObj);
+            if(!idForce) showToast("Conexão estabelecida.", 'success');
+        }
+
+        function getPortCenter(portEl) {
+            const rect = portEl.getBoundingClientRect();
+            const panZoomRect = canvasPanZoom.getBoundingClientRect();
+            return { x: (rect.left - panZoomRect.left + (rect.width / 2)) / scale, y: (rect.top - panZoomRect.top + (rect.height / 2)) / scale };
+        }
+
+        function updateWirePath(wire) {
+            const srcEl = document.querySelector(`.port[data-node="${wire.sourceNode}"][data-port="${wire.sourcePort}"]`);
+            const tgtEl = document.querySelector(`.port[data-node="${wire.targetNode}"][data-port="${wire.targetPort}"]`);
+            if (srcEl && tgtEl) {
+                const p1 = getPortCenter(srcEl);
+                const p2 = getPortCenter(tgtEl);
+                const pathStr = getOrthogonalPath(p1.x, p1.y, p2.x, p2.y);
+                wire.pathEl.setAttribute('d', pathStr);
+                wire.hitboxEl.setAttribute('d', pathStr); // Hitbox acompanha o formato
+                
+                const p1Str = wire.sourcePort, p2Str = wire.targetPort;
+                if(['L1', 'R', 'U', 'U1', '1(L1)', '2(T1)', '1'].includes(p1Str) || ['L1', 'R', 'U', 'U1', '1(L1)', '2(T1)', '1'].includes(p2Str)) wire.pathEl.style.stroke = '#3b82f6';
+                else if(['L2', 'S', 'V', 'V1', '3(L2)', '4(T2)', '3'].includes(p1Str) || ['L2', 'S', 'V', 'V1', '3(L2)', '4(T2)', '3'].includes(p2Str)) wire.pathEl.style.stroke = '#f97316';
+                else if(['L3', 'T', 'W', 'W1', '5(L3)', '6(T3)', '5'].includes(p1Str) || ['L3', 'T', 'W', 'W1', '5(L3)', '6(T3)', '5'].includes(p2Str)) wire.pathEl.style.stroke = '#8b5cf6';
+                else if(['PE'].includes(p1Str) || ['PE'].includes(p2Str)) wire.pathEl.style.stroke = '#22c55e';
+                else if(['N', 'N\'', '0V', 'M', 'Neutro'].includes(p1Str) || ['N', 'N\'', '0V', 'M', 'Neutro'].includes(p2Str)) wire.pathEl.style.stroke = '#0ea5e9';
+                else wire.pathEl.style.stroke = '#ef4444';
+            }
+        }
+
+        function updateAllWires() { wires.forEach(w => updateWirePath(w)); }
+
+        function setupNodeDragging(handleEl, nodeEl, id) {
+            let isDragging = false;
+            let startX, startY, initialX, initialY;
+            function onPointerDown(e) {
+                if(e.target.closest('button')) return; 
+                if(e.shiftKey) return; 
+                isDragging = true;
+                nodeEl.classList.add('dragging');
+                startX = e.clientX || (e.touches && e.touches[0].clientX);
+                startY = e.clientY || (e.touches && e.touches[0].clientY);
+                initialX = parseFloat(nodeEl.style.left) || 0;
+                initialY = parseFloat(nodeEl.style.top) || 0;
+                document.addEventListener('pointermove', onPointerMove);
+                document.addEventListener('pointerup', onPointerUp);
+                document.addEventListener('touchmove', onPointerMove, {passive: false});
+                document.addEventListener('touchend', onPointerUp);
+                if(!e.touches) e.preventDefault(); 
+            }
+            function onPointerMove(e) {
+                if (!isDragging) return;
+                let currentX = e.clientX || (e.touches && e.touches[0].clientX);
+                let currentY = e.clientY || (e.touches && e.touches[0].clientY);
+                let newX = initialX + (currentX - startX) / scale;
+                let newY = initialY + (currentY - startY) / scale;
+                nodeEl.style.left = newX + 'px';
+                nodeEl.style.top = newY + 'px';
+                const nodeData = nodes.find(n => n.id === id);
+                if(nodeData) {
+                    nodeData.x = newX; nodeData.y = newY;
+                    wires.forEach(w => { if (w.sourceNode === id || w.targetNode === id) updateWirePath(w); });
+                }
+            }
+            function onPointerUp() {
+                isDragging = false;
+                nodeEl.classList.remove('dragging');
+                document.removeEventListener('pointermove', onPointerMove);
+                document.removeEventListener('pointerup', onPointerUp);
+                document.removeEventListener('touchmove', onPointerMove);
+                document.removeEventListener('touchend', onPointerUp);
+            }
+            handleEl.addEventListener('pointerdown', onPointerDown);
+            handleEl.addEventListener('touchstart', onPointerDown, {passive: false});
+        }
+
+        function deleteComponent(id) {
+            const el = document.getElementById(id);
+            if(el) el.remove();
+            nodes = nodes.filter(n => n.id !== id);
+            const wiresToRemove = wires.filter(w => w.sourceNode === id || w.targetNode === id);
+            wiresToRemove.forEach(w => { if(w.groupEl) w.groupEl.remove(); });
+            wires = wires.filter(w => w.sourceNode !== id && w.targetNode !== id);
+        }
+
+        function deleteWire(id) {
+            if(isSimulationRunning) return; // Nao deleta fio com energia rodando
+            const wire = wires.find(w => w.id === id);
+            if (wire) {
+                wire.groupEl.remove();
+                wires = wires.filter(w => w.id !== id);
+            }
+        }
+
+        function clearWorkspace(bypassConfirm = false) {
+            if(!bypassConfirm && !confirm("Deseja apagar todo o projeto atual?")) return;
+            if(isSimulationRunning) toggleSimulation();
+            componentsContainer.innerHTML = '';
+            wireLayer.innerHTML = '';
+            nodes = []; wires = []; nodeIdCounter = 0; wireIdCounter = 0;
+            document.getElementById('welcome-text').style.display = 'flex';
+            if(!bypassConfirm) showToast("Bancada limpa.", 'success');
+        }
+
+        function exportCircuit() {
+            if(nodes.length === 0) { showToast("Não há nada na bancada para salvar.", 'error'); return; }
+            const data = {
+                nodes: nodes.map(n => ({ id: n.id, type: n.type, x: n.x, y: n.y })),
+                wires: wires.map(w => ({ id: w.id, srcN: w.sourceNode, srcP: w.sourcePort, tgtN: w.targetNode, tgtP: w.targetPort }))
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "meu_diagrama_motor.json");
+            dlAnchorElem.click();
+            showToast("Projeto Salvo!", 'success');
+        }
+
+        function importCircuit(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    clearWorkspace(true);
+                    data.nodes.forEach(n => createComponent(n.type, n.x, n.y, n.id));
+                    setTimeout(() => {
+                        data.wires.forEach(w => createWire(w.srcN, w.srcP, w.tgtN, w.tgtP, w.id));
+                        document.getElementById('welcome-text').style.display = 'none';
+                        showToast("Projeto Carregado!", 'success');
+                        event.target.value = ''; 
+                    }, 50);
+                } catch(err) { showToast("Arquivo inválido.", 'error'); }
+            };
+            reader.readAsText(file);
+        }
+
+        function showHelp() { alert("Dicas CAD Pro:\n1. Zoom: Scroll do mouse ou Pinça.\n2. Pan: SHIFT + Clique, ou toque com 1 dedo e arraste.\n3. Apagar fio: Clique no fio ou no borne já conectado."); }
+        function showToast(message, type='info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            if(type === 'error') toast.style.borderLeftColor = '#ef4444';
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.animation = 'fadeOut 0.3s ease-out forwards'; setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+        function exportImage() { window.print(); }
+
+        /* ========================================================================= */
+        /* ENGENHARIA SÊNIOR: MOTOR DE SIMULAÇÃO LÓGICA (RESOLVE O BUG DO DESLIGA) */
+        /* ========================================================================= */
+        let simInterval;
+        
+        function toggleSimulation() {
+            isSimulationRunning = !isSimulationRunning;
+            const btn = document.getElementById('btn-sim');
+            if(isSimulationRunning) {
+                btn.innerHTML = '<i class="fa-solid fa-pause text-yellow-400"></i>';
+                showToast("Simulação Iniciada (Lógica Energizada)", "success");
+                workspace.style.boxShadow = "inset 0 0 50px rgba(34, 197, 94, 0.1)";
+                simInterval = setInterval(runSimulationLogic, 100); // 10 FPS Logic Tick
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-play text-green-400"></i>';
+                showToast("Simulação Pausada", "info");
+                workspace.style.boxShadow = "none";
+                clearInterval(simInterval);
+                resetSimulationVisuals();
+            }
+        }
+
+        function resetSimulationVisuals() {
+            wires.forEach(w => w.pathEl.classList.remove('wire-powered'));
+            nodes.forEach(n => {
+                n.el.classList.remove('component-active');
+                const btnInd = n.el.querySelector('.btn-indicator');
+                if(btnInd) {
+                    if(n.type.includes('na')) btnInd.setAttribute('fill', '#22c55e');
+                    else if(n.type.includes('nf')) btnInd.setAttribute('fill', '#ef4444');
+                    else if(n.type.includes('chave')) btnInd.setAttribute('transform', 'rotate(-45 30 30)');
+                }
+                const lamp = n.el.querySelector('.lamp-indicator');
+                if(lamp) lamp.setAttribute('fill', n.type.includes('verde') ? '#166534' : '#991b1b');
+                
+                const gear = n.el.querySelector('.motor-gear');
+                if(gear) { gear.style.opacity = '0'; gear.classList.remove('gear-spin', 'gear-spin-reverse'); }
+            });
+        }
+
+        function runSimulationLogic() {
+            // Algoritmo de Ponto Fixo (Graph Traversal)
+            let portStates = {};
+            
+            // 1. Injetar energia nas fontes
+            nodes.forEach(n => {
+                if(n.type.includes('rede') || n.type.includes('fonte')) {
+                    const template = componentLibrary.find(c => c.type === n.type);
+                    template.outputs.forEach(p => portStates[`${n.id}_${p}`] = true);
+                }
+            });
+
+            let changed = true;
+            let iterations = 0;
+            
+            // 2. Propagar energia (Fios e Componentes Internos)
+            while(changed && iterations < 20) {
+                changed = false;
+                
+                // Propagação via Fios
+                wires.forEach(w => {
+                    const srcKey = `${w.sourceNode}_${w.sourcePort}`;
+                    const tgtKey = `${w.targetNode}_${w.targetPort}`;
+                    if(portStates[srcKey] && !portStates[tgtKey]) { portStates[tgtKey] = true; changed = true; }
+                    if(portStates[tgtKey] && !portStates[srcKey]) { portStates[srcKey] = true; changed = true; }
+                });
+
+                // Propagação via Componentes
+                nodes.forEach(n => {
+                    const hasPower = (port) => portStates[`${n.id}_${port}`];
+                    const setPower = (port) => { if(!portStates[`${n.id}_${port}`]) { portStates[`${n.id}_${port}`] = true; changed = true; } };
+
+                    // Atualiza visuais interativos
+                    const btnInd = n.el.querySelector('.btn-indicator');
+
+                    if(n.type === 'disjuntor_motor') {
+                        if(n.toggled) {
+                            if(btnInd) btnInd.setAttribute('fill', '#22c55e'); // Verde (Ligado)
+                            if(hasPower('1')) setPower('2');
+                            if(hasPower('3')) setPower('4');
+                            if(hasPower('5')) setPower('6');
+                        } else {
+                            if(btnInd) btnInd.setAttribute('fill', '#ef4444'); // Vermelho (Desligado)
+                        }
+                    }
+                    
+                    if(n.type === 'botoeira_na') {
+                        if(n.toggled) {
+                            if(btnInd) btnInd.setAttribute('fill', '#4ade80'); // Brilha quando clicado
+                            if(hasPower('13')) setPower('14'); // Normal Aberto: Fecha ao clicar
+                        } else {
+                            if(btnInd) btnInd.setAttribute('fill', '#22c55e');
+                        }
+                    }
+
+                    if(n.type === 'botoeira_nf') {
+                        // BUG RESOLVIDO: Vermelho NF deixa passar SE NAO estiver pressionado
+                        if(!n.toggled) {
+                            if(btnInd) btnInd.setAttribute('fill', '#ef4444');
+                            if(hasPower('11')) setPower('12'); // Normal Fechado: Passa direto
+                        } else {
+                            if(btnInd) btnInd.setAttribute('fill', '#f87171'); // Brilha
+                            // Se toggled (apertado), ele ABRE e para de passar energia.
+                        }
+                    }
+
+                    if(n.type === 'chave_seletora') {
+                        if(btnInd) btnInd.setAttribute('transform', n.toggled ? 'rotate(45 30 30)' : 'rotate(-45 30 30)');
+                        if(hasPower('13')) {
+                            if(n.toggled) setPower('14(A)'); // Modo AUTO
+                            else setPower('14'); // Modo MAN
+                        }
+                    }
+
+                    if(n.type === 'contator') {
+                        // Para ligar K1: A1 precisa receber fase e A2 precisa estar no Neutro/Outra fase. (Simplificado para A1 recebendo energia aqui)
+                        const bobinaAtiva = hasPower('A1') || hasPower('A2'); // Se energia chegou na bobina
+                        n.active = bobinaAtiva;
+                        
+                        if(bobinaAtiva) {
+                            if(hasPower('L1')) setPower('T1');
+                            if(hasPower('L2')) setPower('T2');
+                            if(hasPower('L3')) setPower('T3');
+                            if(hasPower('13')) setPower('14'); // Contato de Selo fecha!
+                            n.el.classList.add('component-active');
+                        } else {
+                            n.el.classList.remove('component-active');
+                        }
+                    }
+
+                    // Sinalizações
+                    if(n.type.includes('sinaleiro') || n.type.includes('sirene')) {
+                        const lamp = n.el.querySelector('.lamp-indicator');
+                        if(hasPower('X1') || hasPower('X2')) {
+                            if(lamp) lamp.setAttribute('fill', n.type.includes('verde') ? '#4ade80' : '#ef4444');
+                            n.el.classList.add('component-active');
+                        } else {
+                            if(lamp) lamp.setAttribute('fill', n.type.includes('verde') ? '#166534' : '#991b1b');
+                            n.el.classList.remove('component-active');
+                        }
+                    }
+
+                    // Motor Animado
+                    if(n.type === 'motor_3f') {
+                        const gear = n.el.querySelector('.motor-gear');
+                        if(hasPower('U1') && hasPower('V1') && hasPower('W1')) {
+                            // Se tem as 3 fases, gira! (Análise simples)
+                            if(gear) {
+                                gear.style.opacity = '1';
+                                gear.classList.add('gear-spin');
+                            }
+                            n.el.classList.add('component-active');
+                        } else {
+                            if(gear) { gear.style.opacity = '0'; gear.classList.remove('gear-spin', 'gear-spin-reverse'); }
+                            n.el.classList.remove('component-active');
+                        }
+                    }
+                });
+
+                iterations++;
+            }
+
+            // Atualizar Visual dos Fios Energizados
+            wires.forEach(w => {
+                const srcKey = `${w.sourceNode}_${w.sourcePort}`;
+                if(portStates[srcKey]) {
+                    w.pathEl.classList.add('wire-powered');
+                } else {
+                    w.pathEl.classList.remove('wire-powered');
+                }
+            });
+        }
+
+
+        /* ========================================================================= */
+        /* APOSTILA E DICIONÁRIO AUTOMÁTICO */
+        /* ========================================================================= */
+        let isDraggingModal = false;
+        let modalOffsetX = 0; let modalOffsetY = 0;
+        function initModalDrag() {
+            const header = document.getElementById('manual-modal-header');
+            const modal = document.getElementById('manual-modal');
+            header.addEventListener('mousedown', (e) => { isDraggingModal = true; const rect = modal.getBoundingClientRect(); modalOffsetX = e.clientX - rect.left; modalOffsetY = e.clientY - rect.top; document.addEventListener('mousemove', onModalDrag); document.addEventListener('mouseup', onModalStopDrag); });
+            header.addEventListener('touchstart', (e) => { isDraggingModal = true; const rect = modal.getBoundingClientRect(); modalOffsetX = e.touches[0].clientX - rect.left; modalOffsetY = e.touches[0].clientY - rect.top; document.addEventListener('touchmove', onModalTouchDrag, {passive: false}); document.addEventListener('touchend', onModalStopDrag); }, {passive: false});
+        }
+        function onModalDrag(e) { if(!isDraggingModal) return; const modal = document.getElementById('manual-modal'); modal.style.left = (e.clientX - modalOffsetX) + 'px'; modal.style.top = (e.clientY - modalOffsetY) + 'px'; modal.style.transform = 'none'; }
+        function onModalTouchDrag(e) { if(!isDraggingModal) return; e.preventDefault(); const modal = document.getElementById('manual-modal'); modal.style.left = (e.touches[0].clientX - modalOffsetX) + 'px'; modal.style.top = (e.touches[0].clientY - modalOffsetY) + 'px'; modal.style.transform = 'none'; }
+        function onModalStopDrag() { isDraggingModal = false; document.removeEventListener('mousemove', onModalDrag); document.removeEventListener('mouseup', onModalStopDrag); document.removeEventListener('touchmove', onModalTouchDrag); document.removeEventListener('touchend', onModalStopDrag); }
+
+        const manualLessons = [
+            {
+                id: 'partida_direta', title: 'Partida Direta com Selo', icon: 'fa-bolt',
+                content: `
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">1. Partida Direta (O Básico)</h3>
+                    <p class="text-slate-300 mb-6">Puxe o Barramento 380V. Ligue no Disjuntor-Motor. Saia dele para o Contator K1, e do K1 para o Motor.</p>
+                    <p class="text-slate-300 mb-6"><strong>Para o Comando (Selo):</strong> Use a Botoeira Verde (NA) ligada no borne 13-14 do K1 (Selo). A Botoreia Vermelha (NF) vai ANTES do botão verde. Dê Play e clique no verde!</p>
+                `
+            },
+            {
+                id: 'seletora_auto', title: 'Chave Seletora AUTO/MAN', icon: 'fa-toggle-on',
+                content: `
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">2. Usando a Chave Seletora</h3>
+                    <p class="text-slate-300 mb-6">A Chave Seletora permite que a máquina opere de duas formas: Manual (pelo operador) ou Automático (pelo CLP).</p>
+                    <ul class="list-disc pl-5 text-slate-300 mb-6 space-y-1">
+                        <li><strong>Borne 13:</strong> Entrada de energia.</li>
+                        <li><strong>Borne 14 (MAN):</strong> Vai para a botoeira verde do operador.</li>
+                        <li><strong>Borne 14(A) (AUTO):</strong> Vai direto para a saída do CLP.</li>
+                    </ul>
+                    <p class="text-slate-300">Na simulação, clique na chave para alternar a alavanca.</p>
+                `
+            },
+            {
+                id: 'sinalizacao', title: 'Sinalização e Alarmes', icon: 'fa-lightbulb',
+                content: `
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">3. Como Instalar Lâmpadas</h3>
+                    <p class="text-slate-300 mb-6">Sinaleiros mostram o status do painel sem que o operador precise abri-lo.</p>
+                    <ul class="list-disc pl-5 text-slate-300 mb-6 space-y-1">
+                        <li><strong>Sinaleiro Verde (Motor Ligado):</strong> Ligue o X1 no borne 14 do Contator K1, e o X2 no Neutro/0V. Quando K1 atracar, a luz acende.</li>
+                        <li><strong>Sinaleiro Vermelho / Sirene (Falha):</strong> Ligue no contato auxiliar do Disjuntor/Relé Térmico, para que acenda apenas quando houver desarme.</li>
+                    </ul>
+                `
+            },
+            {
+                id: 'dicionario', title: 'Dicionário da Biblioteca', icon: 'fa-book-atlas',
+                content: `
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Dicionário Técnico Completo</h3>
+                    <div id="dict-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Gerado automaticamente via JS -->
+                    </div>
+                `
+            }
+        ];
+
+        function generateDictionary() {
+            const container = document.getElementById('dict-container');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            componentLibrary.forEach(comp => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-900 border border-slate-700 p-3 rounded flex items-center gap-4";
+                
+                const svgWrap = document.createElement('div');
+                svgWrap.className = 'w-16 h-16 shrink-0 bg-slate-800 rounded p-1 flex items-center justify-center';
+                svgWrap.innerHTML = comp.svg.replace('width="100%"', 'width="50"').replace('height="100%"', 'height="50"');
+                
+                const info = document.createElement('div');
+                info.innerHTML = `
+                    <h4 class="text-blue-400 font-bold text-sm">${comp.name}</h4>
+                    <p class="text-[10px] text-slate-400 font-mono mt-1">Categoria: ${comp.category}</p>
+                    <p class="text-[10px] text-slate-400 font-mono">In: [${comp.inputs.join(', ')}] | Out: [${comp.outputs.join(', ')}]</p>
+                `;
+                
+                card.appendChild(svgWrap);
+                card.appendChild(info);
+                container.appendChild(card);
+            });
+        }
+
+        function initManual() {
+            const listContainer = document.getElementById('manual-lessons-list');
+            listContainer.innerHTML = '';
+            manualLessons.forEach((lesson, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-3 rounded-lg hover:bg-slate-700 transition-colors flex items-center gap-3 text-slate-300 hover:text-white border border-transparent hover:border-slate-600';
+                btn.innerHTML = `<div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700"><i class="fa-solid ${lesson.icon}"></i></div> <div><div class="font-bold text-sm leading-tight">${lesson.title}</div></div>`;
+                btn.onclick = () => loadLesson(lesson.id, btn);
+                listContainer.appendChild(btn);
+            });
+        }
+
+        function loadLesson(id, btnElement) {
+            document.querySelectorAll('#manual-lessons-list button').forEach(b => b.classList.remove('bg-blue-600/20', 'border-blue-500/50'));
+            if(btnElement) btnElement.classList.add('bg-blue-600/20', 'border-blue-500/50');
+            const lesson = manualLessons.find(l => l.id === id);
+            if(lesson) {
+                document.getElementById('manual-lesson-content').innerHTML = lesson.content;
+                if(id === 'dicionario') generateDictionary();
+            }
+        }
+
+        function openManual() {
+            document.getElementById('manual-modal').classList.remove('hidden');
+            if(document.getElementById('manual-lessons-list').children.length === 0) initManual();
+        }
+        function closeManual() { document.getElementById('manual-modal').classList.add('hidden'); }
+
+        // STARTUP
+        window.onload = () => {
+            initPalette();
+            initModalDrag(); 
+            window.addEventListener('resize', updateAllWires);
+        };
+    </script>
+</body>
+</html>
