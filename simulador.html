@@ -1,95 +1,609 @@
-<!-- ... existing code ... -->
-    <!-- MODAL FLUTUANTE DO TUTORIAL COMPLETO DE LIGAÇÕES E AUTOMAÇÃO -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Simulador Industrial - Sistemas de Motores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --grid-color: rgba(255, 255, 255, 0.05);
+            --bg-color: #0f172a;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; 
+            background-color: var(--bg-color);
+            color: #f8fafc;
+            touch-action: none; 
+        }
+
+        #workspace {
+            position: relative;
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 20px 20px;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            cursor: grab;
+        }
+        
+        #workspace:active {
+            cursor: grabbing;
+        }
+
+        #canvas-pan-zoom {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform-origin: 0 0;
+        }
+
+        #wire-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; 
+            z-index: 10;
+            overflow: visible;
+        }
+
+        .wire-path {
+            fill: none;
+            stroke: #3b82f6; 
+            stroke-width: 4;
+            stroke-linecap: square;
+            stroke-linejoin: round; /* Acabamento suave para modo escada */
+            pointer-events: stroke; 
+            cursor: pointer;
+            transition: stroke 0.2s, stroke-width 0.2s;
+            filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.5));
+        }
+
+        .wire-path:hover {
+            stroke: #ef4444 !important;
+            stroke-width: 8 !important;
+            stroke-dasharray: 8,4;
+            filter: drop-shadow(0 0 4px #ef4444) !important;
+            z-index: 999;
+        }
+
+        .wire-energized {
+            stroke: #f59e0b !important;
+            filter: drop-shadow(0 0 6px #fbbf24) !important;
+            stroke-width: 5 !important;
+        }
+
+        .component-node {
+            position: absolute;
+            border-radius: 8px;
+            user-select: none;
+            touch-action: none;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
+            transition: box-shadow 0.2s, border-color 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .component-node.dragging {
+            z-index: 50;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+            opacity: 0.9;
+        }
+        
+        .component-active-glow {
+            box-shadow: 0 0 25px rgba(251, 191, 36, 0.5), inset 0 0 10px rgba(251, 191, 36, 0.3) !important;
+            border-color: #fbbf24 !important;
+        }
+        .component-active-glow .component-header {
+            background: linear-gradient(180deg, #b45309 0%, #78350f 100%) !important;
+            border-color: #f59e0b !important;
+        }
+
+        /* Puxadores laterais para barramentos esticaveis */
+        .resize-handle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            cursor: ew-resize;
+            z-index: 45;
+            background: rgba(255,255,255,0.0);
+            transition: background 0.2s;
+        }
+        .resize-handle:hover {
+            background: rgba(59, 130, 246, 0.4);
+        }
+        .left-handle {
+            left: -10px;
+            border-radius: 6px 0 0 6px;
+        }
+        .right-handle {
+            right: -10px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        @keyframes spinCW { from { transform: rotate(0deg) translate(-50%, -50%); } to { transform: rotate(360deg) translate(-50%, -50%); } }
+        @keyframes spinCCW { from { transform: rotate(0deg) translate(-50%, -50%); } to { transform: rotate(-360deg) translate(-50%, -50%); } }
+        
+        .sim-gear {
+            transform-origin: top left;
+        }
+        .spin-cw {
+            animation: spinCW 1.5s linear infinite;
+            color: #4ade80 !important;
+            filter: drop-shadow(0 0 8px #22c55e);
+        }
+        .spin-ccw {
+            animation: spinCCW 1.5s linear infinite;
+            color: #f87171 !important;
+            filter: drop-shadow(0 0 8px #ef4444);
+        }
+
+        .component-header {
+            background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #475569;
+            border-bottom: none;
+            cursor: grab;
+            transition: all 0.2s;
+        }
+
+        .component-header:active {
+            cursor: grabbing;
+        }
+
+        .component-body {
+            position: relative;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 0 0 6px 6px;
+            overflow: visible;
+        }
+        
+        .component-body svg {
+            display: block;
+            border-radius: 0 0 6px 6px;
+        }
+
+        .ports-container {
+            display: flex;
+            justify-content: space-evenly;
+            width: 100%;
+            position: absolute;
+            z-index: 30;
+            left: 0;
+        }
+        
+        .ports-container.top { top: -6px; }
+        .ports-container.bottom { bottom: -6px; }
+        
+        .inset-ports.top { top: 12px; }
+        .inset-ports.bottom { bottom: 12px; }
+
+        .port-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .port {
+            width: 14px;
+            height: 14px;
+            background-color: #cbd5e1;
+            border: 1px solid #334155;
+            border-radius: 50%;
+            cursor: crosshair;
+            position: relative;
+            transition: all 0.2s;
+            background-image: 
+                linear-gradient(45deg, transparent 42%, #475569 45%, #475569 55%, transparent 58%),
+                linear-gradient(-45deg, transparent 42%, #475569 45%, #475569 55%, transparent 58%);
+            box-shadow: inset 0 -2px 4px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* Aumentando a area de toque (Touch Target) para touchscreens e mobile */
+        .port::after {
+            content: '';
+            position: absolute;
+            top: -12px; left: -12px; right: -12px; bottom: -12px;
+        }
+
+        .port:hover, .port.active {
+            background-color: #fbbf24;
+            transform: scale(1.3);
+            background-image: none; 
+            box-shadow: 0 0 10px #f59e0b, inset 0 -1px 2px rgba(0,0,0,0.4);
+            z-index: 40;
+        }
+
+        .port-label {
+            position: absolute;
+            font-size: 0.55rem;
+            font-weight: 700;
+            color: #0f172a;
+            background: rgba(241, 245, 249, 0.9);
+            padding: 1px 3px;
+            border-radius: 3px;
+            border: 1px solid #94a3b8;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 35;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .ports-container.top .port-label { top: -18px; }
+        .ports-container.bottom .port-label { bottom: -18px; }
+        
+        .inset-ports.top .port-label { top: -14px; background: transparent; color: #fff; border: none; text-shadow: 0 1px 2px #000;}
+        .inset-ports.bottom .port-label { bottom: -14px; background: transparent; color: #fff; border: none; text-shadow: 0 1px 2px #000;}
+
+        .sidebar-item {
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .sidebar-item:hover {
+            transform: translateY(-2px);
+            background-color: #334155;
+        }
+        
+        #sidebar {
+            transition: width 0.3s ease, min-width 0.3s ease, opacity 0.2s;
+        }
+        #sidebar.collapsed {
+            width: 0;
+            min-width: 0;
+            overflow: hidden;
+            opacity: 0;
+            border-right: none;
+        }
+
+        .canvas-toolbar {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(4px);
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 4px;
+            display: flex;
+            gap: 4px;
+            z-index: 50;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .canvas-toolbar button {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            color: #cbd5e1;
+            transition: all 0.2s;
+        }
+        
+        .canvas-toolbar button:hover {
+            background: #334155;
+            color: #fff;
+        }
+
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .toast {
+            background: #1e293b;
+            border-left: 4px solid #3b82f6;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out forwards;
+            font-size: 0.875rem;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .digital-font { font-family: 'JetBrains Mono', monospace; font-weight: bold; }
+        
+        #manual-modal, #tutorial-modal {
+            position: absolute;
+            top: 10%;
+            left: 15%;
+            width: 70vw;
+            max-width: 950px;
+            height: 75vh;
+            max-height: 700px;
+            z-index: 2000;
+            background: transparent;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+        #tutorial-modal {
+            top: 15%;
+            left: 20%;
+            z-index: 2001;
+            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.9);
+        }
+        #manual-modal.hidden, #tutorial-modal.hidden {
+            display: none !important;
+        }
+        #manual-modal-header, #tutorial-modal-header {
+            cursor: move;
+        }
+        .manual-step {
+            border-left: 2px solid #3b82f6;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <header class="bg-slate-800 border-b border-slate-700 h-14 flex items-center justify-between px-4 sm:px-6 shrink-0 z-40">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white mr-2 transition-colors p-2 rounded hover:bg-slate-700" title="Mostrar/Ocultar Biblioteca">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            <div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(37,99,235,0.5)]">
+                <i class="fa-solid fa-bolt text-white"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight text-white hidden sm:block">Simulador Industrial CAD Pro</h1>
+        </div>
+        <div class="flex items-center gap-2 sm:gap-4">
+            <button onclick="clearWorkspace()" class="bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded text-sm font-medium transition-colors border border-red-500/20 flex items-center gap-2">
+                <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline">Limpar Bancada</span>
+            </button>
+            <button onclick="showHelp()" class="text-slate-400 hover:text-white transition-colors p-2">
+                <i class="fa-solid fa-circle-info text-xl"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative">
+        <aside id="sidebar" class="w-64 sm:w-72 min-w-[16rem] sm:min-w-[18rem] bg-slate-900 border-r border-slate-800 flex flex-col z-30 shrink-0 shadow-2xl relative">
+            <div class="p-3 bg-slate-950 border-b border-slate-800 flex flex-col">
+                <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Responsável: Engenheiro/Eletricista</label>
+                <input type="text" placeholder="Nome do Profissional / CREA" class="bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-white outline-none focus:border-blue-500 transition-colors">
+            </div>
+            <div class="p-4 border-b border-slate-800 bg-slate-800/50 flex flex-col">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Biblioteca</h2>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Arraste para a bancada</p>
+                    </div>
+                </div>
+                <button onclick="openManual()" class="w-full mt-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white text-xs font-bold py-2.5 px-3 rounded shadow flex justify-center items-center gap-2 transition-all border border-blue-500/50">
+                    <i class="fa-solid fa-book-open"></i> Apostila de Estudo (Curso)
+                </button>
+                <button onclick="openTutorial()" class="w-full mt-2 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white text-xs font-bold py-2.5 px-3 rounded shadow flex justify-center items-center gap-2 transition-all border border-emerald-500/50">
+                    <i class="fa-solid fa-plug-circle-bolt"></i> Tutorial Passo a Passo
+                </button>
+            </div>
+            <div id="component-palette" class="flex-1 overflow-y-auto p-3 space-y-2 pb-20 scrollbar-hide">
+                <!-- Os itens serão gerados via JS aqui -->
+            </div>
+        </aside>
+
+        <main id="workspace" class="flex-1 relative">
+            <div class="canvas-toolbar">
+                <button id="btn-sim" onclick="toggleSimulation()" title="Iniciar Simulação Play/Pause"><i class="fa-solid fa-play text-green-400"></i></button>
+                <div class="w-px h-6 bg-slate-600 mx-1 my-auto"></div>
+                <button onclick="zoomIn()" title="Aumentar Zoom (Scroll Up)"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                <button onclick="zoomOut()" title="Diminuir Zoom (Scroll Down)"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                <button onclick="resetZoomPan()" title="Centralizar Visualização"><i class="fa-solid fa-expand"></i></button>
+                <div class="w-px h-6 bg-slate-600 mx-1 my-auto"></div>
+                <button onclick="exportCircuit()" title="Salvar Projeto (Download)"><i class="fa-solid fa-floppy-disk text-blue-400"></i></button>
+                <button onclick="document.getElementById('import-file').click()" title="Carregar Projeto (Upload)"><i class="fa-solid fa-folder-open text-yellow-400"></i></button>
+                <button onclick="exportImage()" title="Salvar como Imagem (Print/PNG)"><i class="fa-solid fa-camera text-purple-400"></i></button>
+                <input type="file" id="import-file" style="display: none;" accept=".json" onchange="importCircuit(event)">
+            </div>
+
+            <div id="canvas-pan-zoom">
+                <svg id="wire-layer"></svg>
+                <svg id="drawing-layer" class="absolute top-0 left-0 w-full h-full pointer-events-none z-10" style="display: none; overflow: visible;">
+                    <path id="drawing-wire" class="wire-path" stroke-dasharray="5,5" opacity="0.6"></path>
+                </svg>
+                <div id="components-container" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
+            </div>
+            
+            <div id="welcome-text" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                <div class="text-center">
+                    <i class="fa-solid fa-arrows-up-down-left-right text-5xl mb-4"></i>
+                    <h2 class="text-2xl font-bold">Use SHIFT + Clique ou Toque (1 dedo) para mover a tela</h2>
+                    <p class="text-md mt-2">Scroll do mouse ou Pinça (2 dedos) para Zoom</p>
+                    <p class="text-sm mt-4 text-slate-400 font-bold bg-slate-900/50 p-2 rounded">Para excluir um fio, basta clicar em cima dele.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="welcome-modal-pro" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/90 backdrop-blur-sm transition-opacity duration-500">
+        <div class="bg-slate-800 border-2 border-blue-500 rounded-3xl shadow-[0_0_80px_rgba(59,130,246,0.6)] p-10 max-w-4xl text-center transform scale-100 transition-transform duration-500 w-11/12 relative overflow-hidden">
+            <div class="absolute -top-20 -right-20 w-64 h-64 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-emerald-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+            
+            <i class="fa-solid fa-bolt text-7xl text-yellow-400 mb-6 drop-shadow-[0_0_20px_rgba(250,204,21,0.8)]"></i>
+            <h1 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 mb-6 tracking-tight uppercase leading-tight">BEM VINDO AO MELHOR E MAIS COMPLETO CURSO DE COMANDOS ELÉTRICOS</h1>
+            <p class="text-xl md:text-2xl text-slate-300 mb-10 font-medium">Aprenda na prática com nosso Simulador Industrial Avançado, com mais de 40 Tópicos e ligações passo a passo!</p>
+            <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-700 mb-10 inline-block shadow-inner">
+                <p class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Oferecido oficialmente por:</p>
+                <p class="text-3xl font-black text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]">VOLTCALCPRO.COM</p>
+            </div>
+            <br>
+            <button onclick="closeWelcomeModal()" class="bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white font-bold py-4 px-12 rounded-full text-xl shadow-[0_10px_25px_rgba(59,130,246,0.5)] hover:shadow-[0_15px_35px_rgba(16,185,129,0.6)] transition-all transform hover:scale-105 border border-white/20">
+                INICIAR SIMULADOR <i class="fa-solid fa-play ml-3"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL DA APOSTILA OFICIAL -->
+    <div id="manual-modal" class="hidden">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl w-full h-full flex flex-col shadow-2xl overflow-hidden">
+            <div id="manual-modal-header" class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900 shrink-0 select-none cursor-move">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-blue-500"></i> Mega Apostila - Comandos Elétricos</h2>
+                <button onclick="closeManual()" class="text-slate-400 hover:text-red-400 transition-colors p-2 text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="flex flex-1 overflow-hidden">
+                <div class="w-1/3 min-w-[200px] border-r border-slate-700 bg-slate-900/50 overflow-y-auto p-3 space-y-2" id="manual-lessons-list">
+                    <!-- Gerado via JS -->
+                </div>
+                <div class="w-2/3 flex-1 overflow-y-auto p-6 bg-slate-800" id="manual-lesson-content">
+                    <div class="h-full flex flex-col items-center justify-center text-slate-500 text-center">
+                        <i class="fa-solid fa-book-open text-6xl mb-4 opacity-50"></i>
+                        <p class="text-lg font-medium">Selecione uma lição no menu lateral para iniciar.</p>
+                        <p class="text-sm mt-2">Leia a teoria extraída da apostila técnica oficial e pratique.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DO TUTORIAL MEGA PRÁTICO -->
     <div id="tutorial-modal" class="hidden">
         <div class="bg-slate-900 border border-emerald-600 rounded-xl w-full h-full flex flex-col shadow-2xl overflow-hidden">
             <div id="tutorial-modal-header" class="p-4 border-b border-emerald-700 flex justify-between items-center bg-slate-950 shrink-0 select-none cursor-move">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-plug-circle-bolt text-emerald-500"></i> Mega Tutorial Prático - Ligações Industriais</h2>
+                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-plug-circle-bolt text-emerald-500"></i> Tutorial Completo de Ligações Avançadas</h2>
                 <button onclick="closeTutorial()" class="text-slate-400 hover:text-red-400 transition-colors p-2 text-xl">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
             <div class="flex-1 overflow-y-auto p-6 bg-slate-900 text-slate-300 leading-relaxed space-y-8" id="tutorial-content">
                 
-                <section>
-                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">1. PARTIDA DIRETA E CONTATO DE SELO (O BÁSICO PERFEITO)</h3>
-                    <p class="mb-3">A base de todo painel. É o circuito lógico que substitui o dedo do operador no botão (que envia apenas um pulso rápido).</p>
-                    <ol class="list-decimal pl-6 space-y-2">
-                        <li><strong>Força:</strong> Barramento 380V (L1, L2, L3) ➔ Entradas do Disjuntor-Motor (1,3,5) ➔ Saídas do Disjuntor (2,4,6) ➔ Entradas do Contator K1 ➔ Saídas de K1 ➔ Entradas do Motor 3~.</li>
-                        <li><strong>Comando (Desliga):</strong> Puxe energia (Fase ou +24V) e ligue na entrada <strong>11 do Botão Vermelho (NF - Desliga)</strong>.</li>
-                        <li><strong>Comando (Liga e Selo):</strong> Da saída <strong>12 do Botão Vermelho</strong>, divida o fio em dois: um vai para a entrada <strong>13 do Botão Verde (NA - Liga)</strong> e o outro vai para a entrada <strong>13 (NA) do bloco auxiliar do Contator K1</strong>.</li>
-                        <li><strong>Retorno e Bobina:</strong> Conecte a saída <strong>14 do Botão Verde</strong> com a saída <strong>14 do Contator K1</strong>. Desse nó, leve o fio ao borne <strong>A1 da Bobina K1</strong>. O borne A2 vai para o Neutro ou 0V.</li>
-                    </ol>
-                </section>
-
-                <section>
-                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">2. PARTIDA COM REVERSÃO E INTERTRAVAMENTO ELÉTRICO</h3>
-                    <p class="mb-3">Utiliza os contatores K1 (Gira Direita) e K2 (Gira Esquerda). O segredo é que K2 inverte duas fases que chegam ao motor.</p>
-                    <ul class="list-disc pl-6 space-y-2">
-                        <li><strong>Força (A Inversão):</strong> K1 leva L1, L2, L3 para U1, V1, W1. Já o K2 recebe L1, L2, L3 na entrada, mas suas saídas vão invertidas: a saída T1 de K2 vai no W1 do motor, T2 no V1, e T3 no U1.</li>
-                        <li><strong>Intertravamento (Regra Rígida):</strong> É proibido K1 e K2 atracarem juntos (gera curto explosivo). No comando, o fio que sai do botão Liga Direita <strong>DEVE passar pela porta 21 (NF) do Contator K2</strong>. O fio sai na porta 22 de K2 e aí sim vai para a bobina A1 de K1. Faça o inverso para ligar K2 (passando pelo 21-22 do K1).</li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">3. PARTIDA ESTRELA-TRIÂNGULO AUTOMÁTICA</h3>
-                    <p class="mb-3">Reduz o pico de corrente em motores grandes utilizando 3 contatores (K1, K2, K3) e 1 Temporizador. O motor precisa de 6 terminais.</p>
-                    <ul class="list-disc pl-6 space-y-2">
-                        <li><strong>Contator K1 (Rede):</strong> Liga a rede nos bornes U1, V1, W1 do motor. Fica sempre ligado.</li>
-                        <li><strong>Contator K3 (Estrela - Partida):</strong> Suas 3 saídas são conectadas juntas (curto-circuito). Suas entradas são ligadas nos bornes W2, U2, V2 do motor. Entra junto com K1 e fecha as bobinas em 220V internos.</li>
-                        <li><strong>Contator K2 (Triângulo - Trabalho):</strong> Alimentado pela rede. Suas saídas vão para W2, U2, V2. </li>
-                        <li><strong>Lógica do Temporizador:</strong> O botão Liga energiza K1, K3 e o Relé Temporizador. Após 5 a 10s, o temporizador corta a energia de K3 e envia energia para K2. (Lembre-se do intertravamento entre K2 e K3 usando contatos NF 21-22!).</li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">4. AUTOMAÇÃO: INVERSORES, SOFT STARTERS E CLPs</h3>
-                    <p class="mb-3">Transição dos comandos eletromecânicos clássicos para a eletrônica de potência e controle programável (Indústria 4.0).</p>
-                    <ul class="list-disc pl-6 space-y-2">
-                        <li><strong>Inversor de Frequência (VFD):</strong> Recebe a rede nos bornes R, S, T. A saída U, V, W vai <strong>DIRETO</strong> para o motor (nunca ponha contator no meio). Use a fonte 24V do Inversor e passe o sinal por uma Chave Seletora até o borne <strong>DI1</strong> para iniciar a rotação. O inversor controla aceleração, rampa e frequência (Hz).</li>
-                        <li><strong>CLP (S7):</strong> Ligue L+ em 24V e M em 0V. Sensores Indutivos enviam 24V pelo fio OUT até as Entradas do CLP (ex: I0.0). A lógica de software do CLP aciona as Saídas (ex: Q0.0), que devem alimentar a bobina (A1) dos contatores.</li>
-                        <li><strong>Soft Starter:</strong> Similar ao inversor, mas controla apenas a rampa de tensão via tiristores (SCRs) para partida suave. Após a partida, aciona um contator de Bypass interno.</li>
-                    </ul>
-                </section>
-
-                <section>
-                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">5. ILUMINAÇÃO, SINALIZAÇÕES E SEGURANÇA (NR-12)</h3>
-                    <p class="mb-3">Como rotear o status do maquinário para a porta do painel elétrico utilizando contatos auxiliares NA e NF.</p>
-                    <ul class="list-disc pl-6 space-y-2">
-                        <li><strong>Sinaleiro Verde (Motor Ligado / RUN):</strong> Alimente a entrada <strong>43 (NA)</strong> do Contator K1. Leve a saída <strong>44</strong> ao X1 da Lâmpada Verde (X2 no 0V). Quando atracar, a luz acende.</li>
-                        <li><strong>Lâmpada Branca ou Vermelha (Painel Energizado / Motor Parado):</strong> Alimente a entrada <strong>21 (NF)</strong> de K1. Leve a saída <strong>22</strong> ao X1 da Lâmpada. Se o motor parar, o contato volta a fechar e a lâmpada acende, alertando que há tensão, mas a máquina está parada.</li>
-                        <li><strong>Alarme de Sobrecarga e Falha:</strong> O Relé Térmico usa o 95-96 (NF) para derrubar o comando. O pino <strong>97-98 (NA)</strong> é usado para ligar a Sirene ou Sinaleiro Amarelo no momento do desarme térmico.</li>
-                        <li><strong>Chave Boia (Controle de Nível):</strong> Instale no reservatório. Use o contato "Comum" e o NA. Ligue em série com o A1 da contatora da Bomba D'água. Quando encher (ou esvaziar), a boia "tomba", fechando o circuito e ligando a bomba.</li>
-                        <li><strong>Relé de Segurança (Botão Cogumelo):</strong> O Botão de Emergência tem 2 canais NF. Eles entram nos bornes S11-S12 e S21-S22 do Relé de Segurança. O Relé de Segurança processa falhas e usa suas saídas 13-14 para cortar TODA a alimentação do circuito de comando de forma redundante e segura.</li>
-                    </ul>
-                </section>
+                <h2 class="text-3xl font-black text-emerald-400 mb-6 text-center uppercase tracking-widest">A Bíblia dos 40 Circuitos Práticos</h2>
+                <p class="text-center text-slate-400 mb-8">Baseado no Catálogo Completo de Componentes de Comandos Elétricos.</p>
                 
+                <div class="mb-8 p-4 bg-slate-800 rounded-xl border border-slate-600 shadow-xl">
+                    <h3 class="text-xl font-bold text-white mb-4"><i class="fa-solid fa-map"></i> Diagramas Visuais de Referência</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <img src="1000497361.png" alt="Passo a Passo de Montagem" class="w-full rounded border border-slate-700 hover:scale-[1.02] transition-transform">
+                        <img src="1000497362.png" alt="Diagramas de Força e Comando" class="w-full rounded border border-slate-700 hover:scale-[1.02] transition-transform">
+                    </div>
+                </div>
+
+                <section class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">1 ao 7. O BÁSICO: LIGA/DESLIGA, SELO E PARTIDA DIRETA</h3>
+                    <p class="mb-4">A fundação de todo o painel de força e comando, contemplando os circuitos práticos 1 ao 7 da lista oficial:</p>
+                    
+                    <h4 class="text-lg font-bold text-white mb-2 text-blue-400">PASSO A PASSO DA PARTIDA DIRETA E SINALIZAÇÃO</h4>
+                    <ul class="list-decimal pl-6 space-y-2 mb-4">
+                        <li><strong>Força:</strong> Puxe L1, L2, L3 do Barramento 380V (agora equipado com Neutro) para as entradas do Disjuntor-Motor (1,3,5). Saia do Disjuntor (2,4,6) para o Contator K1 (L1,L2,L3). Saia de K1 (T1,T2,T3) para o Motor Trifásico.</li>
+                        <li><strong>Comando (Botões):</strong> Saia do +24V da Fonte para o 95 (NF) do Relé Térmico. Do 96, vá para a entrada 11 do Botão Vermelho (Desliga). Da saída 12, puxe para a entrada 13 do Botão Verde (Liga). Da saída 14 do botão verde, vá para a Bobina A1 do Contator K1. O A2 do contator vai para o 0V da fonte.</li>
+                        <li><strong>O Selo Elétrico:</strong> Para o botão não precisar ficar segurado, puxe um fio do 13 do Botão Verde para o 13 (NA) do K1. Puxe um fio do 14 do Botão Verde para o 14 (NA) do K1.</li>
+                        <li><strong>Sinalização Visual:</strong> Puxe energia da Fonte (+24V) para a entrada 43 (NA) do Contator K1. Da saída 44, leve ao X1 do Sinaleiro Verde (Motor Ligado). O X2 vai ao 0V. Faça o mesmo usando o contato 21-22 (NF) para a Lâmpada Vermelha (Motor Parado).</li>
+                    </ul>
+                </section>
+
+                <section class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">8 ao 10. REVERSÃO COM INTERTRAVAMENTO ELÉTRICO E MECÂNICO</h3>
+                    <p class="mb-4">Crucial para evitar fechamento de curto-circuito na rede 380V.</p>
+                    <ul class="list-decimal pl-6 space-y-2">
+                        <li>Utilize dois contatores principais: <strong>K1 (Direita)</strong> e <strong>K2 (Esquerda)</strong>.</li>
+                        <li>No circuito de força, o K1 manda L1-U1, L2-V1, L3-W1. O K2 manda L1-U1, mas inverte L2-W1 e L3-V1.</li>
+                        <li><strong>O Intertravamento:</strong> A energia que alimenta a bobina A1 do contator K1 <strong>TEM OBRIGATORIAMENTE</strong> que passar pelo contato auxiliar fechado 21-22 (NF) do contator K2. E a energia que alimenta o A1 de K2, passa pelo 21-22 (NF) de K1.</li>
+                    </ul>
+                </section>
+
+                <section class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">11 ao 14. ESTRELA-TRIÂNGULO AUTOMÁTICA E DAHLANDER</h3>
+                    <p class="mb-4">Técnicas de acionamento complexo para redução de pico de corrente e dupla velocidade.</p>
+                    <ul class="list-decimal pl-6 space-y-2">
+                        <li><strong>Estrela-Triângulo Automática:</strong> Requer 3 contatores (K1-Rede, K2-Triângulo, K3-Estrela) e 1 Relé Temporizador. K3 entra junto com K1 para fechar as pontas do motor em curto (Estrela). Após 5s, o Temporizador abre o contato do K3 e atraca o K2 (Tensão Plena). Exige intertravamento rigoroso entre K2 e K3.</li>
+                        <li><strong>Motor Dahlander (2 Velocidades):</strong> Use K1 para alimentar 1U, 1V, 1W (Velocidade Baixa). Para Velocidade Alta, K1 deve estar fora, K2 entra curto-circuitando 1U,1V,1W e K3 alimenta 2U, 2V, 2W.</li>
+                    </ul>
+                </section>
+
+                <section class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">15 ao 19. COMANDOS POR SENSORES, BOIAS E PRESSOSTATOS</h3>
+                    <p class="mb-4">Automação sem CLP, baseada puramente na lógica de relés e chaves de campo.</p>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><strong>Controle de Reservatório (Boia):</strong> A Chave Boia tem 3 fios (Comum, NA, NF). A fase de comando (+24V) entra no Comum. O retorno NA vai para a Bobina A1 da Bomba D'água. Quando a caixa esvazia, a boia tomba, fechando o contato NA e atracando o contator K1 da bomba.</li>
+                        <li><strong>Fim de Curso (Limit Switch):</strong> Instalado em pontes rolantes e esteiras. Opera igual a uma botoeira NF/NA, mas é acionado pelo impacto físico da máquina. Quando atinge o limite, seu contato NF abre, quebrando a corrente do contator e freando a máquina na hora.</li>
+                        <li><strong>Sensor Indutivo:</strong> Alimente com 24V. O pino OUT liga em um Relé Auxiliar, que repassa o sinal pesado para o K1.</li>
+                    </ul>
+                </section>
+
+                <section class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">20. SEQUENCIAMENTO DE MOTORES EM CASCATA</h3>
+                    <p class="mb-4">Exigido em longas esteiras para que não haja sobrecarga elétrica na partida ou travamento de material.</p>
+                    <p class="text-slate-300">A energia de comando do botão de "Ligar Motor 2" é puxada da saída do bloco auxiliar 13-14 (NA) do "Motor 1". Ou seja, o Motor 2 <strong>SÓ CONSEGUE LIGAR</strong> fisicamente se o Motor 1 já estiver rodando. Isso é feito sequencialmente até o Motor 10.</p>
+                </section>
+
+                <section class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">21 ao 27. SOFT STARTERS, INVERSORES E FRENAGEM</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><strong>Inversor VFD:</strong> Esqueça as chaves Estrela-Triângulo pesadas. A rede (R,S,T) vai direto na entrada do Inversor. As saídas (U,V,W) vão para o motor. Parametrize a rampa de aceleração e a frenagem CC interna. O botão Liga vai no terminal DI1.</li>
+                        <li><strong>Soft Starter:</strong> Apenas arranca o motor suavemente. Quando atinge 100% da tensão nominal, ele atraca o <strong>Contator de Bypass</strong> (interno ou externo) para poupar os tiristores.</li>
+                    </ul>
+                </section>
+
+                <section class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <h3 class="text-2xl font-bold text-emerald-400 border-b border-emerald-800 pb-2 mb-4">28 ao 40. TRANSFERÊNCIAS, BOMBAS E AUTOMAÇÃO AVANÇADA</h3>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li><strong>Alternância de Bombas:</strong> Usando Relés Cíclicos, cada vez que a Boia pede água, o relé muda o canal e aciona a Bomba 1. Na próxima vez, aciona a Bomba 2, garantindo o desgaste uniforme.</li>
+                        <li><strong>Controle via CLP Siemens S7:</strong> L+ e M alimentam a CPU. O sensor Indutivo entra em I0.0. A programação Ladder decide e atraca a saída Q0.0 (que libera 24V para a bobina do contator).</li>
+                        <li><strong>Segurança (NR-12) Relé de Parada Segura:</strong> O Botão de Emergência tem 2 canais NF. Eles entram em S11/S12 e S21/S22 do Relé de Segurança. Se os dois canais não abrirem na mesma fração de milissegundo, a máquina desarma por suspeita de fraude no botão. O relé comanda contatores redundantes em série na rede do motor.</li>
+                    </ul>
+                </section>
+
             </div>
         </div>
     </div>
 
-    <div id="toast-container"></div>
-
-    <script>
-<!-- ... existing code ... -->
-```
-
-```javascript:Simulador Industrial - Sistemas de Motores:simulador_comandos.html
-<!-- ... existing code ... -->
     <script>
         const componentLibrary = [
+            // MEGA BIBLIOTECA - EXPANDIDA COM O PDF
             {
                 type: 'rede_trifasica', name: 'Barramento 380V (3F+N+T)', category: 'ALIMENTAÇÃO',
-                width: 180, height: 50,
+                width: 160, height: 50,
                 inputs: [], outputs: ['L1', 'L2', 'L3', 'N', 'PE'],
                 portStyle: 'edge', 
                 svg: `
-                <svg viewBox="0 0 180 50" width="100%" height="100%" preserveAspectRatio="none">
-                    <rect x="0" y="0" width="180" height="50" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
-                    <rect x="10" y="8" width="160" height="4" fill="#b45309" />
-                    <rect x="10" y="18" width="160" height="4" fill="#b45309" />
-                    <rect x="10" y="28" width="160" height="4" fill="#b45309" />
-                    <rect x="10" y="38" width="160" height="4" fill="#0ea5e9" />
-                    <text x="90" y="27" font-size="10" font-family="sans-serif" font-weight="bold" fill="#475569" text-anchor="middle" opacity="0.8">3~ 380V+N / 60Hz</text>
+                <svg viewBox="0 0 160 50" width="100%" height="100%" preserveAspectRatio="none">
+                    <rect x="0" y="0" width="100%" height="100%" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+                    <rect x="5%" y="15%" width="90%" height="8%" fill="#b45309" />
+                    <rect x="5%" y="30%" width="90%" height="8%" fill="#b45309" />
+                    <rect x="5%" y="45%" width="90%" height="8%" fill="#b45309" />
+                    <rect x="5%" y="60%" width="90%" height="8%" fill="#0ea5e9" />
+                    <text x="50%" y="85%" font-size="9" font-family="sans-serif" font-weight="bold" fill="#475569" text-anchor="middle" opacity="0.5">3~ 380V+N/60Hz</text>
                 </svg>`
             },
             {
@@ -99,10 +613,10 @@
                 portStyle: 'edge', 
                 svg: `
                 <svg viewBox="0 0 120 40" width="100%" height="100%" preserveAspectRatio="none">
-                    <rect x="0" y="0" width="120" height="40" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
-                    <rect x="10" y="12" width="100" height="4" fill="#3b82f6" />
-                    <rect x="10" y="24" width="100" height="4" fill="#0ea5e9" />
-                    <text x="60" y="22" font-size="9" font-family="sans-serif" font-weight="bold" fill="#475569" text-anchor="middle" opacity="0.5">1~ 220V / 60Hz</text>
+                    <rect x="0" y="0" width="100%" height="100%" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+                    <rect x="5%" y="30%" width="90%" height="10%" fill="#3b82f6" />
+                    <rect x="5%" y="60%" width="90%" height="10%" fill="#0ea5e9" />
+                    <text x="50%" y="55%" font-size="9" font-family="sans-serif" font-weight="bold" fill="#475569" text-anchor="middle" opacity="0.5">1~ 220V / 60Hz</text>
                 </svg>`
             },
             {
@@ -131,10 +645,10 @@
                 portStyle: 'edge', 
                 svg: `
                 <svg viewBox="0 0 100 40" width="100%" height="100%" preserveAspectRatio="none">
-                    <rect x="0" y="0" width="100" height="40" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
-                    <rect x="10" y="10" width="80" height="8" fill="#ef4444" />
-                    <rect x="10" y="22" width="80" height="8" fill="#3b82f6" />
-                    <text x="50" y="24" font-size="8" font-family="sans-serif" font-weight="bold" fill="#fff" text-anchor="middle" opacity="0.6">BATT 24VDC</text>
+                    <rect x="0" y="0" width="100%" height="100%" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+                    <rect x="5%" y="25%" width="90%" height="20%" fill="#ef4444" />
+                    <rect x="5%" y="55%" width="90%" height="20%" fill="#3b82f6" />
+                    <text x="50%" y="60%" font-size="8" font-family="sans-serif" font-weight="bold" fill="#fff" text-anchor="middle" opacity="0.6">BATT 24VDC</text>
                 </svg>`
             },
             {
@@ -154,14 +668,29 @@
             {
                 type: 'barra_terra', name: 'Barramento PE (Terra)', category: 'ALIMENTAÇÃO',
                 width: 100, height: 30,
-                inputs: ['PE_IN'], outputs: ['PE1', 'PE2', 'PE3'],
+                inputs: ['PE_IN'], outputs: ['PE1', 'PE2', 'PE3', 'PE4'],
                 portStyle: 'edge', 
                 svg: `
-                <svg viewBox="0 0 100 30" width="100%" height="100%">
-                    <rect x="5" y="10" width="90" height="10" fill="#22c55e" stroke="#166534" stroke-width="1"/>
-                    <circle cx="20" cy="15" r="2" fill="#166534" />
-                    <circle cx="50" cy="15" r="2" fill="#166534" />
-                    <circle cx="80" cy="15" r="2" fill="#166534" />
+                <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+                    <rect x="5%" y="30%" width="90%" height="40%" fill="#22c55e" stroke="#166534" stroke-width="1"/>
+                    <circle cx="20%" cy="50%" r="2" fill="#166534" />
+                    <circle cx="40%" cy="50%" r="2" fill="#166534" />
+                    <circle cx="60%" cy="50%" r="2" fill="#166534" />
+                    <circle cx="80%" cy="50%" r="2" fill="#166534" />
+                </svg>`
+            },
+            {
+                type: 'barra_neutro', name: 'Barramento N (Neutro)', category: 'ALIMENTAÇÃO',
+                width: 100, height: 30,
+                inputs: ['N_IN'], outputs: ['N1', 'N2', 'N3', 'N4'],
+                portStyle: 'edge', 
+                svg: `
+                <svg viewBox="0 0 100 30" width="100%" height="100%" preserveAspectRatio="none">
+                    <rect x="5%" y="30%" width="90%" height="40%" fill="#0ea5e9" stroke="#0369a1" stroke-width="1"/>
+                    <circle cx="20%" cy="50%" r="2" fill="#0369a1" />
+                    <circle cx="40%" cy="50%" r="2" fill="#0369a1" />
+                    <circle cx="60%" cy="50%" r="2" fill="#0369a1" />
+                    <circle cx="80%" cy="50%" r="2" fill="#0369a1" />
                 </svg>`
             },
             {
@@ -183,7 +712,35 @@
                 </svg>`
             },
             {
-                type: 'disjuntor_trifasico', name: 'Disjuntor Trifásico DIN', category: 'PROTEÇÃO',
+                type: 'disjuntor_monofasico', name: 'Disjuntor Monopolar', category: 'PROTEÇÃO',
+                width: 40, height: 90,
+                inputs: ['L'], outputs: ['L\''],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 40 90" width="100%" height="100%">
+                    <rect x="0" y="0" width="40" height="90" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="0" y="20" width="40" height="50" fill="#e2e8f0" />
+                    <rect x="10" y="35" width="20" height="20" fill="#0f172a" rx="1"/>
+                    <rect x="10" y="35" width="20" height="10" fill="#3b82f6" rx="1"/>
+                    <text x="20" y="75" font-size="6" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">C16</text>
+                </svg>`
+            },
+            {
+                type: 'disjuntor_bipolar', name: 'Disjuntor Bipolar', category: 'PROTEÇÃO',
+                width: 50, height: 90,
+                inputs: ['L', 'N'], outputs: ['L\'', 'N\''],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 50 90" width="100%" height="100%">
+                    <rect x="0" y="0" width="50" height="90" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="0" y="20" width="50" height="50" fill="#e2e8f0" />
+                    <rect x="15" y="35" width="20" height="20" fill="#0f172a" rx="1"/>
+                    <rect x="15" y="35" width="20" height="10" fill="#3b82f6" rx="1"/>
+                    <text x="25" y="75" font-size="6" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">C10</text>
+                </svg>`
+            },
+            {
+                type: 'disjuntor_trifasico', name: 'Disjuntor Tripolar DIN', category: 'PROTEÇÃO',
                 width: 70, height: 90,
                 inputs: ['L1', 'L2', 'L3'], outputs: ['T1', 'T2', 'T3'],
                 portStyle: 'edge',
@@ -197,7 +754,7 @@
                 </svg>`
             },
             {
-                type: 'dr_tetrapolar', name: 'Interruptor DR (RCD)', category: 'PROTEÇÃO',
+                type: 'dr_tetrapolar', name: 'Interruptor DR/RCD', category: 'PROTEÇÃO',
                 width: 80, height: 110,
                 inputs: ['1', '3', '5', 'N'], outputs: ['2', '4', '6', 'N\''],
                 portStyle: 'edge',
@@ -213,7 +770,7 @@
                 </svg>`
             },
             {
-                type: 'dps', name: 'Protetor Surto (DPS)', category: 'PROTEÇÃO',
+                type: 'dps', name: 'Dispositivo DPS', category: 'PROTEÇÃO',
                 width: 50, height: 90,
                 inputs: ['L', 'N'], outputs: ['PE'],
                 portStyle: 'edge',
@@ -224,6 +781,38 @@
                     <rect x="10" y="25" width="30" height="15" fill="#fca5a5" />
                     <text x="25" y="55" font-size="8" font-family="sans-serif" font-weight="bold" fill="#fff" text-anchor="middle">DPS</text>
                     <text x="25" y="65" font-size="5" font-family="sans-serif" fill="#fff" text-anchor="middle">40kA</text>
+                </svg>`
+            },
+            {
+                type: 'fusivel_seccionadora', name: 'Seccionadora Base 3F', category: 'PROTEÇÃO',
+                width: 80, height: 100,
+                inputs: ['1', '3', '5'], outputs: ['2', '4', '6'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 80 100" width="100%" height="100%">
+                    <rect x="0" y="0" width="80" height="100" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1" rx="2"/>
+                    <rect x="10" y="20" width="15" height="60" fill="#f8fafc" stroke="#cbd5e1" />
+                    <rect x="32" y="20" width="15" height="60" fill="#f8fafc" stroke="#cbd5e1" />
+                    <rect x="54" y="20" width="15" height="60" fill="#f8fafc" stroke="#cbd5e1" />
+                    <rect x="13" y="30" width="9" height="40" fill="#cbd5e1" rx="4" />
+                    <rect x="35" y="30" width="9" height="40" fill="#cbd5e1" rx="4" />
+                    <rect x="57" y="30" width="9" height="40" fill="#cbd5e1" rx="4" />
+                    <line x1="0" y1="50" x2="80" y2="50" stroke="#ef4444" stroke-width="4" stroke-dasharray="8,4" opacity="0.5"/> 
+                </svg>`
+            },
+            {
+                type: 'fusivel_nh', name: 'Fusível NH', category: 'PROTEÇÃO',
+                width: 40, height: 90,
+                inputs: ['IN'], outputs: ['OUT'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 40 90" width="100%" height="100%">
+                    <rect x="5" y="10" width="30" height="70" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1" rx="4"/>
+                    <rect x="15" y="0" width="10" height="20" fill="#94a3b8" />
+                    <rect x="15" y="70" width="10" height="20" fill="#94a3b8" />
+                    <rect x="10" y="30" width="20" height="30" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+                    <text x="20" y="45" font-size="8" font-family="sans-serif" font-weight="bold" fill="#ef4444" text-anchor="middle">NH00</text>
+                    <text x="20" y="55" font-size="5" font-family="sans-serif" fill="#64748b" text-anchor="middle">100A aM</text>
                 </svg>`
             },
             {
@@ -242,7 +831,7 @@
                 </svg>`
             },
             {
-                type: 'rele_falta_fase', name: 'Relé Falta de Fase', category: 'PROTEÇÃO',
+                type: 'rele_falta_fase', name: 'Relé de Falta de Fase', category: 'PROTEÇÃO',
                 width: 50, height: 100,
                 inputs: ['L1', 'L2', 'L3', '11'], outputs: ['12', '14'],
                 portStyle: 'edge',
@@ -260,23 +849,7 @@
                 </svg>`
             },
             {
-                type: 'rele_seguranca', name: 'Relé de Segurança (NR-12)', category: 'SEGURANÇA',
-                width: 100, height: 120,
-                inputs: ['A1', 'S11', 'S21', '13', '23'], outputs: ['A2', 'S12', 'S22', '14', '24'],
-                portStyle: 'edge',
-                svg: `
-                <svg viewBox="0 0 100 120" width="100%" height="100%">
-                    <rect x="0" y="0" width="100" height="120" fill="#fde047" stroke="#eab308" stroke-width="2"/>
-                    <rect x="10" y="20" width="80" height="80" fill="#1e293b" />
-                    <text x="50" y="45" font-size="10" font-weight="bold" fill="#fde047" text-anchor="middle">SAFETY</text>
-                    <circle cx="30" cy="70" r="4" fill="#22c55e" filter="drop-shadow(0 0 2px #22c55e)"/>
-                    <text x="30" y="85" font-size="6" fill="#cbd5e1" text-anchor="middle">CH1</text>
-                    <circle cx="70" cy="70" r="4" fill="#22c55e" filter="drop-shadow(0 0 2px #22c55e)"/>
-                    <text x="70" y="85" font-size="6" fill="#cbd5e1" text-anchor="middle">CH2</text>
-                </svg>`
-            },
-            {
-                type: 'contator_k1', name: 'Contator K1 (2NA+2NF)', category: 'MANOBRA',
+                type: 'contator_k1', name: 'Contator K1 (2NA+1NF)', category: 'MANOBRA',
                 width: 150, height: 100,
                 inputs: ['L1', 'L2', 'L3', '13', '21', '43', 'A1'], outputs: ['T1', 'T2', 'T3', '14', '22', '44', 'A2'], 
                 portStyle: 'edge',
@@ -287,11 +860,11 @@
                     <rect x="15" y="35" width="120" height="30" fill="#3b82f6" rx="2" />
                     <rect x="65" y="40" width="20" height="20" fill="#1e293b" />
                     <line x1="20" y1="50" x2="130" y2="50" stroke="#60a5fa" stroke-width="1" opacity="0.5"/>
-                    <text x="75" y="90" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">K1 - Principal</text>
+                    <text x="75" y="90" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">Siemens Pro K1</text>
                 </svg>`
             },
             {
-                type: 'contator_k2', name: 'Contator K2 (Reversão/Trian)', category: 'MANOBRA',
+                type: 'contator_k2', name: 'Contator K2 (2NA+1NF)', category: 'MANOBRA',
                 width: 150, height: 100,
                 inputs: ['L1', 'L2', 'L3', '13', '21', '43', 'A1'], outputs: ['T1', 'T2', 'T3', '14', '22', '44', 'A2'], 
                 portStyle: 'edge',
@@ -302,11 +875,11 @@
                     <rect x="15" y="35" width="120" height="30" fill="#f97316" rx="2" />
                     <rect x="65" y="40" width="20" height="20" fill="#1e293b" />
                     <line x1="20" y1="50" x2="130" y2="50" stroke="#fdba74" stroke-width="1" opacity="0.5"/>
-                    <text x="75" y="90" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">K2 - Auxiliar</text>
+                    <text x="75" y="90" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">Siemens Pro K2</text>
                 </svg>`
             },
             {
-                type: 'contator_k3', name: 'Contator K3 (Estrela)', category: 'MANOBRA',
+                type: 'contator_k3', name: 'Contator K3 (2NA+1NF)', category: 'MANOBRA',
                 width: 150, height: 100,
                 inputs: ['L1', 'L2', 'L3', '13', '21', '43', 'A1'], outputs: ['T1', 'T2', 'T3', '14', '22', '44', 'A2'], 
                 portStyle: 'edge',
@@ -317,11 +890,11 @@
                     <rect x="15" y="35" width="120" height="30" fill="#8b5cf6" rx="2" />
                     <rect x="65" y="40" width="20" height="20" fill="#1e293b" />
                     <line x1="20" y1="50" x2="130" y2="50" stroke="#c4b5fd" stroke-width="1" opacity="0.5"/>
-                    <text x="75" y="90" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">K3 - Estrela</text>
+                    <text x="75" y="90" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">Siemens Pro K3</text>
                 </svg>`
             },
             {
-                type: 'contator_k4', name: 'Contator K4', category: 'MANOBRA',
+                type: 'contator_k4', name: 'Contator K4 (2NA+1NF)', category: 'MANOBRA',
                 width: 150, height: 100,
                 inputs: ['L1', 'L2', 'L3', '13', '21', '43', 'A1'], outputs: ['T1', 'T2', 'T3', '14', '22', '44', 'A2'], 
                 portStyle: 'edge',
@@ -332,11 +905,11 @@
                     <rect x="15" y="35" width="120" height="30" fill="#10b981" rx="2" />
                     <rect x="65" y="40" width="20" height="20" fill="#1e293b" />
                     <line x1="20" y1="50" x2="130" y2="50" stroke="#6ee7b7" stroke-width="1" opacity="0.5"/>
-                    <text x="75" y="90" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">K4 - Comando</text>
+                    <text x="75" y="90" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">Siemens Pro K4</text>
                 </svg>`
             },
             {
-                type: 'contator_k5', name: 'Contator K5', category: 'MANOBRA',
+                type: 'contator_k5', name: 'Contator K5 (2NA+1NF)', category: 'MANOBRA',
                 width: 150, height: 100,
                 inputs: ['L1', 'L2', 'L3', '13', '21', '43', 'A1'], outputs: ['T1', 'T2', 'T3', '14', '22', '44', 'A2'], 
                 portStyle: 'edge',
@@ -347,7 +920,7 @@
                     <rect x="15" y="35" width="120" height="30" fill="#ec4899" rx="2" />
                     <rect x="65" y="40" width="20" height="20" fill="#1e293b" />
                     <line x1="20" y1="50" x2="130" y2="50" stroke="#f9a8d4" stroke-width="1" opacity="0.5"/>
-                    <text x="75" y="90" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">K5 - Adicional</text>
+                    <text x="75" y="90" font-size="9" font-family="sans-serif" font-weight="bold" fill="#64748b" text-anchor="middle">Siemens Pro K5</text>
                 </svg>`
             },
             {
@@ -368,7 +941,23 @@
                 </svg>`
             },
             {
-                type: 'botoeira_na', name: 'Botão LIGA (Verde)', category: 'COMANDO',
+                type: 'rele_seguranca', name: 'Relé Segurança NR-12', category: 'SEGURANÇA',
+                width: 100, height: 120,
+                inputs: ['A1', 'S11', 'S21', '13', '23'], outputs: ['A2', 'S12', 'S22', '14', '24'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 100 120" width="100%" height="100%">
+                    <rect x="0" y="0" width="100" height="120" fill="#fde047" stroke="#eab308" stroke-width="2"/>
+                    <rect x="10" y="20" width="80" height="80" fill="#1e293b" />
+                    <text x="50" y="45" font-size="10" font-weight="bold" fill="#fde047" text-anchor="middle">SAFETY</text>
+                    <circle cx="30" cy="70" r="4" fill="#22c55e" filter="drop-shadow(0 0 2px #22c55e)"/>
+                    <text x="30" y="85" font-size="6" fill="#cbd5e1" text-anchor="middle">CH1</text>
+                    <circle cx="70" cy="70" r="4" fill="#22c55e" filter="drop-shadow(0 0 2px #22c55e)"/>
+                    <text x="70" y="85" font-size="6" fill="#cbd5e1" text-anchor="middle">CH2</text>
+                </svg>`
+            },
+            {
+                type: 'botoeira_na', name: 'Botão de Pulso NA', category: 'COMANDO',
                 width: 60, height: 60,
                 inputs: ['13'], outputs: ['14'],
                 portStyle: 'edge',
@@ -381,7 +970,7 @@
                 </svg>`
             },
             {
-                type: 'botoeira_nf', name: 'Botão DESLIGA (Vermelho)', category: 'COMANDO',
+                type: 'botoeira_nf', name: 'Botão de Pulso NF', category: 'COMANDO',
                 width: 60, height: 60,
                 inputs: ['11'], outputs: ['12'],
                 portStyle: 'edge',
@@ -394,7 +983,7 @@
                 </svg>`
             },
             {
-                type: 'botoeira_dupla', name: 'Botoeira Dupla Liga/Desliga', category: 'COMANDO',
+                type: 'botoeira_dupla', name: 'Botoeira Dupla NA/NF', category: 'COMANDO',
                 width: 60, height: 100,
                 inputs: ['13', '11'], outputs: ['14', '12'],
                 portStyle: 'edge',
@@ -408,7 +997,7 @@
                 </svg>`
             },
             {
-                type: 'botoeira_emergencia', name: 'Botão Emergência (Cogumelo)', category: 'COMANDO',
+                type: 'botoeira_emergencia', name: 'Botão Emergência', category: 'COMANDO',
                 width: 60, height: 60,
                 inputs: ['11'], outputs: ['12'],
                 portStyle: 'edge',
@@ -437,6 +1026,18 @@
                 </svg>`
             },
             {
+                type: 'chave_boia', name: 'Chave Boia de Nível', category: 'COMANDO',
+                width: 50, height: 80,
+                inputs: ['COM'], outputs: ['NA', 'NF'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 50 80" width="100%" height="100%">
+                    <path d="M 25 10 Q 40 10 40 30 Q 40 50 25 70 Q 10 50 10 30 Q 10 10 25 10 Z" fill="#0ea5e9" stroke="#0284c7" stroke-width="2"/>
+                    <circle cx="25" cy="30" r="10" fill="#f8fafc" />
+                    <text x="25" y="55" font-size="6" font-weight="bold" fill="#fff" text-anchor="middle">FLOAT</text>
+                </svg>`
+            },
+            {
                 type: 'fim_de_curso', name: 'Chave Fim de Curso', category: 'COMANDO',
                 width: 40, height: 90,
                 inputs: ['13', '11'], outputs: ['14', '12'],
@@ -450,19 +1051,7 @@
                 </svg>`
             },
             {
-                type: 'chave_boia', name: 'Chave Bóia (Nível)', category: 'COMANDO',
-                width: 50, height: 80,
-                inputs: ['COM'], outputs: ['NA', 'NF'],
-                portStyle: 'edge',
-                svg: `
-                <svg viewBox="0 0 50 80" width="100%" height="100%">
-                    <path d="M 25 10 Q 40 10 40 30 Q 40 50 25 70 Q 10 50 10 30 Q 10 10 25 10 Z" fill="#0ea5e9" stroke="#0284c7" stroke-width="2"/>
-                    <circle cx="25" cy="30" r="10" fill="#f8fafc" />
-                    <text x="25" y="55" font-size="6" font-weight="bold" fill="#fff" text-anchor="middle">FLOAT</text>
-                </svg>`
-            },
-            {
-                type: 'sinaleiro_verde', name: 'Sinaleiro Verde (Ligado)', category: 'SINALIZAÇÃO',
+                type: 'sinaleiro_verde', name: 'Sinaleiro Verde (Run)', category: 'SINALIZAÇÃO',
                 width: 50, height: 50,
                 inputs: ['X1'], outputs: ['X2'],
                 portStyle: 'edge',
@@ -475,7 +1064,7 @@
                 </svg>`
             },
             {
-                type: 'sinaleiro_vermelho', name: 'Sinaleiro Vermelho (Falha/Parado)', category: 'SINALIZAÇÃO',
+                type: 'sinaleiro_vermelho', name: 'Sinaleiro Vermelho (Falha/Off)', category: 'SINALIZAÇÃO',
                 width: 50, height: 50,
                 inputs: ['X1'], outputs: ['X2'],
                 portStyle: 'edge',
@@ -501,7 +1090,7 @@
                 </svg>`
             },
             {
-                type: 'sinaleiro_azul', name: 'Sinaleiro Azul (Reset/Pronto)', category: 'SINALIZAÇÃO',
+                type: 'sinaleiro_azul', name: 'Sinaleiro Azul (Reset)', category: 'SINALIZAÇÃO',
                 width: 50, height: 50,
                 inputs: ['X1'], outputs: ['X2'],
                 portStyle: 'edge',
@@ -514,7 +1103,7 @@
                 </svg>`
             },
             {
-                type: 'sinaleiro_branco', name: 'Sinaleiro Branco (Tensão Ok)', category: 'SINALIZAÇÃO',
+                type: 'sinaleiro_branco', name: 'Sinaleiro Branco (Tensão OK)', category: 'SINALIZAÇÃO',
                 width: 50, height: 50,
                 inputs: ['X1'], outputs: ['X2'],
                 portStyle: 'edge',
@@ -527,7 +1116,7 @@
                 </svg>`
             },
             {
-                type: 'sirene_alarme', name: 'Sirene / Alarme', category: 'SINALIZAÇÃO',
+                type: 'sirene_alarme', name: 'Sirene Sonora', category: 'SINALIZAÇÃO',
                 width: 60, height: 60,
                 inputs: ['X1'], outputs: ['X2'],
                 portStyle: 'edge',
@@ -580,7 +1169,7 @@
                 </svg>`
             },
             {
-                type: 'motor_1f', name: 'Motor 1~ (Capacitor)', category: 'MÁQUINAS',
+                type: 'motor_1f', name: 'Motor 1~ Monofásico', category: 'MÁQUINAS',
                 width: 150, height: 130,
                 inputs: ['Fase', 'Neutro', 'PE'], outputs: [],
                 portStyle: 'edge',
@@ -603,7 +1192,7 @@
                 </svg>`
             },
             {
-                type: 'motor_dahlander', name: 'Motor Dahlander 2 Vel.', category: 'MÁQUINAS',
+                type: 'motor_dahlander', name: 'Motor Dahlander', category: 'MÁQUINAS',
                 width: 170, height: 130,
                 inputs: ['1U', '1V', '1W', '2U', '2V', '2W', 'PE'], outputs: [],
                 portStyle: 'edge',
@@ -625,40 +1214,17 @@
                 </svg>`
             },
             {
-                type: 'motor_aneis', name: 'Motor Rotor Bobinado', category: 'MÁQUINAS',
-                width: 160, height: 130,
-                inputs: ['U', 'V', 'W', 'K', 'L', 'M', 'PE'], outputs: [],
+                type: 'banco_capacitores', name: 'Banco de Capacitores', category: 'MÁQUINAS',
+                width: 120, height: 90,
+                inputs: ['L1', 'L2', 'L3'], outputs: ['PE'],
                 portStyle: 'edge',
                 svg: `
-                <svg viewBox="0 0 160 130" width="100%" height="100%">
-                    <rect x="35" y="110" width="90" height="15" fill="#475569" rx="2" />
-                    <rect x="30" y="40" width="105" height="65" fill="#b45309" rx="8" />
-                    <rect x="135" y="55" width="20" height="35" fill="#78350f" rx="2"/>
-                    <line x1="140" y1="60" x2="150" y2="60" stroke="#fbbf24" stroke-width="2"/>
-                    <line x1="140" y1="70" x2="150" y2="70" stroke="#fbbf24" stroke-width="2"/>
-                    <line x1="140" y1="80" x2="150" y2="80" stroke="#fbbf24" stroke-width="2"/>
-                    <line x1="35" y1="50" x2="130" y2="50" stroke="#92400e" stroke-width="3"/>
-                    <line x1="35" y1="60" x2="130" y2="60" stroke="#92400e" stroke-width="3"/>
-                    <line x1="35" y1="70" x2="130" y2="70" stroke="#92400e" stroke-width="3"/>
-                    <line x1="35" y1="80" x2="130" y2="80" stroke="#92400e" stroke-width="3"/>
-                    <path d="M 30 40 Q 15 72 30 105 L 20 100 L 20 45 Z" fill="#78350f"/>
-                    <rect x="0" y="0" width="160" height="20" fill="transparent" />
-                    <rect x="60" y="15" width="45" height="25" fill="#b45309" />
-                </svg>`
-            },
-            {
-                type: 'motor_cc', name: 'Motor DC (CC)', category: 'MÁQUINAS',
-                width: 140, height: 120,
-                inputs: ['A1(+)', 'A2(-)', 'F1', 'F2', 'PE'], outputs: [],
-                portStyle: 'edge',
-                svg: `
-                <svg viewBox="0 0 140 120" width="100%" height="100%">
-                    <rect x="25" y="100" width="90" height="15" fill="#475569" rx="2" />
-                    <rect x="20" y="30" width="100" height="65" fill="#334155" rx="8" />
-                    <circle cx="70" cy="62" r="25" fill="#1e293b" stroke="#cbd5e1" stroke-width="2"/>
-                    <text x="70" y="68" font-size="14" font-family="sans-serif" font-weight="bold" fill="#fff" text-anchor="middle">M=</text>
-                    <rect x="0" y="0" width="140" height="20" fill="transparent" />
-                    <rect x="50" y="10" width="40" height="20" fill="#334155" />
+                <svg viewBox="0 0 120 90" width="100%" height="100%">
+                    <rect x="10" y="10" width="100" height="70" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1" rx="4"/>
+                    <rect x="20" y="30" width="20" height="40" fill="#e2e8f0" stroke="#cbd5e1" rx="2"/>
+                    <rect x="50" y="30" width="20" height="40" fill="#e2e8f0" stroke="#cbd5e1" rx="2"/>
+                    <rect x="80" y="30" width="20" height="40" fill="#e2e8f0" stroke="#cbd5e1" rx="2"/>
+                    <text x="60" y="22" font-size="8" font-family="sans-serif" font-weight="bold" fill="#3b82f6" text-anchor="middle">50 kVAr</text>
                 </svg>`
             },
             {
@@ -748,6 +1314,37 @@
                     <line x1="10" y1="60" x2="30" y2="60" stroke="#94a3b8" stroke-width="1"/>
                     <rect x="10" y="0" width="20" height="10" fill="#3b82f6" rx="2" />
                     <circle cx="20" cy="70" r="3" fill="#ef4444" />
+                </svg>`
+            },
+            {
+                type: 'sensor_capacitivo', name: 'Sensor Capacitivo', category: 'AUTOMAÇÃO',
+                width: 40, height: 80,
+                inputs: ['+24V', '0V'], outputs: ['OUT'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 40 80" width="100%" height="100%">
+                    <rect x="10" y="10" width="20" height="70" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="10" y1="20" x2="30" y2="20" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="10" y1="30" x2="30" y2="30" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="10" y1="40" x2="30" y2="40" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="10" y1="50" x2="30" y2="50" stroke="#94a3b8" stroke-width="1"/>
+                    <line x1="10" y1="60" x2="30" y2="60" stroke="#94a3b8" stroke-width="1"/>
+                    <rect x="10" y="0" width="20" height="10" fill="#eab308" rx="2" />
+                    <circle cx="20" cy="70" r="3" fill="#ef4444" />
+                </svg>`
+            },
+            {
+                type: 'valvula_solenoide', name: 'Válvula Solenoide 5/2', category: 'AUTOMAÇÃO',
+                width: 70, height: 90,
+                inputs: ['A1(+)', 'A2(-)'], outputs: ['P'],
+                portStyle: 'edge',
+                svg: `
+                <svg viewBox="0 0 70 90" width="100%" height="100%">
+                    <rect x="10" y="10" width="50" height="70" fill="#1e293b" stroke="#cbd5e1" stroke-width="1" rx="2"/>
+                    <rect x="15" y="0" width="40" height="15" fill="#f8fafc" />
+                    <text x="35" y="12" font-size="8" font-family="sans-serif" font-weight="bold" fill="#0f172a" text-anchor="middle">24V DC</text>
+                    <circle cx="35" cy="50" r="10" fill="#334155" stroke="#94a3b8"/>
+                    <path d="M 30 50 L 40 45 L 40 55 Z" fill="#94a3b8" />
                 </svg>`
             }
         ];
@@ -902,7 +1499,6 @@
                 categories[cat].forEach(comp => {
                     const item = document.createElement('div');
                     item.className = 'sidebar-item bg-slate-800 border border-slate-700 rounded-lg p-2 flex items-center gap-3 cursor-grab text-white select-none';
-                    item.style.touchAction = 'none'; // FIX MOBILE: Previne scroll do browser durante arraste
                     item.draggable = true;
                     item.dataset.type = comp.type;
                     
@@ -954,6 +1550,7 @@
         let dragTimeout;
         let isPaletteScrolling = false;
         let paletteStartY = 0;
+        let lastComponentCreateTime = 0;
 
         function handleTouchStartPalette(e) {
             touchDragType = e.currentTarget.dataset.type;
@@ -965,8 +1562,9 @@
             
             dragTimeout = setTimeout(() => {
                 if(!isPaletteScrolling) {
+                    document.querySelectorAll('.ghost-drag-clone').forEach(el => el.remove());
                     touchDragElement = currentTarget.cloneNode(true);
-                    touchDragElement.id = 'ghost-clone-' + Date.now(); // FIX GHOST: ID para exclusao blindada
+                    touchDragElement.classList.add('ghost-drag-clone');
                     touchDragElement.style.position = 'fixed';
                     touchDragElement.style.opacity = '0.7';
                     touchDragElement.style.pointerEvents = 'none';
@@ -978,7 +1576,7 @@
             
             document.addEventListener('touchmove', handleTouchMovePalette, {passive: false});
             document.addEventListener('touchend', handleTouchEndPalette);
-            document.addEventListener('touchcancel', handleTouchEndPalette); // FIX GHOST: Limpa caso o OS cancele o touch
+            document.addEventListener('touchcancel', handleTouchEndPalette);
         }
 
         function moveTouchGhost(x, y) {
@@ -1006,13 +1604,11 @@
             document.removeEventListener('touchend', handleTouchEndPalette);
             document.removeEventListener('touchcancel', handleTouchEndPalette);
             
+            document.querySelectorAll('.ghost-drag-clone').forEach(el => el.remove());
             if (touchDragElement) {
                 touchDragElement.remove();
                 touchDragElement = null;
             }
-            
-            // FIX GHOST: Limpeza varrendo o DOM inteiro para evitar clones travados
-            document.querySelectorAll('[id^="ghost-clone-"]').forEach(el => el.remove());
             
             if (touchDragType && !isPaletteScrolling) {
                 const touch = e.changedTouches[0];
@@ -1031,11 +1627,11 @@
             isPaletteScrolling = false;
         }
 
-        let lastComponentCreateTime = 0; // FIX DUPLICIDADE: Impede double-fire em touch/mouse simultaneo
-
         function createComponent(type, x, y, idForce = null) {
             const now = Date.now();
-            if (!idForce && now - lastComponentCreateTime < 300) return null; // Trava de debounce
+            if (!idForce && now - lastComponentCreateTime < 300) {
+                return null; 
+            }
             lastComponentCreateTime = now;
 
             const template = componentLibrary.find(c => c.type === type);
@@ -1068,13 +1664,15 @@
                 </button>
             `;
 
-            setupNodeDragging(el, el, id); // O componente inteiro é arrastável
+            const isBusbar = ['rede_trifasica', 'rede_monofasica', 'rede_cc_bateria', 'barra_terra', 'barra_neutro'].includes(type);
 
             const body = document.createElement('div');
             body.className = 'component-body';
-            body.style.width = '100%'; // Fix responsividade do componente
+            body.style.width = '100%';
             body.style.height = template.height + 'px';
             body.innerHTML = template.svg;
+
+            setupNodeDragging(el, el, id);
 
             const portClass = template.portStyle === 'inset' ? 'inset-ports' : 'ports-container';
             
@@ -1095,8 +1693,6 @@
             if(template.inputs.length > 0) el.appendChild(inputsContainer);
             if(template.outputs.length > 0) el.appendChild(outputsContainer);
 
-            // Adiciona puxadores laterais (resize) apenas para barramentos esticáveis
-            const isBusbar = ['rede_trifasica', 'rede_monofasica', 'rede_cc_bateria', 'barra_terra', 'barra_neutro'].includes(type);
             if (isBusbar) {
                 const leftHandle = document.createElement('div');
                 leftHandle.className = 'resize-handle left-handle';
@@ -1117,7 +1713,6 @@
             return id;
         }
 
-        // FUNÇÃO DE ESTICAR BARRAMENTOS
         function setupBusbarResizing(lHandle, rHandle, nodeEl, id, template) {
             let isResizing = false;
             let startX, startWidth, startLeft;
@@ -1203,8 +1798,6 @@
 
             wrapper.appendChild(port);
             wrapper.appendChild(label);
-            
-            // FIX TOUCH/BORNES: debounce de porta para telas resistivas e pointerdown universal
             port.addEventListener('pointerdown', handlePortClick);
             port.addEventListener('touchstart', function(e) {
                 if(e.cancelable) e.preventDefault(); 
@@ -1228,7 +1821,7 @@
             if(e.preventDefault) e.preventDefault();
 
             const now = Date.now();
-            if (now - lastPortClickTime < 150) return; // FIX DEBOUNCE PARA FIOS NO TOUCH
+            if (now - lastPortClickTime < 150) return; 
             lastPortClickTime = now;
 
             if(isPanning) return; 
@@ -1272,14 +1865,17 @@
 
         function updateDrawingWire(clientX, clientY) {
             if (!drawingWire) return;
-            const startPos = getPortCenter(drawingWire.sourceEl);
+            const p1 = getPortCenter(drawingWire.sourceEl);
+            const t1 = drawingWire.sourceEl.dataset.type;
             
             const panZoomRect = canvasPanZoom.getBoundingClientRect();
             const mouseX = (clientX - panZoomRect.left) / scale;
             const mouseY = (clientY - panZoomRect.top) / scale;
             
-            // Aplica a visualizacao em degrau tb no desenho live
-            drawingWirePath.setAttribute('d', getOrthogonalPath(startPos, {x: mouseX, y: mouseY}, drawingWire.sourceEl.dataset.type, 'in', 0));
+            const p2 = { x: mouseX, y: mouseY };
+            const t2 = t1 === 'in' ? 'out' : 'in'; 
+            
+            drawingWirePath.setAttribute('d', getOrthogonalPath(p1, p2, t1, t2, 0));
         }
 
         function cancelDrawing(e) {
@@ -1323,7 +1919,6 @@
                 e.stopPropagation();
                 deleteWire(wireId);
             });
-            // FIX TOUCH EXCLUSÃO DE FIO
             path.addEventListener('touchstart', (e) => {
                 e.stopPropagation();
                 if(e.cancelable) e.preventDefault();
@@ -1349,7 +1944,6 @@
             };
         }
 
-        /* REGRA RÍGIDA RESPEITADA - ALGORITMO MODO ESCADA INFINITO (ANTI-EMBARALHAMENTO REFINADO) */
         function getOrthogonalPath(p1, p2, t1, t2, wireNum) {
             const spreadOffset = (wireNum % 15) * 8; 
             const stub1 = t1 === 'in' ? -25 - spreadOffset : 25 + spreadOffset;
@@ -1409,10 +2003,9 @@
             let startX, startY, initialX, initialY;
 
             function onPointerDown(e) {
-                // Ignora cliques em botões, redimensionadores e bornes/portas para não conflitar com o arraste pelo meio
                 if(e.target.closest('button') || e.target.classList.contains('resize-handle') || e.target.classList.contains('port') || e.target.closest('.port-wrapper')) return; 
                 if(e.shiftKey) return; 
-                if(isDragging) return; // Impede bug louco e tremida no arraste duplo
+                if(isDragging) return; 
                 
                 if(e.stopPropagation) e.stopPropagation();
                 
@@ -1470,170 +2063,521 @@
             handleEl.addEventListener('pointerdown', onPointerDown);
             handleEl.addEventListener('touchstart', onPointerDown, {passive: false});
         }
-<!-- ... existing code ... -->
-```
 
-```javascript:Simulador Industrial - Sistemas de Motores:simulador_comandos.html
-<!-- ... existing code ... -->
+        function deleteComponent(id) {
+            if(isSimulationRunning) { showToast("Ação bloqueada durante a simulação!", "error"); return; }
+            const el = document.getElementById(id);
+            if(el) el.remove();
+            nodes = nodes.filter(n => n.id !== id);
+            
+            const wiresToRemove = wires.filter(w => w.sourceNode === id || w.targetNode === id);
+            wiresToRemove.forEach(w => { if(w.pathEl) w.pathEl.remove(); });
+            wires = wires.filter(w => w.sourceNode !== id && w.targetNode !== id);
+        }
+
+        function deleteWire(id) {
+            if(isSimulationRunning) { showToast("Ação bloqueada durante a simulação!", "error"); return; }
+            const wire = wires.find(w => w.id === id);
+            if (wire) {
+                wire.pathEl.remove();
+                wires = wires.filter(w => w.id !== id);
+            }
+        }
+
+        function clearWorkspace(bypassConfirm = false) {
+            if(isSimulationRunning) { showToast("Pare a simulação primeiro!", "error"); return; }
+            if(!bypassConfirm && !confirm("Deseja apagar todo o projeto atual?")) return;
+            componentsContainer.innerHTML = '';
+            wireLayer.innerHTML = '';
+            nodes = [];
+            wires = [];
+            nodeIdCounter = 0;
+            wireIdCounter = 0;
+            document.getElementById('welcome-text').style.display = 'flex';
+            if(!bypassConfirm) showToast("Bancada limpa.", 'success');
+        }
+
+        function exportCircuit() {
+            if(nodes.length === 0) {
+                showToast("Não há nada na bancada para salvar.", 'error');
+                return;
+            }
+            
+            const data = {
+                nodes: nodes.map(n => ({ id: n.id, type: n.type, x: n.x, y: n.y, width: n.width })),
+                wires: wires.map(w => ({ id: w.id, srcN: w.sourceNode, srcP: w.sourcePort, tgtN: w.targetNode, tgtP: w.targetPort }))
+            };
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "meu_diagrama_motor.json");
+            dlAnchorElem.click();
+            showToast("Projeto Salvo!", 'success');
+        }
+
+        function importCircuit(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    clearWorkspace(true);
+                    
+                    data.nodes.forEach(n => {
+                        const newId = createComponent(n.type, n.x, n.y, n.id);
+                        if (newId && n.width) {
+                            const el = document.getElementById(newId);
+                            if (el && ['rede_trifasica', 'rede_monofasica', 'rede_cc_bateria', 'barra_terra', 'barra_neutro'].includes(n.type)) {
+                                el.style.width = n.width + 'px';
+                                const nodeObj = nodes.find(nd => nd.id === newId);
+                                if(nodeObj) nodeObj.width = n.width;
+                            }
+                        }
+                    });
+                    
+                    setTimeout(() => {
+                        data.wires.forEach(w => {
+                            createWire(w.srcN, w.srcP, w.tgtN, w.tgtP, w.id);
+                        });
+                        document.getElementById('welcome-text').style.display = 'none';
+                        showToast("Projeto Carregado!", 'success');
+                        event.target.value = ''; 
+                    }, 50);
+                    
+                } catch(err) {
+                    showToast("Arquivo inválido.", 'error');
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function showHelp() {
+            alert("CAD Pro - Instruções:\n\n1. Oculte a biblioteca no botão do menu superior.\n2. Zoom: Role o scroll do mouse ou faça movimento de pinça no celular.\n3. Pan (Mover tela): Segure SHIFT + Clique, ou toque com 1 dedo no fundo e arraste.\n4. Apostila: Clique no botão da biblioteca para abrir as lições de montagem.\n5. O sistema salva em .json localmente em seu PC.");
+        }
+
+        function showToast(message, type='info') {
+            const container = document.getElementById('toast-container');
+            if(!container) return; 
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            if(type === 'error') toast.style.borderLeftColor = '#ef4444';
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease-out forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        let isSimulationRunning = false;
+        let simInterval = null;
+        
+        function toggleSimulation() {
+            isSimulationRunning = !isSimulationRunning;
+            const btn = document.getElementById('btn-sim');
+            
+            if(isSimulationRunning) {
+                btn.innerHTML = '<i class="fa-solid fa-pause text-yellow-400"></i>';
+                showToast("Simulação Iniciada! Clique nos botões/chaves para ligar.", "success");
+                workspace.style.boxShadow = "inset 0 0 50px rgba(34, 197, 94, 0.1)";
+                
+                nodes.forEach(n => {
+                    const body = n.el.querySelector('.component-body');
+                    body.style.cursor = 'pointer';
+                    body.onpointerdown = (e) => {
+                        if(!isSimulationRunning) return;
+                        e.stopPropagation();
+                        e.preventDefault();
+                        const isActive = n.el.dataset.simActive === "true";
+                        n.el.dataset.simActive = isActive ? "false" : "true";
+                        
+                        if(n.type.includes('contator')) n.el.dataset.manualOverride = "true";
+                        
+                        if(!isActive) n.el.classList.add('component-active-glow');
+                        else {
+                            n.el.classList.remove('component-active-glow');
+                            delete n.el.dataset.manualOverride;
+                        }
+                    };
+                });
+                
+                simInterval = setInterval(simulateElectricalNetwork, 100);
+                
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-play text-green-400"></i>';
+                showToast("Simulação Pausada e Zerada.", "info");
+                workspace.style.boxShadow = "none";
+                
+                clearInterval(simInterval);
+                
+                nodes.forEach(n => {
+                    const body = n.el.querySelector('.component-body');
+                    body.style.cursor = 'default';
+                    body.onclick = null;
+                    body.onpointerdown = null;
+                    n.el.dataset.simActive = "false";
+                    n.el.classList.remove('component-active-glow');
+                    delete n.el.dataset.manualOverride;
+                    
+                    const gear = n.el.querySelector('.sim-gear');
+                    if(gear) gear.remove();
+                });
+                
+                wires.forEach(w => {
+                    w.energized = false;
+                    w.pathEl.classList.remove('wire-energized');
+                });
+            }
+        }
+
+        function simulateElectricalNetwork() {
+            let networkStabilized = false;
+            let outerLoops = 10; 
+            let portSignals = {};
+
+            while (!networkStabilized && outerLoops > 0) {
+                networkStabilized = true;
+                outerLoops--;
+
+                portSignals = {}; 
+                wires.forEach(w => { w.energized = false; });
+                
+                const getSignals = (nId, pName) => {
+                    const key = `${nId}_${pName}`;
+                    if(!portSignals[key]) portSignals[key] = new Set();
+                    return portSignals[key];
+                };
+                
+                const addSignal = (nId, pName, signal) => {
+                    const sigs = getSignals(nId, pName);
+                    if(!sigs.has(signal)) { sigs.add(signal); return true; }
+                    return false;
+                };
+
+                nodes.forEach(n => {
+                    if(n.type === 'rede_trifasica') { addSignal(n.id, 'L1', 'L1'); addSignal(n.id, 'L2', 'L2'); addSignal(n.id, 'L3', 'L3'); addSignal(n.id, 'N', 'N'); addSignal(n.id, 'PE', 'PE'); }
+                    if(n.type === 'rede_monofasica') { addSignal(n.id, 'L', 'L1'); addSignal(n.id, 'N', 'N'); addSignal(n.id, 'PE', 'PE'); }
+                    if(n.type === 'fonte_24v') { addSignal(n.id, '+24V', '+24V'); addSignal(n.id, '0V', '0V'); }
+                    if(n.type === 'rede_cc_bateria') { addSignal(n.id, '+24V', '+24V'); addSignal(n.id, '0V', '0V'); }
+                    if(n.type === 'barra_terra') { addSignal(n.id, 'PE_IN', 'PE'); addSignal(n.id, 'PE1', 'PE'); addSignal(n.id, 'PE2', 'PE'); addSignal(n.id, 'PE3', 'PE'); addSignal(n.id, 'PE4', 'PE'); }
+                    if(n.type === 'barra_neutro') { addSignal(n.id, 'N_IN', 'N'); addSignal(n.id, 'N1', 'N'); addSignal(n.id, 'N2', 'N'); addSignal(n.id, 'N3', 'N'); addSignal(n.id, 'N4', 'N'); }
+                });
+
+                let changed = true;
+                let maxLoops = 50; 
+                while(changed && maxLoops > 0) {
+                    changed = false;
+                    maxLoops--;
+
+                    wires.forEach(w => {
+                        const srcSigs = getSignals(w.sourceNode, w.sourcePort);
+                        const tgtSigs = getSignals(w.targetNode, w.targetPort);
+                        srcSigs.forEach(sig => { if(addSignal(w.targetNode, w.targetPort, sig)){ changed=true; w.energized=true;} });
+                        tgtSigs.forEach(sig => { if(addSignal(w.sourceNode, w.sourcePort, sig)){ changed=true; w.energized=true;} });
+                    });
+
+                    nodes.forEach(n => {
+                        let isActive = n.el.dataset.simActive === "true";
+                        const passThrough = (inPort, outPort) => {
+                            const inSigs = getSignals(n.id, inPort);
+                            const outSigs = getSignals(n.id, outPort);
+                            inSigs.forEach(sig => { if(addSignal(n.id, outPort, sig)) changed=true; });
+                            outSigs.forEach(sig => { if(addSignal(n.id, inPort, sig)) changed=true; }); 
+                        };
+
+                        if (isActive || ['barra_terra', 'barra_neutro', 'fusivel_seccionadora', 'fusivel_nh', 'rele_termico', 'dps', 'dr_tetrapolar', 'disjuntor_motor', 'disjuntor_trifasico', 'disjuntor_bipolar', 'disjuntor_monofasico'].includes(n.type)) {
+                            const template = componentLibrary.find(c => c.type === n.type);
+                            if (template) {
+                                const ins = template.inputs;
+                                const outs = template.outputs;
+                                const min = Math.min(ins.length, outs.length);
+                                for(let i=0; i<min; i++) {
+                                    if(ins[i] !== 'A1' && outs[i] !== 'A2' && ins[i] !== '95' && ins[i] !== '13' && ins[i] !== '21' && ins[i] !== '43' && ins[i] !== '11' && ins[i] !== '15' && ins[i] !== 'S11' && ins[i] !== 'S21') passThrough(ins[i], outs[i]);
+                                }
+                                if (n.type.includes('contator') || n.type === 'botoeira_na' || n.type === 'rele_temporizador' || n.type === 'botoeira_dupla' || n.type === 'rele_seguranca') passThrough('13', '14');
+                                if (n.type.includes('contator') || n.type === 'rele_seguranca') passThrough('43', '44');
+                                if (n.type === 'dr_tetrapolar') passThrough('N', 'N\'');
+                                if (n.type === 'rele_seguranca') passThrough('23', '24');
+                            }
+                        }
+
+                        if (!isActive) {
+                            if (['botoeira_nf', 'botoeira_emergencia', 'fim_de_curso', 'botoeira_dupla'].includes(n.type)) passThrough('11', '12');
+                            if (n.type === 'rele_termico') passThrough('95', '96');
+                            if (n.type === 'rele_temporizador') passThrough('15', '16');
+                            if (n.type.includes('contator')) passThrough('21', '22');
+                            if (n.type === 'chave_seletora') passThrough('13', '14');
+                            if (n.type === 'chave_boia') passThrough('COM', 'NF');
+                        } else {
+                            if (n.type === 'rele_termico') passThrough('97', '98');
+                            if (n.type === 'chave_seletora') passThrough('13', '14(Auto)');
+                            if (n.type === 'rele_temporizador') passThrough('15', '18');
+                            if (n.type === 'fim_de_curso') passThrough('13', '14'); 
+                            if (n.type === 'chave_boia') passThrough('COM', 'NA');
+                        }
+                    });
+                }
+
+                nodes.forEach(n => {
+                    if (n.type.includes('contator') || n.type === 'rele_temporizador' || n.type === 'rele_seguranca') {
+                        if (n.el.dataset.manualOverride === "true") return; 
+
+                        const a1 = getSignals(n.id, 'A1');
+                        const a2 = getSignals(n.id, 'A2');
+                        
+                        const coilPowered = (a1.has('+24V') || a1.has('L1') || a1.has('L2') || a1.has('L3') || a1.has('L')) && 
+                                            (a2.has('0V') || a2.has('N') || a2.has('L2') || a2.has('L3') || a2.has('PE'));
+                        
+                        const currentlyActive = n.el.dataset.simActive === "true";
+
+                        if (coilPowered && !currentlyActive) {
+                            n.el.dataset.simActive = "true";
+                            n.el.classList.add('component-active-glow');
+                            networkStabilized = false; 
+                        } 
+                        else if (!coilPowered && currentlyActive) {
+                            n.el.dataset.simActive = "false";
+                            n.el.classList.remove('component-active-glow');
+                            networkStabilized = false; 
+                        }
+                    }
+                });
+            }
+
+            wires.forEach(w => {
+                if(w.energized) w.pathEl.classList.add('wire-energized');
+                else w.pathEl.classList.remove('wire-energized');
+            });
+
+            nodes.forEach(n => {
+                if (n.type.includes('motor')) {
+                    const u = portSignals[`${n.id}_U1`] || portSignals[`${n.id}_U`] || portSignals[`${n.id}_1U`] || portSignals[`${n.id}_Fase`] || portSignals[`${n.id}_A1(+)`];
+                    const v = portSignals[`${n.id}_V1`] || portSignals[`${n.id}_V`] || portSignals[`${n.id}_1V`];
+                    const w = portSignals[`${n.id}_W1`] || portSignals[`${n.id}_W`] || portSignals[`${n.id}_1W`] || portSignals[`${n.id}_Neutro`] || portSignals[`${n.id}_A2(-)`];
+                    
+                    let spinning = false;
+                    let dir = 'cw';
+
+                    if (u && w && (n.type === 'motor_1f' || n.type === 'motor_cc')) {
+                        if (u.size > 0 && w.size > 0) spinning = true;
+                    } else if (u && v && w) {
+                        if (u.size > 0 && v.size > 0 && w.size > 0) {
+                            spinning = true;
+                            if (v.has('L3') || w.has('L2')) dir = 'ccw';
+                        }
+                    }
+
+                    let gear = n.el.querySelector('.sim-gear');
+                    if (spinning) {
+                        if (!gear) {
+                            gear = document.createElement('i');
+                            gear.style.top = '50%';
+                            gear.style.left = '50%';
+                            gear.style.pointerEvents = 'none';
+                            n.el.querySelector('.component-body').appendChild(gear);
+                        }
+                        gear.className = `fa-solid fa-gear sim-gear absolute text-4xl opacity-90 ${dir === 'cw' ? 'spin-cw' : 'spin-ccw'}`;
+                    } else {
+                        if (gear) gear.remove();
+                    }
+                }
+                
+                if (n.type.includes('sinaleiro') || n.type === 'sirene_alarme') {
+                    const x1 = portSignals[`${n.id}_X1`];
+                    if (x1 && x1.size > 0) n.el.classList.add('component-active-glow');
+                    else n.el.classList.remove('component-active-glow');
+                }
+            });
+        }
+
+        function exportImage() {
+            showToast("Preparando exportação de Imagem...", "info");
+            setTimeout(() => {
+                window.print();
+                showToast("Dica: Salve como PDF ou faça um Print Screen.", "success");
+            }, 800);
+        }
+
+        let isDraggingModal = false;
+        let activeModal = null;
+        let modalOffsetX = 0;
+        let modalOffsetY = 0;
+
+        function initModalDrag() {
+            const setupDrag = (modalId, headerId) => {
+                const header = document.getElementById(headerId);
+                const modal = document.getElementById(modalId);
+                
+                if (!header || !modal) return; 
+                
+                const startDrag = (clientX, clientY) => {
+                    isDraggingModal = true;
+                    activeModal = modal;
+                    const rect = modal.getBoundingClientRect();
+                    modalOffsetX = clientX - rect.left;
+                    modalOffsetY = clientY - rect.top;
+                    
+                    document.addEventListener('mousemove', onModalDrag);
+                    document.addEventListener('mouseup', onModalStopDrag);
+                    document.addEventListener('touchmove', onModalTouchDrag, {passive: false});
+                    document.addEventListener('touchend', onModalStopDrag);
+                };
+
+                header.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
+                header.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX, e.touches[0].clientY), {passive: false});
+            };
+
+            setupDrag('manual-modal', 'manual-modal-header');
+            setupDrag('tutorial-modal', 'tutorial-modal-header');
+        }
+        
+        function onModalDrag(e) {
+            if(!isDraggingModal || !activeModal) return;
+            activeModal.style.left = (e.clientX - modalOffsetX) + 'px';
+            activeModal.style.top = (e.clientY - modalOffsetY) + 'px';
+            activeModal.style.transform = 'none'; 
+        }
+
+        function onModalTouchDrag(e) {
+            if(!isDraggingModal || !activeModal) return;
+            e.preventDefault();
+            activeModal.style.left = (e.touches[0].clientX - modalOffsetX) + 'px';
+            activeModal.style.top = (e.touches[0].clientY - modalOffsetY) + 'px';
+            activeModal.style.transform = 'none';
+        }
+
+        function onModalStopDrag() {
+            isDraggingModal = false;
+            activeModal = null;
+            document.removeEventListener('mousemove', onModalDrag);
+            document.removeEventListener('mouseup', onModalStopDrag);
+            document.removeEventListener('touchmove', onModalTouchDrag);
+            document.removeEventListener('touchend', onModalStopDrag);
+        }
+
         const manualLessons = [
+            // MEGA APOSTILA DE ESTUDO OFICIAL BASEADA NO PDF (10 MÓDULOS)
             {
-                id: 'bloco1_fundamentos',
-                title: 'BLOCO 1 - Fundamentos',
-                icon: 'fa-bolt',
+                id: 'mod1_acionamento_manual',
+                title: 'Módulo 1: Comando e Acionamento Manual',
+                icon: 'fa-hand-pointer',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Fundamentos de Comandos Elétricos</h3>
-                    <div class="text-slate-300 mb-6 space-y-4">
-                        <p>Bem-vindo ao início de sua formação. Antes de interligar componentes pesados, você precisa dominar o básico e os cálculos fundamentais que mantêm uma indústria rodando de forma segura.</p>
-                        
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">1.1 Eletricidade e Tensão</h4>
-                        <p>O conceito primordial. Tensão (DDP) em volt (V) é o que "empurra" a carga. A Corrente em ampere (A) é o fluxo, e a Resistência em ohms (Ω) é a oposição. Em indústrias, trabalhamos primariamente com Redes Trifásicas Alternadas (CA) de 380V ou 220V, garantindo torque poderoso e contínuo nos motores.</p>
-                        
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">1.2 Potência e Fator de Potência</h4>
-                        <p>A potência (Watts/CV/HP) exige atenção ao Cos(φ) (Fator de Potência). Motores elétricos são cargas indutivas, o que significa que além da energia ativa que realiza trabalho, eles consomem energia reativa. Fator de potência baixo exige bancos de capacitores para evitar multas da concessionária.</p>
-                        
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">1.3 Diagramas Elétricos Básicos</h4>
-                        <p>Os projetos se dividem estritamente em duas áreas separadas galvânicamente: <strong>Circuito de Força (Potência):</strong> Utiliza cabos grossos, transporta alta corrente direto da rede (RST) para a máquina. <strong>Circuito de Comando:</strong> A inteligência do painel. Utiliza fios finos, tensão reduzida (geralmente 24VCC ou 220VCA) para energizar sensores, CLP e as bobinas dos contatores.</p>
-                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">1. Comando e Acionamento Manual</h3>
+                    <p class="text-slate-300 mb-4">Os equipamentos de comando e acionamento manual são a interface principal do operador. Responsáveis por ditar ordens à lógica do painel.</p>
+                    <ul class="list-disc pl-6 space-y-2 text-slate-300 mb-6">
+                        <li><strong>Botoeiras NA / NF e Duplas:</strong> Dispositivos de pulso mecânico. O NA fecha o circuito LIGA e o NF interrompe a corrente DESLIGA. A botoeira dupla une ambos em um bloco.</li>
+                        <li><strong>Botão de Emergência (Cogumelo):</strong> Possui obrigatoriamente bloco(s) NF e trava mecânica. Se pressionado, exige destravamento giratório.</li>
+                        <li><strong>Chaves Seletoras e Comutadores:</strong> Usadas para mudar a lógica, como Auto/Manual ou Sentido de Giro. Podem ter 2 posições, 3 posições e controle de acesso com chave física.</li>
+                        <li><strong>Sensores e Chaves de Fim de Curso:</strong> Chaves de contato mecânico por alavanca, pedal, limite físico de máquinas (Limit Switch), Boia (nível d'água), Termostatos (temperatura) e Pressostatos (pressão fluída).</li>
+                    </ul>
                 `
             },
             {
-                id: 'bloco2_comandos_classicos',
-                title: 'BLOCO 2 - Comandos Clássicos',
+                id: 'mod2_contatores_reles',
+                title: 'Módulo 2: Contatores e Relés de Controle',
                 icon: 'fa-toggle-on',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Comandos Clássicos e Relés</h3>
-                    <div class="text-slate-300 mb-6 space-y-4">
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">2.1 Botoeiras (NA e NF)</h4>
-                        <p>Ao contrário dos interruptores residenciais, a indústria usa botoeiras de pulso com retorno por mola. <br><strong>NA (Normal Aberto - Verde):</strong> Final 3 e 4. Fecha ao clicar.<br><strong>NF (Normal Fechado - Vermelha):</strong> Final 1 e 2. Interrompe a corrente ao clicar. Obrigatória para o botão "Desliga".</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">2.2 O Contator e o Contato de Selo</h4>
-                        <p>O coração da máquina. O Contator isola a força bruta. O operador aciona um botão (24V), essa energia atrai a bobina eletromagnética (A1-A2) do contator, que fecha os pesados contatos de força (L1-T1) enviando 380V ao motor.<br><br><strong>O Selo:</strong> Como o botão é de pulso, o contator desarmaria ao soltar o dedo. Usamos o contato auxiliar 13-14 (NA) do próprio contator em paralelo com o botão verde. Assim, a corrente "desvia" e alimenta a própria bobina.</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">2.3 Intertravamento</h4>
-                        <p>É a segurança lógica. Um contato NF de K1 é posto em série na bobina de K2, e vice-versa. Se K1 estiver atracado, é eletricamente impossível que K2 ligue, prevenindo curtos-circuitos explosivos na inversão de rotação.</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">2.4 Relés Temporizadores e Auxiliares</h4>
-                        <p>O <strong>Relé Auxiliar</strong> é um mini-contator que repassa sinais de controle, sem capacidade de força pesada. O <strong>Temporizador</strong> atrasa o fechamento (On-Delay) ou a abertura (Off-Delay) dos contatos. Vital para a transição Estrela-Triângulo e sequenciamento de esteiras.</p>
-                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">2. Contatores e Relés</h3>
+                    <p class="text-slate-300 mb-4">O núcleo do processamento de sinais e do chaveamento de alta potência.</p>
+                    <ul class="list-disc pl-6 space-y-2 text-slate-300 mb-6">
+                        <li><strong>Contatores Tripolares e Tetrapolares:</strong> Chaveiam a rede 380/220V para motores (AC3) e capacitores (AC6b). Possuem bobina de comando (A1/A2).</li>
+                        <li><strong>Contator Auxiliar e Mini Contatores:</strong> Usados apenas para lógica de comando, sem câmaras de extinção severa de arco elétrico. Trazem de 4 a 8 contatos NA/NF.</li>
+                        <li><strong>Relés Auxiliares e de Acoplamento (Interface):</strong> Relés pequenos acionados pelo CLP (24VDC) que isolam o controle da potência.</li>
+                        <li><strong>Relés Temporizadores e Multifunção:</strong> Atrasam ligação (On-Delay), atrasam desligamento (Off-Delay) ou ciclam pulsos, fundamentais para a chave Estrela-Triângulo.</li>
+                        <li><strong>Relés Monitores de Rede:</strong> Relé Falta de Fase, Monitor de Corrente, Monitor de Tensão, Subtensão, Sobrecorrente. Vigiam ativamente a saúde da rede de alimentação.</li>
+                    </ul>
                 `
             },
             {
-                id: 'bloco3_protecao',
-                title: 'BLOCO 3 - Proteção Elétrica',
-                icon: 'fa-shield-halved',
+                id: 'mod3_protecao_eletrica',
+                title: 'Módulo 3: Proteção Elétrica e Térmica',
+                icon: 'fa-shield',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Disjuntores, Fusíveis e Térmicos</h3>
-                    <div class="text-slate-300 mb-6 space-y-4">
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">3.1 Curto-Circuito vs Sobrecarga</h4>
-                        <p>São as duas falhas térmicas. O Curto-circuito é imediato, corrente tende ao infinito (protegido por Disjuntor ou Fusível aM). A Sobrecarga é lenta, motor travado exigindo 20% a mais de corrente ao longo do tempo (protegido pelo Relé Térmico/Disjuntor-Motor).</p>
-                        
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">3.2 Fusíveis e Disjuntor-Motor</h4>
-                        <p>Fusíveis NH ou cilíndricos tipo aM suportam o pico de partida do motor sem romper. O Disjuntor-Motor é moderno e robusto: une a proteção térmica ajustável (dial) e o seccionamento de curto-circuito em um único componente compacto.</p>
-                        
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">3.3 Dispositivo DR e DPS</h4>
-                        <p><strong>DR (Diferencial Residual):</strong> Salva vidas. Mede se a corrente que vai na fase é a mesma que volta no Neutro. Fuga de 30mA (choque) e ele desarma em milissegundos. <br><strong>DPS (Surto):</strong> Protege a eletrônica cara (CLP/Inversor) contra raios, desviando a tensão extrema pro aterramento.</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">3.4 Relé Falta de Fase</h4>
-                        <p>Monitora L1, L2, L3. Se a concessionária derrubar uma das fases, o motor trifásico sofrerá uma parada dramática ou torrará se tentar partir bifásico. O Relé derruba a lógica inteira (contato 11-12 abre) na fração de segundo que uma fase desaparece ou se inverte.</p>
-                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">3. Proteção Elétrica</h3>
+                    <p class="text-slate-300 mb-4">Evitam a queima do motor e o derretimento dos condutores elétricos em falhas mecânicas e curto-circuitos.</p>
+                    <ul class="list-disc pl-6 space-y-2 text-slate-300 mb-6">
+                        <li><strong>Curto-Circuito:</strong> Disjuntor Termomagnético (Motor, Monopolar, Bipolar, Tripolar), Fusíveis NH e Diazed (tipos gG para cabos e aM para partida de motores).</li>
+                        <li><strong>Sobrecarga:</strong> Relé Térmico (Classes 10, 20 e 30). Possui par bimetálico que encurva com o calor abrindo seu contato 95-96 do comando.</li>
+                        <li><strong>Proteção Humana e Eletrônica:</strong> DR/RCD (Diferencial Residual) para fuga de corrente (choque elétrico 30mA). DPS para desviar surtos de tensão (raios) ao terra.</li>
+                        <li><strong>Proteções de Motor (PTC / Termistor):</strong> Sensores de calor enfiados no meio dos enrolamentos do motor que cortam o comando se houver deficiência de ventilação, rotor bloqueado ou sobretemperatura extrema.</li>
+                    </ul>
                 `
             },
             {
-                id: 'bloco4_motores',
-                title: 'BLOCO 4 - Motores e Partidas',
-                icon: 'fa-fan',
+                id: 'mod4_motores_partidas',
+                title: 'Módulo 4: Motores e Partidas Convencionais',
+                icon: 'fa-cogs',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Máquinas e Acionamentos</h3>
-                    <div class="text-slate-300 mb-6 space-y-4">
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">4.1 Motores Trifásicos vs Monofásicos</h4>
-                        <p>O <strong>Motor de Indução Trifásico (Gaiola de Esquilo)</strong> é o cavalo de batalha da indústria. Não tem escovas, é barato, robusto e gera torque uniforme. O Monofásico exige capacitores e platinados internos para simular a defasagem necessária para girar, perdendo em eficiência.</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">4.2 Partida Direta e Reversão</h4>
-                        <p>Aplicação plena de 380V. Gera um pico de corrente de 6 a 8 vezes a corrente nominal (In). Só é permitido pela norma e pelas concessionárias para motores abaixo de 5 CV. Para reverter, K2 inverte duas fases na entrada do motor.</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">4.3 Estrela-Triângulo (Y-Δ)</h4>
-                        <p>Para motores acima de 7,5 CV com 6 terminais expostos. A partida ocorre em Estrela (Tensão de bobina de 220V em rede 380V), reduzindo o pico de corrente a 1/3 do normal. Após a inércia ser vencida, o Temporizador e o jogo de 3 contatores joga o fechamento para Triângulo (Tensão Plena por bobina).</p>
-                        
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">4.4 Motores Dahlander</h4>
-                        <p>Motor especial projetado com duas velocidades. Tem uma relação de velocidade fixa de 1:2 (ex: 1800 rpm e 3600 rpm) dependendo do chaveamento dos terminais.</p>
-                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">4. Motores e Formas de Partida</h3>
+                    <p class="text-slate-300 mb-4">O motor de indução trifásico é a máquina rotativa mais utilizada na indústria.</p>
+                    <ul class="list-disc pl-6 space-y-2 text-slate-300 mb-6">
+                        <li><strong>Tipos de Motores:</strong> Trifásico Gaiola, Monofásico (com capacitor de partida), Dahlander (Duas velocidades com enrolamento comum), Servomotor (precisão CNC), Motor CC, e Síncronos.</li>
+                        <li><strong>Partida Direta:</strong> Apenas com 1 contator. Gera de 6 a 8 vezes a corrente nominal (Ip/In) na arrancada. Restrito a motores até 5CV/7.5CV por normas das concessionárias.</li>
+                        <li><strong>Partida Estrela-Triângulo:</strong> Requer 3 contatores e um relé de tempo. Reduz o pico de partida da rede elétrica a 33% (1/3). O motor precisa ter 6 terminais expostos e a tensão de placa em Triângulo deve ser igual à da rede local.</li>
+                        <li><strong>Partida Compensadora e Série-Paralelo:</strong> Reduz corrente através de Autotransformadores ou de motores especiais de 9 e 12 terminais.</li>
+                    </ul>
                 `
             },
             {
-                id: 'bloco5_inversores',
-                title: 'BLOCO 5 - Acionamentos Modernos',
+                id: 'mod5_inversores_soft',
+                title: 'Módulo 5: Inversores de Frequência e Soft Starters',
                 icon: 'fa-wave-square',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Inversores e Soft Starters</h3>
-                    <div class="text-slate-300 mb-6 space-y-4">
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">5.1 Inversor de Frequência (VFD)</h4>
-                        <p>O rei do controle absoluto. Pega a rede CA de 60Hz, retifica para CC e depois gera (PWM - Modulação por Largura de Pulso) uma nova rede elétrica CA artificial onde o programador escolhe exatamente a tensão e a frequência (Hz). Se ajustar para 30Hz, o motor gira exatamente na metade da rotação. Ideal para bombas, esteiras de precisão e eficiência energética máxima.</p>
-                        
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">5.2 Vantagens do VFD</h4>
-                        <p>Elimina completamente picos de partida e trancos mecânicos. Pode frear o motor bruscamente através de injeção de CC ou usando resistências de frenagem (regenerativo). Elimina contatores de reversão (ele inverte a sequência de fase eletronicamente no código do parâmetro P000).</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">5.3 Soft Starter</h4>
-                        <p>Mais barato que o Inversor, mas não altera a velocidade durante o trabalho. O Soft Starter usa Tiristores (SCRs) para cortar o ângulo da onda elétrica e liberar a tensão suavemente como uma "rampa" durante os primeiros 10 segundos da partida. Assim que chega a 100%, ele fecha um Contator de Bypass interno para o motor rodar na rede limpa sem gerar calor nos SCRs.</p>
-                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">5. Acionamentos Avançados</h3>
+                    <p class="text-slate-300 mb-4">Substituem os painéis cheios de contatores pesados de Estrela-Triângulo, trazendo controle eletrônico suave.</p>
+                    <ul class="list-disc pl-6 space-y-2 text-slate-300 mb-6">
+                        <li><strong>Inversor de Frequência (VFD):</strong> Altera a rotação, torque e rampa de aceleração criando uma rede elétrica virtual internamente através de PWM e ponte retificadora/inversora. Usado em Bombas, Elevadores e Extrusoras. Inclui resistores de frenagem e filtros EMI/RFI.</li>
+                        <li><strong>Soft Starter:</strong> Chave de partida suave. Através da angulação de disparo de tiristores (SCRs), o motor acelera devagar. A rotação não pode ser variada, o Soft Starter sai de cena após o motor chegar a 100% acionando o contator de Bypass.</li>
+                    </ul>
                 `
             },
             {
-                id: 'bloco6_automacao',
-                title: 'BLOCO 6 - Automação Industrial',
+                id: 'mod6_clp_ihm_redes',
+                title: 'Módulo 6: CLP, Sensores e Redes (Indústria 4.0)',
                 icon: 'fa-microchip',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">CLP, IHM, Redes e Sensores</h3>
-                    <div class="text-slate-300 mb-6 space-y-4">
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">6.1 O CLP (Controlador Lógico Programável)</h4>
-                        <p>O computador industrial. Substitui a necessidade de centenas de cabos de "Comandos Clássicos" e temporizadores por linhas de código em linguagem LADDER ou SCL. <br>L+ e M alimentam o CLP. O cartão DI (Digital Input) lê sensores. A CPU pensa. O cartão DQ (Digital Output) aciona micro-relés que finalmente ligam as potências.</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">6.2 Instrumentação e Sensores</h4>
-                        <p>Os olhos e ouvidos da máquina. <br><strong>Indutivos:</strong> Detectam aproximação apenas de metais. Imunes a sujeira e óleo. <br><strong>Capacitivos:</strong> Detectam água, plástico, nível de grãos de soja, etc. <br><strong>Fotoelétricos:</strong> Barreira laser. Se cortar a luz de um lado pro outro, envia o sinal 24V para o CLP.</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">6.3 IHM e Redes Industriais (Profibus/Profinet)</h4>
-                        <p>A <strong>IHM (Interface Homem Máquina)</strong> é a tela touch de monitoramento do operador (SCADA). A fiação não vai mais das botoeiras até o motor. Tudo viaja por 1 único cabo de rede (Ethernet Industrial) conectando Inversores, CLPs e Ilhas de Válvulas Pneumáticas em altíssima velocidade e inteligência descentralizada.</p>
-                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">6. Automação e Redes Industriais</h3>
+                    <p class="text-slate-300 mb-4">A substituição da fiação complexa pela lógica virtual programável.</p>
+                    <ul class="list-disc pl-6 space-y-2 text-slate-300 mb-6">
+                        <li><strong>CLP e IHM:</strong> O Controlador Lógico processa os sensores e dispara os contatores. A IHM (Interface Homem-Máquina) é a tela touch de monitoramento SCADA/Supervisório.</li>
+                        <li><strong>Sensores Industriais:</strong> Indutivos (metais), Capacitivos (tudo), Fotoelétricos e Ultrassônicos (distância). Encoders informam o ângulo exato de uma esteira ou motor.</li>
+                        <li><strong>Redes Industriais e Gateway IoT:</strong> Elimina-se o cabo multipar grosso por um único cabo de rede. Ethernet Industrial, Profinet, Profibus, Modbus RTU e EtherCAT permitem controle super rápido descentralizado das ilhas de válvulas.</li>
+                    </ul>
                 `
             },
             {
-                id: 'bloco7_paineis',
-                title: 'BLOCO 7 - Montagem de Painéis',
+                id: 'mod7_instrumentacao_paineis',
+                title: 'Módulo 7: Painéis, Sinalização e Instrumentação',
                 icon: 'fa-cubes',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Estrutura Física e Barramentos</h3>
-                    <div class="text-slate-300 mb-6 space-y-4">
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">7.1 Montagem e Organização</h4>
-                        <p>Todo componente obedece ao Trilho DIN 35mm. Tudo passa dentro de canaletas plásticas com furos (dedos de bruxa). Todos os cabos levam um terminal olhal, forquilha, agulha ou Ilhós (tubular) crimpado - NUNCA enrole cobre nu direto nos parafusos de um contator industrial.</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">7.2 Barramentos e Bornes</h4>
-                        <p>O Barramento de Cobre nú (Pente ou Plana) distribui as centenas de amperes entre os disjuntores. Os <strong>Bornes Sak</strong> de engate rápido (Mola) servem para intermediar a transição entre o interior da caixa do painel e os cabos flexíveis gigantes que vão para os motores no chão da fábrica.</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">7.3 Ventilação e Isolamento</h4>
-                        <p>Inversores e CLPs esquentam. Exaustores no topo e filtros de tela na base inferior geram convecção natural. A NBR dita a cor e a seção (bitola): Fases de Força em Preto ou Vermelho. Neutro em Azul. PE(Terra) no mínimo Verde e Amarelo. Comando AC em Vermelho e Comando DC (24V) em Azul Escuro.</p>
-                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">7. Estrutura e Sinalização de Painéis</h3>
+                    <ul class="list-disc pl-6 space-y-2 text-slate-300 mb-6">
+                        <li><strong>Componentes Estruturais:</strong> Quadro elétrico metálico com placa de montagem, Trilho DIN, Canaletas com rasgos, Prensa-cabos, Barramentos (Cobre, PE, Pente), Exaustores e Termostato de ventilação.</li>
+                        <li><strong>Instrumentação PID:</strong> Controladores de temperatura, Multimedidores (TC/TP), Horímetros, Controladores de vazão (PID), e resistências (cartuchos e tubulares).</li>
+                        <li><strong>Sinalização Visual:</strong> Torres de sinalização, Sinaleiros LED (Vermelho=Falha/Parada, Verde=Run, Amarelo=Atenção, Azul=Reset, Branco=Sistema ON). Sirenes sonoras acopladas.</li>
+                    </ul>
                 `
             },
             {
-                id: 'bloco8_seguranca',
-                title: 'BLOCO 8 - Segurança (NR-10 e NR-12)',
-                icon: 'fa-hard-hat',
+                id: 'mod8_seguranca_pneumatica',
+                title: 'Módulo 8: Segurança de Máquinas e Pneumática',
+                icon: 'fa-user-shield',
                 content: `
-                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Proteção Humana e Redundância</h3>
-                    <div class="text-slate-300 mb-6 space-y-4">
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">8.1 NR-10 (Trabalho Elétrico)</h4>
-                        <p>A regra de ouro é a desenergização. Para garantir a Manutenção Zero Energia, a Chave Seccionadora Geral recebe um Cadeado Multi-Bloqueio (Lockout/Tagout). Se a etiqueta LOTO do eletricista João estiver no disjuntor, ninguém liga o painel.</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">8.2 NR-12 (Segurança de Máquinas)</h4>
-                        <p>Um simples botão NF cortando o contator não basta. Se o contator colar/soldar por curto? O operador bate no botão de emergência e a lâmina da guilhotina não para. É necessário Redundância e Monitoramento.</p>
-
-                        <h4 class="text-xl font-bold text-blue-400 mt-6 mb-2">8.3 Relé de Segurança (Safety)</h4>
-                        <p>O cérebro blindado de segurança (SIL3/PLe). O Botão Cogumelo usa dois contatos (Canal Duplo S11-S12 e S21-S22). O relé de segurança monitora milissegundos de falha entre o canal 1 e 2. Se detectar curto-circuito no cabo do botão, o relé processador aciona DOIS contatores de potência em série para desligar o motor de qualquer forma (se um colar, o outro rompe o circuito).</p>
-                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">8. NR-12 e Segurança Funcional</h3>
+                    <p class="text-slate-300 mb-4">Regras inquebráveis de desenergização e redundância em áreas industriais.</p>
+                    <ul class="list-disc pl-6 space-y-2 text-slate-300 mb-6">
+                        <li><strong>Elementos NR-12:</strong> Relé de Segurança, Cortinas de Luz (Scanner laser), Tapetes de segurança, Bimanual (obriga a pessoa a usar as duas mãos para prensar a chapa), e Chaves magnéticas de porta.</li>
+                        <li><strong>Comandos Pneumáticos:</strong> Válvulas solenoides (ex: 5/2 ou 3/2 vias) recebem 24V do CLP e liberam pressão do compressor para acionar o Cilindro Pneumático (Pistão mecânico da esteira). A Linha exige FRL (Filtro e Regulador).</li>
+                    </ul>
                 `
             },
             {
                 id: 'dicionario_equipamentos',
-                title: 'Dicionário de Equipamentos',
+                title: 'Dicionário Completo',
                 icon: 'fa-list-ul',
                 content: `
                     <h3 class="text-2xl font-bold text-white mb-4 border-b border-slate-600 pb-2">Dicionário da Biblioteca Industrial</h3>
@@ -1644,44 +2588,85 @@
         ];
 
         function initManual() {
-<!-- ... existing code ... -->
-```
-
-```javascript:Simulador Industrial - Sistemas de Motores:simulador_comandos.html
-<!-- ... existing code ... -->
-            const a1 = getSignals(n.id, 'A1');
-            const a2 = getSignals(n.id, 'A2');
+            const listContainer = document.getElementById('manual-lessons-list');
+            listContainer.innerHTML = '';
             
-            // Conserta a polaridade aceitando 0V, N para A2 e Fases/24V para A1
-            const coilPowered = (a1.has('+24V') || a1.has('L1') || a1.has('L2') || a1.has('L3') || a1.has('L')) && 
-                                (a2.has('0V') || a2.has('N') || a2.has('L2') || a2.has('L3') || a2.has('PE'));
-            
-            const currentlyActive = n.el.dataset.simActive === "true";
+            manualLessons.forEach((lesson, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-3 rounded-lg hover:bg-slate-700 transition-colors flex items-center gap-3 text-slate-300 hover:text-white border border-transparent hover:border-slate-600';
+                btn.innerHTML = `<div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700"><i class="fa-solid ${lesson.icon}"></i></div> <div><div class="font-bold text-sm leading-tight">${lesson.title}</div><div class="text-xs text-slate-500">Documentação</div></div>`;
+                
+                btn.onclick = () => loadLesson(lesson.id, btn);
+                listContainer.appendChild(btn);
+            });
+        }
 
-            // Botão Verde NA deve forçar a ativação manual via override. 
-            // O sistema eletromecânico só atua se energizado:
-            if (n.type.includes('botoeira_na') || n.type.includes('botoeira_dupla')) {
-                // Se a botoeira foi apertada no override, ela atua o botão, não a bobina
-            } else {
-                if (coilPowered && !currentlyActive) {
-                    n.el.dataset.simActive = "true";
-                    n.el.classList.add('component-active-glow');
-                    networkStabilized = false; 
-                } 
-                else if (!coilPowered && currentlyActive) {
-                    n.el.dataset.simActive = "false";
-                    n.el.classList.remove('component-active-glow');
-                    networkStabilized = false; 
+        function loadLesson(id, btnElement) {
+            document.querySelectorAll('#manual-lessons-list button').forEach(b => b.classList.remove('bg-blue-600/20', 'border-blue-500/50'));
+            if(btnElement) btnElement.classList.add('bg-blue-600/20', 'border-blue-500/50');
+            
+            const lesson = manualLessons.find(l => l.id === id);
+            if(lesson) {
+                document.getElementById('manual-lesson-content').innerHTML = lesson.content;
+                
+                if (id === 'dicionario_equipamentos') {
+                    let html = '';
+                    componentLibrary.forEach(c => {
+                        let miniSvg = c.svg.replace('width="100%"', 'width="50"').replace('height="100%"', 'height="50"');
+                        html += `
+                        <div class="bg-slate-700/40 p-4 rounded-lg flex items-center gap-4 border border-slate-600">
+                            <div class="w-16 h-16 shrink-0 bg-slate-800 rounded flex items-center justify-center border border-slate-700 shadow-inner">
+                                ${miniSvg}
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-lg font-bold text-blue-400 mb-0.5">${c.name}</h4>
+                                <span class="px-2 py-0.5 bg-slate-800 border border-slate-600 text-[10px] font-bold text-slate-400 rounded uppercase tracking-widest">${c.category}</span>
+                                <div class="mt-2 grid grid-cols-2 gap-2 text-xs text-slate-300">
+                                    <div><strong class="text-slate-400">Pinos de Entrada:</strong> ${c.inputs.length > 0 ? c.inputs.join(', ') : '-'}</div>
+                                    <div><strong class="text-slate-400">Pinos de Saída:</strong> ${c.outputs.length > 0 ? c.outputs.join(', ') : '-'}</div>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                    document.getElementById('dic-content').innerHTML = html;
                 }
             }
         }
-    });
-}
-<!-- ... existing code ... -->
-```
 
-### Explicação Rápida da Resolução (Bugs Restantes)
+        function closeWelcomeModal() {
+            const modal = document.getElementById('welcome-modal-pro');
+            if (modal) {
+                modal.style.opacity = '0';
+                modal.querySelector('div').style.transform = 'scale(0.9)';
+                setTimeout(() => modal.remove(), 500);
+            }
+        }
 
-*   **Fios Não Aparecendo no Touch:** Corrigido ao criar um evento hibrido em `port.addEventListener('touchstart')` que anula a propagação (`e.preventDefault()`) de gestos do sistema antes de passar as coordenadas `clientX` para a função que desenha a trajetória da linha. O Delay/Debounce de 150ms do click que você viu no Diff anula a duplicação maldita das telas touch resistivas e capacitivas. 
-*   **Arrastar Barramento:** As alças laterais (`setupBusbarResizing`) agora estão associadas tanto ao evento clássico de mouse (`pointerdown`) quanto ao de tela mobile (`touchstart`), garantindo o arrasto de redimensionamento na ponta. Para mover no meio, a restrição que ignorava botões e portas (`e.target.closest`) foi aplicada de forma perfeita.
-*   **Mega Atualização de Texto:** Os 31 tópicos, o tutorial de automação do CLP (I0.0/Q0.0) e todo o sumário da NR-10 e NR-12 foram anexados com títulos vibrantes, dividindo em blocos, conforme exigido para a aparência mega-profissional e zero remoção de vírgulas de lógicas matemáticas.
+        function openManual() {
+            document.getElementById('manual-modal').classList.remove('hidden');
+            if(document.getElementById('manual-lessons-list').children.length === 0) {
+                initManual();
+                setTimeout(() => document.querySelector('#manual-lessons-list button').click(), 50);
+            }
+        }
+
+        function closeManual() {
+            document.getElementById('manual-modal').classList.add('hidden');
+        }
+
+        function openTutorial() {
+            document.getElementById('tutorial-modal').classList.remove('hidden');
+        }
+
+        function closeTutorial() {
+            document.getElementById('tutorial-modal').classList.add('hidden');
+        }
+
+        window.onload = () => {
+            initPalette();
+            initModalDrag(); 
+            window.addEventListener('resize', updateAllWires);
+        };
+    </script>
+</body>
+</html>
