@@ -1,4 +1,3 @@
-<!-- STREAMING_CHUNK:Inicializando Estrutura HTML e CSS Base... -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -50,7 +49,6 @@
             transform-origin: 0 0;
         }
 
-<!-- STREAMING_CHUNK:Estilizando Camadas de Fios e Animações... -->
         #wire-layer {
             position: absolute;
             top: 0;
@@ -156,7 +154,6 @@
             filter: drop-shadow(0 0 8px #ef4444);
         }
 
-<!-- STREAMING_CHUNK:Estilizando Componentes e Portas de Conexão... -->
         .component-header {
             background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
             padding: 4px 8px;
@@ -284,7 +281,6 @@
             border-right: none;
         }
 
-<!-- STREAMING_CHUNK:Estilizando Toolbar e Modais... -->
         .canvas-toolbar {
             position: absolute;
             top: 15px;
@@ -377,7 +373,6 @@
             margin-bottom: 1rem;
         }
 
-<!-- STREAMING_CHUNK:Configurando Regras de Impressão (PDF)... -->
         /* REGRAS PARA IMPRESSÃO EM PDF DO PROJETO */
         @media print {
             header, #sidebar, .canvas-toolbar, #toast-container, #welcome-modal-pro, #manual-modal, #tutorial-modal {
@@ -411,7 +406,6 @@
 </head>
 <body class="flex flex-col h-screen">
 
-<!-- STREAMING_CHUNK:Renderizando Layout Principal... -->
     <header class="bg-slate-800 border-b border-slate-700 h-14 flex items-center justify-between px-4 sm:px-6 shrink-0 z-40">
         <div class="flex items-center gap-3">
             <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white mr-2 transition-colors p-2 rounded hover:bg-slate-700" title="Mostrar/Ocultar Biblioteca">
@@ -490,7 +484,6 @@
         </main>
     </div>
 
-<!-- STREAMING_CHUNK:Renderizando Modal de Boas Vindas Único... -->
     <!-- Modal de Boas Vindas -->
     <div id="welcome-modal-pro" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/90 backdrop-blur-sm transition-opacity duration-500">
         <div class="bg-slate-800 border-2 border-blue-500 rounded-3xl shadow-[0_0_80px_rgba(59,130,246,0.6)] p-10 max-w-4xl text-center transform scale-100 transition-transform duration-500 w-11/12 relative overflow-hidden">
@@ -511,7 +504,6 @@
         </div>
     </div>
 
-<!-- STREAMING_CHUNK:Renderizando Modal da Apostila Interativa... -->
     <div id="manual-modal" class="hidden">
         <div class="bg-slate-800 border border-slate-600 rounded-xl w-full h-full flex flex-col shadow-2xl overflow-hidden">
             <div id="manual-modal-header" class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900 shrink-0 select-none cursor-move">
@@ -535,7 +527,6 @@
         </div>
     </div>
 
-<!-- STREAMING_CHUNK:Renderizando Modal do Tutorial Mestre de Ligações... -->
     <div id="tutorial-modal" class="hidden">
         <div class="bg-slate-900 border border-emerald-600 rounded-xl w-full h-full flex flex-col shadow-2xl overflow-hidden">
             <div id="tutorial-modal-header" class="p-4 border-b border-emerald-700 flex justify-between items-center bg-slate-950 shrink-0 select-none cursor-move">
@@ -1658,7 +1649,6 @@
         const drawingWirePath = document.getElementById('drawing-wire');
         const componentsContainer = document.getElementById('components-container');
 
-<!-- STREAMING_CHUNK:Inicializando Auto-Save e Storage... -->
         function saveToLocalStorage() {
             if(isSimulationRunning) return;
             const data = {
@@ -1699,7 +1689,6 @@
             }
         }
 
-<!-- STREAMING_CHUNK:Inicializando Motor de Câmera e Controles Mouse/Touch... -->
         function updateTransform() {
             canvasPanZoom.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
             updateAllWires(); 
@@ -1808,7 +1797,6 @@
         function zoomOut() { scale = Math.max(scale - 0.2, 0.4); updateTransform(); }
         function resetZoomPan() { scale = 1; panX = 0; panY = 0; updateTransform(); }
 
-<!-- STREAMING_CHUNK:Lógica da Palette e Drag and Drop... -->
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('collapsed');
@@ -1851,6 +1839,11 @@
                         e.dataTransfer.setData('text/plain', comp.type);
                         e.dataTransfer.setData('offsetX', e.offsetX);
                         e.dataTransfer.setData('offsetY', e.offsetY);
+                    });
+                    
+                    item.addEventListener('dragend', (e) => {
+                        document.querySelectorAll('.ghost-clone').forEach(el => el.remove());
+                        touchDragType = null;
                     });
                     
                     item.addEventListener('touchstart', handleTouchStartPalette, {passive: false});
@@ -1962,7 +1955,6 @@
             isPaletteScrolling = false;
         }
 
-<!-- STREAMING_CHUNK:Sistema de Instanciação e Conexão de Componentes... -->
         function createComponent(type, x, y, idForce = null) {
             const now = Date.now();
             if (!idForce && now - lastComponentCreateTime < 300) {
@@ -2294,8 +2286,8 @@
         }
 
         function getOrthogonalPath(p1, p2, t1, t2, wireNum) {
-            const spreadY = (wireNum % 12) * 8; 
-            const spreadX = (wireNum % 12) * 8;
+            const spreadY = (wireNum % 15) * 8; 
+            const spreadX = (wireNum % 15) * 8;
             
             const stub1 = t1 === 'in' ? -25 - spreadY : 25 + spreadY;
             const stub2 = t2 === 'in' ? -25 - spreadY : 25 + spreadY;
@@ -2317,7 +2309,6 @@
             }
         }
 
-<!-- STREAMING_CHUNK:Lógica de Controle de Nós e Arraste... -->
         function updateWirePath(wire) {
             const srcSelector = `.port[data-node="${wire.sourceNode}"][data-port="${wire.sourcePort}"]`;
             const tgtSelector = `.port[data-node="${wire.targetNode}"][data-port="${wire.targetPort}"]`;
@@ -2418,9 +2409,7 @@
         }
 
         function deleteComponent(id) {
-            if (isSimulationRunning) {
-                return;
-            }
+            if (isSimulationRunning) return;
             const el = document.getElementById(id);
             if(el) el.remove();
             nodes = nodes.filter(n => n.id !== id);
@@ -2432,9 +2421,7 @@
         }
 
         function deleteWire(id) {
-            if (isSimulationRunning) {
-                return;
-            }
+            if (isSimulationRunning) return;
             const wire = wires.find(w => w.id === id);
             if (wire) {
                 wire.pathEl.remove();
@@ -2444,9 +2431,7 @@
         }
 
         function clearWorkspace(bypassConfirm = false) {
-            if (isSimulationRunning) {
-                return;
-            }
+            if (isSimulationRunning) return;
             if(!bypassConfirm && !confirm("Deseja apagar todo o projeto atual?")) return;
             componentsContainer.innerHTML = '';
             wireLayer.innerHTML = '';
@@ -2519,7 +2504,6 @@
             reader.readAsText(file);
         }
 
-<!-- STREAMING_CHUNK:Inicializando Motor de Simulação Avançada... -->
         function showHelp() {
             alert("CAD Pro - Instruções:\n\n1. Oculte a biblioteca no botão do menu superior.\n2. Zoom: Role o scroll do mouse ou faça movimento de pinça no celular.\n3. Pan (Mover tela): Segure SHIFT + Clique, ou toque com 1 dedo no fundo e arraste.\n4. Apostila: Clique no botão da biblioteca para abrir as lições de montagem.\n5. O sistema salva em .json localmente em seu PC.");
         }
@@ -2762,7 +2746,6 @@
             }, 800);
         }
 
-<!-- STREAMING_CHUNK:Inicializando Sistema de Arraste de Modais... -->
         let isDraggingModal = false;
         let activeModal = null;
         let modalOffsetX = 0;
@@ -2849,7 +2832,6 @@
             document.getElementById('tutorial-modal').classList.add('hidden');
         }
 
-<!-- STREAMING_CHUNK:Populando Mega Apostila (40 Tópicos)... -->
         const manualLessons = [
             {
                 id: 'mod1_intro',
