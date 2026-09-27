@@ -1,3 +1,4 @@
+<!-- STREAMING_CHUNK:Inicializando Estrutura HTML e CSS Base... -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -49,6 +50,7 @@
             transform-origin: 0 0;
         }
 
+<!-- STREAMING_CHUNK:Estilizando Camadas de Fios e Animações... -->
         #wire-layer {
             position: absolute;
             top: 0;
@@ -154,6 +156,7 @@
             filter: drop-shadow(0 0 8px #ef4444);
         }
 
+<!-- STREAMING_CHUNK:Estilizando Componentes e Portas de Conexão... -->
         .component-header {
             background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
             padding: 4px 8px;
@@ -281,6 +284,7 @@
             border-right: none;
         }
 
+<!-- STREAMING_CHUNK:Estilizando Toolbar e Modais... -->
         .canvas-toolbar {
             position: absolute;
             top: 15px;
@@ -373,9 +377,10 @@
             margin-bottom: 1rem;
         }
 
+<!-- STREAMING_CHUNK:Configurando Regras de Impressão (PDF)... -->
         /* REGRAS PARA IMPRESSÃO EM PDF DO PROJETO */
         @media print {
-            header, #sidebar, .canvas-toolbar, #toast-container, #welcome-modal-pro, #manual-modal, #tutorial-modal {
+            header, #sidebar, .canvas-toolbar, #toast-container, #welcome-modal-pro, #manual-modal, #tutorial-modal, #welcome-text {
                 display: none !important;
             }
             body {
@@ -386,6 +391,11 @@
                 background-image: none !important;
                 background-color: white !important;
                 overflow: visible !important;
+                position: static !important;
+            }
+            #canvas-pan-zoom {
+                position: static !important;
+                transform: none !important;
             }
             .component-header {
                 color: white !important;
@@ -406,6 +416,7 @@
 </head>
 <body class="flex flex-col h-screen">
 
+<!-- STREAMING_CHUNK:Renderizando Layout Principal... -->
     <header class="bg-slate-800 border-b border-slate-700 h-14 flex items-center justify-between px-4 sm:px-6 shrink-0 z-40">
         <div class="flex items-center gap-3">
             <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white mr-2 transition-colors p-2 rounded hover:bg-slate-700" title="Mostrar/Ocultar Biblioteca">
@@ -484,6 +495,7 @@
         </main>
     </div>
 
+<!-- STREAMING_CHUNK:Renderizando Modal de Boas Vindas Único... -->
     <!-- Modal de Boas Vindas -->
     <div id="welcome-modal-pro" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/90 backdrop-blur-sm transition-opacity duration-500">
         <div class="bg-slate-800 border-2 border-blue-500 rounded-3xl shadow-[0_0_80px_rgba(59,130,246,0.6)] p-10 max-w-4xl text-center transform scale-100 transition-transform duration-500 w-11/12 relative overflow-hidden">
@@ -504,6 +516,7 @@
         </div>
     </div>
 
+<!-- STREAMING_CHUNK:Renderizando Modal da Apostila Interativa... -->
     <div id="manual-modal" class="hidden">
         <div class="bg-slate-800 border border-slate-600 rounded-xl w-full h-full flex flex-col shadow-2xl overflow-hidden">
             <div id="manual-modal-header" class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900 shrink-0 select-none cursor-move">
@@ -527,6 +540,7 @@
         </div>
     </div>
 
+<!-- STREAMING_CHUNK:Renderizando Modal do Tutorial Mestre de Ligações... -->
     <div id="tutorial-modal" class="hidden">
         <div class="bg-slate-900 border border-emerald-600 rounded-xl w-full h-full flex flex-col shadow-2xl overflow-hidden">
             <div id="tutorial-modal-header" class="p-4 border-b border-emerald-700 flex justify-between items-center bg-slate-950 shrink-0 select-none cursor-move">
@@ -2151,6 +2165,8 @@
         function handlePortClick(e) {
             if(e.stopPropagation) e.stopPropagation();
             if(e.preventDefault) e.preventDefault();
+
+            if (isSimulationRunning) return;
 
             const now = Date.now();
             if (now - lastPortClickTime < 150) return; 
