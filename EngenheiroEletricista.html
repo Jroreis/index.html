@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jefferson Reis Oliveira | Engenharia Elétrica & Tecnologia</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        electric: {
+                            blue: '#00f3ff',
+                            dark: '#0a0f16',
+                            card: '#111827',
+                            yellow: '#fadb14'
+                        }
+                    },
+                    fontFamily: {
+                        'tech': ['Orbitron', 'sans-serif'],
+                        'body': ['Rajdhani', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 10px #00f3ff, 0 0 20px #00f3ff',
+                        'neon-yellow': '0 0 10px #fadb14, 0 0 20px #fadb14',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #05080f;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0f16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00f3ff;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #fadb14;
+        }
+
+        /* Background Canvas */
+        #circuit-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* Glowing text utilities */
+        .text-glow-blue {
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.8);
+        }
+        .text-glow-yellow {
+            text-shadow: 0 0 8px rgba(250, 219, 20, 0.8);
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(17, 24, 39, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            border-color: #00f3ff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+            transform: translateY(-5px);
+        }
+
+        /* Animated Circuit Lines on Borders */
+        .circuit-border {
+            position: relative;
+        }
+        .circuit-border::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border: 2px solid transparent;
+            background: linear-gradient(90deg, #00f3ff, #fadb14) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            border-radius: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .circuit-border:hover::before {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="font-body antialiased relative selection:bg-electric-blue selection:text-black">
+
+    <!-- Background Canvas for Circuit Effect -->
+    <canvas id="circuit-canvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-0 transition-all duration-300 backdrop-blur-md bg-electric-dark/80 border-b border-electric-blue/20" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <i class="fa-solid fa-bolt text-electric-yellow text-2xl animate-pulse"></i>
+                    <span class="font-tech text-2xl font-bold tracking-wider text-white">J<span class="text-electric-blue">RO</span></span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#sobre" class="text-gray-300 hover:text-electric-blue transition-colors text-lg font-semibold uppercase tracking-wide">Perfil</a>
+                    <a href="#formacao" class="text-gray-300 hover:text-electric-blue transition-colors text-lg font-semibold uppercase tracking-wide">Formação</a>
+                    <a href="#experiencia" class="text-gray-300 hover:text-electric-blue transition-colors text-lg font-semibold uppercase tracking-wide">Atuação</a>
+                    <a href="#projetos" class="text-gray-300 hover:text-electric-blue transition-colors text-lg font-semibold uppercase tracking-wide">Projetos Tech</a>
+                    <a href="#contato" class="px-6 py-2 border border-electric-blue text-electric-blue rounded hover:bg-electric-blue hover:text-black hover:shadow-neon-blue transition-all duration-300 font-tech font-bold">CONECTAR <i class="fa-solid fa-plug ml-2"></i></a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-electric-blue hover:text-white focus:outline-none">
+                        <i class="fa-solid fa-bars text-3xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-electric-dark border-b border-electric-blue/20">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#sobre" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-electric-blue hover:bg-gray-900 rounded-md">Perfil</a>
+                <a href="#formacao" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-electric-blue hover:bg-gray-900 rounded-md">Formação</a>
+                <a href="#experiencia" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-electric-blue hover:bg-gray-900 rounded-md">Atuação</a>
+                <a href="#projetos" class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-electric-blue hover:bg-gray-900 rounded-md">Projetos Tech</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center pt-20">
+        <div class="absolute inset-0 z-0 flex items-center justify-center opacity-10">
+            <i class="fa-solid fa-microchip text-[40rem] text-electric-blue"></i>
+        </div>
+        
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-electric-yellow/50 bg-electric-yellow/10 text-electric-yellow mb-6">
+                <span class="w-2 h-2 rounded-full bg-electric-yellow animate-ping"></span>
+                <span class="font-tech tracking-wider text-sm font-bold">SISTEMA ONLINE E OPERANTE</span>
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl font-tech font-bold text-white mb-4 tracking-tight">
+                JEFFERSON <span class="text-transparent bg-clip-text bg-gradient-to-r from-electric-blue to-electric-yellow text-glow-blue">REIS OLIVEIRA</span>
+            </h1>
+            
+            <p class="mt-4 text-xl md:text-3xl text-gray-300 font-medium mb-8 max-w-3xl mx-auto">
+                <i class="fa-solid fa-bolt text-electric-yellow mr-2"></i>
+                Estudante de Engenharia Elétrica & Desenvolvedor de Soluções Tecnológicas
+            </p>
+            
+            <p class="text-lg text-gray-400 mb-10 max-w-2xl mx-auto">
+                Unindo a potência das instalações elétricas corporativas e residenciais com a inteligência do desenvolvimento de software e análise de dados.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#experiencia" class="px-8 py-4 bg-electric-blue text-black font-tech font-bold text-lg rounded shadow-neon-blue hover:bg-white transition-all duration-300 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-power-off"></i> INICIAR SISTEMA
+                </a>
+                <a href="#projetos" class="px-8 py-4 bg-transparent border-2 border-electric-yellow text-electric-yellow font-tech font-bold text-lg rounded hover:bg-electric-yellow hover:text-black hover:shadow-neon-yellow transition-all duration-300 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-code"></i> VER PROJETOS
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sobre & Acadêmico Section -->
+    <section id="sobre" class="py-20 bg-gradient-to-b from-transparent to-electric-card/50 relative border-t border-electric-blue/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                
+                <!-- Perfil -->
+                <div class="glass-card p-8 rounded-xl circuit-border relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-20">
+                        <i class="fa-solid fa-user-astronaut text-6xl text-electric-blue"></i>
+                    </div>
+                    <h2 class="text-3xl font-tech font-bold text-white mb-6 flex items-center gap-3">
+                        <i class="fa-solid fa-id-badge text-electric-blue"></i> Perfil Profissional
+                    </h2>
+                    <p class="text-gray-300 text-lg leading-relaxed mb-4">
+                        Profissional com sólida experiência atuando como <strong>Eletricista e Instalador Eletricista</strong>, especializado na execução, manutenção e quantificação de materiais para projetos residenciais e comerciais.
+                    </p>
+                    <p class="text-gray-300 text-lg leading-relaxed mb-6">
+                        Com base técnica afiada pela constante atualização nas normas técnicas (NBR 5410) e comandos elétricos, busco sempre a excelência e a segurança nas instalações. Minha paixão pela área vai além dos cabos físicos: estende-se ao ambiente digital, onde crio softwares e ferramentas para otimizar cálculos de queda de tensão, dimensionamento e orçamentos.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center gap-2 text-electric-yellow">
+                            <i class="fa-solid fa-location-dot"></i> <span>Campinas, SP</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-electric-blue">
+                            <i class="fa-solid fa-language"></i> <span>Inglês Avançado</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formação (ID: formacao) -->
+                <div id="formacao" class="space-y-8">
+                    <div>
+                        <h2 class="text-4xl font-tech font-bold text-white mb-8 flex items-center gap-3">
+                            <i class="fa-solid fa-graduation-cap text-electric-yellow"></i> Formação Acadêmica
+                        </h2>
+                        
+                        <!-- Curso Principal -->
+                        <div class="relative pl-8 border-l-2 border-electric-blue before:absolute before:w-4 before:h-4 before:bg-electric-blue before:rounded-full before:left-[-9px] before:top-2 before:shadow-neon-blue">
+                            <h3 class="text-2xl font-bold text-white">Engenharia Elétrica</h3>
+                            <p class="text-xl text-electric-blue font-tech mb-2">Centro Universitário UNIFATECIE</p>
+                            <span class="inline-block px-3 py-1 bg-electric-yellow/20 text-electric-yellow text-sm font-bold rounded mb-3 border border-electric-yellow/50">Em Andamento</span>
+                            <p class="text-gray-400">
+                                Aprofundamento teórico e prático em sistemas de potência, eletrônica, eletromagnetismo e gestão de energia. Foco na inovação tecnológica aplicada à infraestrutura elétrica moderna.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Áreas de Estudo Contínuo -->
+                    <div class="bg-electric-dark/80 p-6 rounded-lg border border-gray-800">
+                        <h4 class="text-xl font-bold text-white mb-4 font-tech">Focos de Especialização</h4>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="px-4 py-2 rounded-full border border-gray-700 bg-gray-900 text-gray-300 text-sm flex items-center gap-2 hover:border-electric-blue transition-colors">
+                                <i class="fa-solid fa-book text-electric-blue"></i> NBR 5410
+                            </span>
+                            <span class="px-4 py-2 rounded-full border border-gray-700 bg-gray-900 text-gray-300 text-sm flex items-center gap-2 hover:border-electric-blue transition-colors">
+                                <i class="fa-solid fa-charging-station text-electric-blue"></i> Sistemas de Potência
+                            </span>
+                            <span class="px-4 py-2 rounded-full border border-gray-700 bg-gray-900 text-gray-300 text-sm flex items-center gap-2 hover:border-electric-yellow transition-colors">
+                                <i class="fa-solid fa-toggle-on text-electric-yellow"></i> Comandos Elétricos
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Atuação Profissional -->
+    <section id="experiencia" class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-tech font-bold text-white mb-4 text-glow-blue">
+                    ATUAÇÃO PROFISSIONAL
+                </h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-electric-blue to-electric-yellow mx-auto"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="glass-card p-8 rounded-xl flex flex-col h-full hover:bg-electric-blue/5 group cursor-default">
+                    <div class="w-16 h-16 rounded-full bg-electric-blue/20 flex items-center justify-center mb-6 border border-electric-blue group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-solid fa-network-wired text-2xl text-electric-blue"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-3 font-tech">Projetos & Quantificação</h3>
+                    <p class="text-gray-400 flex-grow">
+                        Análise minuciosa de plantas elétricas, cálculo de demanda, previsão de cargas e quantificação precisa de materiais, garantindo eficiência de custo e conformidade técnica para execuções sem retrabalho.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass-card p-8 rounded-xl flex flex-col h-full hover:bg-electric-yellow/5 group cursor-default border-t-4 border-t-electric-yellow">
+                    <div class="w-16 h-16 rounded-full bg-electric-yellow/20 flex items-center justify-center mb-6 border border-electric-yellow group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-solid fa-house-signal text-2xl text-electric-yellow"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-3 font-tech">Instalações Residenciais</h3>
+                    <p class="text-gray-400 flex-grow">
+                        Execução de infraestrutura elétrica residencial do zero, desde a passagem de conduítes, montagem de quadros de distribuição (QDC), até a instalação de acabamentos, sistemas de aterramento e iluminação.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass-card p-8 rounded-xl flex flex-col h-full hover:bg-electric-blue/5 group cursor-default">
+                    <div class="w-16 h-16 rounded-full bg-electric-blue/20 flex items-center justify-center mb-6 border border-electric-blue group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-solid fa-building-shield text-2xl text-electric-blue"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-3 font-tech">Instalações Comerciais</h3>
+                    <p class="text-gray-400 flex-grow">
+                        Adequação e montagem de infraestrutura elétrica para comércios e galpões. Implementação de comandos elétricos, redes estabilizadas, iluminação técnica e rigorosa aplicação das normas de segurança.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projetos de Software (A interseção de elétrica e tech) -->
+    <section id="projetos" class="py-20 bg-[#070b12] border-y border-gray-800 relative overflow-hidden">
+        
+        <!-- Decoração de fundo -->
+        <div class="absolute right-0 top-1/2 transform -translate-y-1/2 opacity-5 pointer-events-none">
+            <i class="fa-brands fa-react text-[30rem]"></i>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12">
+                <div>
+                    <h2 class="text-4xl md:text-5xl font-tech font-bold text-white mb-2 text-glow-yellow">
+                        DESENVOLVIMENTO & SOFTWARE
+                    </h2>
+                    <p class="text-xl text-gray-400">Automatizando a Engenharia através do Código</p>
+                </div>
+                <div class="flex gap-4 text-3xl text-gray-500 mt-4 md:mt-0">
+                    <i class="fa-brands fa-github hover:text-white transition-colors" title="GitHub"></i>
+                    <i class="fa-brands fa-js hover:text-electric-yellow transition-colors" title="JavaScript"></i>
+                    <i class="fa-solid fa-database hover:text-electric-blue transition-colors" title="Bancos de Dados"></i>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Projeto: CalcVoltPro -->
+                <div class="bg-gradient-to-br from-gray-900 to-black p-1 rounded-xl shadow-lg hover:shadow-neon-blue transition-shadow duration-500">
+                    <div class="bg-gray-900 h-full rounded-lg p-6 flex flex-col relative overflow-hidden">
+                        <div class="absolute -right-10 -top-10 w-32 h-32 bg-electric-blue/20 blur-3xl rounded-full"></div>
+                        
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-2xl font-tech font-bold text-white">CalcVoltPro</h3>
+                            <i class="fa-solid fa-calculator text-electric-blue text-2xl"></i>
+                        </div>
+                        <p class="text-gray-300 mb-6 flex-grow">
+                            Aplicativo desenvolvido para profissionais do setor elétrico. Realiza cálculos complexos de queda de tensão, dimensionamento de cabos, disjuntores e gestão ágil de orçamentos diretamente pelo celular ou web.
+                        </p>
+                        
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-bold text-gray-500 uppercase">Stack Tecnológica</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-gray-800 text-xs font-mono text-electric-blue rounded border border-gray-700">Expo (Mobile)</span>
+                                <span class="px-3 py-1 bg-gray-800 text-xs font-mono text-electric-blue rounded border border-gray-700">Vercel (Web)</span>
+                                <span class="px-3 py-1 bg-gray-800 text-xs font-mono text-electric-blue rounded border border-gray-700">GitHub</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projeto: Aylla.AI & Outros -->
+                <div class="bg-gradient-to-br from-gray-900 to-black p-1 rounded-xl shadow-lg hover:shadow-neon-yellow transition-shadow duration-500">
+                    <div class="bg-gray-900 h-full rounded-lg p-6 flex flex-col relative overflow-hidden">
+                        <div class="absolute -right-10 -top-10 w-32 h-32 bg-electric-yellow/20 blur-3xl rounded-full"></div>
+                        
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-2xl font-tech font-bold text-white">Aylla.AI & Gestão</h3>
+                            <i class="fa-solid fa-robot text-electric-yellow text-2xl"></i>
+                        </div>
+                        <p class="text-gray-300 mb-6 flex-grow">
+                            Integração de inteligência artificial (Google AI Studio) para automação de tarefas e análise de dados. Desenvolvimento de sistemas de gestão financeira para controle de obras e investimentos (FIIs, tesouro).
+                        </p>
+                        
+                        <div class="space-y-3">
+                            <h4 class="text-sm font-bold text-gray-500 uppercase">Stack Tecnológica</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-gray-800 text-xs font-mono text-electric-yellow rounded border border-gray-700">Google AI Studio</span>
+                                <span class="px-3 py-1 bg-gray-800 text-xs font-mono text-electric-yellow rounded border border-gray-700">Termux</span>
+                                <span class="px-3 py-1 bg-gray-800 text-xs font-mono text-electric-yellow rounded border border-gray-700">APIs Rest</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Contato e Conexões -->
+    <section id="contato" class="py-20 relative">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <i class="fa-solid fa-satellite-dish text-6xl text-electric-blue mb-6 animate-pulse"></i>
+            <h2 class="text-4xl font-tech font-bold text-white mb-6">ESTABELECER CONEXÃO</h2>
+            <p class="text-xl text-gray-400 mb-10">
+                Aberto a oportunidades em Engenharia Elétrica, projetos de infraestrutura e parcerias em desenvolvimento de tecnologia para o setor.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-6">
+                <!-- Links simulados para contato -->
+                <button onclick="copyToClipboard('jefferson.eng@exemplo.com')" class="group relative px-6 py-4 bg-gray-900 border border-gray-700 rounded-lg hover:border-electric-blue transition-colors flex items-center justify-center gap-4">
+                    <i class="fa-solid fa-envelope text-2xl text-gray-400 group-hover:text-electric-blue transition-colors"></i>
+                    <div class="text-left">
+                        <span class="block text-sm text-gray-500 font-bold uppercase">E-mail Profissional</span>
+                        <span class="block text-white font-tech">jefferson.eng@exemplo.com</span>
+                    </div>
+                    <!-- Tooltip feedback -->
+                    <span class="absolute -top-10 opacity-0 group-focus:opacity-100 bg-electric-blue text-black text-xs font-bold px-2 py-1 rounded transition-opacity">Copiado!</span>
+                </button>
+
+                <a href="#" class="group px-6 py-4 bg-gray-900 border border-gray-700 rounded-lg hover:border-electric-blue transition-colors flex items-center justify-center gap-4">
+                    <i class="fa-brands fa-linkedin text-2xl text-gray-400 group-hover:text-electric-blue transition-colors"></i>
+                    <div class="text-left">
+                        <span class="block text-sm text-gray-500 font-bold uppercase">LinkedIn</span>
+                        <span class="block text-white font-tech">/in/jefferson-reis-oliveira</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-8 border-t border-gray-900 text-center relative z-10">
+        <p class="text-gray-600 font-tech text-sm">
+            &copy; 2026 Jefferson Reis Oliveira. Todos os direitos reservados.
+        </p>
+        <p class="text-gray-700 text-xs mt-2">
+            Engenharia Elétrica & Desenvolvimento
+        </p>
+    </footer>
+
+    <script>
+        // Copy to clipboard helper
+        function copyToClipboard(text) {
+            const tempInput = document.createElement("input");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            
+            // Note: visual feedback is handled by CSS group-focus in the button
+        }
+
+        // Mobile Menu Toggle
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.add('hidden');
+            });
+        });
+
+        // Navbar blur on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 10) {
+                nav.classList.add('shadow-lg', 'shadow-electric-blue/5');
+                nav.style.backgroundColor = 'rgba(10, 15, 22, 0.95)';
+            } else {
+                nav.classList.remove('shadow-lg', 'shadow-electric-blue/5');
+                nav.style.backgroundColor = 'rgba(10, 15, 22, 0.8)';
+            }
+        });
+
+        // --- Circuit Background Animation (Canvas) ---
+        const canvas = document.getElementById('circuit-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let particles = [];
+        
+        // Configuration
+        const particleCount = window.innerWidth < 768 ? 40 : 80;
+        const connectionDistance = 150;
+        const colors = ['#00f3ff', '#fadb14', '#0a4047'];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.radius = Math.random() * 2 + 1;
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Bounce off edges
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                
+                // Add glow to particles
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Update and draw particles
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            // Draw circuit lines between close particles
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < connectionDistance) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        // Make lines look like circuits (orthogonal steps sometimes)
+                        if (Math.random() > 0.8) {
+                           ctx.lineTo(particles[i].x, particles[j].y); 
+                        }
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        
+                        const opacity = 1 - (distance / connectionDistance);
+                        ctx.strokeStyle = `rgba(0, 243, 255, ${opacity * 0.2})`;
+                        ctx.lineWidth = 1;
+                        ctx.shadowBlur = 0; // Remove shadow for lines to save performance
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // Initialize setup
+        window.addEventListener('resize', resize);
+        resize();
+        initParticles();
+        animate();
+    </script>
+</body>
+</html>
