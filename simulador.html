@@ -1,4 +1,3 @@
-<!-- STREAMING_CHUNK:Inicializando Estrutura HTML e CSS Base... -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -50,7 +49,6 @@
             transform-origin: 0 0;
         }
 
-<!-- STREAMING_CHUNK:Estilizando Camadas de Fios e Animações... -->
         #wire-layer {
             position: absolute;
             top: 0;
@@ -156,7 +154,6 @@
             filter: drop-shadow(0 0 8px #ef4444);
         }
 
-<!-- STREAMING_CHUNK:Estilizando Componentes e Portas de Conexão... -->
         .component-header {
             background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
             padding: 4px 8px;
@@ -284,7 +281,6 @@
             border-right: none;
         }
 
-<!-- STREAMING_CHUNK:Estilizando Toolbar e Modais... -->
         .canvas-toolbar {
             position: absolute;
             top: 15px;
@@ -377,46 +373,57 @@
             margin-bottom: 1rem;
         }
 
-<!-- STREAMING_CHUNK:Configurando Regras de Impressão (PDF)... -->
-        /* REGRAS PARA IMPRESSÃO EM PDF DO PROJETO */
+        /* REGRAS PARA IMPRESSÃO EM PDF DO PROJETO OFICIAL - A4 Paisagem, Oculta UI */
         @media print {
-            header, #sidebar, .canvas-toolbar, #toast-container, #welcome-modal-pro, #manual-modal, #tutorial-modal, #welcome-text {
-                display: none !important;
+            @page {
+                size: A4 landscape;
+                margin: 10mm;
             }
-            body {
-                background-color: white !important;
-                color: black !important;
+            body, html {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                background: white !important;
+            }
+            header, aside, .canvas-toolbar, #toast-container, #welcome-text, #welcome-modal-pro, #manual-modal, #tutorial-modal {
+                display: none !important;
             }
             #workspace {
                 background-image: none !important;
                 background-color: white !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
                 overflow: visible !important;
-                position: static !important;
-            }
-            #canvas-pan-zoom {
-                position: static !important;
-                transform: none !important;
+                border: none !important;
             }
             .component-header {
-                color: white !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+                color: #000 !important;
+                background: #f1f5f9 !important;
+                border: 1px solid #94a3b8 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
             .component-node {
-                border: 1px solid #ccc !important;
+                border: 1px solid #64748b !important;
                 box-shadow: none !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
             .wire-path {
                 filter: none !important;
+            }
+            .resize-handle, .component-header button, .port::after {
+                display: none !important;
             }
         }
     </style>
 </head>
 <body class="flex flex-col h-screen">
 
-<!-- STREAMING_CHUNK:Renderizando Layout Principal... -->
     <header class="bg-slate-800 border-b border-slate-700 h-14 flex items-center justify-between px-4 sm:px-6 shrink-0 z-40">
         <div class="flex items-center gap-3">
             <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white mr-2 transition-colors p-2 rounded hover:bg-slate-700" title="Mostrar/Ocultar Biblioteca">
@@ -495,7 +502,6 @@
         </main>
     </div>
 
-<!-- STREAMING_CHUNK:Renderizando Modal de Boas Vindas Único... -->
     <!-- Modal de Boas Vindas -->
     <div id="welcome-modal-pro" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/90 backdrop-blur-sm transition-opacity duration-500">
         <div class="bg-slate-800 border-2 border-blue-500 rounded-3xl shadow-[0_0_80px_rgba(59,130,246,0.6)] p-10 max-w-4xl text-center transform scale-100 transition-transform duration-500 w-11/12 relative overflow-hidden">
@@ -516,7 +522,6 @@
         </div>
     </div>
 
-<!-- STREAMING_CHUNK:Renderizando Modal da Apostila Interativa... -->
     <div id="manual-modal" class="hidden">
         <div class="bg-slate-800 border border-slate-600 rounded-xl w-full h-full flex flex-col shadow-2xl overflow-hidden">
             <div id="manual-modal-header" class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900 shrink-0 select-none cursor-move">
@@ -540,7 +545,6 @@
         </div>
     </div>
 
-<!-- STREAMING_CHUNK:Renderizando Modal do Tutorial Mestre de Ligações... -->
     <div id="tutorial-modal" class="hidden">
         <div class="bg-slate-900 border border-emerald-600 rounded-xl w-full h-full flex flex-col shadow-2xl overflow-hidden">
             <div id="tutorial-modal-header" class="p-4 border-b border-emerald-700 flex justify-between items-center bg-slate-950 shrink-0 select-none cursor-move">
@@ -2218,6 +2222,8 @@
             const startPos = getPortCenter(drawingWire.sourceEl);
             const t1 = drawingWire.sourceEl.dataset.type;
             
+            if (!startPos || isNaN(startPos.x) || isNaN(startPos.y)) return;
+            
             const panZoomRect = canvasPanZoom.getBoundingClientRect();
             const mouseX = (clientX - panZoomRect.left) / scale;
             const mouseY = (clientY - panZoomRect.top) / scale;
@@ -2302,6 +2308,8 @@
         }
 
         function getOrthogonalPath(p1, p2, t1, t2, wireNum) {
+            if (!p1 || !p2 || isNaN(p1.x) || isNaN(p1.y) || isNaN(p2.x) || isNaN(p2.y)) return '';
+            
             const spreadY = (wireNum % 15) * 8; 
             const spreadX = (wireNum % 15) * 8;
             
@@ -2320,7 +2328,7 @@
                 return `M ${p1.x} ${p1.y} L ${p1.x} ${midY} L ${p2.x} ${midY} L ${p2.x} ${p2.y}`;
             } 
             else {
-                const midX = ((p1.x + p2.x) / 2) + spreadX;
+                const midX = p1.x + (p2.x - p1.x) / 2 + ((wireNum % 8) * 10);
                 return `M ${p1.x} ${p1.y} L ${p1.x} ${py1} L ${midX} ${py1} L ${midX} ${py2} L ${p2.x} ${py2} L ${p2.x} ${p2.y}`;
             }
         }
@@ -2335,6 +2343,7 @@
             if (srcEl && tgtEl) {
                 const p1 = getPortCenter(srcEl);
                 const p2 = getPortCenter(tgtEl);
+                if (!p1 || !p2 || isNaN(p1.x) || isNaN(p2.x)) return;
                 
                 const t1 = srcEl.dataset.type;
                 const t2 = tgtEl.dataset.type;
@@ -2651,14 +2660,19 @@
                             outSigs.forEach(sig => { if(addSignal(n.id, inPort, sig)) changed=true; }); 
                         };
 
-                        if (isActive || ['barra_terra', 'barra_neutro', 'fusivel_seccionadora', 'fusivel_nh', 'fusivel_diazed', 'rele_termico', 'dps', 'dr_tetrapolar', 'disjuntor_motor', 'disjuntor_monofasico', 'disjuntor_bipolar', 'disjuntor_trifasico', 'contator_simples'].includes(n.type)) {
+                        const alwaysPassTypes = ['barra_terra', 'barra_neutro', 'fusivel_seccionadora', 'fusivel_nh', 'fusivel_diazed', 'rele_termico', 'dps'];
+                        const isAlwaysPass = alwaysPassTypes.includes(n.type);
+
+                        if (isActive || isAlwaysPass) {
                             const template = componentLibrary.find(c => c.type === n.type);
                             if (template) {
                                 const ins = template.inputs;
                                 const outs = template.outputs;
                                 const min = Math.min(ins.length, outs.length);
                                 for(let i=0; i<min; i++) {
-                                    if(ins[i] !== 'A1' && outs[i] !== 'A2' && ins[i] !== '95' && ins[i] !== '13' && ins[i] !== '21' && ins[i] !== '33' && ins[i] !== '43' && ins[i] !== '11' && ins[i] !== '15') passThrough(ins[i], outs[i]);
+                                    if(ins[i] !== 'A1' && outs[i] !== 'A2' && ins[i] !== '95' && ins[i] !== '13' && ins[i] !== '21' && ins[i] !== '33' && ins[i] !== '43' && ins[i] !== '11' && ins[i] !== '15') {
+                                        passThrough(ins[i], outs[i]);
+                                    }
                                 }
                                 if (n.type.includes('contator') || n.type.includes('botoeira') || n.type === 'rele_temporizador' || n.type === 'rele_interface') passThrough('13', '14');
                                 if (n.type.includes('contator')) { passThrough('43', '44'); passThrough('33', '34'); }
@@ -2690,8 +2704,8 @@
                         const a1 = getSignals(n.id, 'A1');
                         const a2 = getSignals(n.id, 'A2');
                         
-                        const coilPowered = (a1.has('+24V') || a1.has('L1') || a1.has('L2') || a1.has('L3') || a1.has('L')) && 
-                                            (a2.has('0V') || a2.has('N') || a2.has('L2') || a2.has('L3') || a2.has('PE'));
+                        const coilPowered = (a1.has('+24V') || a1.has('L1') || a1.has('L2') || a1.has('L3') || a1.has('L') || a1.has('Fase')) && 
+                                            (a2.has('0V') || a2.has('N') || a2.has('L2') || a2.has('L3') || a2.has('PE') || a2.has('Neutro'));
                         
                         const currentlyActive = n.el.dataset.simActive === "true";
 
