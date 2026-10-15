@@ -1,0 +1,2031 @@
+```react
+import React, { useState, useMemo } from 'react';
+import {
+  Sun, Zap, Battery, ShieldCheck, FileText, Cpu, TrendingUp,
+  Sliders, Download, Copy, Check, AlertTriangle, Info, Layers,
+  Compass, Thermometer, Wrench, Building2, Calculator, Eye
+} from 'lucide-react';
+import {
+  ResponsiveContainer, ComposedChart, Bar, Line, AreaChart, Area,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine
+} from 'recharts';
+
+const CIDADES_BRASIL = [
+  { nome: 'São Paulo - SP', uf: 'SP', hsp: 4.65, lat: 23.5, tempMin: 2, tempMax: 35, conc: 'Enel SP' },
+  { nome: 'Campinas / Ribeirão Preto - SP', uf: 'SP', hsp: 5.25, lat: 21.2, tempMin: 3, tempMax: 38, conc: 'CPFL Paulista' },
+  { nome: 'Rio de Janeiro - RJ', uf: 'RJ', hsp: 4.95, lat: 22.9, tempMin: 10, tempMax: 40, conc: 'Light / Enel RJ' },
+  { nome: 'Belo Horizonte - MG', uf: 'MG', hsp: 5.35, lat: 19.9, tempMin: 6, tempMax: 36, conc: 'CEMIG' },
+  { nome: 'Curitiba - PR', uf: 'PR', hsp: 4.35, lat: 25.4, tempMin: -2, tempMax: 33, conc: 'Copel' },
+  { nome: 'Porto Alegre - RS', uf: 'RS', hsp: 4.50, lat: 30.0, tempMin: 0, tempMax: 37, conc: 'CEEE Equatorial' },
+  { nome: 'Brasília - DF', uf: 'DF', hsp: 5.55, lat: 15.8, tempMin: 7, tempMax: 35, conc: 'Neoenergia DF' },
+  { nome: 'Goiânia - GO', uf: 'GO', hsp: 5.60, lat: 16.7, tempMin: 8, tempMax: 38, conc: 'Equatorial GO' },
+  { nome: 'Salvador - BA', uf: 'BA', hsp: 5.45, lat: 12.9, tempMin: 18, tempMax: 35, conc: 'Neoenergia Coelba' },
+  { nome: 'Fortaleza - CE', uf: 'CE', hsp: 5.85, lat: 3.7, tempMin: 20, tempMax: 36, conc: 'Enel CE' },
+  { nome: 'Recife - PE', uf: 'PE', hsp: 5.50, lat: 8.0, tempMin: 18, tempMax: 35, conc: 'Neoenergia Pernambuco' },
+  { nome: 'Manaus - AM', uf: 'AM', hsp: 4.60, lat: 3.1, tempMin: 20, tempMax: 38, conc: 'Amazonas Energia' },
+  { nome: 'Cuiabá - MT', uf: 'MT', hsp: 5.40, lat: 15.6, tempMin: 9, tempMax: 42, conc: 'Energisa MT' },
+];
+
+const MODULOS_PRESETS = [
+  { id: 'topcon_585', nome: 'N-Type TOPCon Bifacial 585W', pmax: 585, vmp: 42.8, imp: 13.67, voc: 51.2, isc: 14.45, coefVoc: -0.25, coefPmax: -0.29, area: 2.58, efici: 22.6 },
+  { id: 'perc_550', nome: 'Mono PERC Half-Cell 550W', pmax: 550, vmp: 41.9, imp: 13.13, voc: 49.8, isc: 13.98, coefVoc: -0.27, coefPmax: -0.35, area: 2.58, efici: 21.3 },
+  { id: 'hjt_620', nome: 'HJT Heterojunção 620W', pmax: 620, vmp: 44.5, imp: 13.93, voc: 53.0, isc: 14.70, coefVoc: -0.24, coefPmax: -0.26, area: 2.79, efici: 22.8 },
+  { id: 'perc_450', nome: 'Mono PERC Residencial 450W', pmax: 450, vmp: 34.6, imp: 13.01, voc: 41.2, isc: 13.85, coefVoc: -0.28, coefPmax: -0.35, area: 2.07, efici: 20.7 },
+];
+
+const INVERSORES_PRESETS = [
+  { id: 'inv_3k_mono', nome: 'Inversor String 3.0 kW Monofásico (2 MPPT)', pNomCA: 3.0, pMaxCC: 4.5, vMaxCC: 600, vMpptMin: 80, vMpptMax: 500, vPartida: 100, nMppt: 2, iMaxMppt: 16, fases: 'Monofásico 220V', vCA: 220 },
+  { id: 'inv_5k_mono', nome: 'Inversor String 5.0 kW Monofásico (2 MPPT)', pNomCA: 5.0, pMaxCC: 7.5, vMaxCC: 600, vMpptMin: 90, vMpptMax: 520, vPartida: 120, nMppt: 2, iMaxMppt: 16, fases: 'Monofásico 220V', vCA: 220 },
+  { id: 'inv_8k_mono', nome: 'Inversor String 8.0 kW Monofásico/Bifásico (3 MPPT)', pNomCA: 8.0, pMaxCC: 12.0, vMaxCC: 600, vMpptMin: 90, vMpptMax: 520, vPartida: 120, nMppt: 3, iMaxMppt: 18, fases: 'Bifásico 220V', vCA: 220 },
+  { id: 'inv_15k_tri', nome: 'Inversor String 15.0 kW Trifásico 380V (3 MPPT)', pNomCA: 15.0, pMaxCC: 22.5, vMaxCC: 1000, vMpptMin: 180, vMpptMax: 850, vPartida: 200, nMppt: 3, iMaxMppt: 26, fases: 'Trifásico 380V', vCA: 380 },
+  { id: 'inv_30k_tri', nome: 'Inversor Comercial 30.0 kW Trifásico 380V (4 MPPT)', pNomCA: 30.0, pMaxCC: 45.0, vMaxCC: 1100, vMpptMin: 200, vMpptMax: 950, vPartida: 250, nMppt: 4, iMaxMppt: 32, fases: 'Trifásico 380V', vCA: 380 },
+  { id: 'inv_5k_hib', nome: 'Inversor Híbrido 5.0 kW + Backup 48V (2 MPPT)', pNomCA: 5.0, pMaxCC: 7.5, vMaxCC: 550, vMpptMin: 100, vMpptMax: 480, vPartida: 125, nMppt: 2, iMaxMppt: 16, fases: 'Monofásico 220V', vCA: 220 },
+];
+
+const TABELA_CABOS_NBR5410 = [
+  { secao: 2.5, izB1_2cond: 24, izB1_3cond: 21, izSolarCC: 33 },
+  { secao: 4.0, izB1_2cond: 32, izB1_3cond: 28, izSolarCC: 44 },
+  { secao: 6.0, izB1_2cond: 41, izB1_3cond: 36, izSolarCC: 57 },
+  { secao: 10.0, izB1_2cond: 57, izB1_3cond: 50, izSolarCC: 76 },
+  { secao: 16.0, izB1_2cond: 76, izB1_3cond: 68, izSolarCC: 101 },
+  { secao: 25.0, izB1_2cond: 101, izB1_3cond: 89, izSolarCC: 135 },
+  { secao: 35.0, izB1_2cond: 125, izB1_3cond: 110, izSolarCC: 169 },
+  { secao: 50.0, izB1_2cond: 151, izB1_3cond: 134, izSolarCC: 207 },
+];
+
+const DISJUNTORES_PADRAO = [10, 16, 20, 25, 32, 40, 50, 63, 70, 80, 100, 125, 150, 175, 200];
+const FUSIVEIS_GPV = [12, 15, 16, 20, 25, 30, 32];
+
+const MESES_SAZONALIDADE = [
+  { mes: 'Jan', fator: 1.06 },
+  { mes: 'Fev', fator: 1.08 },
+  { mes: 'Mar', fator: 1.03 },
+  { mes: 'Abr', fator: 0.96 },
+  { mes: 'Mai', fator: 0.88 },
+  { mes: 'Jun', fator: 0.83 },
+  { mes: 'Jul', fator: 0.86 },
+  { mes: 'Ago', fator: 0.98 },
+  { mes: 'Set', fator: 1.02 },
+  { mes: 'Out', fator: 1.07 },
+  { mes: 'Nov', fator: 1.11 },
+  { mes: 'Dez', fator: 1.12 },
+];
+
+export default function App() {
+  const [abaAtiva, setAbaAtiva] = useState('dimensionamento');
+  const [copiadoStatus, setCopiadoStatus] = useState(false);
+
+  // Dados de Identificação do Projeto
+  const [nomeProjeto, setNomeProjeto] = useState('UFV Residencial & Comercial Padrão');
+  const [nomeCliente, setNomeCliente] = useState('Cliente Exemplo Ltda');
+  const [engenheiroResp, setEngenheiroResp] = useState('Eng. Eletricista Responsável - CREA/CFT');
+
+  // Parâmetros de Localização e Consumo
+  const [cidadeIdx, setCidadeIdx] = useState(0);
+  const [hspCustom, setHspCustom] = useState(4.65);
+  const [tempMinLocal, setTempMinLocal] = useState(2);
+  const [tempMaxLocal, setTempMaxLocal] = useState(35);
+  const [consumoMensal, setConsumoMensal] = useState(850);
+  const [tipoLigacao, setTipoLigacao] = useState('bifasico'); // monofasico, bifasico, trifasico
+  const [modalidadeSistema, setModalidadeSistema] = useState('ongrid'); // ongrid, hibrido, offgrid
+
+  // Parâmetros de Orientação e Perdas (PR)
+  const [azimute, setAzimute] = useState(0); // 0 = Norte, 90 = Leste/Oeste, 180 = Sul
+  const [inclinacao, setInclinacao] = useState(22);
+  const [perdaTemp, setPerdaTemp] = useState(8.5);
+  const [perdaSujeira, setPerdaSujeira] = useState(3.0);
+  const [perdaCabos, setPerdaCabos] = useState(1.5);
+  const [perdaInversor, setPerdaInversor] = useState(3.5);
+
+  // Parâmetros de Baterias (Híbrido / Off-Grid)
+  const [diasAutonomia, setDiasAutonomia] = useState(1.5);
+  const [percentualBackup, setPercentualBackup] = useState(50);
+  const [tensaoBancoBat, setTensaoBancoBat] = useState(48);
+  const [tecnologiaBateria, setTecnologiaBateria] = useState('lifepo4'); // lifepo4 (DoD 85%), chumbo (DoD 50%)
+
+  // Equipamentos e Coordenação de Strings
+  const [moduloId, setModuloId] = useState('topcon_585');
+  const [inversorId, setInversorId] = useState('inv_5k_mono');
+  const [numStrings, setNumStrings] = useState(2);
+  const [modulosPorString, setModulosPorString] = useState(6);
+  const [autoDimensionarStrings, setAutoDimensionarStrings] = useState(true);
+
+  // Parâmetros de Projeto Elétrico (NBR 5410 / NBR 16690)
+  const [compCaboCC, setCompCaboCC] = useState(22); // metros (trecho unidirecional string -> inversor)
+  const [compCaboCA, setCompCaboCA] = useState(18); // metros (inversor -> QGBT)
+  const [tensaoRedeCA, setTensaoRedeCA] = useState(220); // 127, 220, 380
+  const [potenciaInstaladaQGBT, setPotenciaInstaladaQGBT] = useState(18.5); // kW da edificação
+  const [fatorDemandaQGBT, setFatorDemandaQGBT] = useState(0.65);
+
+  // Parâmetros Financeiros e Lei 14.300
+  const [tarifaEnergia, setTarifaEnergia] = useState(0.92); // R$/kWh com impostos
+  const [custoFioB, setCustoFioB] = useState(0.24); // R$/kWh componente Fio B
+  const [simultaneidade, setSimultaneidade] = useState(38); // % consumida instantaneamente
+  const [inflacaoEnergetica, setInflacaoEnergetica] = useState(6.5); // % a.a.
+  const [tmaDesconto, setTmaDesconto] = useState(9.5); // % a.a.
+  const [custoPorKwp, setCustoPorKwp] = useState(3150); // R$/kWp instalado
+
+  const handleSelectCidade = (index) => {
+    const idx = Number(index);
+    setCidadeIdx(idx);
+    const cid = CIDADES_BRASIL[idx];
+    if (cid) {
+      setHspCustom(cid.hsp);
+      setTempMinLocal(cid.tempMin);
+      setTempMaxLocal(cid.tempMax);
+      setInclinacao(Math.round(cid.lat));
+    }
+  };
+
+  const dadosDimensionamento = useMemo(() => {
+    const custoDisponibilidade =
+      modalidadeSistema === 'offgrid' ? 0 :
+      tipoLigacao === 'monofasico' ? 30 :
+      tipoLigacao === 'bifasico' ? 50 : 100;
+
+    const consumoCompensavel = Math.max(0, consumoMensal - custoDisponibilidade);
+    const energiaDiariaAlvo = (modalidadeSistema === 'offgrid' ? consumoMensal : consumoCompensavel) / 30;
+
+    // Fator de perda por desvio azimutal e inclinação
+    const desvioAzimute = Math.abs(azimute);
+    const penalidadeAzimute = desvioAzimute <= 15 ? 0 : (desvioAzimute / 180) * 0.18;
+    const latRef = CIDADES_BRASIL[cidadeIdx]?.lat || 20;
+    const desvioInclinacao = Math.abs(inclinacao - latRef);
+    const penalidadeInclinacao = Math.min(0.12, (desvioInclinacao / 45) * 0.08);
+    const fatorPosicional = Math.max(0.75, 1 - penalidadeAzimute - penalidadeInclinacao);
+
+    // Performance Ratio (PR)
+    const prBase =
+      (1 - perdaTemp / 100) *
+      (1 - perdaSujeira / 100) *
+      (1 - perdaCabos / 100) *
+      (1 - perdaInversor / 100);
+    const prFinal = Math.max(0.55, Math.min(0.92, prBase * fatorPosicional));
+
+    const potenciaPicoNecessaria = energiaDiariaAlvo / (Math.max(1, hspCustom) * prFinal);
+
+    // Modulo selecionado
+    const mod = MODULOS_PRESETS.find((m) => m.id === moduloId) || MODULOS_PRESETS[0];
+    const inv = INVERSORES_PRESETS.find((i) => i.id === inversorId) || INVERSORES_PRESETS[1];
+
+    const qtdModulosIdeal = Math.max(2, Math.ceil((potenciaPicoNecessaria * 1000) / mod.pmax));
+
+    // Se auto-dimensionar estiver ativo, calcula arranjo equilibrado
+    const nStringsEfetivo = autoDimensionarStrings
+      ? Math.min(inv.nMppt, qtdModulosIdeal >= 10 ? 2 : 1)
+      : Math.max(1, numStrings);
+
+    const modPorStringEfetivo = autoDimensionarStrings
+      ? Math.max(2, Math.ceil(qtdModulosIdeal / nStringsEfetivo))
+      : Math.max(1, modulosPorString);
+
+    const totalModulosInstalados = nStringsEfetivo * modPorStringEfetivo;
+    const potenciaPicoInstalada = (totalModulosInstalados * mod.pmax) / 1000;
+    const geracaoMensalEstimada = potenciaPicoInstalada * hspCustom * prFinal * 30;
+    const areaOcupadaM2 = totalModulosInstalados * mod.area;
+    const pesoEstimadoKg = totalModulosInstalados * 28.5;
+
+    // Dimensionamento de Banco de Baterias (Híbrido ou Off-Grid)
+    const dodBateria = tecnologiaBateria === 'lifepo4' ? 0.85 : 0.50;
+    const eficiBateria = tecnologiaBateria === 'lifepo4' ? 0.95 : 0.82;
+    const fraCargasCriticas = modalidadeSistema === 'offgrid' ? 1.0 : percentualBackup / 100;
+    const energiaBackupKwh =
+      ((consumoMensal / 30) * fraCargasCriticas * diasAutonomia) / (dodBateria * eficiBateria);
+    const capacidadeBancoAh = (energiaBackupKwh * 1000) / tensaoBancoBat;
+    const qtdBaterias48V100Ah = Math.ceil(energiaBackupKwh / 4.8);
+
+    return {
+      custoDisponibilidade,
+      consumoCompensavel,
+      energiaDiariaAlvo,
+      fatorPosicional,
+      prFinal,
+      potenciaPicoNecessaria,
+      mod,
+      inv,
+      qtdModulosIdeal,
+      nStringsEfetivo,
+      modPorStringEfetivo,
+      totalModulosInstalados,
+      potenciaPicoInstalada,
+      geracaoMensalEstimada,
+      areaOcupadaM2,
+      pesoEstimadoKg,
+      dodBateria,
+      energiaBackupKwh,
+      capacidadeBancoAh,
+      qtdBaterias48V100Ah,
+    };
+  }, [
+    consumoMensal, tipoLigacao, modalidadeSistema, azimute, inclinacao, cidadeIdx,
+    perdaTemp, perdaSujeira, perdaCabos, perdaInversor, hspCustom, moduloId,
+    inversorId, numStrings, modulosPorString, autoDimensionarStrings,
+    diasAutonomia, percentualBackup, tensaoBancoBat, tecnologiaBateria
+  ]);
+
+  const engenhariaStrings = useMemo(() => {
+    const { mod, inv, nStringsEfetivo, modPorStringEfetivo, potenciaPicoInstalada } = dadosDimensionamento;
+
+    // Temperatura da célula em frio extremo (considera temperatura mínima ambiente)
+    const deltaTempMin = tempMinLocal - 25; // STC = 25°C
+    // Temperatura máxima de operação da célula (T_amb + ~28°C sob 1000 W/m²)
+    const tempCelulaMax = tempMaxLocal + 28;
+    const deltaTempMax = tempCelulaMax - 25;
+
+    // Correção térmica de tensão do módulo (coefVoc em %/°C)
+    const vocModuloFrio = mod.voc * (1 + (mod.coefVoc / 100) * deltaTempMin);
+    const vmpModuloQuente = mod.vmp * (1 + (mod.coefPmax / 100) * deltaTempMax);
+    const vmpModuloSTC = mod.vmp;
+
+    // Tensões da String
+    const vocStringMax = vocModuloFrio * modPorStringEfetivo;
+    const vmpStringMinQuente = vmpModuloQuente * modPorStringEfetivo;
+    const vmpStringSTC = vmpModuloSTC * modPorStringEfetivo;
+
+    // Limites de módulos por string permitidos pelo inversor
+    const maxModulosPorString = Math.floor(inv.vMaxCC / vocModuloFrio);
+    const minModulosPorString = Math.ceil(Math.max(inv.vPartida, inv.vMpptMin) / vmpModuloQuente);
+
+    // Fator de Dimensionamento do Inversor (FDI) e Overload
+    const fdi = inv.pNomCA / Math.max(0.1, potenciaPicoInstalada);
+    const overloadPercent = ((potenciaPicoInstalada / inv.pNomCA) - 1) * 100;
+
+    // Verificações de Conformidade (NBR 16690)
+    const okTensaoMax = vocStringMax <= inv.vMaxCC;
+    const okTensaoMinMppt = vmpStringMinQuente >= inv.vMpptMin && vmpStringMinQuente >= inv.vPartida;
+    const okTensaoMaxMppt = vmpStringSTC <= inv.vMpptMax;
+    const okCorrenteMppt = mod.imp <= inv.iMaxMppt;
+    const okQuantidadeMppt = nStringsEfetivo <= inv.nMppt;
+    const okOverload = potenciaPicoInstalada <= inv.pMaxCC && fdi >= 0.65;
+
+    const todasConformidades =
+      okTensaoMax && okTensaoMinMppt && okTensaoMaxMppt && okCorrenteMppt && okQuantidadeMppt && okOverload;
+
+    return {
+      tempCelulaMax,
+      vocModuloFrio,
+      vmpModuloQuente,
+      vocStringMax,
+      vmpStringMinQuente,
+      vmpStringSTC,
+      maxModulosPorString,
+      minModulosPorString,
+      fdi,
+      overloadPercent,
+      okTensaoMax,
+      okTensaoMinMppt,
+      okTensaoMaxMppt,
+      okCorrenteMppt,
+      okQuantidadeMppt,
+      okOverload,
+      todasConformidades,
+    };
+  }, [dadosDimensionamento, tempMinLocal, tempMaxLocal]);
+
+  const projetoEletrico = useMemo(() => {
+    const { mod, inv, potenciaPicoInstalada } = dadosDimensionamento;
+    const { vmpStringSTC } = engenhariaStrings;
+    const rhoCobre = 0.0178; // Ohm.mm²/m a 70°C
+
+    // 1. LADO CC (NBR 16690)
+    const iProjetoCC = mod.isc * 1.25;
+    const iFusivelMin = mod.isc * 1.5;
+    const iFusivelMax = mod.isc * 2.0;
+    const fusivelEscolhido = FUSIVEIS_GPV.find((f) => f >= iFusivelMin && f <= iFusivelMax) || 16;
+
+    // Escolha do Cabo Solar CC (mínimo 4.0 mm² e Queda de Tensão <= 1.5%)
+    let caboCC = TABELA_CABOS_NBR5410[1]; // 4.0 mm² padrão inicial
+    for (const c of TABELA_CABOS_NBR5410) {
+      if (c.secao < 4.0) continue;
+      const quedaV = (2 * rhoCobre * compCaboCC * mod.imp) / c.secao;
+      const quedaPerc = (quedaV / Math.max(100, vmpStringSTC)) * 100;
+      if (c.izSolarCC >= iProjetoCC && quedaPerc <= 1.5) {
+        caboCC = c;
+        break;
+      }
+    }
+    const quedaTensaoCC_V = (2 * rhoCobre * compCaboCC * mod.imp) / caboCC.secao;
+    const quedaTensaoCC_Perc = (quedaTensaoCC_V / Math.max(100, vmpStringSTC)) * 100;
+    const tensaoDpsCC = inv.vMaxCC <= 600 ? 600 : 1000;
+
+    // 2. LADO CA DO INVERSOR (NBR 5410)
+    const isTrifasicoInv = inv.fases.toLowerCase().includes('trifásico');
+    const vLinhaCA = isTrifasicoInv ? 380 : tensaoRedeCA;
+    const iNominalCA = isTrifasicoInv
+      ? (inv.pNomCA * 1000) / (Math.sqrt(3) * vLinhaCA)
+      : (inv.pNomCA * 1000) / vLinhaCA;
+
+    const iProjetoCA = iNominalCA * 1.25; // Fator de regime contínuo fotovoltaico
+    const disjuntorInversorCA = DISJUNTORES_PADRAO.find((d) => d >= iProjetoCA) || 32;
+
+    // Seleção do Cabo CA (Critério de Ampacidade Iz >= In_disjuntor e Queda de Tensão <= 2.0%)
+    let caboCA = TABELA_CABOS_NBR5410[1];
+    const fatorQuedaCA = isTrifasicoInv ? Math.sqrt(3) : 2;
+    for (const c of TABELA_CABOS_NBR5410) {
+      const izAplicavel = isTrifasicoInv ? c.izB1_3cond : c.izB1_2cond;
+      const quedaV = (fatorQuedaCA * rhoCobre * compCaboCA * iNominalCA) / c.secao;
+      const quedaPerc = (quedaV / vLinhaCA) * 100;
+      if (izAplicavel >= disjuntorInversorCA && quedaPerc <= 2.0) {
+        caboCA = c;
+        break;
+      }
+    }
+    const quedaTensaoCA_V = (fatorQuedaCA * rhoCobre * compCaboCA * iNominalCA) / caboCA.secao;
+    const quedaTensaoCA_Perc = (quedaTensaoCA_V / vLinhaCA) * 100;
+    const drCorrenteNominal = DISJUNTORES_PADRAO.find((d) => d >= disjuntorInversorCA && d >= 25) || 40;
+
+    // 3. PADRÃO DE ENTRADA / QGBT DA EDIFICAÇÃO
+    const demandaEdificacaoKVA = (potenciaInstaladaQGBT * fatorDemandaQGBT) / 0.92;
+    const potenciaDisponibilizadaKVA = Math.max(demandaEdificacaoKVA, inv.pNomCA);
+    const iDemandaQGBT = tipoLigacao === 'trifasico'
+      ? (potenciaDisponibilizadaKVA * 1000) / (Math.sqrt(3) * tensaoRedeCA)
+      : (potenciaDisponibilizadaKVA * 1000) / tensaoRedeCA;
+
+    const disjuntorGeralQGBT = DISJUNTORES_PADRAO.find((d) => d >= iDemandaQGBT) || 63;
+    const caboEntradaQGBT = TABELA_CABOS_NBR5410.find((c) => {
+      const iz = tipoLigacao === 'trifasico' ? c.izB1_3cond : c.izB1_2cond;
+      return iz >= disjuntorGeralQGBT && c.secao >= 10.0;
+    }) || TABELA_CABOS_NBR5410[5];
+
+    return {
+      iProjetoCC,
+      fusivelEscolhido,
+      caboCC,
+      quedaTensaoCC_V,
+      quedaTensaoCC_Perc,
+      tensaoDpsCC,
+      isTrifasicoInv,
+      vLinhaCA,
+      iNominalCA,
+      iProjetoCA,
+      disjuntorInversorCA,
+      caboCA,
+      quedaTensaoCA_V,
+      quedaTensaoCA_Perc,
+      drCorrenteNominal,
+      demandaEdificacaoKVA,
+      potenciaDisponibilizadaKVA,
+      iDemandaQGBT,
+      disjuntorGeralQGBT,
+      caboEntradaQGBT,
+    };
+  }, [dadosDimensionamento, engenhariaStrings, compCaboCC, compCaboCA, tensaoRedeCA, potenciaInstaladaQGBT, fatorDemandaQGBT, tipoLigacao]);
+
+  const analiseFinanceira = useMemo(() => {
+    const { potenciaPicoInstalada, geracaoMensalEstimada, energiaBackupKwh, custoDisponibilidade } = dadosDimensionamento;
+
+    // CAPEX Estimado
+    const custoBaseFV = potenciaPicoInstalada * custoPorKwp;
+    const custoBancoBaterias = modalidadeSistema === 'ongrid' ? 0 : energiaBackupKwh * 2250;
+    const capexTotal = Math.max(5000, custoBaseFV + custoBancoBaterias);
+
+    // Economia Mensal no Ano 1 considerando Lei 14.300 (Simultaneidade + Fio B na energia injetada)
+    const energiaSimultanea = geracaoMensalEstimada * (simultaneidade / 100);
+    const energiaInjetada = geracaoMensalEstimada * (1 - simultaneidade / 100);
+    const valorKwhInjetadoLiquido = Math.max(0.20, tarifaEnergia - custoFioB);
+
+    const economiaBrutaMensal =
+      energiaSimultanea * tarifaEnergia + energiaInjetada * valorKwhInjetadoLiquido;
+    const economiaAnualAno1 = economiaBrutaMensal * 12;
+
+    // Projeção de 25 Anos
+    const fluxoCaixa = [];
+    let saldoSimples = -capexTotal;
+    let saldoDescontado = -capexTotal;
+    let paybackSimplesAnos = null;
+    let paybackDescontadoAnos = null;
+    let geracaoTotal25Anos = 0;
+    let custoTotalAtualizado = capexTotal;
+
+    for (let ano = 1; ano <= 25; ano++) {
+      const fatorDegradacaoModulo = 1 - 0.0055 * (ano - 1);
+      const fatorInflacaoTarifa = Math.pow(1 + inflacaoEnergetica / 100, ano - 1);
+      const geracaoAno = geracaoMensalEstimada * 12 * fatorDegradacaoModulo;
+      geracaoTotal25Anos += geracaoAno;
+
+      const receitaEconomiaAno = economiaAnualAno1 * fatorDegradacaoModulo * fatorInflacaoTarifa;
+      const custoOemAno = capexTotal * 0.008 * fatorInflacaoTarifa;
+      const trocaInversor = ano === 13 ? capexTotal * 0.18 : 0;
+
+      const fluxoLiquidoAno = receitaEconomiaAno - custoOemAno - trocaInversor;
+      const fluxoDescontadoAno = fluxoLiquidoAno / Math.pow(1 + tmaDesconto / 100, ano);
+
+      custoTotalAtualizado += (custoOemAno + trocaInversor) / Math.pow(1 + tmaDesconto / 100, ano);
+
+      const saldoSimplesAnt = saldoSimples;
+      const saldoDescontadoAnt = saldoDescontado;
+
+      saldoSimples += fluxoLiquidoAno;
+      saldoDescontado += fluxoDescontadoAno;
+
+      if (paybackSimplesAnos === null && saldoSimples >= 0) {
+        paybackSimplesAnos = (ano - 1) + Math.abs(saldoSimplesAnt) / Math.max(1, fluxoLiquidoAno);
+      }
+      if (paybackDescontadoAnos === null && saldoDescontado >= 0) {
+        paybackDescontadoAnos = (ano - 1) + Math.abs(saldoDescontadoAnt) / Math.max(1, fluxoDescontadoAno);
+      }
+
+      fluxoCaixa.push({
+        ano: `Ano ${ano}`,
+        anoNum: ano,
+        fluxoAnual: Math.round(fluxoLiquidoAno),
+        acumuladoSimples: Math.round(saldoSimples),
+        acumuladoDescontado: Math.round(saldoDescontado),
+      });
+    }
+
+    const vpl25Anos = saldoDescontado;
+    const lcoe = custoTotalAtualizado / Math.max(1, geracaoTotal25Anos);
+
+    // Sazonalidade mensal de geração vs consumo
+    const graficoMensal = MESES_SAZONALIDADE.map((item) => ({
+      mes: item.mes,
+      geracao: Math.round(geracaoMensalEstimada * item.fator),
+      consumo: consumoMensal,
+      minimoRede: custoDisponibilidade,
+    }));
+
+    return {
+      custoBaseFV,
+      custoBancoBaterias,
+      capexTotal,
+      economiaBrutaMensal,
+      economiaAnualAno1,
+      paybackSimplesAnos: paybackSimplesAnos ? paybackSimplesAnos.toFixed(1) : '> 25',
+      paybackDescontadoAnos: paybackDescontadoAnos ? paybackDescontadoAnos.toFixed(1) : '> 25',
+      vpl25Anos,
+      lcoe,
+      economiaAcumulada25Anos: saldoSimples + capexTotal,
+      fluxoCaixa,
+      graficoMensal,
+    };
+  }, [
+    dadosDimensionamento, custoPorKwp, modalidadeSistema, simultaneidade,
+    tarifaEnergia, custoFioB, inflacaoEnergetica, tmaDesconto, consumoMensal
+  ]);
+
+  const listaMateriais = useMemo(() => {
+    const { mod, inv, totalModulosInstalados, nStringsEfetivo, qtdBaterias48V100Ah } = dadosDimensionamento;
+    const { caboCC, caboCA, fusivelEscolhido, tensaoDpsCC, disjuntorInversorCA, drCorrenteNominal } = projetoEletrico;
+
+    const itens = [
+      { codigo: 'FV-01', item: `Módulo Fotovoltaico ${mod.nome}`, qtd: `${totalModulosInstalados} un`, norma: 'IEC 61215 / INMETRO' },
+      { codigo: 'FV-02', item: `${inv.nome}`, qtd: '1 un', norma: 'ABNT NBR 16149 / 16150' },
+      { codigo: 'FV-03', item: `Estrutura de Fixação em Alumínio Anodizado + Parafusos Inox 304`, qtd: `${Math.ceil(totalModulosInstalados / 4)} kits`, norma: 'ABNT NBR 6123' },
+      { codigo: 'CC-01', item: `Cabo Solar Fotovoltaico ${caboCC.secao.toFixed(1)} mm² 1.8kV CC Preto/Vermelho UV`, qtd: `${compCaboCC * nStringsEfetivo * 2} m`, norma: 'ABNT NBR 16612' },
+      { codigo: 'CC-02', item: `Fusível Fotovoltaico gPV ${fusivelEscolhido}A 1000VCC + Base Porta-Fusível`, qtd: `${nStringsEfetivo * 2} un`, norma: 'IEC 60269-6' },
+      { codigo: 'CC-03', item: `DPS Classe II Fotovoltaico ${tensaoDpsCC}VCC 40kA`, qtd: `${nStringsEfetivo} un`, norma: 'IEC 61643-31' },
+      { codigo: 'CC-04', item: `Par de Conectores MC4 1500VCC IP68`, qtd: `${nStringsEfetivo * 2 + 2} pares`, norma: 'ABNT NBR 16690' },
+      { codigo: 'CA-01', item: `Cabo de Cobre Flexível HEPR 90°C 0.6/1kV ${caboCA.secao.toFixed(1)} mm²`, qtd: `${compCaboCA * (projetoEletrico.isTrifasicoInv ? 5 : 3)} m`, norma: 'ABNT NBR 7286 / 5410' },
+      { codigo: 'CA-02', item: `Disjuntor Termomagnético DIN Curva C ${disjuntorInversorCA}A (${projetoEletrico.isTrifasicoInv ? 'Tripolar' : 'Bipolar'})`, qtd: '1 un', norma: 'ABNT NBR NM 60898' },
+      { codigo: 'CA-03', item: `Interruptor Diferencial Residual (DR) ${drCorrenteNominal}A / 300mA`, qtd: '1 un', norma: 'ABNT NBR NM 61008' },
+      { codigo: 'CA-04', item: `DPS CA Classe II 275V 20/40kA`, qtd: `${projetoEletrico.isTrifasicoInv ? 4 : 3} un`, norma: 'ABNT NBR 5410' },
+      { codigo: 'AT-01', item: `Kit de Aterramento Equipotencial (Hastes Cobreadas 2,40m + Cabo Nu 16 mm²)`, qtd: '1 cj', norma: 'ABNT NBR 5410 / 5419' },
+    ];
+
+    if (modalidadeSistema !== 'ongrid') {
+      itens.push({
+        codigo: 'BAT-01',
+        item: `Módulo de Bateria Estacionária ${tecnologiaBateria === 'lifepo4' ? 'Lítio LiFePO4 48V 100Ah (4.8 kWh)' : 'Chumbo-Ácido Estacionária'}`,
+        qtd: `${Math.max(1, qtdBaterias48V100Ah)} un`,
+        norma: 'IEC 62619',
+      });
+    }
+
+    return itens;
+  }, [dadosDimensionamento, projetoEletrico, compCaboCC, compCaboCA, modalidadeSistema, tecnologiaBateria]);
+
+  const textoMemorialDescritivo = useMemo(() => {
+    const cid = CIDADES_BRASIL[cidadeIdx] || CIDADES_BRASIL[0];
+    const { mod, inv, totalModulosInstalados, nStringsEfetivo, modPorStringEfetivo, potenciaPicoInstalada, geracaoMensalEstimada, prFinal } = dadosDimensionamento;
+    const { vocStringMax, vmpStringMinQuente, fdi } = engenhariaStrings;
+    const { caboCC, caboCA, disjuntorInversorCA, quedaTensaoCC_Perc, quedaTensaoCA_Perc, disjuntorGeralQGBT } = projetoEletrico;
+
+    return `MEMORIAL DESCRITIVO TÉCNICO - PROJETO ELÉTRICO E FOTOVOLTAICO
+======================================================================
+1. IDENTIFICAÇÃO DO EMPREENDIMENTO
+• Projeto: ${nomeProjeto}
+• Titular / Cliente: ${nomeCliente}
+• Localidade: ${cid.nome} (Concessionária: ${cid.conc})
+• Responsável Técnico: ${engenheiroResp}
+• Modalidade Operacional: ${modalidadeSistema === 'ongrid' ? 'Microgeração Distribuída Conectada à Rede (On-Grid - Lei 14.300/2022)' : modalidadeSistema === 'hibrido' ? 'Sistema Híbrido Conectado à Rede com Armazenamento (Backup)' : 'Sistema Isolado Autônomo (Off-Grid)'}
+
+2. LEVANTAMENTO ENERGÉTICO E METEOROLÓGICO
+• Consumo Médio Mensal Declarado: ${consumoMensal} kWh/mês
+• Tipo de Fornecimento: ${tipoLigacao.toUpperCase()} (${tensaoRedeCA} V) - Custo de Disponibilidade: ${dadosDimensionamento.custoDisponibilidade} kWh/mês
+• Irradiação Solar Global no Plano Horizontal (HSP): ${hspCustom.toFixed(2)} kWh/m².dia
+• Taxa de Desempenho Global (Performance Ratio - PR): ${(prFinal * 100).toFixed(1)}% (Azimute: ${azimute}° | Inclinação: ${inclinacao}°)
+
+3. ESPECIFICAÇÃO DO GERADOR FOTOVOLTAICO E COORDENAÇÃO DE STRINGS (ABNT NBR 16690)
+• Potência de Pico Instalada: ${potenciaPicoInstalada.toFixed(2)} kWp (${totalModulosInstalados} módulos de ${mod.pmax} Wp - ${mod.nome})
+• Geração Média Mensal Estimada: ${Math.round(geracaoMensalEstimada)} kWh/mês
+• Inversor Especificado: 1x ${inv.nome} (Potência Nominal CA: ${inv.pNomCA.toFixed(1)} kW)
+• Fator de Dimensionamento do Inversor (FDI): ${fdi.toFixed(2)}
+• Configuração do Arranjo CC: ${nStringsEfetivo} string(s) de ${modPorStringEfetivo} módulos em série
+• Tensão de Circuito Aberto Corrigida p/ Temperatura Mínima (${tempMinLocal}°C): Voc_corr = ${vocStringMax.toFixed(1)} V (Limite Máx. Inversor: ${inv.vMaxCC} V)
+• Tensão MPPT Mínima em Alta Temperatura: Vmp_min = ${vmpStringMinQuente.toFixed(1)} V (Faixa MPPT: ${inv.vMpptMin} V a ${inv.vMpptMax} V)
+
+4. DIMENSIONAMENTO ELÉTRICO CC E CA (ABNT NBR 5410 E NBR 16690)
+• Circuito CC (Strings -> Inversor): Cabo Solar ${caboCC.secao.toFixed(1)} mm² 1,8 kV CC (Comprimento: ${compCaboCC} m | Queda de Tensão: ${quedaTensaoCC_Perc.toFixed(2)}% <= 1,5%)
+• Proteção CC: Fusíveis gPV ${projetoEletrico.fusivelEscolhido} A + DPS Classe II ${projetoEletrico.tensaoDpsCC} VCC + Chave Seccionadora sob carga
+• Circuito CA (Inversor -> QGBT): Cabo HEPR 90°C ${caboCA.secao.toFixed(1)} mm² (Comprimento: ${compCaboCA} m | Queda de Tensão: ${quedaTensaoCA_Perc.toFixed(2)}% <= 2,0%)
+• Proteção CA: Disjuntor Termomagnético Curva C ${disjuntorInversorCA} A + DR ${projetoEletrico.drCorrenteNominal} A (300 mA) + DPS CA 275 V Classe II
+• Padrão de Entrada / QGBT: Disjuntor Geral ${disjuntorGeralQGBT} A com condutor de entrada ${projetoEletrico.caboEntradaQGBT.secao.toFixed(1)} mm²
+
+5. NORMAS TÉCNICAS APLICÁVEIS
+• ABNT NBR 16690: Instalações elétricas de arranjos fotovoltaicos — Requisitos de projeto
+• ABNT NBR 5410: Instalações elétricas de baixa tensão
+• ABNT NBR 16149 e NBR 16150: Sistemas fotovoltaicos — Características da interface de conexão com a rede elétrica
+• Resolução Normativa ANEEL nº 1.000/2021 e Lei Federal nº 14.300/2022.`;
+  }, [
+    cidadeIdx, dadosDimensionamento, engenhariaStrings, projetoEletrico,
+    nomeProjeto, nomeCliente, engenheiroResp, modalidadeSistema, consumoMensal,
+    tipoLigacao, tensaoRedeCA, hspCustom, azimute, inclinacao, tempMinLocal,
+    compCaboCC, compCaboCA
+  ]);
+
+  const copiarMemorial = () => {
+    navigator.clipboard.writeText(textoMemorialDescritivo);
+    setCopiadoStatus(true);
+    setTimeout(() => setCopiadoStatus(false), 2500);
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-500 selection:text-slate-950">
+      {/* Top Engineering Header */}
+      <header className="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+              <Sun className="w-6 h-6 text-slate-950 stroke-[2.5]" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white">
+                  SolarCAD & EngStudio <span className="text-amber-400">PRO</span>
+                </h1>
+                <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                  NBR 16690 & 5410
+                </span>
+              </div>
+              <p className="text-xs text-slate-400">
+                Mega Simulador Fotovoltaico, Dimensionamento Elétrico CA/CC e Gerador de Diagrama Unifilar
+              </p>
+            </div>
+          </div>
+
+          {/* Live Summary Strip */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 bg-slate-950/80 p-2 rounded-xl border border-slate-800">
+            <div className="px-3 py-1 border-r border-slate-800/80">
+              <div className="text-[10px] uppercase tracking-wider text-slate-400">Potência FV</div>
+              <div className="text-sm sm:text-base font-bold text-amber-400">
+                {dadosDimensionamento.potenciaPicoInstalada.toFixed(2)} kWp
+              </div>
+            </div>
+            <div className="px-3 py-1 sm:border-r border-slate-800/80">
+              <div className="text-[10px] uppercase tracking-wider text-slate-400">Geração Est.</div>
+              <div className="text-sm sm:text-base font-bold text-emerald-400">
+                {Math.round(dadosDimensionamento.geracaoMensalEstimada)} kWh/mês
+              </div>
+            </div>
+            <div className="px-3 py-1 border-r border-slate-800/80">
+              <div className="text-[10px] uppercase tracking-wider text-slate-400">Proteção CA / Cabo</div>
+              <div className="text-sm sm:text-base font-bold text-sky-400">
+                {projetoEletrico.disjuntorInversorCA}A / {projetoEletrico.caboCA.secao}mm²
+              </div>
+            </div>
+            <div className="px-3 py-1">
+              <div className="text-[10px] uppercase tracking-wider text-slate-400">Status Engenharia</div>
+              <div className="flex items-center gap-1.5 text-sm sm:text-base font-bold">
+                {engenhariaStrings.todasConformidades ? (
+                  <span className="text-emerald-400 flex items-center gap-1">
+                    <ShieldCheck className="w-4 h-4" /> Conforme
+                  </span>
+                ) : (
+                  <span className="text-rose-400 flex items-center gap-1">
+                    <AlertTriangle className="w-4 h-4" /> Ajustar
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation Bar */}
+        <div className="max-w-7xl mx-auto px-4 flex overflow-x-auto no-scrollbar border-t border-slate-800/70">
+          {[
+            { id: 'dimensionamento', label: '1. Dimensionamento Solar & Baterias', icon: Sun },
+            { id: 'strings', label: '2. Engenharia de Strings & MPPT', icon: Cpu },
+            { id: 'eletrico', label: '3. Projeto Elétrico CA/CC (NBR 5410)', icon: Zap },
+            { id: 'unifilar', label: '4. Diagrama Unifilar CAD (SVG)', icon: Layers },
+            { id: 'financeiro', label: '5. Viabilidade & Lei 14.300', icon: TrendingUp },
+            { id: 'memorial', label: '6. Memorial & Lista de Materiais', icon: FileText },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const active = abaAtiva === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setAbaAtiva(tab.id)}
+                className={`flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-medium whitespace-nowrap border-b-2 transition-all ${
+                  active
+                    ? 'border-amber-400 text-amber-400 bg-amber-500/10'
+                    : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      </header>
+
+      {/* Main Content Container */}
+      <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        {}
+        {abaAtiva === 'dimensionamento' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left Column: Inputs */}
+            <div className="lg:col-span-5 space-y-5">
+              {/* Modalidade & Localidade */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                  <Compass className="w-5 h-5 text-amber-400" />
+                  Modalidade e Estudo Solarimétrico
+                </h2>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-400 mb-2">
+                    Arquitetura do Sistema Fotovoltaico
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: 'ongrid', titulo: 'On-Grid', desc: 'Conectado à Rede' },
+                      { id: 'hibrido', titulo: 'Híbrido', desc: 'Rede + Backup' },
+                      { id: 'offgrid', titulo: 'Off-Grid', desc: '100% Isolado' },
+                    ].map((mod) => (
+                      <button
+                        key={mod.id}
+                        onClick={() => setModalidadeSistema(mod.id)}
+                        className={`p-2.5 rounded-xl border text-left transition-all ${
+                          modalidadeSistema === mod.id
+                            ? 'bg-amber-500/15 border-amber-400 text-amber-300'
+                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                        }`}
+                      >
+                        <div className="text-xs font-bold">{mod.titulo}</div>
+                        <div className="text-[10px] opacity-80">{mod.desc}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs text-slate-400 mb-1">
+                      Base Meteorológica (Cidade / Concessionária)
+                    </label>
+                    <select
+                      value={cidadeIdx}
+                      onChange={(e) => handleSelectCidade(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400"
+                    >
+                      {CIDADES_BRASIL.map((c, idx) => (
+                        <option key={c.nome} value={idx}>
+                          {c.nome} — HSP: {c.hsp} kWh/m².dia ({c.conc})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1">
+                      HSP Local (Horas de Sol Pleno)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.05"
+                      min="2.5"
+                      max="7.0"
+                      value={hspCustom}
+                      onChange={(e) => setHspCustom(Number(e.target.value) || 4.5)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-amber-400 font-semibold"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1">
+                      Consumo Médio Mensal (kWh/mês)
+                    </label>
+                    <input
+                      type="number"
+                      step="25"
+                      min="50"
+                      max="100000"
+                      value={consumoMensal}
+                      onChange={(e) => setConsumoMensal(Math.max(50, Number(e.target.value) || 100))}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-emerald-400 font-semibold"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1.5">
+                    Padrão de Ligação na Concessionária (Custo de Disponibilidade)
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: 'monofasico', label: 'Monofásico (30 kWh)' },
+                      { id: 'bifasico', label: 'Bifásico (50 kWh)' },
+                      { id: 'trifasico', label: 'Trifásico (100 kWh)' },
+                    ].map((lig) => (
+                      <button
+                        key={lig.id}
+                        onClick={() => setTipoLigacao(lig.id)}
+                        className={`py-2 px-2 rounded-lg text-xs font-medium border ${
+                          tipoLigacao === lig.id
+                            ? 'bg-sky-500/20 border-sky-400 text-sky-300'
+                            : 'bg-slate-950 border-slate-800 text-slate-400'
+                        }`}
+                      >
+                        {lig.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Posicionamento e Perdas (PR) */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                    <Sliders className="w-5 h-5 text-sky-400" />
+                    Orientação & Performance Ratio (PR)
+                  </h2>
+                  <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-sky-500/15 text-sky-300 border border-sky-500/30">
+                    PR Global: {(dadosDimensionamento.prFinal * 100).toFixed(1)}%
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-slate-400">Azimute (0° = Norte)</span>
+                      <span className="text-amber-400 font-semibold">{azimute}°</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="-180"
+                      max="180"
+                      step="5"
+                      value={azimute}
+                      onChange={(e) => setAzimute(Number(e.target.value))}
+                      className="w-full accent-amber-400"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-slate-400">Inclinação do Telhado (β)</span>
+                      <span className="text-amber-400 font-semibold">{inclinacao}°</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="5"
+                      max="45"
+                      step="1"
+                      value={inclinacao}
+                      onChange={(e) => setInclinacao(Number(e.target.value))}
+                      className="w-full accent-amber-400"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800">
+                  <div>
+                    <label className="block text-[11px] text-slate-400">Perda Térmica (%)</label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      value={perdaTemp}
+                      onChange={(e) => setPerdaTemp(Number(e.target.value) || 0)}
+                      className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-slate-400">Sujidade / Sombreamento (%)</label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      value={perdaSujeira}
+                      onChange={(e) => setPerdaSujeira(Number(e.target.value) || 0)}
+                      className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-slate-400">Perdas Ôhmicas CC/CA (%)</label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      value={perdaCabos}
+                      onChange={(e) => setPerdaCabos(Number(e.target.value) || 0)}
+                      className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-slate-400">Ineficiência Inversor (%)</label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      value={perdaInversor}
+                      onChange={(e) => setPerdaInversor(Number(e.target.value) || 0)}
+                      className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Banco de Baterias (se Híbrido ou Off-Grid) */}
+              {modalidadeSistema !== 'ongrid' && (
+                <div className="bg-slate-900 border border-emerald-500/40 rounded-2xl p-5 space-y-4">
+                  <h2 className="text-base font-semibold text-emerald-400 flex items-center gap-2">
+                    <Battery className="w-5 h-5" />
+                    Dimensionamento do Banco de Baterias ({modalidadeSistema.toUpperCase()})
+                  </h2>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-1">Tecnologia e DoD</label>
+                      <select
+                        value={tecnologiaBateria}
+                        onChange={(e) => setTecnologiaBateria(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs text-white"
+                      >
+                        <option value="lifepo4">Lítio LiFePO4 (DoD 85% - 6000 ciclos)</option>
+                        <option value="chumbo">Chumbo-Ácido OPzV/AGM (DoD 50%)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-1">Autonomia Desejada (Dias)</label>
+                      <input
+                        type="number"
+                        step="0.5"
+                        min="0.5"
+                        max="5"
+                        value={diasAutonomia}
+                        onChange={(e) => setDiasAutonomia(Number(e.target.value) || 1)}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white"
+                      />
+                    </div>
+                    {modalidadeSistema === 'hibrido' && (
+                      <div className="col-span-2">
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="text-slate-400">Fração de Cargas Críticas no Quadro de Backup</span>
+                          <span className="text-emerald-400 font-bold">{percentualBackup}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="15"
+                          max="100"
+                          step="5"
+                          value={percentualBackup}
+                          onChange={(e) => setPercentualBackup(Number(e.target.value))}
+                          className="w-full accent-emerald-400"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800 text-center">
+                    <div className="bg-slate-950 p-2 rounded-lg">
+                      <div className="text-[10px] text-slate-400">Energia Total</div>
+                      <div className="text-sm font-bold text-emerald-400">
+                        {dadosDimensionamento.energiaBackupKwh.toFixed(1)} kWh
+                      </div>
+                    </div>
+                    <div className="bg-slate-950 p-2 rounded-lg">
+                      <div className="text-[10px] text-slate-400">Capacidade (48V)</div>
+                      <div className="text-sm font-bold text-white">
+                        {Math.round(dadosDimensionamento.capacidadeBancoAh)} Ah
+                      </div>
+                    </div>
+                    <div className="bg-slate-950 p-2 rounded-lg">
+                      <div className="text-[10px] text-slate-400">Racks 4.8kWh</div>
+                      <div className="text-sm font-bold text-amber-400">
+                        {dadosDimensionamento.qtdBaterias48V100Ah} un
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column: Engineering Outputs & Seasonal Generation Chart */}
+            <div className="lg:col-span-7 space-y-5">
+              {/* KPI Cards Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                  <div className="text-xs text-slate-400">Potência Calculada</div>
+                  <div className="text-2xl font-bold text-white mt-1">
+                    {dadosDimensionamento.potenciaPicoNecessaria.toFixed(2)} <span className="text-xs font-normal text-slate-400">kWp</span>
+                  </div>
+                  <div className="text-[11px] text-amber-400 mt-1">
+                    Instalada: {dadosDimensionamento.potenciaPicoInstalada.toFixed(2)} kWp
+                  </div>
+                </div>
+
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                  <div className="text-xs text-slate-400">Total de Módulos</div>
+                  <div className="text-2xl font-bold text-amber-400 mt-1">
+                    {dadosDimensionamento.totalModulosInstalados} <span className="text-xs font-normal text-slate-400">painéis</span>
+                  </div>
+                  <div className="text-[11px] text-slate-400 mt-1">
+                    {dadosDimensionamento.nStringsEfetivo}x strings de {dadosDimensionamento.modPorStringEfetivo} mód.
+                  </div>
+                </div>
+
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                  <div className="text-xs text-slate-400">Área de Telhado</div>
+                  <div className="text-2xl font-bold text-sky-400 mt-1">
+                    {dadosDimensionamento.areaOcupadaM2.toFixed(1)} <span className="text-xs font-normal text-slate-400">m²</span>
+                  </div>
+                  <div className="text-[11px] text-slate-400 mt-1">
+                    Peso: ~{Math.round(dadosDimensionamento.pesoEstimadoKg)} kg
+                  </div>
+                </div>
+
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                  <div className="text-xs text-slate-400">Geração Média</div>
+                  <div className="text-2xl font-bold text-emerald-400 mt-1">
+                    {Math.round(dadosDimensionamento.geracaoMensalEstimada)} <span className="text-xs font-normal text-slate-400">kWh</span>
+                  </div>
+                  <div className="text-[11px] text-emerald-300/80 mt-1">
+                    {Math.round((dadosDimensionamento.geracaoMensalEstimada / consumoMensal) * 100)}% da fatura
+                  </div>
+                </div>
+              </div>
+
+              {/* Equação Memorial Explicita */}
+              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">
+                    Memória de Cálculo Fotovoltaico
+                  </span>
+                  <span className="text-xs text-slate-400 font-mono">
+                    P_pico = E_diária / (HSP × PR)
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3 text-xs">
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
+                    <div className="text-slate-400">1. Energia Diária Alvo (E_diária)</div>
+                    <div className="font-mono text-sm text-white mt-1">
+                      ({consumoMensal} - {dadosDimensionamento.custoDisponibilidade}) / 30 ={' '}
+                      <strong className="text-amber-400">{dadosDimensionamento.energiaDiariaAlvo.toFixed(2)} kWh/dia</strong>
+                    </div>
+                  </div>
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
+                    <div className="text-slate-400">2. Rendimento Global (HSP × PR)</div>
+                    <div className="font-mono text-sm text-white mt-1">
+                      {hspCustom} × {(dadosDimensionamento.prFinal).toFixed(3)} ={' '}
+                      <strong className="text-sky-400">{(hspCustom * dadosDimensionamento.prFinal).toFixed(2)} kWh/kWp.dia</strong>
+                    </div>
+                  </div>
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
+                    <div className="text-slate-400">3. Potência de Pico Ideal</div>
+                    <div className="font-mono text-sm text-white mt-1">
+                      {dadosDimensionamento.energiaDiariaAlvo.toFixed(2)} / {(hspCustom * dadosDimensionamento.prFinal).toFixed(2)} ={' '}
+                      <strong className="text-emerald-400">{dadosDimensionamento.potenciaPicoNecessaria.toFixed(2)} kWp</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Gráfico Sazonalidade de Geração Mensal */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-white">
+                      Curva Anual de Geração Fotovoltaica vs. Consumo Mensal
+                    </h3>
+                    <p className="text-xs text-slate-400">
+                      Simulação sazonal (kWh/mês) considerando variação solarimétrica ao longo do ano
+                    </p>
+                  </div>
+                </div>
+                <div className="h-72 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ComposedChart data={analiseFinanceira.graficoMensal}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                      <XAxis dataKey="mes" stroke="#94a3b8" fontSize={12} />
+                      <YAxis stroke="#94a3b8" fontSize={12} unit=" kWh" />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#f8fafc' }}
+                      />
+                      <Legend />
+                      <Bar dataKey="geracao" name="Geração FV (kWh)" fill="#f59e0b" radius={[6, 6, 0, 0]} />
+                      <Line type="monotone" dataKey="consumo" name="Consumo Fatura (kWh)" stroke="#38bdf8" strokeWidth={2.5} dot={false} />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {}
+        {abaAtiva === 'strings' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Seleção de Módulo, Inversor e Temperaturas */}
+            <div className="lg:col-span-5 space-y-5">
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                  <Cpu className="w-5 h-5 text-amber-400" />
+                  Especificação de Módulos e Inversor
+                </h2>
+
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">
+                    Modelo do Módulo Fotovoltaico (Datasheet STC)
+                  </label>
+                  <select
+                    value={moduloId}
+                    onChange={(e) => setModuloId(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white"
+                  >
+                    {MODULOS_PRESETS.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.nome} (Voc: {m.voc}V | Vmp: {m.vmp}V | Isc: {m.isc}A)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">
+                    Modelo do Inversor (Limites CC e MPPT)
+                  </label>
+                  <select
+                    value={inversorId}
+                    onChange={(e) => setInversorId(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white"
+                  >
+                    {INVERSORES_PRESETS.map((i) => (
+                      <option key={i.id} value={i.id}>
+                        {i.nome} — Vmáx: {i.vMaxCC}V | MPPT: {i.vMpptMin}-{i.vMpptMax}V
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="pt-2 border-t border-slate-800">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-medium text-slate-300">
+                      Arranjo de Strings (Série / Paralelo)
+                    </span>
+                    <label className="flex items-center gap-2 text-xs text-amber-400 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={autoDimensionarStrings}
+                        onChange={(e) => setAutoDimensionarStrings(e.target.checked)}
+                        className="rounded accent-amber-400"
+                      />
+                      Auto-dimensionar pelo Consumo
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-1">Quantidade de Strings</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="8"
+                        disabled={autoDimensionarStrings}
+                        value={dadosDimensionamento.nStringsEfetivo}
+                        onChange={(e) => setNumStrings(Math.max(1, Number(e.target.value) || 1))}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white disabled:opacity-50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-1">Módulos por String (Série)</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="28"
+                        disabled={autoDimensionarStrings}
+                        value={dadosDimensionamento.modPorStringEfetivo}
+                        onChange={(e) => setModulosPorString(Math.max(1, Number(e.target.value) || 1))}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white disabled:opacity-50"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Temperaturas Extremas para Correção Térmica */}
+                <div className="pt-2 border-t border-slate-800">
+                  <h3 className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mb-2">
+                    <Thermometer className="w-4 h-4 text-rose-400" />
+                    Temperaturas Históricas p/ Correção de Tensão (NBR 16690)
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] text-slate-400">Temp. Mínima Histórica (°C)</label>
+                      <input
+                        type="number"
+                        value={tempMinLocal}
+                        onChange={(e) => setTempMinLocal(Number(e.target.value))}
+                        className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-sm text-sky-400 font-semibold"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] text-slate-400">Temp. Ambiente Máxima (°C)</label>
+                      <input
+                        type="number"
+                        value={tempMaxLocal}
+                        onChange={(e) => setTempMaxLocal(Number(e.target.value))}
+                        className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-sm text-rose-400 font-semibold"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Painel de Verificação de Engenharia de Strings */}
+            <div className="lg:col-span-7 space-y-5">
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+                  <div>
+                    <h2 className="text-base font-semibold text-white">
+                      Diagnóstico de Coordenação Elétrica Módulo-Inversor
+                    </h2>
+                    <p className="text-xs text-slate-400">
+                      Faixa recomendada para esta combinação: <strong>{engenhariaStrings.minModulosPorString} a {engenhariaStrings.maxModulosPorString} módulos por string</strong>
+                    </p>
+                  </div>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                      engenhariaStrings.todasConformidades
+                        ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300'
+                        : 'bg-rose-500/15 border-rose-500/40 text-rose-300'
+                    }`}
+                  >
+                    {engenhariaStrings.todasConformidades ? '100% APROVADO NBR 16690' : 'ATENÇÃO: FORA DE FAIXA'}
+                  </span>
+                </div>
+
+                {/* Barra Visual de Janela de Tensão da String */}
+                <div className="space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-400">
+                      Vmp Quente ({engenhariaStrings.tempCelulaMax}°C cél.): <strong className="text-sky-400">{engenhariaStrings.vmpStringMinQuente.toFixed(1)} V</strong>
+                    </span>
+                    <span className="text-slate-400">
+                      Vmp STC (25°C): <strong className="text-amber-400">{engenhariaStrings.vmpStringSTC.toFixed(1)} V</strong>
+                    </span>
+                    <span className="text-slate-400">
+                      Voc Frio ({tempMinLocal}°C): <strong className="text-rose-400">{engenhariaStrings.vocStringMax.toFixed(1)} V</strong>
+                    </span>
+                  </div>
+
+                  {/* Barra de Progresso Comparativa */}
+                  <div className="relative h-6 bg-slate-900 rounded-lg overflow-hidden border border-slate-800">
+                    {/* Faixa MPPT do Inversor */}
+                    <div
+                      className="absolute top-0 bottom-0 bg-emerald-500/20 border-x border-emerald-500/50"
+                      style={{
+                        left: `${Math.min(95, (dadosDimensionamento.inv.vMpptMin / dadosDimensionamento.inv.vMaxCC) * 100)}%`,
+                        width: `${Math.min(95, ((dadosDimensionamento.inv.vMpptMax - dadosDimensionamento.inv.vMpptMin) / dadosDimensionamento.inv.vMaxCC) * 100)}%`,
+                      }}
+                    />
+                    {/* Marcador Voc Máximo da String */}
+                    <div
+                      className="absolute top-0 bottom-0 w-1.5 bg-rose-500"
+                      style={{
+                        left: `${Math.min(99, (engenhariaStrings.vocStringMax / dadosDimensionamento.inv.vMaxCC) * 100)}%`,
+                      }}
+                    />
+                    {/* Marcador Vmp Quente da String */}
+                    <div
+                      className="absolute top-0 bottom-0 w-1.5 bg-sky-400"
+                      style={{
+                        left: `${Math.min(99, (engenhariaStrings.vmpStringMinQuente / dadosDimensionamento.inv.vMaxCC) * 100)}%`,
+                      }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-[11px] text-slate-400">
+                    <span>0 V</span>
+                    <span className="text-emerald-400">
+                      Janela MPPT: {dadosDimensionamento.inv.vMpptMin}V – {dadosDimensionamento.inv.vMpptMax}V
+                    </span>
+                    <span className="text-rose-400 font-semibold">
+                      Limite Máx CC Inversor: {dadosDimensionamento.inv.vMaxCC}V
+                    </span>
+                  </div>
+                </div>
+
+                {/* Checklist de Testes de Engenharia */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    {
+                      titulo: 'Tensão Máxima de Circuito Aberto (Voc Frio)',
+                      valor: `${engenhariaStrings.vocStringMax.toFixed(1)} V ≤ ${dadosDimensionamento.inv.vMaxCC} V`,
+                      ok: engenhariaStrings.okTensaoMax,
+                      detalhe: `Voc corrigido p/ ${tempMinLocal}°C (${engenhariaStrings.vocModuloFrio.toFixed(1)}V/mód)`,
+                    },
+                    {
+                      titulo: 'Tensão Mínima MPPT e Partida (Calor)',
+                      valor: `${engenhariaStrings.vmpStringMinQuente.toFixed(1)} V ≥ ${dadosDimensionamento.inv.vMpptMin} V`,
+                      ok: engenhariaStrings.okTensaoMinMppt,
+                      detalhe: `Vmp com célula a ${engenhariaStrings.tempCelulaMax}°C (${engenhariaStrings.vmpModuloQuente.toFixed(1)}V/mód)`,
+                    },
+                    {
+                      titulo: 'Corrente de Entrada do MPPT (Imp)',
+                      valor: `${dadosDimensionamento.mod.imp.toFixed(2)} A ≤ ${dadosDimensionamento.inv.iMaxMppt} A`,
+                      ok: engenhariaStrings.okCorrenteMppt,
+                      detalhe: `Isc do módulo: ${dadosDimensionamento.mod.isc} A`,
+                    },
+                    {
+                      titulo: 'Fator de Dimensionamento (FDI / Overload)',
+                      valor: `FDI: ${engenhariaStrings.fdi.toFixed(2)} (${engenhariaStrings.overloadPercent >= 0 ? '+' : ''}${engenhariaStrings.overloadPercent.toFixed(0)}%)`,
+                      ok: engenhariaStrings.okOverload,
+                      detalhe: `Pot. CC: ${dadosDimensionamento.potenciaPicoInstalada.toFixed(2)} kWp / CA: ${dadosDimensionamento.inv.pNomCA} kW`,
+                    },
+                  ].map((check, i) => (
+                    <div
+                      key={i}
+                      className={`p-3.5 rounded-xl border ${
+                        check.ok
+                          ? 'bg-slate-950 border-slate-800'
+                          : 'bg-rose-950/20 border-rose-500/40'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-slate-300">{check.titulo}</span>
+                        {check.ok ? (
+                          <Check className="w-4 h-4 text-emerald-400" />
+                        ) : (
+                          <AlertTriangle className="w-4 h-4 text-rose-400" />
+                        )}
+                      </div>
+                      <div className="text-sm font-bold text-white mt-1">{check.valor}</div>
+                      <div className="text-[11px] text-slate-400 mt-0.5">{check.detalhe}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {}
+        {abaAtiva === 'eletrico' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Parâmetros de Instalação Elétrica */}
+            <div className="lg:col-span-4 space-y-5">
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                  <Wrench className="w-5 h-5 text-amber-400" />
+                  Parâmetros dos Circuitos CC, CA e QGBT
+                </h2>
+
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">
+                    Distância dos Cabos CC (Arranjo FV → String Box/Inversor)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="3"
+                      max="150"
+                      value={compCaboCC}
+                      onChange={(e) => setCompCaboCC(Math.max(1, Number(e.target.value) || 10))}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white"
+                    />
+                    <span className="text-xs text-slate-400">metros</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">
+                    Distância dos Cabos CA (Inversor → QGBT Principal)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="2"
+                      max="200"
+                      value={compCaboCA}
+                      onChange={(e) => setCompCaboCA(Math.max(1, Number(e.target.value) || 10))}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white"
+                    />
+                    <span className="text-xs text-slate-400">metros</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">
+                    Tensão Nominal da Rede Local CA (V)
+                  </label>
+                  <select
+                    value={tensaoRedeCA}
+                    onChange={(e) => setTensaoRedeCA(Number(e.target.value))}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white"
+                  >
+                    <option value={220}>220 V (Monofásico / Bifásico / Trifásico)</option>
+                    <option value={380}>380 V (Trifásico 220/380V)</option>
+                    <option value={127}>127 V (Monofásico)</option>
+                  </select>
+                </div>
+
+                <div className="pt-3 border-t border-slate-800 space-y-3">
+                  <h3 className="text-xs font-semibold text-sky-400 uppercase tracking-wider">
+                    Carga Instalada da Edificação (QGBT)
+                  </h3>
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1">
+                      Potência Instalada Total no Imóvel (kW)
+                    </label>
+                    <input
+                      type="number"
+                      step="1"
+                      value={potenciaInstaladaQGBT}
+                      onChange={(e) => setPotenciaInstaladaQGBT(Math.max(2, Number(e.target.value) || 10))}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-slate-400">Fator de Demanda Médio (FD)</span>
+                      <span className="text-sky-400 font-bold">{(fatorDemandaQGBT * 100).toFixed(0)}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0.30"
+                      max="1.00"
+                      step="0.05"
+                      value={fatorDemandaQGBT}
+                      onChange={(e) => setFatorDemandaQGBT(Number(e.target.value))}
+                      className="w-full accent-sky-400"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tabelas de Dimensionamento Elétrico CC, CA e QGBT */}
+            <div className="lg:col-span-8 space-y-5">
+              {/* Bloco 1: Circuito CC (NBR 16690) */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                    <Sun className="w-4 h-4" />
+                    1. Dimensionamento do Trecho Corrente Contínua (CC - ABNT NBR 16690)
+                  </h3>
+                  <span className="text-xs text-slate-400">Critério: Queda ΔV ≤ 1,5%</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                    <div className="text-[11px] text-slate-400">Cabo Solar 1.8 kV CC</div>
+                    <div className="text-xl font-bold text-amber-400 mt-1">
+                      {projetoEletrico.caboCC.secao.toFixed(1)} mm²
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">
+                      Iz = {projetoEletrico.caboCC.izSolarCC} A (Cobre Estanhado)
+                    </div>
+                  </div>
+                  <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                    <div className="text-[11px] text-slate-400">Queda de Tensão CC</div>
+                    <div className="text-xl font-bold text-emerald-400 mt-1">
+                      {projetoEletrico.quedaTensaoCC_Perc.toFixed(2)}%
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">
+                      ΔV = {projetoEletrico.quedaTensaoCC_V.toFixed(1)} V ({compCaboCC} m)
+                    </div>
+                  </div>
+                  <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                    <div className="text-[11px] text-slate-400">Fusível gPV por Polo</div>
+                    <div className="text-xl font-bold text-white mt-1">
+                      {projetoEletrico.fusivelEscolhido} A
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">
+                      1000 VCC (1,5×Isc a 2,0×Isc)
+                    </div>
+                  </div>
+                  <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                    <div className="text-[11px] text-slate-400">DPS CC String Box</div>
+                    <div className="text-xl font-bold text-sky-400 mt-1">
+                      {projetoEletrico.tensaoDpsCC} VCC
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">
+                      Classe II - 40 kA Próx. Inversor
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bloco 2: Circuito CA do Inversor (NBR 5410) */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
+                    <Zap className="w-4 h-4" />
+                    2. Dimensionamento do Circuito CA do Inversor (ABNT NBR 5410)
+                  </h3>
+                  <span className="text-xs text-slate-400">Método B1 | Isolação HEPR 90°C</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                    <div className="text-[11px] text-slate-400">Condutor Fase/Neutro/PE</div>
+                    <div className="text-xl font-bold text-sky-400 mt-1">
+                      {projetoEletrico.caboCA.secao.toFixed(1)} mm²
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">
+                      Cabo HEPR 90°C 0.6/1kV
+                    </div>
+                  </div>
+                  <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                    <div className="text-[11px] text-slate-400">Disjuntor CA Inversor</div>
+                    <div className="text-xl font-bold text-white mt-1">
+                      {projetoEletrico.disjuntorInversorCA} A
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">
+                      Curva C ({projetoEletrico.isTrifasicoInv ? 'Tripolar' : 'Bipolar'}) | Ib={projetoEletrico.iNominalCA.toFixed(1)}A
+                    </div>
+                  </div>
+                  <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                    <div className="text-[11px] text-slate-400">Queda de Tensão CA</div>
+                    <div className="text-xl font-bold text-emerald-400 mt-1">
+                      {projetoEletrico.quedaTensaoCA_Perc.toFixed(2)}%
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">
+                      ΔV = {projetoEletrico.quedaTensaoCA_V.toFixed(1)} V ({compCaboCA} m)
+                    </div>
+                  </div>
+                  <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                    <div className="text-[11px] text-slate-400">Dispositivo DR + DPS CA</div>
+                    <div className="text-xl font-bold text-amber-400 mt-1">
+                      {projetoEletrico.drCorrenteNominal}A / 300mA
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">
+                      DPS Classe II 275V 20/40kA
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bloco 3: Padrão de Entrada e QGBT */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                    <Building2 className="w-4 h-4" />
+                    3. Quadro Geral de Baixa Tensão (QGBT) & Padrão de Entrada
+                  </h3>
+                  <span className="text-xs text-slate-400">Compatibilidade de Demanda</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                    <div className="text-[11px] text-slate-400">Demanda Calculada / Disponibilizada</div>
+                    <div className="text-lg font-bold text-white mt-1">
+                      {projetoEletrico.potenciaDisponibilizadaKVA.toFixed(1)} kVA
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">
+                      Corrente de Demanda: {projetoEletrico.iDemandaQGBT.toFixed(1)} A
+                    </div>
+                  </div>
+                  <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                    <div className="text-[11px] text-slate-400">Disjuntor Geral do Padrão</div>
+                    <div className="text-lg font-bold text-emerald-400 mt-1">
+                      {projetoEletrico.disjuntorGeralQGBT} A ({tipoLigacao.toUpperCase()})
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">
+                      Coordenação seletiva c/ inversor ({projetoEletrico.disjuntorInversorCA} A)
+                    </div>
+                  </div>
+                  <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                    <div className="text-[11px] text-slate-400">Ramal de Entrada Recomendado</div>
+                    <div className="text-lg font-bold text-sky-400 mt-1">
+                      # {projetoEletrico.caboEntradaQGBT.secao.toFixed(1)} mm²
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">
+                      Aterramento: Cabo 16 mm² + Hastes 2,40m
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {}
+        {abaAtiva === 'unifilar' && (
+          <div className="space-y-4">
+            {/* Barra de Edição Rápida do Carimbo Técnico */}
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-[11px] text-slate-400 mb-1">Título do Projeto no Carimbo</label>
+                <input
+                  type="text"
+                  value={nomeProjeto}
+                  onChange={(e) => setNomeProjeto(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] text-slate-400 mb-1">Proprietário / Unidade Consumidora</label>
+                <input
+                  type="text"
+                  value={nomeCliente}
+                  onChange={(e) => setNomeCliente(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] text-slate-400 mb-1">Responsável Técnico (CREA / CFT)</label>
+                <input
+                  type="text"
+                  value={engenheiroResp}
+                  onChange={(e) => setEngenheiroResp(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white"
+                />
+              </div>
+            </div>
+
+            {/* Prancha CAD do Diagrama Unifilar em SVG */}
+            <div className="bg-[#071120] border-2 border-slate-700 rounded-2xl p-3 sm:p-6 overflow-x-auto shadow-2xl">
+              <div className="min-w-[920px]">
+                <svg viewBox="0 0 1100 560" className="w-full h-auto font-mono select-none">
+                  {/* Fundo de Grade Técnica (Blueprint) */}
+                  <defs>
+                    <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse">
+                      <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#1e293b" strokeWidth="0.7" />
+                    </pattern>
+                  </defs>
+                  <rect width="1100" height="560" fill="#071120" />
+                  <rect width="1100" height="560" fill="url(#grid)" />
+
+                  {/* Moldura ABNT da Folha */}
+                  <rect x="12" y="12" width="1076" height="536" fill="none" stroke="#64748b" strokeWidth="2" />
+                  <rect x="20" y="20" width="1060" height="520" fill="none" stroke="#475569" strokeWidth="1" />
+
+                  {/* Título Superior da Prancha */}
+                  <text x="40" y="50" fill="#f8fafc" fontSize="15" fontWeight="bold">
+                    DIAGRAMA UNIFILAR GERAL — SISTEMA FOTOVOLTAICO {modalidadeSistema.toUpperCase()} ({dadosDimensionamento.potenciaPicoInstalada.toFixed(2)} kWp / {dadosDimensionamento.inv.pNomCA.toFixed(1)} kW)
+                  </text>
+                  <text x="40" y="68" fill="#94a3b8" fontSize="11">
+                    CONFORMIDADE: ABNT NBR 16690 / ABNT NBR 5410 / REN ANEEL 1.000 — CONCESSIONÁRIA: {CIDADES_BRASIL[cidadeIdx]?.conc}
+                  </text>
+
+                  {/* BLOCO 1: ARRANJO FOTOVOLTAICO (STRINGS) */}
+                  <g transform="translate(40, 120)">
+                    <rect x="0" y="0" width="175" height="190" rx="6" fill="#0f172a" stroke="#f59e0b" strokeWidth="2" />
+                    <line x1="0" y1="35" x2="175" y2="35" stroke="#f59e0b" strokeWidth="1" strokeDasharray="4 2" />
+                    <text x="87" y="22" textAnchor="middle" fill="#fbbf24" fontSize="12" fontWeight="bold">
+                      ARRANJO FOTOVOLTAICO
+                    </text>
+                    <text x="87" y="60" textAnchor="middle" fill="#f8fafc" fontSize="12" fontWeight="bold">
+                      {dadosDimensionamento.totalModulosInstalados}x Módulos {dadosDimensionamento.mod.pmax} Wp
+                    </text>
+                    <text x="87" y="80" textAnchor="middle" fill="#cbd5e1" fontSize="10">
+                      {dadosDimensionamento.nStringsEfetivo} String(s) × {dadosDimensionamento.modPorStringEfetivo} Mód. Série
+                    </text>
+                    <text x="87" y="105" textAnchor="middle" fill="#38bdf8" fontSize="10">
+                      Vmp STC: {engenhariaStrings.vmpStringSTC.toFixed(1)} V
+                    </text>
+                    <text x="87" y="122" textAnchor="middle" fill="#fb7185" fontSize="10">
+                      Voc({tempMinLocal}°C): {engenhariaStrings.vocStringMax.toFixed(1)} V
+                    </text>
+                    <text x="87" y="139" textAnchor="middle" fill="#34d399" fontSize="10">
+                      Isc: {dadosDimensionamento.mod.isc} A / Imp: {dadosDimensionamento.mod.imp} A
+                    </text>
+                    <text x="87" y="170" textAnchor="middle" fill="#94a3b8" fontSize="9">
+                      Aterramento Estrutura #6.0mm²
+                    </text>
+                  </g>
+
+                  {/* Linha CC entre Arranjo e String Box CC */}
+                  <line x1="215" y1="215" x2="310" y2="215" stroke="#f59e0b" strokeWidth="3" />
+                  {/* Traços de condutores CC (+, -, PE) */}
+                  <line x1="250" y1="205" x2="260" y2="225" stroke="#f8fafc" strokeWidth="1.5" />
+                  <line x1="258" y1="205" x2="268" y2="225" stroke="#f8fafc" strokeWidth="1.5" />
+                  <line x1="266" y1="205" x2="276" y2="225" stroke="#34d399" strokeWidth="1.5" />
+                  <text x="262" y="192" textAnchor="middle" fill="#fbbf24" fontSize="10" fontWeight="bold">
+                    2×#{projetoEletrico.caboCC.secao.toFixed(1)}mm² (CC)
+                  </text>
+                  <text x="262" y="242" textAnchor="middle" fill="#34d399" fontSize="9">
+                    + PE #6.0mm² ({compCaboCC}m)
+                  </text>
+
+                  {/* BLOCO 2: STRING BOX CC (PROTEÇÃO CC) */}
+                  <g transform="translate(310, 130)">
+                    <rect x="0" y="0" width="160" height="170" rx="6" fill="#0f172a" stroke="#f59e0b" strokeWidth="1.8" strokeDasharray="5 3" />
+                    <text x="80" y="22" textAnchor="middle" fill="#fbbf24" fontSize="11" fontWeight="bold">
+                      STRING BOX CC
+                    </text>
+                    <text x="80" y="52" textAnchor="middle" fill="#f8fafc" fontSize="10">
+                      Fusíveis gPV: {projetoEletrico.fusivelEscolhido} A
+                    </text>
+                    <text x="80" y="72" textAnchor="middle" fill="#38bdf8" fontSize="10">
+                      DPS CC Classe II
+                    </text>
+                    <text x="80" y="88" textAnchor="middle" fill="#38bdf8" fontSize="10">
+                      {projetoEletrico.tensaoDpsCC} VCC / 40 kA
+                    </text>
+                    <text x="80" y="114" textAnchor="middle" fill="#cbd5e1" fontSize="10">
+                      Chave Seccionadora CC
+                    </text>
+                    <text x="80" y="130" textAnchor="middle" fill="#94a3b8" fontSize="9">
+                      Sob Carga ({dadosDimensionamento.inv.nMppt} MPPT)
+                    </text>
+                  </g>
+
+                  {/* Linha CC String Box -> Inversor */}
+                  <line x1="470" y1="215" x2="520" y2="215" stroke="#f59e0b" strokeWidth="3" />
+
+                  {/* BLOCO 3: INVERSOR FOTOVOLTAICO (CC / CA) */}
+                  <g transform="translate(520, 125)">
+                    <rect x="0" y="0" width="165" height="180" rx="8" fill="#0f172a" stroke="#38bdf8" strokeWidth="2.2" />
+                    {/* Diagonal divisória CC / CA */}
+                    <line x1="15" y1="120" x2="150" y2="45" stroke="#475569" strokeWidth="1.5" />
+                    <text x="42" y="68" fill="#fbbf24" fontSize="16" fontWeight="bold">
+                      =
+                    </text>
+                    <text x="115" y="108" fill="#38bdf8" fontSize="16" fontWeight="bold">
+                      ~
+                    </text>
+                    <text x="82" y="22" textAnchor="middle" fill="#f8fafc" fontSize="11" fontWeight="bold">
+                      INVERSOR {dadosDimensionamento.inv.pNomCA.toFixed(1)} kW
+                    </text>
+                    <text x="82" y="142" textAnchor="middle" fill="#38bdf8" fontSize="10">
+                      {dadosDimensionamento.inv.fases}
+                    </text>
+                    <text x="82" y="158" textAnchor="middle" fill="#94a3b8" fontSize="9">
+                      Inom CA: {projetoEletrico.iNominalCA.toFixed(1)} A | FDI: {engenhariaStrings.fdi.toFixed(2)}
+                    </text>
+                  </g>
+
+                  {/* BATERIA CONECTADA AO INVERSOR (SE HÍBRIDO OU OFF-GRID) */}
+                  {modalidadeSistema !== 'ongrid' && (
+                    <g transform="translate(520, 345)">
+                      <line x1="82" y1="-40" x2="82" y2="0" stroke="#34d399" strokeWidth="2.5" strokeDasharray="4 2" />
+                      <rect x="0" y="0" width="165" height="85" rx="6" fill="#0f172a" stroke="#34d399" strokeWidth="2" />
+                      <text x="82" y="22" textAnchor="middle" fill="#34d399" fontSize="11" fontWeight="bold">
+                        BANCO DE BATERIAS
+                      </text>
+                      <text x="82" y="42" textAnchor="middle" fill="#f8fafc" fontSize="10">
+                        {dadosDimensionamento.energiaBackupKwh.toFixed(1)} kWh ({tensaoBancoBat} VCC)
+                      </text>
+                      <text x="82" y="60" textAnchor="middle" fill="#94a3b8" fontSize="9">
+                        {tecnologiaBateria.toUpperCase()} — Fusível CC 125A
+                      </text>
+                    </g>
+                  )}
+
+                  {/* Linha CA Inversor -> Quadro de Proteção CA */}
+                  <line x1="685" y1="215" x2="770" y2="215" stroke="#38bdf8" strokeWidth="3" />
+                  <line x1="720" y1="205" x2="730" y2="225" stroke="#f8fafc" strokeWidth="1.5" />
+                  <line x1="728" y1="205" x2="738" y2="225" stroke="#f8fafc" strokeWidth="1.5" />
+                  <text x="728" y="192" textAnchor="middle" fill="#38bdf8" fontSize="10" fontWeight="bold">
+                    #{projetoEletrico.caboCA.secao.toFixed(1)}mm² HEPR 90°C
+                  </text>
+                  <text x="728" y="242" textAnchor="middle" fill="#94a3b8" fontSize="9">
+                    L = {compCaboCA}m (ΔV={projetoEletrico.quedaTensaoCA_Perc.toFixed(2)}%)
+                  </text>
+
+                  {/* BLOCO 4: PROTEÇÃO CA E QGBT */}
+                  <g transform="translate(770, 125)">
+                    <rect x="0" y="0" width="155" height="180" rx="6" fill="#0f172a" stroke="#38bdf8" strokeWidth="1.8" />
+                    <text x="77" y="22" textAnchor="middle" fill="#38bdf8" fontSize="11" fontWeight="bold">
+                      PROTEÇÃO CA / QGBT
+                    </text>
+                    <text x="77" y="50" textAnchor="middle" fill="#f8fafc" fontSize="10" fontWeight="bold">
+                      Disj. Inversor: {projetoEletrico.disjuntorInversorCA} A
+                    </text>
+                    <text x="77" y="68" textAnchor="middle" fill="#cbd5e1" fontSize="9">
+                      Curva C ({projetoEletrico.isTrifasicoInv ? 'Tripolar' : 'Bipolar'})
+                    </text>
+                    <text x="77" y="92" textAnchor="middle" fill="#fbbf24" fontSize="10">
+                      DR: {projetoEletrico.drCorrenteNominal} A / 300 mA
+                    </text>
+                    <text x="77" y="114" textAnchor="middle" fill="#38bdf8" fontSize="10">
+                      DPS CA Classe II 275V
+                    </text>
+                    <line x1="15" y1="130" x2="140" y2="130" stroke="#334155" strokeWidth="1" />
+                    <text x="77" y="150" textAnchor="middle" fill="#34d399" fontSize="10" fontWeight="bold">
+                      Disj. Geral: {projetoEletrico.disjuntorGeralQGBT} A
+                    </text>
+                    <text x="77" y="166" textAnchor="middle" fill="#94a3b8" fontSize="9">
+                      Ramal #{projetoEletrico.caboEntradaQGBT.secao.toFixed(1)}mm²
+                    </text>
+                  </g>
+
+                  {/* Linha QGBT -> Medidor Bidirecional e Rede */}
+                  <line x1="925" y1="215" x2="965" y2="215" stroke="#34d399" strokeWidth="3" />
+
+                  {/* BLOCO 5: MEDIDOR BIDIRECIONAL E REDE CONCESSIONÁRIA */}
+                  <g transform="translate(965, 140)">
+                    <rect x="0" y="0" width="98" height="150" rx="6" fill="#0f172a" stroke="#34d399" strokeWidth="2" />
+                    <circle cx="49" cy="52" r="22" fill="#071120" stroke="#34d399" strokeWidth="1.8" />
+                    <text x="49" y="56" textAnchor="middle" fill="#34d399" fontSize="11" fontWeight="bold">
+                      kWh
+                    </text>
+                    <text x="49" y="20" textAnchor="middle" fill="#34d399" fontSize="10" fontWeight="bold">
+                      MEDIDOR
+                    </text>
+                    <text x="49" y="92" textAnchor="middle" fill="#f8fafc" fontSize="9">
+                      {modalidadeSistema === 'offgrid' ? 'ISOLADO' : 'BIDIRECIONAL'}
+                    </text>
+                    <text x="49" y="112" textAnchor="middle" fill="#94a3b8" fontSize="9">
+                      {tipoLigacao.toUpperCase()}
+                    </text>
+                    <text x="49" y="130" textAnchor="middle" fill="#fbbf24" fontSize="9" fontWeight="bold">
+                      {tensaoRedeCA} V / 60 Hz
+                    </text>
+                  </g>
+
+                  {/* CARIMBO TÉCNICO ABNT (CANTO INFERIOR DIREITO) */}
+                  <g transform="translate(650, 435)">
+                    <rect x="0" y="0" width="430" height="105" fill="#0f172a" stroke="#64748b" strokeWidth="1.5" />
+                    <line x1="0" y1="28" x2="430" y2="28" stroke="#475569" strokeWidth="1" />
+                    <line x1="0" y1="56" x2="430" y2="56" stroke="#475569" strokeWidth="1" />
+                    <line x1="0" y1="82" x2="430" y2="82" stroke="#475569" strokeWidth="1" />
+                    <line x1="295" y1="56" x2="295" y2="105" stroke="#475569" strokeWidth="1" />
+
+                    <text x="10" y="18" fill="#fbbf24" fontSize="10" fontWeight="bold">
+                      PROJETO: {nomeProjeto.slice(0, 48)}
+                    </text>
+                    <text x="10" y="46" fill="#f8fafc" fontSize="10">
+                      CLIENTE: {nomeCliente.slice(0, 48)}
+                    </text>
+                    <text x="10" y="73" fill="#cbd5e1" fontSize="9">
+                      RESP. TÉCNICO: {engenheiroResp.slice(0, 36)}
+                    </text>
+                    <text x="305" y="73" fill="#38bdf8" fontSize="9" fontWeight="bold">
+                      POTÊNCIA: {dadosDimensionamento.potenciaPicoInstalada.toFixed(2)} kWp
+                    </text>
+                    <text x="10" y="97" fill="#94a3b8" fontSize="9">
+                      LOCAL: {CIDADES_BRASIL[cidadeIdx]?.nome}
+                    </text>
+                    <text x="305" y="97" fill="#34d399" fontSize="9" fontWeight="bold">
+                      FOLHA: 01 / 01 (UNIFILAR)
+                    </text>
+                  </g>
+
+                  {/* LEGENDA TÉCNICA (CANTO INFERIOR ESQUERDO) */}
+                  <g transform="translate(40, 445)">
+                    <rect x="0" y="0" width="450" height="85" rx="4" fill="#0f172a" stroke="#334155" strokeWidth="1" />
+                    <text x="14" y="20" fill="#94a3b8" fontSize="10" fontWeight="bold">
+                      NOTAS TÉCNICAS OBRIGATÓRIAS (ABNT NBR 16690 / NBR 5410):
+                    </text>
+                    <text x="14" y="38" fill="#cbd5e1" fontSize="9">
+                      1. Todos os módulos, estruturas metálicas, String Box e carcaça do inversor devem ser equipotencializados ao BEP.
+                    </text>
+                    <text x="14" y="54" fill="#cbd5e1" fontSize="9">
+                      2. Instalar placa de advertência: "ATENÇÃO: RISCO DE CHOQUE ELÉTRICO — GERAÇÃO PRÓPRIA CONECTADA".
+                    </text>
+                    <text x="14" y="70" fill="#cbd5e1" fontSize="9">
+                      3. Inversor dotado de proteção anti-ilhamento certificada pelo INMETRO conforme Portaria vigente.
+                    </text>
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {}
+        {abaAtiva === 'financeiro' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Inputs Econômicos e Lei 14.300 */}
+            <div className="lg:col-span-4 space-y-5">
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+                <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                  <Calculator className="w-5 h-5 text-amber-400" />
+                  Parâmetros Tarifários & Lei 14.300
+                </h2>
+
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">
+                    Tarifa de Energia com Impostos (R$/kWh)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.02"
+                    value={tarifaEnergia}
+                    onChange={(e) => setTarifaEnergia(Math.max(0.3, Number(e.target.value) || 0.85))}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1">
+                    Encargo Fio B Não Compensado na Injeção (R$/kWh)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.02"
+                    value={custoFioB}
+                    onChange={(e) => setCustoFioB(Math.max(0, Number(e.target.value) || 0))}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-white"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-slate-400">Fator de Simultaneidade (Autoconsumo Instantâneo)</span>
+                    <span className="text-amber-400 font-bold">{simultaneidade}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="10"
+                    max="90"
+                    step="2"
+                    value={simultaneidade}
+                    onChange={(e) => setSimultaneidade(Number(e.target.value))}
+                    className="w-full accent-amber-400"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800">
+                  <div>
+                    <label className="block text-[11px] text-slate-400">Custo Turnkey (R$/kWp)</label>
+                    <input
+                      type="number"
+                      step="100"
+                      value={custoPorKwp}
+                      onChange={(e) => setCustoPorKwp(Math.max(1500, Number(e.target.value) || 3000))}
+                      className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-slate-400">Inflação Energética (% a.a.)</label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      value={inflacaoEnergetica}
+                      onChange={(e) => setInflacaoEnergetica(Number(e.target.value) || 5)}
+                      className="w-full mt-1 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Indicadores Financeiros e Fluxo de Caixa 25 Anos */}
+            <div className="lg:col-span-8 space-y-5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                  <div className="text-xs text-slate-400">Investimento (CAPEX)</div>
+                  <div className="text-lg sm:text-xl font-bold text-white mt-1">
+                    R$ {Math.round(analiseFinanceira.capexTotal).toLocaleString('pt-BR')}
+                  </div>
+                  <div className="text-[11px] text-slate-400 mt-1">
+                    Economia Ano 1: R$ {Math.round(analiseFinanceira.economiaAnualAno1).toLocaleString('pt-BR')}
+                  </div>
+                </div>
+
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                  <div className="text-xs text-slate-400">Payback Simples / Desc.</div>
+                  <div className="text-lg sm:text-xl font-bold text-amber-400 mt-1">
+                    {analiseFinanceira.paybackSimplesAnos} anos
+                  </div>
+                  <div className="text-[11px] text-slate-400 mt-1">
+                    Descontado: {analiseFinanceira.paybackDescontadoAnos} anos
+                  </div>
+                </div>
+
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                  <div className="text-xs text-slate-400">VPL (25 Anos)</div>
+                  <div className="text-lg sm:text-xl font-bold text-emerald-400 mt-1">
+                    R$ {Math.round(analiseFinanceira.vpl25Anos).toLocaleString('pt-BR')}
+                  </div>
+                  <div className="text-[11px] text-slate-400 mt-1">
+                    TMA: {tmaDesconto}% a.a.
+                  </div>
+                </div>
+
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+                  <div className="text-xs text-slate-400">LCOE (Custo Nivelado)</div>
+                  <div className="text-lg sm:text-xl font-bold text-sky-400 mt-1">
+                    R$ {analiseFinanceira.lcoe.toFixed(2)}/kWh
+                  </div>
+                  <div className="text-[11px] text-emerald-400 mt-1">
+                    vs. R$ {tarifaEnergia.toFixed(2)} Concessionária
+                  </div>
+                </div>
+              </div>
+
+              {/* Gráfico de Fluxo de Caixa Acumulado em 25 Anos */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                <h3 className="text-sm font-semibold text-white mb-1">
+                  Curva de Retorno do Investimento (Payback e VPL em 25 Anos)
+                </h3>
+                <p className="text-xs text-slate-400 mb-4">
+                  Inclui degradação anual dos módulos (0,55%/ano), custos de O&M e substituição do inversor no ano 13
+                </p>
+                <div className="h-72 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={analiseFinanceira.fluxoCaixa}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                      <XAxis dataKey="ano" stroke="#94a3b8" fontSize={11} />
+                      <YAxis stroke="#94a3b8" fontSize={11} />
+                      <Tooltip
+                        formatter={(val) => `R$ ${Number(val).toLocaleString('pt-BR')}`}
+                        contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#f8fafc' }}
+                      />
+                      <Legend />
+                      <ReferenceLine y={0} stroke="#f43f5e" strokeDasharray="4 4" />
+                      <Area
+                        type="monotone"
+                        dataKey="acumuladoSimples"
+                        name="Saldo Acumulado Nominal (R$)"
+                        stroke="#10b981"
+                        fill="#10b981"
+                        fillOpacity={0.2}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="acumuladoDescontado"
+                        name="VPL Descontado Acumulado (R$)"
+                        stroke="#38bdf8"
+                        fill="#38bdf8"
+                        fillOpacity={0.15}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {}
+        {abaAtiva === 'memorial' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Lista Quantitativa de Materiais (BOM) */}
+            <div className="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                  <Layers className="w-5 h-5 text-amber-400" />
+                  Lista Quantitativa de Materiais (BOM)
+                </h2>
+                <span className="text-xs text-slate-400">Cálculo Automático</span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-800 text-slate-400">
+                      <th className="py-2 px-2">Cód.</th>
+                      <th className="py-2 px-2">Descrição Técnica do Equipamento / Material</th>
+                      <th className="py-2 px-2">Qtd.</th>
+                      <th className="py-2 px-2">Norma</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/70">
+                    {listaMateriais.map((mat) => (
+                      <tr key={mat.codigo} className="hover:bg-slate-800/40">
+                        <td className="py-2.5 px-2 font-mono text-amber-400 font-semibold">{mat.codigo}</td>
+                        <td className="py-2.5 px-2 text-slate-200">{mat.item}</td>
+                        <td className="py-2.5 px-2 font-bold text-emerald-400 whitespace-nowrap">{mat.qtd}</td>
+                        <td className="py-2.5 px-2 text-slate-400 whitespace-nowrap">{mat.norma}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Memorial Descritivo Pronto para Homologação */}
+            <div className="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-sky-400" />
+                    Memorial Descritivo Técnico (Padrão Concessionária)
+                  </h2>
+                  <button
+                    onClick={copiarMemorial}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs transition-all"
+                  >
+                    {copiadoStatus ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    {copiadoStatus ? 'Memorial Copiado!' : 'Copiar Memorial'}
+                  </button>
+                </div>
+
+                <pre className="w-full h-96 overflow-y-auto bg-slate-950 border border-slate-800 rounded-xl p-4 text-[11px] leading-relaxed font-mono text-slate-200 whitespace-pre-wrap">
+                  {textoMemorialDescritivo}
+                </pre>
+              </div>
+
+              <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center gap-3 text-xs text-slate-400">
+                <Info className="w-5 h-5 text-amber-400 shrink-0" />
+                <span>
+                  Todos os valores do Memorial Descritivo e do Diagrama Unifilar são atualizados em tempo real conforme você altera módulos, inversores, cabos ou consumo nas abas anteriores.
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
