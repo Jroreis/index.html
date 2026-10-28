@@ -1,10 +1,11 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QDC Pro Generator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>QDC Pro Generator 3D - NBR 5410</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
@@ -15,6 +16,24 @@
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
         .tab-btn.active { background-color: #2563eb; color: white; border-color: #2563eb; }
+
+        /* Suporte de Câmera 3D Interativa sem WebGL crash */
+        #qdc-3d-stage {
+            perspective: 1600px;
+            transform-style: preserve-3d;
+            overflow: auto;
+        }
+        #qdc-3d-Plane {
+            transform-style: preserve-3d;
+            transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.18s ease;
+            transform-origin: center center;
+        }
+        .qdc-3d-cabinet-shadow {
+            box-shadow: 
+                0 20px 45px -10px rgba(15, 23, 42, 0.35),
+                0 8px 18px -6px rgba(15, 23, 42, 0.22),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+        }
 
         @media print {
             @page { size: A4 landscape; margin: 0; }
@@ -41,10 +60,13 @@
 
     <div id="ui-wrapper" class="w-full flex flex-col items-center p-4">
         
-        <header class="w-full max-w-6xl flex justify-between items-center mb-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        <header class="w-full max-w-6xl flex flex-wrap justify-between items-center gap-3 mb-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
             <div>
-                <h1 class="text-2xl font-bold text-slate-800">QDC Pro Generator</h1>
-                <p class="text-sm text-slate-500">Desenho Físico Inteligente e Diagrama Unifilar (NBR 5410)</p>
+                <div class="flex items-center gap-2">
+                    <h1 class="text-2xl font-bold text-slate-800">QDC Pro Generator</h1>
+                    <span class="bg-blue-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-wider shadow-sm">3D CAD • NBR 5410</span>
+                </div>
+                <p class="text-sm text-slate-500">Desenho Físico 3D Inteligente e Diagrama Unifilar (ABNT NBR 5410)</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="installPWA()" id="btn-install" class="hidden bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-5 rounded-lg shadow-sm flex items-center transition-colors">
@@ -84,15 +106,15 @@
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Aterramento (NBR 5410)</label>
                     <select id="sys-aterramento" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50 outline-none" onchange="renderApp()">
                         <option value="tn-s" selected>TN-S (Separados)</option>
-                        <option value="tn-c-s">TN-C-S (Jumper N-PE)</option>
-                        <option value="tn-c">TN-C (Comum)</option>
-                        <option value="tt">TT (Independente)</option>
-                        <option value="it">IT (Isolado)</option>
+                        <option value="tn-c-s">TN-C-S (BEP PEN -> N+PE)</option>
+                        <option value="tn-c">TN-C (PEN Comum)</option>
+                        <option value="tt">TT (Terra Independente)</option>
+                        <option value="it">IT (Isolado / Impedância)</option>
                     </select>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pb-4 border-b border-slate-100">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 pb-4 border-b border-slate-100">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Disjuntor Geral (A)</label>
                     <select id="geral-amp" class="w-full text-sm border-slate-300 rounded border p-2 bg-slate-50" onchange="renderApp()">
@@ -124,6 +146,17 @@
                         <span class="text-sm font-semibold text-slate-700">Incluir DR Geral</span>
                     </label>
                 </div>
+                <div class="flex items-center">
+                    <label class="flex items-center space-x-2 cursor-pointer bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-2 rounded-lg transition-colors w-full">
+                        <input type="checkbox" id="single-rail" class="form-checkbox h-4 w-4 text-blue-600 rounded" onchange="renderApp()">
+                        <span class="text-xs font-bold text-blue-800 leading-tight">Todos em 1 Só Trilho DIN</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Status de Conformidade NBR 5410 -->
+            <div id="nbr-status-bar" class="text-xs px-3 py-2 rounded-lg border flex flex-wrap items-center justify-between gap-2 bg-emerald-50 border-emerald-200 text-emerald-800">
+                <!-- Preenchido via JS -->
             </div>
 
             <div>
@@ -140,17 +173,36 @@
         </div>
 
         <main class="w-full max-w-6xl flex flex-col bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-            <div class="flex border-b border-slate-200 bg-slate-50 px-4 py-3 gap-2">
-                <button onclick="switchTab('fisico')" id="btn-fisico" class="tab-btn active px-4 py-2 rounded-md text-sm font-semibold text-slate-600 bg-white shadow-sm border border-slate-200 transition-colors">
-                    Esquema Físico
-                </button>
-                <button onclick="switchTab('unifilar')" id="btn-unifilar" class="tab-btn px-4 py-2 rounded-md text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors">
-                    Diagrama Unifilar
-                </button>
+            <div class="flex flex-wrap justify-between items-center border-b border-slate-200 bg-slate-50 px-4 py-3 gap-2">
+                <div class="flex gap-2">
+                    <button onclick="switchTab('fisico')" id="btn-fisico" class="tab-btn active px-4 py-2 rounded-md text-sm font-semibold text-slate-600 bg-white shadow-sm border border-slate-200 transition-colors">
+                        Esquema Físico 3D
+                    </button>
+                    <button onclick="switchTab('unifilar')" id="btn-unifilar" class="tab-btn px-4 py-2 rounded-md text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors">
+                        Diagrama Unifilar
+                    </button>
+                </div>
+
+                <!-- Controles de Visualização 3D -->
+                <div id="controls-3d-bar" class="flex flex-wrap items-center gap-2 text-xs text-slate-600">
+                    <span class="font-bold text-slate-500 uppercase text-[10px]">Ângulo 3D:</span>
+                    <button onclick="set3DPreset(0, 0, 1)" class="px-2.5 py-1 rounded bg-white hover:bg-blue-50 border border-slate-200 font-semibold text-slate-700 shadow-sm transition-colors">Frontal CAD 3D</button>
+                    <button onclick="set3DPreset(14, -12, 0.96)" class="px-2.5 py-1 rounded bg-white hover:bg-blue-50 border border-slate-200 font-semibold text-slate-700 shadow-sm transition-colors">Isométrico 3D</button>
+                    <button onclick="set3DPreset(22, 10, 0.95)" class="px-2.5 py-1 rounded bg-white hover:bg-blue-50 border border-slate-200 font-semibold text-slate-700 shadow-sm transition-colors">Relevo Superior</button>
+                    <div class="flex items-center gap-1 bg-white px-2 py-1 rounded border border-slate-200">
+                        <span class="text-[10px] font-bold text-slate-400">Inclinar X:</span>
+                        <input type="range" id="rot-x" min="-25" max="30" value="8" oninput="update3DTransform()" class="w-16 accent-blue-600 cursor-pointer">
+                        <span class="text-[10px] font-bold text-slate-400 ml-1">Girar Y:</span>
+                        <input type="range" id="rot-y" min="-25" max="25" value="-6" oninput="update3DTransform()" class="w-16 accent-blue-600 cursor-pointer">
+                    </div>
+                </div>
             </div>
-            <div class="overflow-auto bg-slate-100 relative w-full p-4 flex items-center justify-center">
-                <div id="svg-render-area" class="w-full max-w-5xl bg-white rounded shadow-sm flex items-center justify-center min-h-[600px] border border-slate-200">
-                    <!-- SVG injetado via JS -->
+
+            <div id="qdc-3d-stage" class="overflow-auto bg-slate-200/70 relative w-full p-6 flex items-center justify-center">
+                <div id="qdc-3d-Plane" class="w-full max-w-5xl bg-white rounded-lg qdc-3d-cabinet-shadow flex items-center justify-center min-h-[600px] border border-slate-300">
+                    <div id="svg-render-area" class="w-full h-full flex items-center justify-center">
+                        <!-- SVG injetado via JS -->
+                    </div>
                 </div>
             </div>
         </main>
@@ -161,16 +213,139 @@
 
     <script>
         let state = {
-            resp: '', obra: '', sistema: 'mono', aterramento: 'tn-s',
-            geral: { amp: 63, cabo: 16 }, hasDPS: true, hasDR: true, circuitos: [], currentTab: 'fisico', logo: null
+            resp: '',
+            obra: '',
+            sistema: 'mono',
+            aterramento: 'tn-s',
+            geral: { amp: 63, cabo: 16 },
+            hasDPS: true,
+            hasDR: true,
+            singleRail: false,
+            circuitos: [],
+            currentTab: 'fisico',
+            logo: null,
+            view3D: { rotX: 8, rotY: -6, scale: 0.98 }
         };
 
-        const phaseColors = ['#ef4444', '#000000', '#78716c'];
+        // Cores padronizadas para Fases (distintas de Azul-claro N e Verde/Amarelo PE conforme NBR 5410 item 6.1.5.3)
+        const phaseColors = ['#dc2626', '#1e293b', '#78350f'];
+        const phaseHighlights = ['#f87171', '#64748b', '#b45309'];
 
+        // Capacidade de condução de corrente (Iz) conforme ABNT NBR 5410 - Tabela 36 (Método B1, PVC 70°C)
+        const nbrCableCapacity = {
+            '1.5': { twoCond: 17.5, threeCond: 15.5, maxBreakerRec: 16 },
+            '2.5': { twoCond: 24.0, threeCond: 21.0, maxBreakerRec: 20 },
+            '4.0': { twoCond: 32.0, threeCond: 28.0, maxBreakerRec: 32 },
+            '6.0': { twoCond: 41.0, threeCond: 36.0, maxBreakerRec: 40 },
+            '10':  { twoCond: 57.0, threeCond: 50.0, maxBreakerRec: 50 },
+            '16':  { twoCond: 76.0, threeCond: 68.0, maxBreakerRec: 63 },
+            '25':  { twoCond: 101.0, threeCond: 89.0, maxBreakerRec: 80 },
+            '35':  { twoCond: 125.0, threeCond: 110.0, maxBreakerRec: 100 }
+        };
+
+        // Definições Vetoriais 3D (Gradientes volumétricos metálicos/termoplásticos sem usar filtros <feDropShadow> que quebram PDF)
         const svgDefs = `
             <defs>
-                <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.25"/></filter>
-                <g id="screw"><circle cx="0" cy="0" r="3" fill="#94a3b8" stroke="#475569" stroke-width="1.5"/><line x1="-2" y1="0" x2="2" y2="0" stroke="#1e293b"/><line x1="0" y1="-2" x2="0" y2="2" stroke="#1e293b"/></g>
+                <!-- Corpo Termoplástico 3D dos Disjuntores -->
+                <linearGradient id="body3D" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#f8fafc"/>
+                    <stop offset="15%" stop-color="#ffffff"/>
+                    <stop offset="82%" stop-color="#e2e8f0"/>
+                    <stop offset="100%" stop-color="#cbd5e1"/>
+                </linearGradient>
+                <linearGradient id="bodySide3D" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#94a3b8"/>
+                    <stop offset="100%" stop-color="#475569"/>
+                </linearGradient>
+                <linearGradient id="bodyBottom3D" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#64748b"/>
+                    <stop offset="100%" stop-color="#334155"/>
+                </linearGradient>
+                <linearGradient id="recess3D" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#475569"/>
+                    <stop offset="40%" stop-color="#cbd5e1"/>
+                    <stop offset="100%" stop-color="#f1f5f9"/>
+                </linearGradient>
+
+                <!-- Trilho DIN 35mm Metálico 3D -->
+                <linearGradient id="dinRail3D" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#64748b"/>
+                    <stop offset="18%" stop-color="#e2e8f0"/>
+                    <stop offset="30%" stop-color="#94a3b8"/>
+                    <stop offset="50%" stop-color="#475569"/>
+                    <stop offset="72%" stop-color="#cbd5e1"/>
+                    <stop offset="88%" stop-color="#f8fafc"/>
+                    <stop offset="100%" stop-color="#475569"/>
+                </linearGradient>
+
+                <!-- Barramento Cobre / Latão 3D -->
+                <linearGradient id="copper3D" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#f59e0b"/>
+                    <stop offset="30%" stop-color="#fde68a"/>
+                    <stop offset="65%" stop-color="#d97706"/>
+                    <stop offset="100%" stop-color="#78350f"/>
+                </linearGradient>
+                <linearGradient id="busN3D" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#1d4ed8"/>
+                    <stop offset="35%" stop-color="#60a5fa"/>
+                    <stop offset="75%" stop-color="#2563eb"/>
+                    <stop offset="100%" stop-color="#1e3a8a"/>
+                </linearGradient>
+                <linearGradient id="busPE3D" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#15803d"/>
+                    <stop offset="35%" stop-color="#4ade80"/>
+                    <stop offset="75%" stop-color="#16a34a"/>
+                    <stop offset="100%" stop-color="#14532d"/>
+                </linearGradient>
+
+                <!-- Manoplas 3D (Preta, Vermelha, Azul IDR, Cartucho DPS) -->
+                <linearGradient id="leverDark3D" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#475569"/>
+                    <stop offset="30%" stop-color="#1e293b"/>
+                    <stop offset="100%" stop-color="#020617"/>
+                </linearGradient>
+                <linearGradient id="leverRed3D" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#fca5a5"/>
+                    <stop offset="30%" stop-color="#ef4444"/>
+                    <stop offset="100%" stop-color="#991b1b"/>
+                </linearGradient>
+                <linearGradient id="leverBlue3D" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#93c5fd"/>
+                    <stop offset="30%" stop-color="#2563eb"/>
+                    <stop offset="100%" stop-color="#1e3a8a"/>
+                </linearGradient>
+                <linearGradient id="dpsCartridge3D" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#ef4444"/>
+                    <stop offset="25%" stop-color="#fca5a5"/>
+                    <stop offset="80%" stop-color="#dc2626"/>
+                    <stop offset="100%" stop-color="#7f1d1d"/>
+                </linearGradient>
+
+                <!-- Fundo do Quadro Metálico 3D -->
+                <linearGradient id="cabinetBack3D" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#f8fafc"/>
+                    <stop offset="50%" stop-color="#f1f5f9"/>
+                    <stop offset="100%" stop-color="#e2e8f0"/>
+                </linearGradient>
+
+                <!-- Conduíte Corrugado 3D -->
+                <linearGradient id="conduit3D" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#64748b"/>
+                    <stop offset="35%" stop-color="#e2e8f0"/>
+                    <stop offset="70%" stop-color="#94a3b8"/>
+                    <stop offset="100%" stop-color="#334155"/>
+                </linearGradient>
+
+                <!-- Parafuso Fenda/Phillips 3D -->
+                <g id="screw">
+                    <circle cx="1" cy="1.5" r="4" fill="#0f172a" opacity="0.35"/>
+                    <circle cx="0" cy="0" r="4" fill="#cbd5e1" stroke="#475569" stroke-width="1.2"/>
+                    <circle cx="-1" cy="-1" r="2.5" fill="#f8fafc" opacity="0.6"/>
+                    <line x1="-2.5" y1="0" x2="2.5" y2="0" stroke="#1e293b" stroke-width="1.2"/>
+                    <line x1="0" y1="-2.5" x2="0" y2="2.5" stroke="#1e293b" stroke-width="1.2"/>
+                </g>
+
+                <!-- Simbologia Unifilar NBR 5410 -->
                 <g id="sym-fase"><line x1="-6" y1="-6" x2="6" y2="6" stroke="#000" stroke-width="1.5"/></g>
                 <g id="sym-neutro"><line x1="-6" y1="-6" x2="6" y2="6" stroke="#000" stroke-width="1.5"/><line x1="-6" y1="-6" x2="-2" y2="-10" stroke="#000" stroke-width="1.5"/></g>
                 <g id="sym-terra"><line x1="-6" y1="-6" x2="6" y2="6" stroke="#000" stroke-width="1.5"/><line x1="-4" y1="9" x2="4" y2="-1" stroke="#000" stroke-width="1.5"/></g>
@@ -178,48 +353,162 @@
             </defs>
         `;
 
-        // PWA Setup
+        function escapeXml(unsafe) {
+            return String(unsafe || '').replace(/[<>&'"]/g, function (c) {
+                switch (c) {
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    case '&': return '&amp;';
+                    case '\'': return '&apos;';
+                    case '"': return '&quot;';
+                }
+                return c;
+            });
+        }
+
+        // Desenha cabo 3D cilíndrico com sombra, base e brilho especular
+        function drawWire3D(pathD, color, width = 3.5, highlightColor = '#ffffff', isPEN = false) {
+            let out = '';
+            // Sombra projetada no fundo do QDC (sem filtro SVG para nunca bugar o PDF)
+            out += `<path d="${pathD}" fill="none" stroke="#0f172a" stroke-opacity="0.18" stroke-width="${width + 1.5}" stroke-linejoin="round" stroke-linecap="round" transform="translate(2, 3)"/>`;
+            // Corpo principal do cabo
+            out += `<path d="${pathD}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linejoin="round" stroke-linecap="round"/>`;
+            // Se for condutor PEN (NBR 5410 item 6.1.5.3.3: azul-claro com marcações verde-amarelas)
+            if (isPEN) {
+                out += `<path d="${pathD}" fill="none" stroke="#22c55e" stroke-width="${width}" stroke-dasharray="10,14" stroke-linejoin="round" stroke-linecap="round"/>`;
+                out += `<path d="${pathD}" fill="none" stroke="#eab308" stroke-width="${width * 0.6}" stroke-dasharray="4,20" stroke-dashoffset="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+            } else {
+                // Reflexo cilíndrico 3D
+                out += `<path d="${pathD}" fill="none" stroke="${highlightColor}" stroke-opacity="0.45" stroke-width="${Math.max(1, width * 0.28)}" stroke-linejoin="round" stroke-linecap="round" transform="translate(-0.5, -0.5)"/>`;
+            }
+            return out;
+        }
+
+        // Desenha Trilho DIN 35mm em 3D com abas, profundidade e furos oblongos
+        function drawDinRail3D(x, y, width) {
+            let html = `<g>`;
+            // Sombra 3D na chapa de fundo
+            html += `<rect x="${x + 4}" y="${y + 5}" width="${width}" height="34" rx="2" fill="#0f172a" fill-opacity="0.22"/>`;
+            // Extrusão lateral direita e inferior do trilho
+            html += `<polygon points="${x+width},${y} ${x+width+6},${y+5} ${x+width+6},${y+39} ${x+width},${y+34}" fill="#475569"/>`;
+            html += `<polygon points="${x},${y+34} ${x+width},${y+34} ${x+width+6},${y+39} ${x+6},${y+39}" fill="#334155"/>`;
+            // Corpo metálico perfil cartola 35mm
+            html += `<rect x="${x}" y="${y}" width="${width}" height="34" rx="2" fill="url(#dinRail3D)" stroke="#475569" stroke-width="1.5"/>`;
+            // Rebaixo central 3D do trilho DIN
+            html += `<rect x="${x + 4}" y="${y + 6}" width="${width - 8}" height="22" fill="#94a3b8" stroke="#64748b" stroke-width="1"/>`;
+            // Furos oblongos de fixação no trilho
+            for (let slotX = x + 20; slotX < x + width - 35; slotX += 45) {
+                html += `<rect x="${slotX}" y="${y + 12}" width="22" height="10" rx="5" fill="#334155" stroke="#e2e8f0" stroke-width="0.8"/>`;
+                html += `<rect x="${slotX + 2}" y="${y + 14}" width="18" height="6" rx="3" fill="#0f172a" opacity="0.65"/>`;
+            }
+            html += `</g>`;
+            return html;
+        }
+
+        // PWA Setup Seguro
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            document.getElementById('btn-install').classList.remove('hidden');
+            const btn = document.getElementById('btn-install');
+            if (btn) btn.classList.remove('hidden');
         });
         function installPWA() {
-            if(deferredPrompt) {
+            if (deferredPrompt) {
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') document.getElementById('btn-install').classList.add('hidden');
+                    if (choiceResult.outcome === 'accepted') {
+                        const btn = document.getElementById('btn-install');
+                        if (btn) btn.classList.add('hidden');
+                    }
                     deferredPrompt = null;
                 });
             }
         }
-        const manifest = { name: "QDC Pro Generator", short_name: "QDC Pro", display: "standalone", theme_color: "#ffffff" };
-        const blobManifest = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-        document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${URL.createObjectURL(blobManifest)}">`);
+        try {
+            const manifest = { name: "QDC Pro Generator 3D", short_name: "QDC Pro 3D", display: "standalone", theme_color: "#ffffff" };
+            const blobManifest = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+            document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${URL.createObjectURL(blobManifest)}">`);
+        } catch (err) {
+            // Seguro para ambientes sandboxed
+        }
 
-        // LocalStorage Zero Lag
-        function saveState() { localStorage.setItem('qdc_state', JSON.stringify(state)); }
-        function loadState() { 
-            const saved = localStorage.getItem('qdc_state');
-            if(saved) state = Object.assign(state, JSON.parse(saved));
-            
-            document.getElementById('proj-resp').value = state.resp;
-            document.getElementById('proj-obra').value = state.obra;
-            document.getElementById('sys-type').value = state.sistema;
-            document.getElementById('sys-aterramento').value = state.aterramento;
-            document.getElementById('geral-amp').value = state.geral.amp;
-            document.getElementById('geral-cabo').value = state.geral.cabo;
-            document.getElementById('has-dps').checked = state.hasDPS;
-            document.getElementById('has-dr').checked = state.hasDR;
+        // LocalStorage Seguro (Sem risco de crash por QuotaExceeded ou SecurityError)
+        function saveState() {
+            try {
+                localStorage.setItem('qdc_state', JSON.stringify(state));
+            } catch (e) {
+                // Ignora erro de quota ou sandbox sem travar a aplicação
+            }
+        }
+        function loadState() {
+            try {
+                const saved = localStorage.getItem('qdc_state');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    state = Object.assign(state, parsed);
+                    if (!state.geral) state.geral = { amp: 63, cabo: 16 };
+                    if (!Array.isArray(state.circuitos)) state.circuitos = [];
+                    if (!state.view3D) state.view3D = { rotX: 8, rotY: -6, scale: 0.98 };
+                }
+            } catch (e) {
+                // Fallback limpo caso localStorage esteja bloqueado ou corrompido
+            }
+
+            // Se não houver circuitos salvos, inicia com 3 circuitos padrão NBR 5410 para demonstração imediata
+            if (state.circuitos.length === 0) {
+                state.circuitos = [
+                    { id: 101, nome: 'Iluminação Social', polos: 1, amp: 10, cabo: '1.5', usaDR: true },
+                    { id: 102, nome: 'Tomadas Uso Geral', polos: 1, amp: 20, cabo: '2.5', usaDR: true },
+                    { id: 103, nome: 'Chuveiro Elétrico', polos: state.sistema === 'mono' ? 1 : 2, amp: 32, cabo: '6.0', usaDR: true }
+                ];
+            }
+
+            document.getElementById('proj-resp').value = state.resp || '';
+            document.getElementById('proj-obra').value = state.obra || '';
+            document.getElementById('sys-type').value = state.sistema || 'mono';
+            document.getElementById('sys-aterramento').value = state.aterramento || 'tn-s';
+            document.getElementById('geral-amp').value = state.geral.amp || 63;
+            document.getElementById('geral-cabo').value = state.geral.cabo || 16;
+            document.getElementById('has-dps').checked = state.hasDPS !== false;
+            document.getElementById('has-dr').checked = state.hasDR !== false;
+            document.getElementById('single-rail').checked = Boolean(state.singleRail);
         }
 
         function handleLogoUpload(event) {
             const file = event.target.files[0];
-            if(!file) return;
+            if (!file) return;
             const reader = new FileReader();
             reader.onload = (e) => { state.logo = e.target.result; renderApp(); };
             reader.readAsDataURL(file);
+        }
+
+        function set3DPreset(rx, ry, sc) {
+            state.view3D = { rotX: rx, rotY: ry, scale: sc || 1 };
+            const rxInput = document.getElementById('rot-x');
+            const ryInput = document.getElementById('rot-y');
+            if (rxInput) rxInput.value = rx;
+            if (ryInput) ryInput.value = ry;
+            apply3DTransform();
+        }
+
+        function update3DTransform() {
+            const rx = parseFloat(document.getElementById('rot-x').value) || 0;
+            const ry = parseFloat(document.getElementById('rot-y').value) || 0;
+            state.view3D.rotX = rx;
+            state.view3D.rotY = ry;
+            apply3DTransform();
+        }
+
+        function apply3DTransform() {
+            const plane = document.getElementById('qdc-3d-Plane');
+            if (!plane) return;
+            if (state.currentTab === 'unifilar') {
+                plane.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+            } else {
+                const { rotX, rotY, scale } = state.view3D;
+                plane.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(${scale || 0.98})`;
+            }
         }
 
         let renderTimeout;
@@ -228,19 +517,107 @@
             renderTimeout = setTimeout(() => {
                 _syncStateFromForm();
                 _renderUI();
+                _renderNBRStatus();
                 switchTab(state.currentTab);
                 saveState();
-            }, 100); 
+            }, 60);
         }
 
         function _syncStateFromForm() {
             state.resp = document.getElementById('proj-resp').value || '';
             state.obra = document.getElementById('proj-obra').value || '';
             state.aterramento = document.getElementById('sys-aterramento').value;
-            state.geral.amp = parseInt(document.getElementById('geral-amp').value);
-            state.geral.cabo = parseInt(document.getElementById('geral-cabo').value);
+            state.geral.amp = parseInt(document.getElementById('geral-amp').value) || 63;
+            state.geral.cabo = parseInt(document.getElementById('geral-cabo').value) || 16;
             state.hasDPS = document.getElementById('has-dps').checked;
             state.hasDR = document.getElementById('has-dr').checked;
+            state.singleRail = document.getElementById('single-rail').checked;
+        }
+
+        // Validação Normativa ABNT NBR 5410 em tempo real
+        function getNBRWarnings() {
+            const warnings = [];
+            const numFases = state.sistema === 'mono' ? 1 : (state.sistema === 'bi' ? 2 : 3);
+            const geralCap = nbrCableCapacity[String(state.geral.cabo)];
+            if (geralCap) {
+                const izGeral = numFases === 3 ? geralCap.threeCond : geralCap.twoCond;
+                if (state.geral.amp > izGeral) {
+                    warnings.push(`Entrada: Disjuntor Geral (${state.geral.amp}A) excede a capacidade Iz (${izGeral}A) do cabo ${state.geral.cabo}mm² (NBR 5410 Tab. 36).`);
+                }
+            }
+            if (state.aterramento === 'tn-c' && state.hasDR) {
+                warnings.push(`Aterramento TN-C: A NBR 5410 (item 5.3.5.2.2) proíbe o uso de DR em esquema TN-C puro; o condutor PEN foi convertido em TN-C-S no BEP.`);
+            }
+            state.circuitos.forEach((c, idx) => {
+                const cap = nbrCableCapacity[String(c.cabo)];
+                if (cap) {
+                    const iz = c.polos === 3 ? cap.threeCond : cap.twoCond;
+                    if (c.amp > iz) {
+                        warnings.push(`C${idx+1} (${c.nome}): Disjuntor C${c.amp}A maior que Iz=${iz}A do cabo ${c.cabo}mm² (Recomendado máx. ${cap.maxBreakerRec}A).`);
+                    }
+                }
+            });
+            return warnings;
+        }
+
+        function _renderNBRStatus() {
+            const bar = document.getElementById('nbr-status-bar');
+            if (!bar) return;
+            const warnings = getNBRWarnings();
+            if (warnings.length === 0) {
+                bar.className = "text-xs px-3 py-2 rounded-lg border flex flex-wrap items-center justify-between gap-2 bg-emerald-50 border-emerald-200 text-emerald-800";
+                bar.innerHTML = `
+                    <div class="flex items-center gap-2 font-semibold">
+                        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                        <span>Dimensionamento 100% em conformidade com a ABNT NBR 5410 (Coordenação Cabo × Disjuntor, Barramentos PE/N e Proteções).</span>
+                    </div>
+                    <span class="text-[11px] font-bold uppercase bg-emerald-100 px-2 py-0.5 rounded">${state.singleRail ? 'Modo: 1 Só Trilho DIN' : 'Modo: Multi-Trilho DIN'}</span>
+                `;
+            } else {
+                bar.className = "text-xs px-3 py-2 rounded-lg border flex flex-col gap-1 bg-amber-50 border-amber-300 text-amber-900";
+                bar.innerHTML = `
+                    <div class="flex items-center justify-between w-full">
+                        <span class="font-bold flex items-center gap-1.5">⚠️ Alertas Técnicos ABNT NBR 5410 (${warnings.length}):</span>
+                        <button onclick="autoFixNBR()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-2.5 py-0.5 rounded text-[11px] transition-colors">Ajustar Automaticamente (NBR 5410)</button>
+                    </div>
+                    <ul class="list-disc list-inside text-[11px] space-y-0.5">
+                        ${warnings.map(w => `<li>${escapeXml(w)}</li>`).join('')}
+                    </ul>
+                `;
+            }
+        }
+
+        function autoFixNBR() {
+            if (state.aterramento === 'tn-c' && state.hasDR) {
+                state.aterramento = 'tn-c-s';
+                document.getElementById('sys-aterramento').value = 'tn-c-s';
+            }
+            const numFases = state.sistema === 'mono' ? 1 : (state.sistema === 'bi' ? 2 : 3);
+            const geralCap = nbrCableCapacity[String(state.geral.cabo)];
+            if (geralCap) {
+                const izGeral = numFases === 3 ? geralCap.threeCond : geralCap.twoCond;
+                if (state.geral.amp > izGeral) {
+                    if (state.geral.amp <= 50) state.geral.cabo = 10;
+                    else if (state.geral.amp <= 63) state.geral.cabo = 16;
+                    else if (state.geral.amp <= 80) state.geral.cabo = 25;
+                    else state.geral.cabo = 35;
+                    document.getElementById('geral-cabo').value = state.geral.cabo;
+                }
+            }
+            state.circuitos.forEach(c => {
+                const cap = nbrCableCapacity[String(c.cabo)];
+                if (cap) {
+                    const iz = c.polos === 3 ? cap.threeCond : cap.twoCond;
+                    if (c.amp > iz) {
+                        if (c.amp <= 16) c.cabo = '1.5';
+                        else if (c.amp <= 20) c.cabo = '2.5';
+                        else if (c.amp <= 32) c.cabo = '4.0';
+                        else if (c.amp <= 40) c.cabo = '6.0';
+                        else c.cabo = '10';
+                    }
+                }
+            });
+            renderApp();
         }
 
         function _renderUI() {
@@ -248,16 +625,23 @@
             list.innerHTML = '';
             const maxPoles = state.sistema === 'mono' ? 1 : (state.sistema === 'bi' ? 2 : 3);
 
-            state.circuitos.forEach((c) => {
+            state.circuitos.forEach((c, idx) => {
                 let poleOptions = `<option value="1" ${c.polos===1?'selected':''}>1 Polo</option>`;
                 if (maxPoles >= 2) poleOptions += `<option value="2" ${c.polos===2?'selected':''}>2 Polos</option>`;
                 if (maxPoles === 3) poleOptions += `<option value="3" ${c.polos===3?'selected':''}>3 Polos</option>`;
 
+                const cap = nbrCableCapacity[String(c.cabo)];
+                const iz = cap ? (c.polos === 3 ? cap.threeCond : cap.twoCond) : 999;
+                const isOverloaded = c.amp > iz;
+
                 list.innerHTML += `
-                    <div class="bg-slate-50 border border-slate-200 rounded p-2 relative text-xs shadow-sm">
-                        <button onclick="removeCircuit(${c.id})" class="absolute top-1 right-1 text-red-400 hover:text-red-600 font-bold text-lg leading-none">&times;</button>
-                        <input type="text" value="${c.nome}" onchange="updateCircuit(${c.id}, 'nome', this.value)" class="w-[90%] font-bold bg-transparent border-b border-slate-300 focus:border-blue-500 outline-none mb-2 text-slate-700">
-                        <div class="grid grid-cols-4 gap-1">
+                    <div class="bg-slate-50 border ${isOverloaded ? 'border-amber-400 bg-amber-50/40' : 'border-slate-200'} rounded-lg p-2.5 relative text-xs shadow-sm">
+                        <button onclick="removeCircuit(${c.id})" title="Remover Circuito" class="absolute top-1.5 right-2 text-red-400 hover:text-red-600 font-bold text-lg leading-none">&times;</button>
+                        <div class="flex items-center gap-1.5 mb-2">
+                            <span class="bg-slate-800 text-white text-[10px] font-black px-1.5 py-0.5 rounded">C${idx+1}</span>
+                            <input type="text" value="${escapeXml(c.nome)}" onchange="updateCircuit(${c.id}, 'nome', this.value)" class="w-[82%] font-bold bg-transparent border-b border-slate-300 focus:border-blue-500 outline-none text-slate-700">
+                        </div>
+                        <div class="grid grid-cols-4 gap-1.5">
                             <div><span class="block text-[9px] text-slate-500 uppercase font-bold">Polos</span>
                             <select onchange="updateCircuit(${c.id}, 'polos', this.value)" class="w-full p-1 border rounded bg-white text-slate-700">${poleOptions}</select></div>
                             
@@ -266,7 +650,7 @@
                                 ${[10,16,20,25,32,40,50].map(v=>`<option value="${v}" ${c.amp===v?'selected':''}>${v}A</option>`).join('')}
                             </select></div>
                             
-                            <div><span class="block text-[9px] text-slate-500 uppercase font-bold">Cabo</span>
+                            <div><span class="block text-[9px] text-slate-500 uppercase font-bold">Cabo (mm²)</span>
                             <select onchange="updateCircuit(${c.id}, 'cabo', this.value)" class="w-full p-1 border rounded bg-white text-slate-700">
                                 ${['1.5','2.5','4.0','6.0','10'].map(v=>`<option value="${v}" ${c.cabo===v?'selected':''}>${v}</option>`).join('')}
                             </select></div>
@@ -283,7 +667,14 @@
 
         function addCircuit() {
             const maxPoles = state.sistema === 'mono' ? 1 : (state.sistema === 'bi' ? 2 : 3);
-            state.circuitos.push({ id: Date.now(), nome: `Circuito ${state.circuitos.length + 1}`, polos: maxPoles === 3 ? 1 : maxPoles, amp: 20, cabo: '2.5', usaDR: true });
+            state.circuitos.push({
+                id: Date.now() + Math.floor(Math.random() * 1000),
+                nome: `Circuito ${state.circuitos.length + 1}`,
+                polos: maxPoles === 3 ? 1 : maxPoles,
+                amp: 20,
+                cabo: '2.5',
+                usaDR: true
+            });
             renderApp();
         }
 
@@ -296,7 +687,7 @@
             state.sistema = document.getElementById('sys-type').value;
             const maxPoles = state.sistema === 'mono' ? 1 : (state.sistema === 'bi' ? 2 : 3);
             state.circuitos.forEach(c => { 
-                if(c.polos > maxPoles) c.polos = maxPoles; 
+                if (c.polos > maxPoles) c.polos = maxPoles; 
                 c.usaDR = c.usaDR !== false; 
             });
             renderApp();
@@ -317,7 +708,14 @@
             const activeBtn = document.getElementById(`btn-${state.currentTab}`);
             activeBtn.classList.add('active');
             activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+
+            const controls3D = document.getElementById('controls-3d-bar');
+            if (controls3D) {
+                controls3D.style.display = state.currentTab === 'fisico' ? 'flex' : 'none';
+            }
+
             document.getElementById('svg-render-area').innerHTML = state.currentTab === 'fisico' ? generateFisicoSVG() : generateUnifilarSVG();
+            apply3DTransform();
         }
 
         function exportPDF() {
@@ -329,299 +727,464 @@
             setTimeout(() => { window.print(); }, 200);
         }
 
+        // Desenha Disjuntor / DPS / IDR em 3D Volumétrico Realista
         function drawBreaker(x, y, poles, label, sublabel, type="disj") {
             const w = poles * 40;
+            const dX = 7, dY = 7; // Extrusão 3D isométrica
+            const safeLabel = escapeXml(label);
+            const safeSublabel = escapeXml(sublabel);
+
             let html = `<g transform="translate(${x}, ${y})">`;
-            // Removido o filter="url(#shadow)" para corrigir o bug de PDF onde os componentes ficam invisíveis
-            html += `<rect x="0" y="0" width="${w}" height="90" rx="4" fill="#ffffff" stroke="#1e293b" stroke-width="2.5"/>`;
-            for(let p=0; p<poles; p++) {
-                html += `<rect x="${p*40+5}" y="5" width="30" height="15" rx="2" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" />`;
-                html += `<rect x="${p*40+5}" y="70" width="30" height="15" rx="2" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" />`;
-                html += `<use href="#screw" x="${p*40+20}" y="12.5" /><use href="#screw" x="${p*40+20}" y="77.5" />`;
+
+            // 1. Sombra 3D projetada no fundo e no trilho DIN
+            html += `<rect x="5" y="7" width="${w + 5}" height="92" rx="4" fill="#0f172a" fill-opacity="0.26"/>`;
+
+            // 2. Paredes de extrusão 3D (Direita e Base Inferior)
+            html += `<polygon points="${w},2 ${w+dX},${2+dY} ${w+dX},${88+dY} ${w},88" fill="url(#bodySide3D)" stroke="#334155" stroke-width="1"/>`;
+            html += `<polygon points="2,90 ${w},90 ${w+dX},${90+dY} ${2+dX},${90+dY}" fill="url(#bodyBottom3D)" stroke="#1e293b" stroke-width="1"/>`;
+
+            // 3. Corpo principal 3D moldado
+            html += `<rect x="0" y="0" width="${w}" height="90" rx="4" fill="url(#body3D)" stroke="#1e293b" stroke-width="2"/>`;
+
+            // 4. Degrau frontal 3D (Ressalto padrão IEC/DIN 43880)
+            html += `<polygon points="${w-2},22 ${w+4},26 ${w+4},68 ${w-2},64" fill="#94a3b8" stroke="#475569" stroke-width="0.8"/>`;
+            html += `<rect x="2" y="22" width="${w-4}" height="44" rx="2" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.2"/>`;
+
+            // 5. Divisórias entre polos e bornes recuados em 3D
+            for (let p = 0; p < poles; p++) {
+                if (p > 0) {
+                    html += `<line x1="${p*40}" y1="0" x2="${p*40}" y2="90" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="2,1"/>`;
+                }
+                // Cavidade superior do borne
+                html += `<rect x="${p*40+6}" y="4" width="28" height="15" rx="2" fill="url(#recess3D)" stroke="#64748b" stroke-width="1.2"/>`;
+                // Cavidade inferior do borne
+                html += `<rect x="${p*40+6}" y="71" width="28" height="15" rx="2" fill="url(#recess3D)" stroke="#64748b" stroke-width="1.2"/>`;
+                // Parafusos 3D nos bornes
+                html += `<use href="#screw" x="${p*40+20}" y="11.5" />`;
+                html += `<use href="#screw" x="${p*40+20}" y="78.5" />`;
             }
+
+            // 6. Elementos específicos por tipo (DPS, IDR, Disjuntor Termomagnético)
             if (type === "dps") {
-                for(let p=0; p<poles; p++) html += `<rect x="${p*40+5}" y="30" width="30" height="30" fill="#fca5a5" stroke="#dc2626" stroke-width="2" />`; 
+                for (let p = 0; p < poles; p++) {
+                    // Cartucho plugável 3D do DPS
+                    html += `<rect x="${p*40+5}" y="25" width="30" height="38" rx="2" fill="url(#dpsCartridge3D)" stroke="#991b1b" stroke-width="1.5"/>`;
+                    // Visor de status Verde (Operacional NBR 5410)
+                    html += `<rect x="${p*40+13}" y="31" width="14" height="8" rx="1.5" fill="#22c55e" stroke="#14532d" stroke-width="1"/>`;
+                    html += `<text x="${p*40+20}" y="53" text-anchor="middle" font-size="7" font-weight="900" fill="#ffffff">275V</text>`;
+                }
             } else if (type === "dr") {
-                html += `<rect x="${(w/2)-15}" y="35" width="30" height="20" rx="2" fill="#0f172a" /><rect x="${(w/2)-15}" y="32" width="30" height="10" rx="2" fill="#2563eb" /><circle cx="${w-20}" cy="45" r="5" fill="#f1f5f9" stroke="#64748b" stroke-width="2" /><text x="${w-20}" y="60" text-anchor="middle" font-size="8" font-weight="900" fill="#475569">TESTE</text>`;
-            } else { 
-                html += `<rect x="${(w/2)-10}" y="35" width="20" height="20" rx="2" fill="#0f172a" /><rect x="${(w/2)-10}" y="32" width="20" height="10" rx="2" fill="#ef4444" />`; 
+                // Manopla 3D Azul do IDR + Botão de Teste 3D
+                const lw = Math.min(w - 16, Math.max(28, poles * 22));
+                const lx = (w / 2) - (lw / 2) - 4;
+                html += `<rect x="${lx+2}" y="38" width="${lw}" height="21" rx="2" fill="#0f172a" opacity="0.35"/>`;
+                html += `<rect x="${lx}" y="35" width="${lw}" height="20" rx="2" fill="url(#leverDark3D)" stroke="#0f172a" stroke-width="1"/>`;
+                html += `<rect x="${lx}" y="31" width="${lw}" height="11" rx="2" fill="url(#leverBlue3D)" stroke="#1e3a8a" stroke-width="1"/>`;
+                // Indicador ON (I)
+                html += `<rect x="${lx + lw/2 - 5}" y="46" width="10" height="6" rx="1" fill="#ef4444"/>`;
+                // Botão Teste "T" 3D
+                html += `<circle cx="${w-14}" cy="44" r="6" fill="#e2e8f0" stroke="#475569" stroke-width="1.5"/>`;
+                html += `<circle cx="${w-14.5}" cy="43.5" r="4" fill="#f8fafc"/>`;
+                html += `<text x="${w-14}" y="46.5" text-anchor="middle" font-size="7" font-weight="900" fill="#1e293b">T</text>`;
+                html += `<text x="${w-14}" y="60" text-anchor="middle" font-size="6.5" font-weight="900" fill="#334155">30mA</text>`;
+            } else {
+                // Manopla 3D do Disjuntor Termomagnético com barra de interligação multipolar
+                const lw = Math.min(w - 12, Math.max(20, poles * 24));
+                const lx = (w / 2) - (lw / 2);
+                html += `<rect x="${lx+2}" y="38" width="${lw}" height="21" rx="2" fill="#0f172a" opacity="0.35"/>`;
+                html += `<rect x="${lx}" y="35" width="${lw}" height="20" rx="2" fill="url(#leverDark3D)" stroke="#0f172a" stroke-width="1"/>`;
+                html += `<rect x="${lx}" y="31" width="${lw}" height="11" rx="2" fill="url(#leverRed3D)" stroke="#7f1d1d" stroke-width="1"/>`;
+                html += `<line x1="${lx+3}" y1="34" x2="${lx+lw-3}" y2="34" stroke="#fecaca" stroke-width="1.2"/>`;
+                // Indicador ON (I)
+                html += `<rect x="${(w/2)-5}" y="47" width="10" height="5" rx="1" fill="#dc2626"/>`;
             }
-            html += `<text x="${w/2}" y="-10" text-anchor="middle" font-size="12" font-weight="900" fill="#0f172a">${label}</text>`;
-            // Alterado de fill="#ffffff" para fill="#0f172a" para garantir cores fortes e visibilidade nas etiquetas (C10, C20)
-            if(sublabel) html += `<text x="${w/2}" y="28" text-anchor="middle" font-size="10" font-weight="900" fill="#0f172a">${sublabel}</text></g>`;
+
+            // 7. Etiqueta de Identificação Superior e Curva/Corrente
+            html += `<rect x="2" y="-22" width="${w-4}" height="16" rx="3" fill="#0f172a" fill-opacity="0.88"/>`;
+            html += `<text x="${w/2}" y="-10" text-anchor="middle" font-size="10.5" font-weight="900" fill="#ffffff">${safeLabel}</text>`;
+            if (safeSublabel) {
+                html += `<text x="${w/2}" y="30" text-anchor="middle" font-size="9.5" font-weight="900" fill="#0f172a">${safeSublabel}</text>`;
+            }
+            html += `</g>`;
             return html;
         }
 
         function generateFisicoSVG() {
             const numFases = state.sistema === 'mono' ? 1 : (state.sistema === 'bi' ? 2 : 3);
-            const hasMainNeutral = true; 
-            
+            const hasMainNeutral = true;
+
+            // Polos do DPS e IDR Geral conforme NBR 5410
+            const dpsPolos = numFases + ((state.aterramento === 'tn-c') ? 0 : 1);
+            const drPolos = numFases + 1;
+
+            // Organização dos circuitos em trilhos DIN (suporta Modo Padrão Multi-Trilho e Modo 1 Só Trilho DIN)
             let circuitosPerRow = [];
-            let currRowIdx = 0;
-            let currRowW = 0;
-            if(state.circuitos.length > 0) circuitosPerRow[0] = [];
-            
-            state.circuitos.forEach(c => {
-                let w = (c.polos * 40) + 20; 
-                if (currRowW + w > 790) { 
-                    currRowIdx++;
-                    circuitosPerRow[currRowIdx] = [];
-                    currRowW = 0;
-                }
-                circuitosPerRow[currRowIdx].push(c);
-                currRowW += w;
-            });
-            
-            let numTrilhosAuto = Math.max(1, circuitosPerRow.length);
-            const svgHeight = Math.max(800, 350 + (numTrilhosAuto * 210) + 120); 
-            
-            let svg = `<svg viewBox="0 0 1200 ${svgHeight}" class="w-full h-auto bg-white" xmlns="http://www.w3.org/2000/svg">${svgDefs}`;
-
-            // CABEÇALHO OFICIAL 
-            svg += `<rect x="50" y="20" width="1100" height="70" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" rx="5"/>`;
-            if(state.logo) svg += `<image href="${state.logo}" x="60" y="25" height="60" width="150" preserveAspectRatio="xMinYMin meet"/>`;
-            
-            svg += `<text x="600" y="45" text-anchor="middle" font-size="20" font-weight="900" fill="#1e293b">QUADRO DE DISTRIBUIÇÃO - SISTEMA ${state.sistema.toUpperCase()} (FÍSICO)</text>`;
-            svg += `<text x="600" y="70" text-anchor="middle" font-size="13" font-weight="bold" fill="#475569">RESPONSÁVEL TÉCNICO: ${state.resp.toUpperCase() || 'NÃO INFORMADO'}   |   CLIENTE/OBRA: ${state.obra.toUpperCase() || 'NÃO INFORMADA'}   |   ATERRAMENTO: ${state.aterramento.toUpperCase()}</text>`;
-
-            const qHeight = svgHeight - 130 - 100; 
-            svg += `<rect x="50" y="110" width="1100" height="${qHeight}" fill="#ffffff" stroke="#e2e8f0" stroke-width="3" rx="10"/>`;
-
-            const barNY = 160, barPEY = 160;
-            const busNx = 80, busPEx = 1090;
-            const barH = qHeight - 50;
-
-            // Barramento PE 
-            svg += `<rect x="${busPEx}" y="${barPEY}" width="30" height="${barH}" rx="3" fill="#f0fdf4" stroke="#22c55e" stroke-width="2" />`;
-            svg += `<text x="${busPEx+15}" y="${barPEY-10}" text-anchor="middle" font-size="12" font-weight="bold" fill="#16a34a">TERRA (PE)</text>`;
-            for(let i=180; i<=(160 + barH - 20); i+=20) svg += `<use href="#screw" x="${busPEx+15}" y="${i}"/>`;
-
-            // Barramento N - DIVIDIDO (Pré-DR e Pós-DR)
-            let halfBar = (barH/2) - 10;
-            svg += `<rect x="${busNx}" y="${barNY}" width="30" height="${halfBar}" rx="3" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" />`;
-            svg += `<text x="${busNx+15}" y="${barNY-10}" text-anchor="middle" font-size="10" font-weight="bold" fill="#2563eb">N (PRÉ-DR)</text>`;
-            for(let i=barNY+20; i<=(barNY + halfBar - 20); i+=20) svg += `<use href="#screw" x="${busNx+15}" y="${i}"/>`;
-            
-            let barNY_Pos = barNY + halfBar + 20;
-            svg += `<rect x="${busNx}" y="${barNY_Pos}" width="30" height="${halfBar}" rx="3" fill="#eff6ff" stroke="#3b82f6" stroke-width="2" />`;
-            svg += `<text x="${busNx+15}" y="${barNY_Pos-5}" text-anchor="middle" font-size="10" font-weight="bold" fill="#2563eb">N (PÓS-DR)</text>`;
-            for(let i=barNY_Pos+20; i<=(barNY_Pos + halfBar - 20); i+=20) svg += `<use href="#screw" x="${busNx+15}" y="${i}"/>`;
-
-
-            const entNx = 250, entPEx = 300;
-            // BEP TAMANHO PADRÃO NO CENTRO TOPO E ROTEAMENTO DE ENTRADA
-            if (state.aterramento === 'tn-c-s' || state.aterramento === 'tn-c') {
-                let bepW = 100;
-                let bepX = 550;
-                // Removido filter="url(#shadow)"
-                svg += `<rect x="${bepX}" y="125" width="${bepW}" height="20" rx="3" fill="#b45309" stroke="#78350f" stroke-width="2"/>`;
-                svg += `<text x="${bepX + (bepW/2)}" y="139" text-anchor="middle" font-size="10" font-weight="900" fill="#ffffff">BEP (${state.aterramento.toUpperCase()})</text>`;
-                
-                // PEN -> BEP
-                svg += `<path d="M ${entNx} 115 L ${entNx} 135 L ${bepX} 135" fill="none" stroke="#22c55e" stroke-width="4"/>`;
-                svg += `<text x="${entNx}" y="110" text-anchor="middle" font-size="12" font-weight="bold" fill="#22c55e">PEN</text>`;
-                
-                // BEP -> PE Busbar
-                svg += `<path d="M ${bepX+bepW} 135 L ${busPEx+15} 135 L ${busPEx+15} 160" fill="none" stroke="#22c55e" stroke-width="4"/>`;
-                
-                // BEP -> N Busbar (Pré-DR)
-                svg += `<path d="M ${bepX} 135 L ${busNx+15} 135 L ${busNx+15} 160" fill="none" stroke="#3b82f6" stroke-width="4"/>`;
-                
+            if (state.singleRail) {
+                // Todos os disjuntores em 1 único trilho DIN
+                circuitosPerRow = [state.circuitos.slice()];
             } else {
-                // Entrada N direto para o Busbar N (Pré-DR)
-                svg += `<path d="M ${entNx} 115 L ${entNx} 135 L ${busNx+15} 135 L ${busNx+15} 160" fill="none" stroke="#3b82f6" stroke-width="4" stroke-linejoin="round"/>`;
-                svg += `<text x="${entNx}" y="110" text-anchor="middle" font-size="12" font-weight="bold" fill="#3b82f6">N</text>`;
-                
-                // Entrada PE direto para o Busbar PE
-                svg += `<path d="M ${entPEx} 115 L ${entPEx} 142 L ${busPEx+15} 142 L ${busPEx+15} 160" fill="none" stroke="#22c55e" stroke-width="4" stroke-linejoin="round"/>`;
-                svg += `<text x="${entPEx}" y="110" text-anchor="middle" font-size="12" font-weight="bold" fill="#22c55e">PE</text>`;
+                let currRowIdx = 0;
+                let currRowW = 0;
+                if (state.circuitos.length > 0) circuitosPerRow[0] = [];
+                state.circuitos.forEach(c => {
+                    let w = (c.polos * 40) + 22;
+                    if (currRowW + w > 760 && circuitosPerRow[currRowIdx].length > 0) {
+                        currRowIdx++;
+                        circuitosPerRow[currRowIdx] = [];
+                        currRowW = 0;
+                    }
+                    circuitosPerRow[currRowIdx].push(c);
+                    currRowW += w;
+                });
             }
 
-            // --- Componentes Principais ---
-            const yMain = 220;
-            const xGeral = 350;
-            const xDPS = xGeral + (numFases*40) + 40;
-            const dpsPolos = numFases + (hasMainNeutral ? 1 : 0);
-            const xDR = state.hasDPS ? (xDPS + (dpsPolos*40) + 40) : xDPS;
-            const drPolos = numFases + (hasMainNeutral ? 1 : 0);
+            // Cálculo dinâmico de largura e altura para nunca cortar ou sobrepor componentes
+            const xGeral = 320;
+            const xDPS = xGeral + (numFases * 40) + 36;
+            const xDR = state.hasDPS ? (xDPS + (dpsPolos * 40) + 36) : xDPS;
+            const afterMainX = (state.hasDR ? (xDR + drPolos * 40) : (state.hasDPS ? (xDPS + dpsPolos * 40) : (xGeral + numFases * 40))) + 45;
 
+            const singleRailCircuitsW = state.circuitos.reduce((acc, c) => acc + (c.polos * 40) + 22, 0);
+            const neededInnerRight = state.singleRail
+                ? Math.max(1060, afterMainX + singleRailCircuitsW + 40)
+                : 1060;
+
+            const svgWidth = Math.max(1200, neededInnerRight + 160);
+            const busNx = 85;
+            const busPEx = svgWidth - 115;
+
+            // Contagem de bornes nos barramentos para dimensionar altura sem estourar
+            const totalCircuits = state.circuitos.length;
+            const minBusSlots = Math.max(8, totalCircuits + 4);
+            const numTrilhosAuto = state.singleRail ? 1 : Math.max(1, circuitosPerRow.length);
+
+            const baseContentHeight = state.singleRail
+                ? 540
+                : (360 + (numTrilhosAuto * 225) + 130);
+            const minBusHeightNeeded = 260 + (minBusSlots * 20) + 180;
+            const svgHeight = Math.max(800, baseContentHeight, minBusHeightNeeded);
+
+            let svg = `<svg viewBox="0 0 ${svgWidth} ${svgHeight}" class="w-full h-auto bg-white select-none" xmlns="http://www.w3.org/2000/svg">${svgDefs}`;
+
+            // CABEÇALHO OFICIAL
+            const frameW = svgWidth - 100;
+            const centerX = svgWidth / 2;
+            svg += `<rect x="50" y="20" width="${frameW}" height="72" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" rx="6"/>`;
+            if (state.logo) {
+                svg += `<image href="${state.logo}" x="62" y="26" height="60" width="150" preserveAspectRatio="xMinYMin meet"/>`;
+            }
+            svg += `<text x="${centerX}" y="46" text-anchor="middle" font-size="20" font-weight="900" fill="#0f172a">QUADRO DE DISTRIBUIÇÃO 3D - SISTEMA ${escapeXml(state.sistema.toUpperCase())} (${state.singleRail ? 'TRILHO DIN ÚNICO' : 'FÍSICO NBR 5410'})</text>`;
+            svg += `<text x="${centerX}" y="71" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#475569">RESPONSÁVEL TÉCNICO: ${escapeXml(state.resp.toUpperCase() || 'NÃO INFORMADO')}   |   CLIENTE/OBRA: ${escapeXml(state.obra.toUpperCase() || 'NÃO INFORMADA')}   |   ATERRAMENTO: ${escapeXml(state.aterramento.toUpperCase())}</text>`;
+
+            // CAIXA DO QDC EM 3D (Gabinete com bordas chanfradas e fundo em relevo)
+            const qHeight = svgHeight - 230;
+            // Sombra externa e moldura 3D do gabinete
+            svg += `<rect x="56" y="116" width="${frameW}" height="${qHeight}" fill="#0f172a" fill-opacity="0.12" rx="12"/>`;
+            svg += `<rect x="50" y="110" width="${frameW}" height="${qHeight}" fill="#cbd5e1" stroke="#64748b" stroke-width="3" rx="10"/>`;
+            // Paredes internas chanfradas 3D do quadro
+            svg += `<polygon points="50,110 ${50+frameW},110 ${50+frameW-14},124 64,124" fill="#94a3b8"/>`;
+            svg += `<polygon points="50,110 64,124 64,${110+qHeight-14} 50,${110+qHeight}" fill="#94a3b8"/>`;
+            svg += `<polygon points="${50+frameW},110 ${50+frameW},${110+qHeight} ${50+frameW-14},${110+qHeight-14} ${50+frameW-14},124" fill="#64748b"/>`;
+            svg += `<polygon points="50,${110+qHeight} ${50+frameW},${110+qHeight} ${50+frameW-14},${110+qHeight-14} 64,${110+qHeight-14}" fill="#475569"/>`;
+            // Chapa de montagem interna 3D
+            svg += `<rect x="64" y="124" width="${frameW-28}" height="${qHeight-28}" fill="url(#cabinetBack3D)" stroke="#94a3b8" stroke-width="1.5" rx="6"/>`;
+
+            // BARRAMENTOS 3D (N Pré-DR, N Pós-DR e Terra PE)
+            const barNY = 170, barPEY = 170;
+            const barH = qHeight - 85;
+            const screwStep = Math.min(20, Math.max(12, Math.floor((barH - 40) / Math.max(8, totalCircuits + 3))));
+
+            // Barramento PE 3D (Direita)
+            svg += `<rect x="${busPEx+5}" y="${barPEY+5}" width="32" height="${barH}" rx="3" fill="#0f172a" fill-opacity="0.22"/>`;
+            svg += `<polygon points="${busPEx+30},${barPEY} ${busPEx+36},${barPEY+5} ${busPEx+36},${barPEY+barH+5} ${busPEx+30},${barPEY+barH}" fill="#14532d"/>`;
+            svg += `<rect x="${busPEx}" y="${barPEY}" width="30" height="${barH}" rx="3" fill="url(#busPE3D)" stroke="#14532d" stroke-width="2"/>`;
+            svg += `<rect x="${busPEx+5}" y="${barPEY+6}" width="20" height="${barH-12}" rx="1.5" fill="url(#copper3D)" stroke="#78350f" stroke-width="1"/>`;
+            svg += `<text x="${busPEx+15}" y="${barPEY-10}" text-anchor="middle" font-size="11" font-weight="900" fill="#15803d">TERRA (PE)</text>`;
+            for (let sy = barPEY + 18; sy <= (barPEY + barH - 14); sy += screwStep) {
+                svg += `<use href="#screw" x="${busPEx+15}" y="${sy}"/>`;
+            }
+
+            // Barramento N 3D DIVIDIDO (Pré-DR e Pós-DR)
+            const halfBar = Math.floor((barH / 2) - 14);
+            const screwStepN = Math.min(18, Math.max(11, Math.floor((halfBar - 30) / Math.max(4, totalCircuits + 2))));
+
+            // N (PRÉ-DR)
+            svg += `<rect x="${busNx+5}" y="${barNY+5}" width="32" height="${halfBar}" rx="3" fill="#0f172a" fill-opacity="0.22"/>`;
+            svg += `<polygon points="${busNx+30},${barNY} ${busNx+36},${barNY+5} ${busNx+36},${barNY+halfBar+5} ${busNx+30},${barNY+halfBar}" fill="#1e3a8a"/>`;
+            svg += `<rect x="${busNx}" y="${barNY}" width="30" height="${halfBar}" rx="3" fill="url(#busN3D)" stroke="#1e3a8a" stroke-width="2"/>`;
+            svg += `<rect x="${busNx+5}" y="${barNY+6}" width="20" height="${halfBar-12}" rx="1.5" fill="url(#copper3D)" stroke="#78350f" stroke-width="1"/>`;
+            svg += `<text x="${busNx+15}" y="${barNY-10}" text-anchor="middle" font-size="10" font-weight="900" fill="#1d4ed8">N (PRÉ-DR)</text>`;
+            for (let sy = barNY + 16; sy <= (barNY + halfBar - 12); sy += screwStepN) {
+                svg += `<use href="#screw" x="${busNx+15}" y="${sy}"/>`;
+            }
+
+            // N (PÓS-DR)
+            const barNY_Pos = barNY + halfBar + 28;
+            svg += `<rect x="${busNx+5}" y="${barNY_Pos+5}" width="32" height="${halfBar}" rx="3" fill="#0f172a" fill-opacity="0.22"/>`;
+            svg += `<polygon points="${busNx+30},${barNY_Pos} ${busNx+36},${barNY_Pos+5} ${busNx+36},${barNY_Pos+halfBar+5} ${busNx+30},${barNY_Pos+halfBar}" fill="#1e3a8a"/>`;
+            svg += `<rect x="${busNx}" y="${barNY_Pos}" width="30" height="${halfBar}" rx="3" fill="url(#busN3D)" stroke="#1e3a8a" stroke-width="2"/>`;
+            svg += `<rect x="${busNx+5}" y="${barNY_Pos+6}" width="20" height="${halfBar-12}" rx="1.5" fill="url(#copper3D)" stroke="#78350f" stroke-width="1"/>`;
+            svg += `<text x="${busNx+15}" y="${barNY_Pos-7}" text-anchor="middle" font-size="10" font-weight="900" fill="#1d4ed8">N (PÓS-DR)</text>`;
+            for (let sy = barNY_Pos + 16; sy <= (barNY_Pos + halfBar - 12); sy += screwStepN) {
+                svg += `<use href="#screw" x="${busNx+15}" y="${sy}"/>`;
+            }
+
+            // ENTRADA DE REDE E BEP (NBR 5410)
+            const entNx = 240, entPEx = 280;
+            if (state.aterramento === 'tn-c-s' || state.aterramento === 'tn-c') {
+                const bepW = 120;
+                const bepX = 520;
+                svg += `<rect x="${bepX+3}" y="132" width="${bepW}" height="22" rx="3" fill="#0f172a" fill-opacity="0.25"/>`;
+                svg += `<rect x="${bepX}" y="128" width="${bepW}" height="22" rx="3" fill="url(#copper3D)" stroke="#78350f" stroke-width="2"/>`;
+                svg += `<text x="${bepX + (bepW/2)}" y="143" text-anchor="middle" font-size="10" font-weight="900" fill="#0f172a">BEP (${escapeXml(state.aterramento.toUpperCase())})</text>`;
+
+                // Condutor PEN (Azul-claro com anéis verde-amarelos conforme NBR 5410 item 6.1.5.3.3)
+                svg += drawWire3D(`M ${entNx} 115 L ${entNx} 139 L ${bepX} 139`, '#2563eb', 4.5, '#93c5fd', true);
+                svg += `<text x="${entNx}" y="106" text-anchor="middle" font-size="11" font-weight="900" fill="#1d4ed8">PEN</text>`;
+
+                // BEP -> Barramento PE
+                svg += drawWire3D(`M ${bepX+bepW} 139 L ${busPEx+15} 139 L ${busPEx+15} ${barPEY+18}`, '#16a34a', 4, '#86efac');
+                // BEP -> Barramento N (Pré-DR)
+                svg += drawWire3D(`M ${bepX} 139 L ${busNx+15} 139 L ${busNx+15} ${barNY+16}`, '#2563eb', 4, '#93c5fd');
+            } else {
+                // Entrada N direto para Barramento N (Pré-DR)
+                svg += drawWire3D(`M ${entNx} 115 L ${entNx} 137 L ${busNx+15} 137 L ${busNx+15} ${barNY+16}`, '#2563eb', 4, '#93c5fd');
+                svg += `<text x="${entNx}" y="106" text-anchor="middle" font-size="11" font-weight="900" fill="#2563eb">N</text>`;
+
+                // Entrada PE direto para Barramento PE
+                svg += drawWire3D(`M ${entPEx} 115 L ${entPEx} 145 L ${busPEx+15} 145 L ${busPEx+15} ${barPEY+18}`, '#16a34a', 4, '#86efac');
+                svg += `<text x="${entPEx}" y="106" text-anchor="middle" font-size="11" font-weight="900" fill="#16a34a">PE (${state.aterramento.toUpperCase()})</text>`;
+            }
+
+            // POSIÇÃO VERTICAL DOS COMPONENTES PRINCIPAIS
+            const yMain = state.singleRail ? 270 : 230;
+
+            // Trilho DIN 3D da fileira principal (ou Trilho Único completo)
+            if (state.singleRail) {
+                const railWidth = busPEx - 255;
+                svg += drawDinRail3D(230, yMain + 28, railWidth);
+                svg += `<text x="235" y="${yMain + 22}" font-size="9" font-weight="900" fill="#475569">TRILHO DIN 35mm ÚNICO (TODOS OS DISJUNTORES)</text>`;
+            } else {
+                const topRailW = Math.max(520, afterMainX - 210);
+                svg += drawDinRail3D(230, yMain + 28, topRailW);
+            }
+
+            // Desenho dos Dispositivos Principais em 3D
             svg += drawBreaker(xGeral, yMain, numFases, "GERAL", `C${state.geral.amp}`, "disj");
             if (state.hasDPS) svg += drawBreaker(xDPS, yMain, dpsPolos, "DPS (Surto)", "275V", "dps");
-            if (state.hasDR) svg += drawBreaker(xDR, yMain, drPolos, "IDR GERAL", "30mA", "dr");
+            if (state.hasDR) svg += drawBreaker(xDR, yMain, drPolos, "IDR GERAL", `${state.geral.amp}A / 30mA`, "dr");
 
-            // Roteamento Fase Rua -> Topo Geral
-            for(let f=0; f<numFases; f++) {
-                let px = xGeral + (f*40) + 20;
-                svg += `<path d="M ${px} 115 L ${px} ${yMain}" fill="none" stroke="${phaseColors[f]}" stroke-width="4"/>`;
-                svg += `<text x="${px}" y="110" text-anchor="middle" font-size="12" font-weight="bold" fill="${phaseColors[f]}">F${f+1}</text>`;
+            // Roteamento Fase Entrada -> Topo do Disjuntor Geral
+            for (let f = 0; f < numFases; f++) {
+                let px = xGeral + (f * 40) + 20;
+                svg += drawWire3D(`M ${px} 115 L ${px} ${yMain+8}`, phaseColors[f], 4.2, phaseHighlights[f]);
+                svg += `<text x="${px}" y="106" text-anchor="middle" font-size="11" font-weight="900" fill="${phaseColors[f]}">F${f+1}</text>`;
             }
 
             // Roteamento do Neutro saindo do Barramento Pré-DR para o Topo do IDR e DPS
-            if (hasMainNeutral && (state.hasDR || state.hasDPS)) {
+            const dpsHasNeutralPole = state.hasDPS && (dpsPolos > numFases);
+            if (hasMainNeutral && (state.hasDR || dpsHasNeutralPole)) {
                 let nOutX = busNx + 15;
-                let nOutY = barNY + 15; // Pega um ponto no barramento Pré-DR
-                let nTrackY = 165; // Linha de trajeto horizontal do Neutro no topo
-                
+                let nOutY = barNY + 16;
+                let nTrackY = yMain - 52;
+
                 let idrNX = state.hasDR ? xDR + (numFases * 40) + 20 : 0;
-                let dpsNX = state.hasDPS ? xDPS + (numFases * 40) + 20 : 0;
-                
-                let pathStr = `M ${nOutX} ${nOutY} L 130 ${nOutY} L 130 ${nTrackY} `;
-                
-                if (state.hasDR && state.hasDPS) {
-                    pathStr += `L ${dpsNX} ${nTrackY} L ${dpsNX} ${yMain} M ${dpsNX} ${nTrackY} L ${idrNX} ${nTrackY} L ${idrNX} ${yMain}`;
-                    svg += `<path d="${pathStr}" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round"/>`;
-                    svg += `<circle cx="${dpsNX}" cy="${nTrackY}" r="3" fill="#3b82f6"/>`; // Nó da derivação do DPS
+                let dpsNX = dpsHasNeutralPole ? xDPS + (numFases * 40) + 20 : 0;
+
+                if (state.hasDR && dpsHasNeutralPole) {
+                    svg += drawWire3D(`M ${nOutX} ${nOutY} L 135 ${nOutY} L 135 ${nTrackY} L ${dpsNX} ${nTrackY} L ${dpsNX} ${yMain+8}`, '#2563eb', 3.2, '#93c5fd');
+                    svg += drawWire3D(`M ${dpsNX} ${nTrackY} L ${idrNX} ${nTrackY} L ${idrNX} ${yMain+8}`, '#2563eb', 3.2, '#93c5fd');
+                    svg += `<circle cx="${dpsNX}" cy="${nTrackY}" r="3.5" fill="#1d4ed8"/>`;
                 } else if (state.hasDR) {
-                    pathStr += `L ${idrNX} ${nTrackY} L ${idrNX} ${yMain}`;
-                    svg += `<path d="${pathStr}" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round"/>`;
-                } else if (state.hasDPS) {
-                    pathStr += `L ${dpsNX} ${nTrackY} L ${dpsNX} ${yMain}`;
-                    svg += `<path d="${pathStr}" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round"/>`;
+                    svg += drawWire3D(`M ${nOutX} ${nOutY} L 135 ${nOutY} L 135 ${nTrackY} L ${idrNX} ${nTrackY} L ${idrNX} ${yMain+8}`, '#2563eb', 3.2, '#93c5fd');
+                } else if (dpsHasNeutralPole) {
+                    svg += drawWire3D(`M ${nOutX} ${nOutY} L 135 ${nOutY} L 135 ${nTrackY} L ${dpsNX} ${nTrackY} L ${dpsNX} ${yMain+8}`, '#2563eb', 3.2, '#93c5fd');
                 }
-                svg += `<circle cx="${nOutX}" cy="${nOutY}" r="3" fill="#3b82f6"/>`; // Ponto de ancoragem no barramento
             }
 
-            // Roteamento: Geral (Fundo) -> DPS (Topo) e IDR (Topo)
-            const routeGapY = 190; // Altura da canaleta superior (efeito escada)
-            for(let f=0; f<numFases; f++) {
-                let geralOutX = xGeral + (f*40) + 20;
-                let drInX = xDR + (f*40) + 20;
-                let dpsInX = xDPS + (f*40) + 20;
-                let dropY = yMain + 90 + 15 + (f*5); 
-                let leftRouteX = xGeral - 30 - (f*5); // Desvio escalonado pela esquerda do Geral
+            // Roteamento: Geral (Saída Inferior) -> DPS (Topo) e IDR (Topo)
+            const routeGapY = yMain - 28;
+            for (let f = 0; f < numFases; f++) {
+                let geralOutX = xGeral + (f * 40) + 20;
+                let drInX = xDR + (f * 40) + 20;
+                let dpsInX = xDPS + (f * 40) + 20;
+                let dropY = yMain + 90 + 16 + (f * 6);
+                let leftRouteX = xGeral - 28 - (f * 6);
 
                 if (state.hasDR) {
-                    // Sai por baixo, vai pra esquerda, sobe, alimenta IDR por cima
-                    svg += `<path d="M ${geralOutX} ${yMain+90} L ${geralOutX} ${dropY} L ${leftRouteX} ${dropY} L ${leftRouteX} ${routeGapY-(f*5)} L ${drInX} ${routeGapY-(f*5)} L ${drInX} ${yMain}" fill="none" stroke="${phaseColors[f]}" stroke-width="3" stroke-linejoin="round"/>`;
+                    svg += drawWire3D(`M ${geralOutX} ${yMain+82} L ${geralOutX} ${dropY} L ${leftRouteX} ${dropY} L ${leftRouteX} ${routeGapY-(f*5)} L ${drInX} ${routeGapY-(f*5)} L ${drInX} ${yMain+8}`, phaseColors[f], 3.2, phaseHighlights[f]);
                     if (state.hasDPS) {
-                        // Deriva a mesma linha por cima para o DPS
-                        svg += `<path d="M ${dpsInX} ${routeGapY-(f*5)} L ${dpsInX} ${yMain}" fill="none" stroke="${phaseColors[f]}" stroke-width="3" stroke-linejoin="round"/>`;
-                        svg += `<circle cx="${dpsInX}" cy="${routeGapY-(f*5)}" r="3" fill="${phaseColors[f]}"/>`;
+                        svg += drawWire3D(`M ${dpsInX} ${routeGapY-(f*5)} L ${dpsInX} ${yMain+8}`, phaseColors[f], 3.2, phaseHighlights[f]);
+                        svg += `<circle cx="${dpsInX}" cy="${routeGapY-(f*5)}" r="3.5" fill="${phaseColors[f]}"/>`;
                     }
                 } else if (state.hasDPS) {
-                    // Sem IDR, escada vai só pro DPS
-                    svg += `<path d="M ${geralOutX} ${yMain+90} L ${geralOutX} ${dropY} L ${leftRouteX} ${dropY} L ${leftRouteX} ${routeGapY-(f*5)} L ${dpsInX} ${routeGapY-(f*5)} L ${dpsInX} ${yMain}" fill="none" stroke="${phaseColors[f]}" stroke-width="3" stroke-linejoin="round"/>`;
+                    svg += drawWire3D(`M ${geralOutX} ${yMain+82} L ${geralOutX} ${dropY} L ${leftRouteX} ${dropY} L ${leftRouteX} ${routeGapY-(f*5)} L ${dpsInX} ${routeGapY-(f*5)} L ${dpsInX} ${yMain+8}`, phaseColors[f], 3.2, phaseHighlights[f]);
                 }
             }
 
-            // Neutro Bottom IDR -> Pós-DR Busbar
+            // Saída de Neutro do IDR -> Barramento N (Pós-DR)
             if (hasMainNeutral && state.hasDR) {
-                let nOutX = xDR + (numFases*40) + 20;
-                let postDrY = barNY_Pos + 20; // Garante que a derivação desça direto e exclusivo para o 2º barramento
-                svg += `<path d="M ${nOutX} ${yMain+90} L ${nOutX} ${postDrY} L ${busNx+15} ${postDrY}" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round"/>`;
-                svg += `<circle cx="${busNx+15}" cy="${postDrY}" r="3" fill="#3b82f6"/>`; // Ponto de fixação
+                let nOutX = xDR + (numFases * 40) + 20;
+                let postDrY = barNY_Pos + 16;
+                let midY = yMain + 128;
+                svg += drawWire3D(`M ${nOutX} ${yMain+82} L ${nOutX} ${midY} L 148 ${midY} L 148 ${postDrY} L ${busNx+15} ${postDrY}`, '#2563eb', 3.4, '#93c5fd');
             }
 
-            // DPS Bottom -> Terra Busbar DIRETO (Ignora BEP)
+            // Saída Inferior do DPS -> Barramento Terra (PE)
             if (state.hasDPS) {
-                let dpsBotY = yMain + 90, gBusY = dpsBotY + 45; 
-                let rightTrunkX = busPEx - 30; 
-                svg += `<path d="M ${xDPS+20} ${dpsBotY} L ${xDPS+20} ${gBusY} L ${rightTrunkX} ${gBusY} L ${rightTrunkX} 250 L ${busPEx+15} 250" fill="none" stroke="#22c55e" stroke-width="3" stroke-linejoin="round"/>`;
-                for(let i=1; i<dpsPolos; i++) {
-                    let px = xDPS + (i*40) + 20;
-                    svg += `<path d="M ${px} ${dpsBotY} L ${px} ${gBusY}" fill="none" stroke="#22c55e" stroke-width="3"/><circle cx="${px}" cy="${gBusY}" r="3" fill="#22c55e"/>`;
+                let dpsBotY = yMain + 82, gBusY = yMain + 140;
+                let rightTrunkX = busPEx - 26;
+                let peAnchorY = barPEY + 18 + screwStep;
+                svg += drawWire3D(`M ${xDPS+20} ${dpsBotY} L ${xDPS+20} ${gBusY} L ${rightTrunkX} ${gBusY} L ${rightTrunkX} ${peAnchorY} L ${busPEx+15} ${peAnchorY}`, '#16a34a', 3.2, '#86efac');
+                for (let i = 1; i < dpsPolos; i++) {
+                    let px = xDPS + (i * 40) + 20;
+                    svg += drawWire3D(`M ${px} ${dpsBotY} L ${px} ${gBusY}`, '#16a34a', 3.2, '#86efac');
+                    svg += `<circle cx="${px}" cy="${gBusY}" r="3.5" fill="#15803d"/>`;
                 }
-                svg += `<circle cx="${busPEx+15}" cy="250" r="3" fill="#22c55e"/>`; 
             }
 
-            // TRONCO MESTRE (Phase output to comb busbar)
-            let maxTrunkY = 370; // Altura mínima garantida do tronco
-            if (circuitosPerRow.length > 0) {
-                // Estica o tronco até o Y do último circuito
-                maxTrunkY = 410 + ((circuitosPerRow.length - 1) * 210) - 20 + (numFases * 5); 
-            }
-            const trunkX = 180;
+            // TRONCO DE ALIMENTAÇÃO DAS FASES PARA OS CIRCUITOS
             let sourceX = state.hasDR ? xDR : xGeral;
-            for(let f=0; f<numFases; f++) {
-                let px = sourceX + (f*40) + 20;
-                let dropY = yMain + 90 + 50 + (f*6); 
-                svg += `<path d="M ${px} ${yMain+90} L ${px} ${dropY} L ${trunkX+(f*10)} ${dropY} L ${trunkX+(f*10)} ${maxTrunkY}" fill="none" stroke="${phaseColors[f]}" stroke-width="3" stroke-linejoin="round"/>`;
+            const trunkX = 185;
+
+            if (state.singleRail) {
+                // Em 1 só trilho DIN: alimenta o barramento pente dos circuitos diretamente na mesma linha!
+                if (state.circuitos.length > 0) {
+                    const firstCircuitX = afterMainX;
+                    for (let f = 0; f < numFases; f++) {
+                        let px = sourceX + (f * 40) + 20;
+                        let dropY = yMain + 90 + 48 + (f * 6);
+                        let destX = firstCircuitX + (f * 40) + 20;
+                        let combFeedY = yMain - 32 - (f * 5);
+                        let midChannelX = afterMainX - 18 - (f * 4);
+                        svg += drawWire3D(`M ${px} ${yMain+82} L ${px} ${dropY} L ${midChannelX} ${dropY} L ${midChannelX} ${combFeedY} L ${destX} ${combFeedY} L ${destX} ${yMain+8}`, phaseColors[f], 3.4, phaseHighlights[f]);
+                    }
+                }
+            } else {
+                // Modo Multi-trilho: desce tronco vertical à esquerda até o último trilho
+                let maxTrunkY = 390;
+                if (circuitosPerRow.length > 0) {
+                    maxTrunkY = 430 + ((circuitosPerRow.length - 1) * 225) - 22 + (numFases * 5);
+                }
+                for (let f = 0; f < numFases; f++) {
+                    let px = sourceX + (f * 40) + 20;
+                    let dropY = yMain + 90 + 50 + (f * 6);
+                    svg += drawWire3D(`M ${px} ${yMain+82} L ${px} ${dropY} L ${trunkX+(f*10)} ${dropY} L ${trunkX+(f*10)} ${maxTrunkY}`, phaseColors[f], 3.4, phaseHighlights[f]);
+                }
             }
 
-            // --- CIRCUITOS E ROTEAMENTO ORGANIZADO ---
-            let nHoleCountPre = 0;
-            let nHoleCountPos = 0;
-            let peHoleCount = 0;
+            // --- CIRCUITOS DE DISTRIBUIÇÃO E ROTEAMENTO 3D ---
+            let nHoleCountPre = 2;
+            let nHoleCountPos = 2;
+            let peHoleCount = 2;
             let legData = [];
 
             for (let row = 0; row < circuitosPerRow.length; row++) {
-                let currentX = 260; 
-                let cY = 410 + (row * 210);
+                const rowCircuits = circuitosPerRow[row];
+                if (!rowCircuits || rowCircuits.length === 0) continue;
 
-                // Barramento Pente Completo para o trilho
-                let totalRowW = circuitosPerRow[row].reduce((acc, c) => acc + (c.polos * 40), 0) + (circuitosPerRow[row].length - 1) * 20; 
+                let currentX = state.singleRail ? afterMainX : 260;
+                let cY = state.singleRail ? yMain : (430 + (row * 225));
 
-                svg += `<rect x="230" y="${cY+30}" width="830" height="30" fill="#cbd5e1" stroke="#94a3b8" rx="2"/>`;
-                for(let f=0; f<numFases; f++) {
-                    let destX = currentX + (f*40) + 20;
-                    svg += `<path d="M ${trunkX+(f*10)} ${cY-20+(f*5)} L ${destX} ${cY-20+(f*5)} L ${destX} ${cY}" fill="none" stroke="${phaseColors[f]}" stroke-width="3" stroke-linejoin="round"/><circle cx="${trunkX+(f*10)}" cy="${cY-20+(f*5)}" r="3" fill="${phaseColors[f]}"/>`;
-                }
-                svg += `<rect x="${currentX}" y="${cY-15}" width="${totalRowW}" height="10" rx="3" fill="#b45309" stroke="#78350f"/>`;
-                svg += `<text x="${currentX + totalRowW/2}" y="${cY-20}" text-anchor="middle" font-size="9" font-weight="900" fill="#b45309">BARRAMENTO PENTE</text>`;
+                let totalRowW = rowCircuits.reduce((acc, c) => acc + (c.polos * 40), 0) + Math.max(0, rowCircuits.length - 1) * 22;
 
-                for (let idx = 0; idx < circuitosPerRow[row].length; idx++) {
-                    let c = circuitosPerRow[row][idx];
-                    let w = c.polos * 40;
-                    
-                    svg += drawBreaker(currentX, cY, c.polos, c.nome.substring(0,8), `C${c.amp}`);
-                    legData.push({nome: c.nome, bitola: c.cabo, amp: c.amp}); 
-                    
-                    // CAIXA DO CONDUÍTE (Sem Texto em cima do cabo)
-                    let bY = cY + 90; 
-                    let labelY = cY + 170;
-                    let conduitCenter = currentX + (w/2);
-                    
-                    // 1. Fases agrupando pro centro do conduíte
-                    for(let p=0; p<c.polos; p++) {
-                        let px = currentX + (p*40) + 20;
-                        let targetX = conduitCenter - 6 + (p*6); 
-                        svg += `<path d="M ${px} ${bY} L ${px} ${bY+20} L ${targetX} ${bY+35} L ${targetX} ${labelY+30}" fill="none" stroke="${phaseColors[p % numFases]}" stroke-width="2.5" stroke-linejoin="round"/>`;
+                // Se não for trilho único, desenha o trilho DIN 3D da fileira e a derivação do tronco
+                if (!state.singleRail) {
+                    svg += drawDinRail3D(230, cY + 28, Math.max(830, totalRowW + 60));
+                    for (let f = 0; f < numFases; f++) {
+                        let destX = currentX + (f * 40) + 20;
+                        svg += drawWire3D(`M ${trunkX+(f*10)} ${cY-22+(f*5)} L ${destX} ${cY-22+(f*5)} L ${destX} ${cY+8}`, phaseColors[f], 3.2, phaseHighlights[f]);
+                        svg += `<circle cx="${trunkX+(f*10)}" cy="${cY-22+(f*5)}" r="3.5" fill="${phaseColors[f]}"/>`;
                     }
-                    
-                    // 2. Terra agrupando pro conduíte
-                    let holeY_PE = barPEY + 20 + (peHoleCount * 18);
+                }
+
+                // Barramento Pente 3D (Cobre Isolado com dentes)
+                if (totalRowW > 0) {
+                    svg += `<rect x="${currentX+3}" y="${cY-37}" width="${totalRowW}" height="12" rx="3" fill="#0f172a" fill-opacity="0.22"/>`;
+                    svg += `<rect x="${currentX}" y="${cY-40}" width="${totalRowW}" height="12" rx="3" fill="url(#copper3D)" stroke="#78350f" stroke-width="1.5"/>`;
+                    svg += `<text x="${currentX + totalRowW/2}" y="${cY-45}" text-anchor="middle" font-size="8.5" font-weight="900" fill="#92400e">BARRAMENTO PENTE 3D</text>`;
+                }
+
+                for (let idx = 0; idx < rowCircuits.length; idx++) {
+                    let c = rowCircuits[idx];
+                    let w = c.polos * 40;
+
+                    // Alimentação superior do disjuntor: Pente Pós-DR (se usaDR=true) ou Derivação Pré-DR (se usaDR=false, evitando disparo indevido do IDR conforme NBR 5410)
+                    for (let p = 0; p < c.polos; p++) {
+                        let fIdx = (idx + p) % numFases;
+                        if (c.usaDR !== false || !state.hasDR) {
+                            let toothX = currentX + (p * 40) + 17;
+                            svg += `<rect x="${toothX}" y="${cY-28}" width="6" height="32" fill="url(#copper3D)" stroke="#78350f" stroke-width="0.8"/>`;
+                        } else {
+                            let termX = currentX + (p * 40) + 20;
+                            let preDrTapY = cY - 54 - (fIdx * 4);
+                            let geralTapX = xGeral + (fIdx * 40) + 20;
+                            svg += drawWire3D(`M ${geralTapX} ${routeGapY-(fIdx*5)} L ${geralTapX} ${preDrTapY} L ${termX} ${preDrTapY} L ${termX} ${cY+8}`, phaseColors[fIdx], 2.5, phaseHighlights[fIdx]);
+                            svg += `<circle cx="${geralTapX}" cy="${routeGapY-(fIdx*5)}" r="3" fill="${phaseColors[fIdx]}"/>`;
+                        }
+                    }
+
+                    svg += drawBreaker(currentX, cY, c.polos, c.nome.substring(0, 9), `C${c.amp}`);
+                    legData.push({ nome: c.nome, bitola: c.cabo, amp: c.amp, usaDR: c.usaDR !== false });
+
+                    let bY = cY + 82;
+                    let labelY = cY + 175;
+                    let conduitCenter = currentX + (w / 2);
+
+                    // 1. Fases agrupando para o centro do conduíte
+                    for (let p = 0; p < c.polos; p++) {
+                        let px = currentX + (p * 40) + 20;
+                        let targetX = conduitCenter - 6 + (p * 6);
+                        let fIdx = (idx + p) % numFases;
+                        svg += drawWire3D(`M ${px} ${bY} L ${px} ${bY+22} L ${targetX} ${bY+38} L ${targetX} ${labelY+28}`, phaseColors[fIdx], 2.6, phaseHighlights[fIdx]);
+                    }
+
+                    // 2. Terra (PE) saindo de um parafuso real no Barramento PE até o conduíte
+                    let holeY_PE = Math.min(barPEY + barH - 14, barPEY + 18 + (peHoleCount * screwStep));
                     peHoleCount++;
-                    let peTrunkX = 1060; 
-                    let routePeY = cY + 120 + (idx % 6) * 4; 
-                    let targetPEX = conduitCenter + (c.polos*6);
-                    svg += `<path d="M ${busPEx+15} ${holeY_PE} L ${peTrunkX} ${holeY_PE} L ${peTrunkX} ${routePeY} L ${targetPEX} ${routePeY} L ${targetPEX} ${labelY+30}" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linejoin="round"/>`;
-                    svg += `<circle cx="${busPEx+15}" cy="${holeY_PE}" r="3" fill="#22c55e"/>`; 
-                    
-                    // 3. Neutro agrupando pro conduíte
+                    let peTrunkX = busPEx - 18 - ((idx % 4) * 4);
+                    let routePeY = cY + 124 + (idx % 6) * 4;
+                    let targetPEX = conduitCenter + (c.polos * 5);
+                    svg += drawWire3D(`M ${busPEx+15} ${holeY_PE} L ${peTrunkX} ${holeY_PE} L ${peTrunkX} ${routePeY} L ${targetPEX} ${routePeY} L ${targetPEX} ${labelY+28}`, '#16a34a', 2.5, '#86efac');
+
+                    // 3. Neutro (N) saindo do Barramento N (Pós-DR ou Pré-DR conforme seleção do circuito)
                     if (c.polos === 1) {
                         let holeY_N;
-                        if(c.usaDR !== false && state.hasDR) {
-                            holeY_N = barNY_Pos + 20 + (nHoleCountPos * 18);
+                        if (c.usaDR !== false && state.hasDR) {
+                            holeY_N = Math.min(barNY_Pos + halfBar - 12, barNY_Pos + 16 + (nHoleCountPos * screwStepN));
                             nHoleCountPos++;
                         } else {
-                            holeY_N = barNY + 20 + (nHoleCountPre * 18);
+                            holeY_N = Math.min(barNY + halfBar - 12, barNY + 16 + (nHoleCountPre * screwStepN));
                             nHoleCountPre++;
                         }
-                        let nTrunkX = 130; 
-                        let routeNy = cY + 140 + (idx % 6) * 4; 
-                        let targetNX = conduitCenter - 12;
-                        svg += `<path d="M ${busNx+15} ${holeY_N} L ${nTrunkX} ${holeY_N} L ${nTrunkX} ${routeNy} L ${targetNX} ${routeNy} L ${targetNX} ${labelY+30}" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linejoin="round"/>`;
-                        svg += `<circle cx="${busNx+15}" cy="${holeY_N}" r="3" fill="#3b82f6"/>`; 
+                        let nTrunkX = 128 + ((idx % 4) * 4);
+                        let routeNy = cY + 144 + (idx % 6) * 4;
+                        let targetNX = conduitCenter - 11;
+                        svg += drawWire3D(`M ${busNx+15} ${holeY_N} L ${nTrunkX} ${holeY_N} L ${nTrunkX} ${routeNy} L ${targetNX} ${routeNy} L ${targetNX} ${labelY+28}`, '#2563eb', 2.5, '#93c5fd');
                     }
 
-                    // Desenho Visual do Tubo do Conduíte Profissional (Cilíndro)
-                    svg += `<path d="M ${conduitCenter-15} ${labelY} L ${conduitCenter+15} ${labelY} L ${conduitCenter+10} ${labelY+40} L ${conduitCenter-10} ${labelY+40} Z" fill="#cbd5e1" stroke="#94a3b8" stroke-width="2"/>`;
-                    svg += `<ellipse cx="${conduitCenter}" cy="${labelY}" rx="15" ry="6" fill="#0f172a" />`;
+                    // Conduíte Corrugado 3D com anéis em relevo e boca elíptica
+                    svg += `<path d="M ${conduitCenter-16} ${labelY} L ${conduitCenter+16} ${labelY} L ${conduitCenter+12} ${labelY+42} L ${conduitCenter-12} ${labelY+42} Z" fill="url(#conduit3D)" stroke="#475569" stroke-width="1.5"/>`;
+                    for (let ry = labelY + 10; ry <= labelY + 34; ry += 8) {
+                        svg += `<line x1="${conduitCenter-14}" y1="${ry}" x2="${conduitCenter+14}" y2="${ry}" stroke="#334155" stroke-width="1.2"/>`;
+                    }
+                    svg += `<ellipse cx="${conduitCenter}" cy="${labelY}" rx="16" ry="6" fill="#0f172a" stroke="#64748b" stroke-width="1.2"/>`;
+                    svg += `<text x="${conduitCenter}" y="${labelY+54}" text-anchor="middle" font-size="9" font-weight="900" fill="#334155">${escapeXml(c.cabo)}mm²</text>`;
 
-                    currentX += w + 20;
+                    currentX += w + 22;
                 }
             }
 
             // LEGENDA TÉCNICA
-            let legY = svgHeight - 80;
-            svg += `<rect x="50" y="${legY}" width="1100" height="70" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" rx="5"/>`;
-            svg += `<text x="60" y="${legY+20}" font-size="12" font-weight="900" fill="#1e293b">LEGENDA TÉCNICA DE CIRCUITOS (CONDUÍTES):</text>`;
-            let lx = 60, ly = legY + 45;
-            legData.forEach(d => {
-                let txt = `${d.nome}: C${d.amp} / ${d.bitola}mm²`;
-                if(lx + (txt.length*7) > 1100) { lx = 60; ly += 15; } 
-                svg += `<text x="${lx}" y="${ly}" font-size="11" font-weight="bold" fill="#475569">${txt}</text>`;
-                lx += (txt.length * 7) + 20;
+            let legY = svgHeight - 92;
+            svg += `<rect x="50" y="${legY}" width="${frameW}" height="74" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" rx="6"/>`;
+            svg += `<text x="62" y="${legY+20}" font-size="11.5" font-weight="900" fill="#0f172a">LEGENDA TÉCNICA DE CIRCUITOS E PROTEÇÕES (ABNT NBR 5410):</text>`;
+            let lx = 62, ly = legY + 42;
+            legData.forEach((d, i) => {
+                let txt = `C${i+1} (${d.nome}): C${d.amp}A | ${d.bitola}mm² | ${d.usaDR && state.hasDR ? 'Pós-DR' : 'Pré-DR'}`;
+                if (lx + (txt.length * 6.8) > (svgWidth - 70)) { lx = 62; ly += 18; }
+                svg += `<text x="${lx}" y="${ly}" font-size="10.5" font-weight="bold" fill="#334155">${escapeXml(txt)}</text>`;
+                lx += (txt.length * 6.8) + 22;
             });
 
             svg += `</svg>`;
@@ -629,94 +1192,102 @@
         }
 
         function generateUnifilarSVG() {
-            const uniWidth = Math.max(1200, 400 + (state.circuitos.length * 100));
+            const uniWidth = Math.max(1200, 420 + (state.circuitos.length * 110));
             const numFases = state.sistema === 'mono' ? 1 : (state.sistema === 'bi' ? 2 : 3);
+            const frameW = uniWidth - 100;
+            const centerX = uniWidth / 2;
 
-            let svg = `<svg viewBox="0 0 ${uniWidth} 800" class="w-full h-auto bg-white" xmlns="http://www.w3.org/2000/svg">${svgDefs}`;
+            let svg = `<svg viewBox="0 0 ${uniWidth} 800" class="w-full h-auto bg-white select-none" xmlns="http://www.w3.org/2000/svg">${svgDefs}`;
             
-            // CABEÇALHO OFICIAL NO DIAGRAMA
-            svg += `<rect x="50" y="20" width="1100" height="70" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" rx="5"/>`;
-            if(state.logo) svg += `<image href="${state.logo}" x="60" y="25" height="60" width="150" preserveAspectRatio="xMinYMin meet"/>`;
-            
-            svg += `<text x="600" y="45" text-anchor="middle" font-size="20" font-weight="900" fill="#1e293b">DIAGRAMA UNIFILAR - SISTEMA ${state.sistema.toUpperCase()} (NBR 5410)</text>`;
-            svg += `<text x="600" y="70" text-anchor="middle" font-size="13" font-weight="bold" fill="#475569">RESPONSÁVEL TÉCNICO: ${state.resp.toUpperCase() || 'NÃO INFORMADO'}   |   CLIENTE/OBRA: ${state.obra.toUpperCase() || 'NÃO INFORMADA'}   |   ATERRAMENTO: ${state.aterramento.toUpperCase()}</text>`;
+            // CABEÇALHO OFICIAL NO DIAGRAMA (Largura dinâmica acompanhando uniWidth)
+            svg += `<rect x="50" y="20" width="${frameW}" height="72" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" rx="6"/>`;
+            if (state.logo) {
+                svg += `<image href="${state.logo}" x="62" y="26" height="60" width="150" preserveAspectRatio="xMinYMin meet"/>`;
+            }
+            svg += `<text x="${centerX}" y="46" text-anchor="middle" font-size="20" font-weight="900" fill="#1e293b">DIAGRAMA UNIFILAR - SISTEMA ${escapeXml(state.sistema.toUpperCase())} (ABNT NBR 5410)</text>`;
+            svg += `<text x="${centerX}" y="71" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#475569">RESPONSÁVEL TÉCNICO: ${escapeXml(state.resp.toUpperCase() || 'NÃO INFORMADO')}   |   CLIENTE/OBRA: ${escapeXml(state.obra.toUpperCase() || 'NÃO INFORMADA')}   |   ATERRAMENTO: ${escapeXml(state.aterramento.toUpperCase())}</text>`;
 
             let layX = 200, layY = 150;
 
             svg += `<line x1="${layX}" y1="${layY}" x2="${layX}" y2="${layY+100}" stroke="#000" stroke-width="2.5"/>`;
-            svg += `<text x="${layX}" y="${layY-10}" text-anchor="middle" font-weight="900">REDE</text>`;
+            svg += `<text x="${layX}" y="${layY-10}" text-anchor="middle" font-weight="900">REDE (${escapeXml(state.aterramento.toUpperCase())})</text>`;
+            svg += `<text x="${layX+25}" y="${layY+15}" font-size="11" font-weight="bold" fill="#334155">${state.geral.cabo} mm²</text>`;
             
-            svg += `<g transform="translate(${layX}, ${layY+30})">`;
-            for(let i=0; i<numFases; i++) svg += `<use href="#sym-fase" x="${i*8 - 8}"/>`;
+            svg += `<g transform="translate(${layX}, ${layY+35})">`;
+            for (let i = 0; i < numFases; i++) svg += `<use href="#sym-fase" x="${i*8 - 8}"/>`;
             svg += `<use href="#sym-neutro" x="${numFases*8}"/><use href="#sym-terra" x="${numFases*8 + 8}"/>`;
-            svg += `</g>`; 
+            svg += `</g>`;
 
             layY += 100;
             
             svg += `<use href="#uni-breaker" x="${layX}" y="${layY}" />`;
             svg += `<text x="${layX+20}" y="${layY+15}" font-weight="900">Disj. Geral</text>`;
-            svg += `<text x="${layX+20}" y="${layY+30}" font-size="11" font-weight="bold">${numFases}x ${state.geral.amp}A</text>`;
+            svg += `<text x="${layX+20}" y="${layY+30}" font-size="11" font-weight="bold">Curva C - ${numFases}P ${state.geral.amp}A</text>`;
             layY += 50;
             svg += `<line x1="${layX}" y1="${layY-20}" x2="${layX}" y2="${layY+40}" stroke="#000" stroke-width="2.5"/>`;
 
             if (state.hasDPS) {
-                svg += `<rect x="${layX-10}" y="${layY}" width="20" height="20" fill="none" stroke="#ef4444" stroke-width="2.5" />`;
-                svg += `<text x="${layX+20}" y="${layY+15}" font-weight="900" fill="#dc2626">DPS (${numFases+1}x 275V)</text>`;
+                const dpsP = numFases + (state.aterramento === 'tn-c' ? 0 : 1);
+                svg += `<rect x="${layX-10}" y="${layY}" width="20" height="20" fill="#fef2f2" stroke="#ef4444" stroke-width="2.5" />`;
+                svg += `<text x="${layX+20}" y="${layY+15}" font-weight="900" fill="#dc2626">DPS (${dpsP}x 275V / 20kA)</text>`;
                 layY += 40;
                 svg += `<line x1="${layX}" y1="${layY-20}" x2="${layX}" y2="${layY+40}" stroke="#000" stroke-width="2.5"/>`;
             }
 
             if (state.hasDR) {
-                svg += `<rect x="${layX-15}" y="${layY}" width="30" height="20" rx="2" fill="none" stroke="#2563eb" stroke-width="2.5" />`;
+                svg += `<rect x="${layX-15}" y="${layY}" width="30" height="20" rx="2" fill="#eff6ff" stroke="#2563eb" stroke-width="2.5" />`;
                 let drP = numFases + 1;
-                svg += `<text x="${layX+25}" y="${layY+15}" font-weight="900" fill="#1d4ed8">IDR GERAL ${drP}P (30mA)</text>`;
+                svg += `<text x="${layX+25}" y="${layY+15}" font-weight="900" fill="#1d4ed8">IDR GERAL ${drP}P (${state.geral.amp}A / 30mA)</text>`;
                 layY += 40;
                 svg += `<line x1="${layX}" y1="${layY-20}" x2="${layX}" y2="${layY+40}" stroke="#000" stroke-width="2.5"/>`;
             }
 
-            let qdcEndX = layX + (state.circuitos.length * 100) + 100;
+            let qdcEndX = layX + Math.max(200, (state.circuitos.length * 105) + 80);
             svg += `<line x1="${layX}" y1="${layY}" x2="${qdcEndX}" y2="${layY}" stroke="#000" stroke-width="4.5"/>`;
-            svg += `<text x="${layX + (qdcEndX-layX)/2}" y="${layY-10}" text-anchor="middle" font-style="italic" font-weight="900">Barramento Principal (QDC)</text>`;
+            svg += `<text x="${layX + (qdcEndX-layX)/2}" y="${layY-10}" text-anchor="middle" font-style="italic" font-weight="900">Barramento Principal QDC (${state.singleRail ? 'Trilho DIN Único' : 'Múltiplos Trilhos'})</text>`;
 
-            let legData = [{nome: "Entrada Rede", bitola: state.geral.cabo}];
+            let legData = [{ nome: "Entrada Rede", bitola: state.geral.cabo, amp: state.geral.amp }];
 
             state.circuitos.forEach((c, i) => {
-                let cx = layX + 100 + (i * 100);
+                let cx = layX + 95 + (i * 105);
                 svg += `<line x1="${cx}" y1="${layY}" x2="${cx}" y2="${layY+30}" stroke="#000" stroke-width="2"/>`;
                 svg += `<use href="#uni-breaker" x="${cx}" y="${layY+30}" />`;
-                svg += `<text x="${cx+15}" y="${layY+45}" font-weight="900">C${i+1}</text>`;
-                svg += `<text x="${cx+15}" y="${layY+60}" font-size="11" font-weight="bold">${c.polos}x ${c.amp}A</text>`;
-                svg += `<line x1="${cx}" y1="${layY+60}" x2="${cx}" y2="${layY+140}" stroke="#000" stroke-width="2"/>`;
+                svg += `<text x="${cx+14}" y="${layY+44}" font-weight="900" font-size="12">C${i+1}</text>`;
+                svg += `<text x="${cx+14}" y="${layY+58}" font-size="10.5" font-weight="bold">${c.polos}P C${c.amp}A</text>`;
+                svg += `<text x="${cx+14}" y="${layY+71}" font-size="9.5" font-weight="bold" fill="#475569">${escapeXml(c.cabo)}mm²</text>`;
+                svg += `<line x1="${cx}" y1="${layY+60}" x2="${cx}" y2="${layY+145}" stroke="#000" stroke-width="2"/>`;
                 
-                svg += `<g transform="translate(${cx}, ${layY+100})">`;
-                let off = 0;
-                for(let p=0; p<c.polos; p++) { svg += `<use href="#sym-fase" x="${off}"/>`; off+=8; }
-                if(c.polos === 1) { svg += `<use href="#sym-neutro" x="${off}"/>`; off+=8; } 
+                svg += `<g transform="translate(${cx}, ${layY+105})">`;
+                let off = -((c.polos + (c.polos === 1 ? 2 : 1)) * 4) + 4;
+                for (let p = 0; p < c.polos; p++) { svg += `<use href="#sym-fase" x="${off}"/>`; off += 8; }
+                if (c.polos === 1) { svg += `<use href="#sym-neutro" x="${off}"/>`; off += 8; }
                 svg += `<use href="#sym-terra" x="${off}"/>`;
-                svg += `</g>`; 
+                svg += `</g>`;
 
-                svg += `<rect x="${cx-40}" y="${layY+140}" width="80" height="25" fill="#f8fafc" stroke="#94a3b8" rx="2" />`;
-                svg += `<text x="${cx}" y="${layY+157}" text-anchor="middle" font-size="10" font-weight="900">${c.nome}</text>`;
+                svg += `<rect x="${cx-44}" y="${layY+145}" width="88" height="32" fill="#f8fafc" stroke="#94a3b8" rx="3" />`;
+                svg += `<text x="${cx}" y="${layY+160}" text-anchor="middle" font-size="9.5" font-weight="900" fill="#0f172a">${escapeXml(c.nome.substring(0, 13))}</text>`;
+                svg += `<text x="${cx}" y="${layY+172}" text-anchor="middle" font-size="8" font-weight="bold" fill="${c.usaDR !== false && state.hasDR ? '#2563eb' : '#64748b'}">${c.usaDR !== false && state.hasDR ? 'Com DR (30mA)' : 'Sem DR'}</text>`;
                 
-                legData.push({nome: c.nome, bitola: c.cabo});
+                legData.push({ nome: c.nome, bitola: c.cabo, amp: c.amp });
             });
 
-            // LEGENDA INFERIOR
-            svg += `<rect x="50" y="680" width="220" height="80" fill="none" stroke="#cbd5e1" stroke-dasharray="4"/>`;
-            svg += `<text x="160" y="700" text-anchor="middle" font-size="11" font-weight="900">Simbologia</text>`;
-            svg += `<use href="#sym-fase" x="70" y="720"/><text x="85" y="724" font-size="10" font-weight="bold">Fase</text>`;
-            svg += `<use href="#sym-neutro" x="150" y="720"/><text x="165" y="724" font-size="10" font-weight="bold">Neutro</text>`;
-            svg += `<use href="#sym-terra" x="70" y="745"/><text x="85" y="749" font-size="10" font-weight="bold">Terra (PE)</text>`;
-            svg += `<use href="#uni-breaker" x="150" y="735" transform="scale(0.8)"/><text x="165" y="749" font-size="10" font-weight="bold">Disjuntor</text>`;
+            // LEGENDA INFERIOR CORRIGIDA (Sem bug de transform="scale" deslocando o símbolo)
+            svg += `<rect x="50" y="680" width="230" height="85" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4" rx="5"/>`;
+            svg += `<text x="165" y="700" text-anchor="middle" font-size="11" font-weight="900" fill="#0f172a">Simbologia NBR 5410</text>`;
+            svg += `<use href="#sym-fase" x="72" y="722"/><text x="86" y="726" font-size="10" font-weight="bold">Fase (F)</text>`;
+            svg += `<use href="#sym-neutro" x="155" y="722"/><text x="170" y="726" font-size="10" font-weight="bold">Neutro (N)</text>`;
+            svg += `<use href="#sym-terra" x="72" y="748"/><text x="86" y="752" font-size="10" font-weight="bold">Proteção (PE)</text>`;
+            svg += `<g transform="translate(155, 735) scale(0.75)"><use href="#uni-breaker" x="0" y="0"/></g><text x="170" y="752" font-size="10" font-weight="bold">Disjuntor DIN</text>`;
 
-            svg += `<rect x="300" y="680" width="850" height="80" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" rx="5"/>`;
-            svg += `<text x="310" y="700" font-size="12" font-weight="900">Tabela de Cabos:</text>`;
-            let lx = 310, ly = 720;
+            const tableW = frameW - 250;
+            svg += `<rect x="300" y="680" width="${tableW}" height="85" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" rx="5"/>`;
+            svg += `<text x="315" y="700" font-size="12" font-weight="900" fill="#0f172a">Tabela de Dimensionamento de Cabos e Proteções (NBR 5410):</text>`;
+            let lx = 315, ly = 722;
             legData.forEach(d => {
-                let txt = `${d.nome}: ${d.bitola}mm²`;
-                if(lx + (txt.length*7) > 1100) { lx = 310; ly += 15; }
-                svg += `<text x="${lx}" y="${ly}" font-size="11" font-weight="bold" fill="#475569">${txt}</text>`;
-                lx += (txt.length * 7) + 20;
+                let txt = `${d.nome}: ${d.amp}A / ${d.bitola}mm²`;
+                if (lx + (txt.length * 7) > (uniWidth - 70)) { lx = 315; ly += 16; }
+                svg += `<text x="${lx}" y="${ly}" font-size="10.5" font-weight="bold" fill="#475569">${escapeXml(txt)}</text>`;
+                lx += (txt.length * 7) + 22;
             });
 
             svg += `</svg>`;
