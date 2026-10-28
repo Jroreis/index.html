@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -59,30 +60,58 @@
 
     <div id="ui-wrapper" class="w-full flex flex-col items-center p-4">
         
-        <header class="w-full max-w-6xl flex flex-wrap justify-between items-center gap-3 mb-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-            <div>
-                <div class="flex items-center gap-2">
-                    <h1 class="text-2xl font-bold text-slate-800">QDC Pro Generator</h1>
-                    <span class="bg-blue-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-wider shadow-sm">3D CAD • NBR 5410</span>
+        <header class="w-full max-w-6xl flex flex-wrap justify-between items-center gap-4 mb-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+            <div class="flex items-center gap-3.5">
+                <!-- Quadro Padrão da Foto / Logo da Empresa ou Usuário (Proporção 4:3 fixa, sem achatar) -->
+                <label for="logo-upload" title="Clique para enviar ou alterar a foto/logomarca" class="cursor-pointer group relative w-20 h-16 rounded-lg border-2 border-slate-200 hover:border-blue-500 bg-slate-50 flex items-center justify-center overflow-hidden shadow-sm transition-all shrink-0">
+                    <img id="header-logo-preview" src="" alt="Logo" class="hidden w-full h-full object-contain p-1 bg-white" />
+                    <div id="header-logo-placeholder" class="flex flex-col items-center justify-center text-slate-400 group-hover:text-blue-600 transition-colors">
+                        <svg class="w-6 h-6 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span class="text-[9px] font-bold uppercase tracking-tight">Foto / Logo</span>
+                    </div>
+                </label>
+                <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h1 class="text-2xl font-black text-slate-800 tracking-tight">QDC Pro Generator</h1>
+                        <span class="bg-blue-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-wider shadow-sm">3D CAD • NBR 5410</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-500 font-medium">Desenho Físico 3D Inteligente e Diagrama Unifilar (ABNT NBR 5410)</p>
                 </div>
-                <p class="text-sm text-slate-500">Desenho Físico 3D Inteligente e Diagrama Unifilar (ABNT NBR 5410)</p>
             </div>
-            <div class="flex gap-2">
-                <button onclick="installPWA()" id="btn-install" class="hidden bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-5 rounded-lg shadow-sm flex items-center transition-colors">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    Instalar App
-                </button>
-                <button onclick="exportPDF()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-5 rounded-lg shadow-sm flex items-center transition-colors">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    Exportar PDF
-                </button>
+
+            <!-- Identificação do Engenheiro/Eletricista e da Obra no Cabeçalho -->
+            <div class="flex flex-wrap items-center gap-3 ml-auto">
+                <div class="flex flex-wrap items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs">
+                    <div class="pr-2.5 border-r border-slate-200">
+                        <span class="block text-[9px] font-extrabold uppercase text-blue-600 tracking-wider">Engenheiro / Eletricista</span>
+                        <span id="header-resp-display" class="font-bold text-slate-800 text-xs">Não informado</span>
+                    </div>
+                    <div class="pl-1">
+                        <span class="block text-[9px] font-extrabold uppercase text-emerald-600 tracking-wider">Obra / Cliente</span>
+                        <span id="header-obra-display" class="font-bold text-slate-800 text-xs">Não informada</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button onclick="installPWA()" id="btn-install" class="hidden bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-4 rounded-lg shadow-sm flex items-center text-sm transition-colors">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Instalar App
+                    </button>
+                    <button onclick="exportPDF()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm flex items-center text-sm transition-colors">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Exportar PDF
+                    </button>
+                </div>
             </div>
         </header>
 
         <div class="w-full max-w-6xl bg-white p-5 rounded-xl shadow-md flex flex-col gap-4 border border-slate-200 mb-6">
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4 pb-4 border-b border-slate-100">
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Logomarca (PDF)</label>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase">Foto / Logo (Padrão)</label>
+                        <button type="button" id="btn-clear-logo" onclick="clearLogo()" class="hidden text-[10px] font-bold text-red-500 hover:text-red-700">Remover</button>
+                    </div>
                     <input type="file" id="logo-upload" accept="image/*" onchange="handleLogoUpload(event)" class="w-full text-xs border-slate-300 rounded border p-1.5 bg-slate-50 outline-none">
                 </div>
                 <div>
@@ -474,12 +503,78 @@
             document.getElementById('single-rail').checked = Boolean(state.singleRail);
         }
 
+        // Normaliza qualquer foto/logomarca para um quadro padrão 4:3 (360x270) mantendo 100% da proporção original (sem achatar!)
         function handleLogoUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = (e) => { state.logo = e.target.result; renderApp(); };
+            reader.onload = (e) => {
+                const rawDataUrl = e.target.result;
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        const targetW = 360;
+                        const targetH = 270;
+                        const canvas = document.createElement('canvas');
+                        canvas.width = targetW;
+                        canvas.height = targetH;
+                        const ctx = canvas.getContext('2d');
+                        ctx.clearRect(0, 0, targetW, targetH);
+
+                        const scale = Math.min((targetW - 16) / Math.max(1, img.width), (targetH - 16) / Math.max(1, img.height));
+                        const drawW = img.width * scale;
+                        const drawH = img.height * scale;
+                        const offsetX = (targetW - drawW) / 2;
+                        const offsetY = (targetH - drawH) / 2;
+
+                        ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+                        state.logo = canvas.toDataURL('image/png');
+                    } catch (err) {
+                        state.logo = rawDataUrl;
+                    }
+                    renderApp();
+                };
+                img.onerror = () => {
+                    state.logo = rawDataUrl;
+                    renderApp();
+                };
+                img.src = rawDataUrl;
+            };
             reader.readAsDataURL(file);
+        }
+
+        function clearLogo() {
+            state.logo = null;
+            const input = document.getElementById('logo-upload');
+            if (input) input.value = '';
+            renderApp();
+        }
+
+        function updateHeaderIdentityUI() {
+            const respEl = document.getElementById('header-resp-display');
+            const obraEl = document.getElementById('header-obra-display');
+            const previewImg = document.getElementById('header-logo-preview');
+            const placeholder = document.getElementById('header-logo-placeholder');
+            const clearBtn = document.getElementById('btn-clear-logo');
+
+            if (respEl) respEl.textContent = state.resp.trim() ? state.resp.trim() : 'Não informado';
+            if (obraEl) obraEl.textContent = state.obra.trim() ? state.obra.trim() : 'Não informada';
+
+            if (state.logo) {
+                if (previewImg) {
+                    previewImg.src = state.logo;
+                    previewImg.classList.remove('hidden');
+                }
+                if (placeholder) placeholder.classList.add('hidden');
+                if (clearBtn) clearBtn.classList.remove('hidden');
+            } else {
+                if (previewImg) {
+                    previewImg.src = '';
+                    previewImg.classList.add('hidden');
+                }
+                if (placeholder) placeholder.classList.remove('hidden');
+                if (clearBtn) clearBtn.classList.add('hidden');
+            }
         }
 
         function set3DPreset(rx, ry, sc) {
@@ -515,11 +610,67 @@
             clearTimeout(renderTimeout);
             renderTimeout = setTimeout(() => {
                 _syncStateFromForm();
+                updateHeaderIdentityUI();
                 _renderUI();
                 _renderNBRStatus();
                 switchTab(state.currentTab);
                 saveState();
             }, 60);
+        }
+
+        // Cabeçalho Técnico Padrão ABNT (Físico 3D e Unifilar) com Foto/Logo proporcional (sem achatar) e Identificação Destacada
+        function drawTechnicalHeaderSVG(svgWidth, mainTitle, badgeText) {
+            const frameW = svgWidth - 100;
+            const logoBoxW = 112;
+            const logoBoxH = 84;
+            const rightCardsW = 410;
+            const centerAreaX = 50 + logoBoxW + 24;
+            const centerAreaW = Math.max(300, frameW - logoBoxW - rightCardsW - 44);
+            const respText = state.resp.trim() ? state.resp.trim().toUpperCase() : 'NÃO INFORMADO';
+            const obraText = state.obra.trim() ? state.obra.trim().toUpperCase() : 'NÃO INFORMADA';
+            const sysLabel = state.sistema === 'mono' ? 'MONOFÁSICO (1F+N)' : (state.sistema === 'bi' ? 'BIFÁSICO (2F+N)' : 'TRIFÁSICO (3F+N)');
+
+            let h = `<g>`;
+            // Sombra e Moldura Principal do Cabeçalho
+            h += `<rect x="54" y="16" width="${frameW}" height="92" fill="#0f172a" fill-opacity="0.08" rx="8"/>`;
+            h += `<rect x="50" y="12" width="${frameW}" height="92" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" rx="8"/>`;
+            h += `<rect x="50" y="12" width="8" height="92" fill="#2563eb" rx="4"/>`;
+
+            // 1. Quadro Padrão 4:3 da Foto / Logomarca da Empresa ou Profissional (Esquerda)
+            h += `<rect x="66" y="16" width="${logoBoxW}" height="${logoBoxH}" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" rx="6"/>`;
+            if (state.logo) {
+                h += `<image href="${state.logo}" x="70" y="19" width="${logoBoxW - 8}" height="${logoBoxH - 6}" preserveAspectRatio="xMidYMid meet"/>`;
+            } else {
+                h += `<rect x="92" y="28" width="60" height="40" rx="4" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="3,2"/>`;
+                h += `<text x="${66 + logoBoxW/2}" y="51" text-anchor="middle" font-size="9" font-weight="900" fill="#64748b">FOTO / LOGO</text>`;
+                h += `<text x="${66 + logoBoxW/2}" y="84" text-anchor="middle" font-size="8" font-weight="700" fill="#94a3b8">TAMANHO PADRÃO</text>`;
+            }
+
+            // 2. Bloco Central: Título do Projeto e Parâmetros Normativos
+            h += `<rect x="${centerAreaX}" y="20" width="145" height="18" rx="4" fill="#dbeafe"/>`;
+            h += `<text x="${centerAreaX + 72.5}" y="32.5" text-anchor="middle" font-size="9.5" font-weight="900" fill="#1d4ed8">${escapeXml(badgeText)}</text>`;
+            h += `<text x="${centerAreaX}" y="58" font-size="18.5" font-weight="900" fill="#0f172a">${escapeXml(mainTitle)}</text>`;
+            h += `<text x="${centerAreaX}" y="79" font-size="11" font-weight="700" fill="#475569">SISTEMA: ${escapeXml(sysLabel)}   •   ATERRAMENTO: ${escapeXml(state.aterramento.toUpperCase())}   •   GERAL: ${state.geral.amp}A (${state.geral.cabo}mm²)</text>`;
+            h += `<text x="${centerAreaX}" y="95" font-size="9.5" font-weight="800" fill="#2563eb">PROJETO ELÉTRICO CONFORME NORMA ABNT NBR 5410</text>`;
+
+            // 3. Cartões de Identificação (Direita): Engenheiro/Eletricista e Obra/Cliente
+            const rightX = 50 + frameW - rightCardsW - 10;
+            const cardW = rightCardsW;
+
+            // Cartão Responsável Técnico (Engenheiro / Eletricista)
+            h += `<rect x="${rightX}" y="18" width="${cardW}" height="38" rx="5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>`;
+            h += `<rect x="${rightX}" y="18" width="5" height="38" rx="2.5" fill="#2563eb"/>`;
+            h += `<text x="${rightX + 14}" y="31" font-size="8.5" font-weight="900" fill="#2563eb">ENGENHEIRO / ELETRICISTA RESPONSÁVEL:</text>`;
+            h += `<text x="${rightX + 14}" y="47" font-size="12" font-weight="900" fill="#0f172a">${escapeXml(respText.substring(0, 42))}</text>`;
+
+            // Cartão Obra / Cliente
+            h += `<rect x="${rightX}" y="60" width="${cardW}" height="38" rx="5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>`;
+            h += `<rect x="${rightX}" y="60" width="5" height="38" rx="2.5" fill="#16a34a"/>`;
+            h += `<text x="${rightX + 14}" y="73" font-size="8.5" font-weight="900" fill="#15803d">IDENTIFICAÇÃO DA OBRA / CLIENTE:</text>`;
+            h += `<text x="${rightX + 14}" y="89" font-size="12" font-weight="900" fill="#0f172a">${escapeXml(obraText.substring(0, 42))}</text>`;
+
+            h += `</g>`;
+            return h;
         }
 
         function _syncStateFromForm() {
@@ -865,15 +1016,13 @@
 
             let svg = `<svg viewBox="0 0 ${svgWidth} ${svgHeight}" class="w-full h-auto bg-white select-none" xmlns="http://www.w3.org/2000/svg">${svgDefs}`;
 
-            // CABEÇALHO OFICIAL
+            // CABEÇALHO TÉCNICO OFICIAL REPAGINADO
             const frameW = svgWidth - 100;
-            const centerX = svgWidth / 2;
-            svg += `<rect x="50" y="20" width="${frameW}" height="72" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" rx="6"/>`;
-            if (state.logo) {
-                svg += `<image href="${state.logo}" x="62" y="26" height="60" width="150" preserveAspectRatio="xMinYMin meet"/>`;
-            }
-            svg += `<text x="${centerX}" y="46" text-anchor="middle" font-size="20" font-weight="900" fill="#0f172a">QUADRO DE DISTRIBUIÇÃO 3D - SISTEMA ${escapeXml(state.sistema.toUpperCase())} (${state.singleRail ? 'TRILHO DIN ÚNICO' : 'FÍSICO NBR 5410'})</text>`;
-            svg += `<text x="${centerX}" y="71" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#475569">RESPONSÁVEL TÉCNICO: ${escapeXml(state.resp.toUpperCase() || 'NÃO INFORMADO')}   |   CLIENTE/OBRA: ${escapeXml(state.obra.toUpperCase() || 'NÃO INFORMADA')}   |   ATERRAMENTO: ${escapeXml(state.aterramento.toUpperCase())}</text>`;
+            svg += drawTechnicalHeaderSVG(
+                svgWidth,
+                `QUADRO DE DISTRIBUIÇÃO 3D (${state.singleRail ? 'TRILHO DIN ÚNICO' : 'ESQUEMA FÍSICO'})`,
+                'PROJETO FÍSICO 3D'
+            );
 
             // CAIXA DO QDC EM 3D (Gabinete com bordas chanfradas e fundo em relevo)
             const qHeight = svgHeight - 230;
@@ -938,8 +1087,8 @@
                 svg += `<text x="${bepX + (bepW/2)}" y="143" text-anchor="middle" font-size="10" font-weight="900" fill="#0f172a">BEP (${escapeXml(state.aterramento.toUpperCase())})</text>`;
 
                 // Condutor PEN (Azul-claro com anéis verde-amarelos conforme NBR 5410 item 6.1.5.3.3)
-                svg += drawWire3D(`M ${entNx} 115 L ${entNx} 139 L ${bepX} 139`, '#2563eb', 4.5, '#93c5fd', true);
-                svg += `<text x="${entNx}" y="106" text-anchor="middle" font-size="11" font-weight="900" fill="#1d4ed8">PEN</text>`;
+                svg += drawWire3D(`M ${entNx} 116 L ${entNx} 139 L ${bepX} 139`, '#2563eb', 4.5, '#93c5fd', true);
+                svg += `<text x="${entNx}" y="112" text-anchor="middle" font-size="11" font-weight="900" fill="#1d4ed8">PEN</text>`;
 
                 // BEP -> Barramento PE
                 svg += drawWire3D(`M ${bepX+bepW} 139 L ${busPEx+15} 139 L ${busPEx+15} ${barPEY+18}`, '#16a34a', 4, '#86efac');
@@ -947,12 +1096,12 @@
                 svg += drawWire3D(`M ${bepX} 139 L ${busNx+15} 139 L ${busNx+15} ${barNY+16}`, '#2563eb', 4, '#93c5fd');
             } else {
                 // Entrada N direto para Barramento N (Pré-DR)
-                svg += drawWire3D(`M ${entNx} 115 L ${entNx} 137 L ${busNx+15} 137 L ${busNx+15} ${barNY+16}`, '#2563eb', 4, '#93c5fd');
-                svg += `<text x="${entNx}" y="106" text-anchor="middle" font-size="11" font-weight="900" fill="#2563eb">N</text>`;
+                svg += drawWire3D(`M ${entNx} 116 L ${entNx} 137 L ${busNx+15} 137 L ${busNx+15} ${barNY+16}`, '#2563eb', 4, '#93c5fd');
+                svg += `<text x="${entNx}" y="112" text-anchor="middle" font-size="11" font-weight="900" fill="#2563eb">N</text>`;
 
                 // Entrada PE direto para Barramento PE
-                svg += drawWire3D(`M ${entPEx} 115 L ${entPEx} 145 L ${busPEx+15} 145 L ${busPEx+15} ${barPEY+18}`, '#16a34a', 4, '#86efac');
-                svg += `<text x="${entPEx}" y="106" text-anchor="middle" font-size="11" font-weight="900" fill="#16a34a">PE (${state.aterramento.toUpperCase()})</text>`;
+                svg += drawWire3D(`M ${entPEx} 116 L ${entPEx} 145 L ${busPEx+15} 145 L ${busPEx+15} ${barPEY+18}`, '#16a34a', 4, '#86efac');
+                svg += `<text x="${entPEx}" y="112" text-anchor="middle" font-size="11" font-weight="900" fill="#16a34a">PE (${state.aterramento.toUpperCase()})</text>`;
             }
 
             // POSIÇÃO VERTICAL DOS COMPONENTES PRINCIPAIS
@@ -976,8 +1125,8 @@
             // Roteamento Fase Entrada -> Topo do Disjuntor Geral
             for (let f = 0; f < numFases; f++) {
                 let px = xGeral + (f * 40) + 20;
-                svg += drawWire3D(`M ${px} 115 L ${px} ${yMain+8}`, phaseColors[f], 4.2, phaseHighlights[f]);
-                svg += `<text x="${px}" y="106" text-anchor="middle" font-size="11" font-weight="900" fill="${phaseColors[f]}">F${f+1}</text>`;
+                svg += drawWire3D(`M ${px} 116 L ${px} ${yMain+8}`, phaseColors[f], 4.2, phaseHighlights[f]);
+                svg += `<text x="${px}" y="112" text-anchor="middle" font-size="11" font-weight="900" fill="${phaseColors[f]}">F${f+1}</text>`;
             }
 
             // Roteamento do Neutro saindo do Barramento Pré-DR para o Topo do IDR e DPS
@@ -1198,13 +1347,12 @@
 
             let svg = `<svg viewBox="0 0 ${uniWidth} 800" class="w-full h-auto bg-white select-none" xmlns="http://www.w3.org/2000/svg">${svgDefs}`;
             
-            // CABEÇALHO OFICIAL NO DIAGRAMA (Largura dinâmica acompanhando uniWidth)
-            svg += `<rect x="50" y="20" width="${frameW}" height="72" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" rx="6"/>`;
-            if (state.logo) {
-                svg += `<image href="${state.logo}" x="62" y="26" height="60" width="150" preserveAspectRatio="xMinYMin meet"/>`;
-            }
-            svg += `<text x="${centerX}" y="46" text-anchor="middle" font-size="20" font-weight="900" fill="#1e293b">DIAGRAMA UNIFILAR - SISTEMA ${escapeXml(state.sistema.toUpperCase())} (ABNT NBR 5410)</text>`;
-            svg += `<text x="${centerX}" y="71" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#475569">RESPONSÁVEL TÉCNICO: ${escapeXml(state.resp.toUpperCase() || 'NÃO INFORMADO')}   |   CLIENTE/OBRA: ${escapeXml(state.obra.toUpperCase() || 'NÃO INFORMADA')}   |   ATERRAMENTO: ${escapeXml(state.aterramento.toUpperCase())}</text>`;
+            // CABEÇALHO TÉCNICO OFICIAL NO DIAGRAMA UNIFILAR
+            svg += drawTechnicalHeaderSVG(
+                uniWidth,
+                `DIAGRAMA UNIFILAR - SISTEMA ${state.sistema.toUpperCase()}`,
+                'ESQUEMA UNIFILAR'
+            );
 
             let layX = 200, layY = 150;
 
