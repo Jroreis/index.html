@@ -276,9 +276,38 @@
         <button data-tool="outlet220" class="tool-btn px-2 py-1 rounded border border-slate-700 bg-[#232b3a] hover:bg-slate-700 text-xs flex flex-col items-center min-w-[68px]">
           <span class="text-sm leading-none">🔥</span> <span class="text-[10px] font-medium mt-0.5">Tomada 220W (20A)</span> <span class="text-[9px] text-rose-400 font-mono-tech">Coz/MLR</span>
         </button>
-        <button data-tool="conduit" class="tool-btn px-2 py-1 rounded border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-200 text-xs flex flex-col items-center min-w-[70px]">
-          <span class="text-sm leading-none">〰️</span> <span class="text-[10px] font-semibold mt-0.5">Eletroduto Ø 3/4"</span> <span class="text-[9px] text-amber-300 font-mono-tech">2 Cliques</span>
+        <button data-tool="conduit" class="tool-btn px-2 py-1 rounded border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-200 text-xs flex flex-col items-center min-w-[72px]" title="Conectar pontos com Canduíte / Eletroduto (2 cliques)">
+          <span class="text-sm leading-none">〰️</span> <span id="lblRibbonConduitBtn" class="text-[10px] font-semibold mt-0.5">Eletroduto Ø 3/4"</span> <span class="text-[9px] text-amber-300 font-mono-tech">2 Cliques</span>
         </button>
+        <div class="bg-[#12161f] px-1.5 py-0.5 rounded border border-amber-500/40 flex flex-col justify-center">
+          <span class="text-[8px] text-amber-300 uppercase font-mono-tech leading-tight">Bitola Canduíte</span>
+          <select id="selDefaultConduitDiam" aria-label="Bitola do Canduíte" class="bg-transparent text-amber-200 font-mono-tech font-bold text-[10px] focus:outline-none">
+            <option value='Ø 1/2" (16mm)'>Ø 1/2" (16mm)</option>
+            <option value='Ø 3/4" (20mm)'>Ø 3/4" (20mm)</option>
+            <option value='Ø 3/4" (25mm)' selected>Ø 3/4" (25mm) Padrão</option>
+            <option value='Ø 1" (32mm)'>Ø 1" (32mm) Reforçado</option>
+            <option value='Ø 1.1/4" (40mm)'>Ø 1.1/4" (40mm)</option>
+            <option value='Ø 1.1/2" (50mm)'>Ø 1.1/2" (50mm)</option>
+            <option value='Ø 2" (60mm)'>Ø 2" (60mm) Entrada</option>
+            <option value='Ø 2.1/2" (75mm)'>Ø 2.1/2" (75mm)</option>
+            <option value='Ø 3" (85mm)'>Ø 3" (85mm)</option>
+            <option value='Ø 4" (110mm)'>Ø 4" (110mm)</option>
+          </select>
+        </div>
+        <div class="bg-[#12161f] px-1.5 py-0.5 rounded border border-slate-700 flex flex-col justify-center">
+          <span class="text-[8px] text-slate-400 uppercase font-mono-tech leading-tight">Tipo Canduíte</span>
+          <select id="selDefaultConduitType" aria-label="Tipo de Canduíte" class="bg-transparent text-sky-300 font-mono-tech font-semibold text-[10px] focus:outline-none">
+            <option value="Corrugado Flexível Amarelo" selected>Corrugado Amarelo (Parede)</option>
+            <option value="Corrugado Laranja Reforçado">Corrugado Laranja (Laje)</option>
+            <option value="PVC Rígido Roscável">PVC Rígido Roscável (Preto)</option>
+            <option value="PVC Rígido Soldável">PVC Rígido Soldável</option>
+            <option value="Metálico Galvanizado">Eletroduto Galvanizado</option>
+            <option value="Condulete Aparente">Condulete Aparente (Alum/PVC)</option>
+            <option value="PEAD Subterrâneo">PEAD Subterrâneo (Enterrado)</option>
+            <option value="Sealtubo Flexível">Sealtubo Metálico Flexível</option>
+            <option value="Eletrocalha / Perfilado">Eletrocalha / Perfilado</option>
+          </select>
+        </div>
         <button id="btnAutoRouteConduits" class="px-2 py-1 rounded border border-sky-500/40 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 text-xs flex flex-col items-center justify-center min-w-[74px]">
           <span class="text-[10px] font-semibold">⚡ Auto-Conectar Novos Pontos ao QD</span>
         </button>
@@ -461,8 +490,13 @@
       <button data-lib-cat="quadros_caixas" data-tool="caixa_pass" class="tool-btn px-2 py-0.5 rounded border border-amber-700/60 bg-amber-950/40 hover:bg-amber-900/60 text-amber-200 shrink-0">⏹️ Caixa Passagem 10×10 (Piso)</button>
       <button data-lib-cat="quadros_caixas" data-tool="condulete" class="tool-btn px-2 py-0.5 rounded border border-amber-700/60 bg-amber-950/40 hover:bg-amber-900/60 text-amber-200 shrink-0">▭ Condulete Aparente</button>
       <button data-lib-cat="quadros_caixas" data-tool="aterramento" class="tool-btn px-2 py-0.5 rounded border border-amber-700/60 bg-amber-950/40 hover:bg-amber-900/60 text-amber-200 shrink-0">⏚ Aterramento</button>
+      <button data-lib-cat="quadros_caixas" data-tool="conduit_34" class="tool-btn px-2 py-0.5 rounded border border-amber-600/70 bg-amber-950/50 hover:bg-amber-900/70 text-amber-200 shrink-0">〰️ Canduíte Ø 3/4" (Laje/Forro)</button>
+      <button data-lib-cat="quadros_caixas" data-tool="conduit_1pol" class="tool-btn px-2 py-0.5 rounded border border-amber-600/70 bg-amber-950/50 hover:bg-amber-900/70 text-amber-200 shrink-0">〰️ Canduíte Ø 1" (Reforçado)</button>
+      <button data-lib-cat="quadros_caixas" data-tool="conduit_114" class="tool-btn px-2 py-0.5 rounded border border-amber-600/70 bg-amber-950/50 hover:bg-amber-900/70 text-amber-200 shrink-0">〰️ Canduíte Ø 1.1/4" (32/40mm)</button>
+      <button data-lib-cat="quadros_caixas" data-tool="conduit_2pol" class="tool-btn px-2 py-0.5 rounded border border-amber-600/70 bg-amber-950/50 hover:bg-amber-900/70 text-amber-200 shrink-0">〰️ Canduíte Ø 2" (Entrada QDC)</button>
       <button data-lib-cat="quadros_caixas" data-tool="conduit_wall" class="tool-btn px-2 py-0.5 rounded border border-amber-700/60 bg-amber-950/40 hover:bg-amber-900/60 text-amber-200 shrink-0">┄ Eletroduto Parede</button>
       <button data-lib-cat="quadros_caixas" data-tool="conduit_floor" class="tool-btn px-2 py-0.5 rounded border border-amber-700/60 bg-amber-950/40 hover:bg-amber-900/60 text-amber-200 shrink-0">─·─ Eletroduto Piso</button>
+      <button data-lib-cat="quadros_caixas" data-tool="conduit_exposed" class="tool-btn px-2 py-0.5 rounded border border-amber-700/60 bg-amber-950/40 hover:bg-amber-900/60 text-amber-200 shrink-0">═ Canduíte Aparente / Condulete</button>
     </div>
   </div>
 
@@ -829,7 +863,7 @@
             </div>
 
             <div id="printSheetWrapper" class="flex-1 relative overflow-hidden flex items-center justify-center cursor-grab active:cursor-grabbing touch-none">
-              <canvas id="printSheetCanvas" width="1800" height="1270" class="bg-white shadow-2xl rounded border border-slate-400 origin-center transition-transform duration-75"></canvas>
+              <canvas id="printSheetCanvas" width="1800" height="1270" style="max-width: 98%; max-height: 98%; width: auto; height: auto;" class="bg-white shadow-2xl rounded border border-slate-400 origin-center transition-transform duration-75"></canvas>
             </div>
           </div>
 
@@ -1551,6 +1585,7 @@
 
     // Desenha toda a planta baixa elétrica no estilo executivo das 4 imagens de referência
     function drawTechnicalPlanOnContext(targetCtx, transformFn, scaleVal, opts = {}) {
+      targetCtx.save();
       const isWhite = opts.isWhite !== undefined ? opts.isWhite : true;
       const showUnderlayImg = opts.showUnderlay !== undefined ? opts.showUnderlay : false;
       const underlayAlpha = opts.underlayAlpha !== undefined ? opts.underlayAlpha : 0.75;
@@ -1812,6 +1847,7 @@
 
         if (cd.style === "floor") targetCtx.setLineDash([8, 3, 2, 3]);
         else if (cd.style === "wall") targetCtx.setLineDash([4, 3]);
+        else if (cd.style === "exposed") { targetCtx.setLineDash([12, 2]); targetCtx.lineWidth = isSel ? 3.0 : 2.0; }
         else targetCtx.setLineDash([]);
 
         targetCtx.beginPath();
@@ -1904,7 +1940,8 @@
             if (cmdLet && expanded.some(x => x.startsWith("R"))) {
               targetCtx.fillText(cmdLet, tx, ty - 8.5);
             }
-            targetCtx.fillText(`-${circNum}- (#${cd.wireMm2 || 2.5})`, tx, ty + 13.5);
+            const shortDiam = String(cd.diameter || 'Ø 3/4"').split("(")[0].trim();
+            targetCtx.fillText(`-${circNum}- (#${cd.wireMm2 || 2.5} | ${shortDiam})`, tx, ty + 13.5);
           }
         }
 
@@ -2129,6 +2166,7 @@
         }
         targetCtx.restore();
       });
+      targetCtx.restore();
     }
 
     function render2D() {
@@ -2541,7 +2579,26 @@
           showToast(`Saída: ${hit.ref.name}. Agora clique no destino!`);
         } else if (appState.conduitDraftFrom !== hit.id) {
           saveUndoSnapshot();
-          const styleMap = { conduit: "ceiling", conduit_wall: "wall", conduit_floor: "floor" };
+          const styleMap = {
+            conduit: "ceiling",
+            conduit_34: "ceiling",
+            conduit_1pol: "ceiling",
+            conduit_114: "ceiling",
+            conduit_2pol: "ceiling",
+            conduit_wall: "wall",
+            conduit_floor: "floor",
+            conduit_exposed: "exposed"
+          };
+          const presetDiamMap = {
+            conduit_34: 'Ø 3/4" (25mm)',
+            conduit_1pol: 'Ø 1" (32mm)',
+            conduit_114: 'Ø 1.1/4" (40mm)',
+            conduit_2pol: 'Ø 2" (60mm)'
+          };
+          const chosenDiam = presetDiamMap[tool] || document.getElementById("selDefaultConduitDiam")?.value || 'Ø 3/4" (25mm)';
+          const chosenType = (tool === "conduit_exposed")
+            ? "Condulete Aparente"
+            : (document.getElementById("selDefaultConduitType")?.value || "Corrugado Flexível Amarelo");
           const newCd = {
             id: "cd_" + Date.now(),
             from: appState.conduitDraftFrom,
@@ -2549,7 +2606,8 @@
             curve: 0.20,
             wires: "F,N,T",
             wireMm2: hit.ref.wireMm2 || 2.5,
-            diameter: "Ø 25",
+            diameter: chosenDiam,
+            conduitType: chosenType,
             style: styleMap[tool] || "ceiling"
           };
           project.conduits.push(newCd);
@@ -3590,166 +3648,240 @@
     // Inclui: Planta Baixa + Tabela Legenda Auxiliar (Alturas) + Esquemático dos Níveis +
     // Identificação dos Itens (01-04) + Notas NBR 5410 + Carimbo Executivo Vertical!
     // ============================================================================
+    // Auxiliar para quebrar linhas automaticamente dentro da largura máxima sem cortar palavras nem vazar da caixa
+    function drawWrappedLinesInBox(c, textLines, x, startY, maxWidth, lineHeight, maxBottomY) {
+      let curY = startY;
+      for (let rawLine of textLines) {
+        const line = String(rawLine || "").trim();
+        if (!line) continue;
+        const words = line.split(/\s+/);
+        let current = "";
+        for (let w of words) {
+          const test = current ? (current + " " + w) : w;
+          if (c.measureText(test).width > maxWidth && current) {
+            if (curY > maxBottomY) return curY;
+            c.fillText(current, x, curY);
+            curY += lineHeight;
+            current = w;
+          } else {
+            current = test;
+          }
+        }
+        if (current && curY <= maxBottomY) {
+          c.fillText(current, x, curY);
+          curY += lineHeight;
+        }
+      }
+      return curY;
+    }
+
     function drawExecutiveLegendTableOnCanvas(c, x, y, w, h) {
       c.save();
+      c.beginPath();
+      c.rect(x, y, w, h);
+      c.clip();
+
+      c.fillStyle = "#ffffff";
+      c.fillRect(x, y, w, h);
       c.strokeStyle = "#0f172a";
       c.fillStyle = "#0f172a";
       c.lineWidth = 1.4;
-
-      c.font = "bold 11px 'Inter', sans-serif";
-      c.textAlign = "left";
-      c.fillText("LEGENDA AUXILIAR (PADRÃO):", x, y - 16);
-      c.font = "10px 'Inter', sans-serif";
-      c.fillText("ALTURA PONTOS ELÉTRICA", x, y - 4);
-
       c.strokeRect(x, y, w, h);
 
-      // Cabeçalho das 3 colunas: PONTO | UTILIZAÇÃO | ALTURA
-      const col1 = x + 36;
-      const col2 = x + w * 0.56;
-      const col3 = x + w * 0.85;
+      // Faixa de Título Interna no Topo da Tabela (nunca corta fora da caixa!)
+      const titleH = 24;
+      const headH = 18;
+      const topOffset = titleH + headH;
+
+      c.fillStyle = "#f1f5f9";
+      c.fillRect(x + 1, y + 1, w - 2, topOffset - 1);
+
+      c.fillStyle = "#0f172a";
+      c.textBaseline = "alphabetic";
+      c.textAlign = "left";
+      c.font = "bold 9.5px 'Inter', sans-serif";
+      c.fillText("LEGENDA AUXILIAR (PADRÃO) — ALTURA PONTOS ELÉTRICA E CANDUÍTES", x + 8, y + 15);
+
+      // Cabeçalho das 4 colunas: SÍMB. | PONTO / DESCRIÇÃO | UTILIZAÇÃO | ALTURA
+      const col1 = x + 38;
+      const col2 = x + Math.round(w * 0.57);
+      const col3 = x + Math.round(w * 0.84);
+
       c.beginPath();
-      c.moveTo(x, y + 20); c.lineTo(x + w, y + 20);
-      c.moveTo(col1, y); c.lineTo(col1, y + h);
-      c.moveTo(col2, y); c.lineTo(col2, y + h);
-      c.moveTo(col3, y); c.lineTo(col3, y + h);
+      c.moveTo(x, y + titleH); c.lineTo(x + w, y + titleH);
+      c.moveTo(x, y + topOffset); c.lineTo(x + w, y + topOffset);
+      c.moveTo(col1, y + titleH); c.lineTo(col1, y + h);
+      c.moveTo(col2, y + titleH); c.lineTo(col2, y + h);
+      c.moveTo(col3, y + titleH); c.lineTo(col3, y + h);
       c.stroke();
 
-      c.font = "bold 9px 'Inter', sans-serif";
+      c.font = "bold 8px 'Inter', sans-serif";
       c.textAlign = "center";
-      c.fillText("PONTO", (x + col2) / 2, y + 14);
-      c.fillText("UTILIZAÇÃO", (col2 + col3) / 2, y + 14);
-      c.fillText("ALTURA", (col3 + x + w) / 2, y + 14);
+      c.fillText("SÍMB.", (x + col1) / 2, y + titleH + 12);
+      c.fillText("PONTO / DESCRIÇÃO", (col1 + col2) / 2, y + titleH + 12);
+      c.fillText("UTILIZAÇÃO", (col2 + col3) / 2, y + titleH + 12);
+      c.fillText("ALTURA", (col3 + x + w) / 2, y + titleH + 12);
 
       const rows = [
         { sym: "◯", col: "#64748b", pt: "CAIXA OITAVADA EMBUTIDA", use: "USO COMUM", alt: "TETO" },
         { sym: "□○", col: "#16a34a", pt: "TOMADA BAIXA 10A/127V", use: "USO COMUM", alt: "0,30" },
         { sym: "□○", col: "#16a34a", pt: "TOMADA BAIXA 20A/127V", use: "USO COMUM", alt: "0,30" },
-        { sym: "□USB", col: "#16a34a", pt: "1 TOMADA BAIXA 10A/127V + USB", use: "USO COMUM", alt: "0,30" },
+        { sym: "□USB", col: "#16a34a", pt: "1 TOMADA BAIXA 10A + USB", use: "USO COMUM", alt: "0,30" },
         { sym: "□◐", col: "#16a34a", pt: "TOMADA MÉDIA 10A/127V", use: "USO COMUM", alt: "1,10" },
-        { sym: "□◐", col: "#16a34a", pt: "TOMADA MÉDIA 20A/127V + INTERR.", use: "USO COMUM", alt: "1,10" },
+        { sym: "□◐", col: "#16a34a", pt: "TOMADA MÉDIA 20A + INTERR.", use: "USO COMUM", alt: "1,10" },
         { sym: "□2x", col: "#16a34a", pt: "2 TOMADAS MÉDIAS 10A/127V", use: "USO COMUM", alt: "1,10" },
-        { sym: "□USB", col: "#16a34a", pt: "1 TOMADA MÉDIA 10A/127V + USB", use: "USO COMUM", alt: "1,10" },
+        { sym: "□USB", col: "#16a34a", pt: "1 TOMADA MÉDIA 10A + USB", use: "USO COMUM", alt: "1,10" },
         { sym: "[FG]", col: "#15803d", pt: "TOMADA 20A/127V", use: "FOGÃO A GÁS", alt: "0,30" },
-        { sym: "[FMO]", col: "#15803d", pt: "TOMADA 20A/127V", use: "FORNO MICROONDAS", alt: "1,50" },
+        { sym: "[FMO]", col: "#15803d", pt: "TOMADA 20A/127V", use: "MICROONDAS", alt: "1,50" },
         { sym: "[FEL]", col: "#15803d", pt: "TOMADA 20A/220V", use: "FORNO ELÉTRICO", alt: "0,70" },
-        { sym: "[MLSR]", col: "#15803d", pt: "TOMADA 20A/127V", use: "MÁQ. LAVAR/SECAR ROUPA", alt: "0,70" },
-        { sym: "[MLL]", col: "#15803d", pt: "TOMADA 20A/127V", use: "MÁQ. LAVAR LOUÇA", alt: "0,70" },
-        { sym: "[PER]", col: "#15803d", pt: "TAMPA CEGA", use: "PERSIANA ELÉTRICA", alt: "2,20" },
-        { sym: "[CKT]", col: "#15803d", pt: "COOKTOP ELÉTRICO DE INDUÇÃO", use: "COZINHA", alt: "0,70" },
-        { sym: "[EX]", col: "#15803d", pt: "PONTO P/ EXAUSTOR/DEPURADOR", use: "COZINHA", alt: "2,10" },
-        { sym: "[HIDR]", col: "#15803d", pt: "HIDROMASSAGEM", use: "HIDROMASSAGEM", alt: "0,30" },
+        { sym: "[MLSR]", col: "#15803d", pt: "TOMADA 20A/127V", use: "MÁQ. LAVAR ROUPA", alt: "0,70" },
+        { sym: "[MLL]", col: "#15803d", pt: "TOMADA 20A/127V", use: "MÁQ. LAVA-LOUÇA", alt: "0,70" },
+        { sym: "[PER]", col: "#15803d", pt: "PONTO PERSIANA ELÉTRICA", use: "PERSIANA", alt: "2,20" },
+        { sym: "[CKT]", col: "#15803d", pt: "COOKTOP DE INDUÇÃO 220V", use: "COZINHA", alt: "0,70" },
+        { sym: "[EX]", col: "#15803d", pt: "PONTO EXAUSTOR / COIFA", use: "COZINHA", alt: "2,10" },
+        { sym: "[HIDR]", col: "#15803d", pt: "PONTO HIDROMASSAGEM", use: "BANHO", alt: "0,30" },
         { sym: "(EX)", col: "#15803d", pt: "PONTO P/ VENTOKIT", use: "VENTOKIT", alt: "TETO" },
-        { sym: "(AC)", col: "#15803d", pt: "PONTO P/ AR COND.", use: "AR CONDICIONADO", alt: "0,50/2,20" },
-        { sym: "▨", col: "#dc2626", pt: "BLOCO AUTÔNOMO (TETO)", use: "ILUM. DE EMERGÊNCIA", alt: "TETO" },
-        { sym: "回", col: "#dc2626", pt: "TAMPA CEGA Ø3/8\" ALARME INC.", use: "ACIONAMENTO ALARME", alt: "1,30" },
-        { sym: "◐", col: "#dc2626", pt: "DETECTOR DE FUMAÇA - ÓPTICO", use: "DETECTOR DE FUMAÇA", alt: "TETO" },
-        { sym: "📞", col: "#1d4ed8", pt: "INTERFONE RJ11", use: "INTERFONE", alt: "1,20" },
-        { sym: "回", col: "#1d4ed8", pt: "REDE RJ45", use: "REDE", alt: "0,30" },
-        { sym: "📺", col: "#16a34a", pt: "TAMPA CEGA COM ORIFÍCIO Ø3/8\"", use: "TELEVISÃO", alt: "0,30/TETO" },
-        { sym: "▭", col: "#15803d", pt: "QUADRO DE DISTRIBUIÇÃO (QDC)", use: "DISTRIBUIÇÃO", alt: "1,40" },
+        { sym: "(AC)", col: "#15803d", pt: "PONTO P/ AR CONDICIONADO", use: "CLIMATIZAÇÃO", alt: "2,20" },
+        { sym: "▨", col: "#dc2626", pt: "BLOCO AUTÔNOMO (TETO)", use: "EMERGÊNCIA", alt: "TETO" },
+        { sym: "回", col: "#dc2626", pt: "ACIONADOR ALARME INC.", use: "INCÊNDIO", alt: "1,30" },
+        { sym: "◐", col: "#dc2626", pt: "DETECTOR FUMAÇA ÓPTICO", use: "INCÊNDIO", alt: "TETO" },
+        { sym: "📞", col: "#1d4ed8", pt: "INTERFONE RJ11", use: "TELECOM", alt: "1,20" },
+        { sym: "回", col: "#1d4ed8", pt: "PONTO DE REDE RJ45", use: "DADOS / REDE", alt: "0,30" },
+        { sym: "📺", col: "#16a34a", pt: 'PONTO DE TV (Ø 3/4")', use: "TELEVISÃO", alt: "1,10" },
+        { sym: "▭", col: "#15803d", pt: "QUADRO DISTRIBUIÇÃO (QDC)", use: "DISTRIBUIÇÃO", alt: "1,40" },
         { sym: "☒", col: "#1d4ed8", pt: "QUADRO VDI 20x20cm", use: "TELECOM", alt: "1,40" },
         { sym: "⊕", col: "#9333ea", pt: "PONTO DE LUZ NO TETO", use: "ILUMINAÇÃO", alt: "TETO" },
-        { sym: "☒", col: "#9333ea", pt: "LUMINÁRIA EMBUTIDA NO FORRO", use: "ILUMINAÇÃO", alt: "FORRO" },
-        { sym: "▣", col: "#0f172a", pt: "CAIXA DE PASSAGEM 10X10", use: "PASSAGEM", alt: "PISO" }
+        { sym: "━━", col: "#0f172a", pt: 'CANDUÍTE Ø 3/4" / Ø 1" LAJE', use: "FORRO / LAJE", alt: "LAJE" },
+        { sym: "┅┅", col: "#0f172a", pt: 'CANDUÍTE Ø 3/4" / Ø 1" PAREDE', use: "EMBUT. PAREDE", alt: "PAREDE" },
+        { sym: "─·─", col: "#0f172a", pt: 'CANDUÍTE Ø 3/4" / Ø 1" PISO', use: "PISO / SUBT.", alt: "PISO" }
       ];
 
-      const rowH = (h - 20) / rows.length;
+      const rowH = (h - topOffset) / rows.length;
       rows.forEach((r, i) => {
-        const ry = y + 20 + i * rowH;
+        const ry = y + topOffset + i * rowH;
         c.beginPath();
         c.moveTo(x, ry);
         c.lineTo(x + w, ry);
         c.strokeStyle = "#cbd5e1";
-        c.lineWidth = 0.8;
+        c.lineWidth = 0.75;
         c.stroke();
 
-        c.font = "bold 7.5px 'JetBrains Mono', monospace";
+        const textY = ry + rowH * 0.72;
+        c.font = "bold 7.2px 'JetBrains Mono', monospace";
         c.fillStyle = r.col;
         c.textAlign = "center";
-        c.fillText(r.sym, x + 18, ry + rowH * 0.72);
+        c.fillText(r.sym, (x + col1) / 2, textY);
 
         c.fillStyle = "#0f172a";
-        c.font = "7.5px 'Inter', sans-serif";
+        c.font = "7.2px 'Inter', sans-serif";
         c.textAlign = "left";
-        c.fillText(r.pt, col1 + 5, ry + rowH * 0.72);
-        c.fillText(r.use, col2 + 5, ry + rowH * 0.72);
+        c.fillText(r.pt, col1 + 5, textY);
+        c.fillText(r.use, col2 + 5, textY);
 
         c.textAlign = "center";
-        c.font = "7.5px 'JetBrains Mono', monospace";
-        c.fillText(r.alt, (col3 + x + w) / 2, ry + rowH * 0.72);
+        c.font = "7.2px 'JetBrains Mono', monospace";
+        c.fillText(r.alt, (col3 + x + w) / 2, textY);
       });
       c.restore();
     }
 
-    // Desenha o Esquemático dos Níveis + Identificação dos Itens (01-04) igual à foto 90893.jpg!
+    // Desenha o Esquemático dos Níveis + Identificação dos Itens (01-04) 100% contido dentro da caixa!
     function drawLevelsAndItemsOnCanvas(c, x, y, w, h) {
       c.save();
+      c.beginPath();
+      c.rect(x, y, w, h);
+      c.clip();
+
+      c.fillStyle = "#ffffff";
+      c.fillRect(x, y, w, h);
       c.strokeStyle = "#0f172a";
       c.fillStyle = "#0f172a";
-      c.lineWidth = 1.2;
+      c.lineWidth = 1.3;
       c.strokeRect(x, y, w, h);
 
-      // Esquemático dos Níveis (Topo)
+      // Faixa de Título do Esquemático dos Níveis no Topo
+      c.fillStyle = "#f1f5f9";
+      c.fillRect(x + 1, y + 1, w - 2, 20);
+      c.fillStyle = "#0f172a";
+      c.textBaseline = "alphabetic";
+      c.font = "bold 9px 'Inter', sans-serif";
+      c.textAlign = "center";
+      c.fillText("ESQUEMÁTICO DOS NÍVEIS", x + w / 2, y + 14);
+      c.beginPath(); c.moveTo(x, y + 21); c.lineTo(x + w, y + 21); c.stroke();
+
       const levels = [
-        ["ÁTICO", "776,06", "2,97"],
-        ["17º ANDAR", "773,09", "2,97"],
-        ["16º ANDAR", "770,11", "2,97"],
-        ["15º ANDAR", "767,13", "2,97"],
-        ["3º ANDAR", "731,43", "2,97"],
-        ["2º ANDAR", "728,46", "2,97"],
-        ["1º ANDAR", "725,48", "2,97"],
-        ["PUC", "721,46", "4,02"],
-        ["TÉRREO", "714,98", "2,97"],
-        ["SUBSOLO", "711,91", "3,07"]
+        ["ÁTICO", "+776,06", "PD=2,97m"],
+        ["17º PAVIMENTO", "+773,09", "PD=2,97m"],
+        ["16º PAVIMENTO", "+770,11", "PD=2,97m"],
+        ["3º PAVIMENTO", "+731,43", "PD=2,97m"],
+        ["2º PAVIMENTO", "+728,46", "PD=2,97m"],
+        ["1º PAVIMENTO", "+725,48", "PD=2,97m"],
+        ["PUC / LAZER", "+721,46", "PD=4,02m"],
+        ["TÉRREO", "+714,98", "PD=2,97m"],
+        ["SUBSOLO", "+711,91", "PD=3,07m"]
       ];
-      c.font = "7.5px 'JetBrains Mono', monospace";
+      c.font = "7.2px 'JetBrains Mono', monospace";
       levels.forEach((lv, i) => {
-        const ly = y + 16 + i * 14;
+        const ly = y + 34 + i * 13.5;
         c.textAlign = "left";
-        c.fillText(lv[0], x + 20, ly);
+        c.fillText(lv[0], x + 12, ly);
         c.textAlign = "center";
-        c.fillText(lv[1], x + w * 0.55, ly);
-        c.fillText(lv[2], x + w * 0.82, ly);
+        c.fillText(lv[1], x + w * 0.56, ly);
+        c.textAlign = "right";
+        c.fillText(lv[2], x + w - 12, ly);
         c.beginPath();
         c.setLineDash([3, 2]);
-        c.moveTo(x + 18, ly + 3);
-        c.lineTo(x + w - 18, ly + 3);
+        c.strokeStyle = "#94a3b8";
+        c.moveTo(x + 10, ly + 3);
+        c.lineTo(x + w - 10, ly + 3);
         c.stroke();
         c.setLineDash([]);
       });
 
-      c.font = "bold 10px 'Inter', sans-serif";
-      c.textAlign = "center";
-      c.fillText("ESQUEMÁTICO DOS NÍVEIS", x + w / 2, y + 168);
+      // Divisória para Identificação dos Itens (01 a 04)
+      const idTopY = y + 158;
+      c.strokeStyle = "#0f172a";
+      c.fillStyle = "#f1f5f9";
+      c.fillRect(x + 1, idTopY, w - 2, 18);
+      c.beginPath();
+      c.moveTo(x, idTopY); c.lineTo(x + w, idTopY);
+      c.moveTo(x, idTopY + 18); c.lineTo(x + w, idTopY + 18);
+      c.stroke();
 
-      // Identificação dos Itens (01 a 04)
+      c.fillStyle = "#0f172a";
       c.textAlign = "left";
-      c.font = "bold 9px 'Inter', sans-serif";
-      c.fillText("IDENTIFICAÇÃO DOS ITENS:", x + 10, y + 186);
-      c.beginPath(); c.moveTo(x + 10, y + 189); c.lineTo(x + w - 10, y + 189); c.stroke();
+      c.font = "bold 8.5px 'Inter', sans-serif";
+      c.fillText("IDENTIFICAÇÃO DOS ITENS EXECUTIVOS:", x + 10, idTopY + 12.5);
 
       const items = [
-        ["01", "PRANCHA DE MADEIRA 700x1200x25mm P/ DISTRIBUIÇÃO TEL, INT, TV (H=130cm)."],
+        ["01", "PRANCHA DE MADEIRA 700x1200x25mm P/ DISTRIB. TEL, INT, TV (H=130cm)."],
         ["02", "CAIXA DE PISO 10x10cm P/ ALIMENTAÇÃO ELÉTRICA DE BANCADA."],
-        ["03", "PONTO DE FORÇA P/ AR CONDICIONADO UC-01 / UC-02 EM CAIXA 4x4\" 220V."],
-        ["04", "CAIXA DE PVC 200x200x85mm INSTALADA A H=50cm DO PISO."]
+        ['03', 'PONTO DE FORÇA P/ AR-CONDICIONADO EM CAIXA 4x4" 220V + CANDUÍTE Ø 3/4".'],
+        ["04", "CAIXA DE PASSAGEM PVC 200x200x85mm INSTALADA A H=50cm DO PISO."]
       ];
-      c.font = "7.2px 'Inter', sans-serif";
       items.forEach((it, idx) => {
-        const iy = y + 204 + idx * 16;
-        c.strokeRect(x + 10, iy - 8, 16, 11);
-        c.font = "bold 7px 'JetBrains Mono', monospace";
-        c.fillText(it[0], x + 13, iy);
-        c.font = "7px 'Inter', sans-serif";
-        c.fillText(it[1].slice(0, 58), x + 30, iy);
+        const iy = idTopY + 32 + idx * 22;
+        c.strokeStyle = "#0f172a";
+        c.lineWidth = 1.0;
+        c.strokeRect(x + 8, iy - 9, 18, 12);
+        c.font = "bold 7.2px 'JetBrains Mono', monospace";
+        c.textAlign = "center";
+        c.fillText(it[0], x + 17, iy);
+
+        c.font = "6.8px 'Inter', sans-serif";
+        c.textAlign = "left";
+        drawWrappedLinesInBox(c, [it[1]], x + 31, iy - 1, w - 39, 8.5, iy + 10);
       });
       c.restore();
     }
 
-    // Desenha o Carimbo Executivo Vertical Padrão Construtora / Engenharia igual à foto 90887.jpg!
+    // Desenha o Carimbo Executivo Vertical Padrão Construtora / Engenharia 100% alinhado dentro das células!
     function drawConstructorTitleBlockOnCanvas(c, x, y, w, h, tb) {
       c.save();
+      c.beginPath();
+      c.rect(x, y, w, h);
+      c.clip();
+
       c.fillStyle = "#ffffff";
       c.fillRect(x, y, w, h);
       c.strokeStyle = "#0f172a";
@@ -3757,38 +3889,42 @@
       c.strokeRect(x, y, w, h);
 
       c.fillStyle = "#0f172a";
+      c.textBaseline = "alphabetic";
       c.lineWidth = 1.1;
 
       // 1. TABELA DE REVISÕES (03, 02, 01, 00) no topo do carimbo
+      const cRev1 = 46;
+      const cRev2 = 112;
+      const cRev3 = w - 78;
       const revRows = [
         ["", "", "", ""],
         ["", "", "", ""],
         ["", "", "", ""],
         [tb.date ? "00" : "", tb.date || "", tb.content ? "EMISSÃO DO PROJETO" : "", tb.electrician || ""],
-        ["REVISÃO", "DATA", "MODIFICAÇÃO", "RESPONSÁVEL"]
+        ["REV.", "DATA", "MODIFICAÇÃO / DESCRIÇÃO", "RESPONSÁVEL"]
       ];
       revRows.forEach((r, i) => {
         const ry = y + 18 + i * 18;
         c.beginPath(); c.moveTo(x, ry + 4); c.lineTo(x + w, ry + 4); c.stroke();
-        c.font = i === 4 ? "bold 7.5px 'Inter', sans-serif" : "7.5px 'JetBrains Mono', monospace";
+        c.font = i === 4 ? "bold 7.2px 'Inter', sans-serif" : "7.2px 'JetBrains Mono', monospace";
         c.textAlign = "center";
-        c.fillText(r[0], x + 22, ry);
-        c.fillText(r[1], x + 76, ry);
-        c.fillText(r[2].slice(0, 32), x + 215, ry);
-        c.fillText(r[3].slice(0, 10), x + w - 34, ry);
+        c.fillText(r[0], x + cRev1 / 2, ry);
+        c.fillText(r[1], x + (cRev1 + cRev2) / 2, ry);
+        c.fillText(r[2].slice(0, 26), x + (cRev2 + cRev3) / 2, ry);
+        c.fillText(r[3].slice(0, 11), x + (cRev3 + w) / 2, ry);
       });
-      // Linhas verticais da tabela de revisão
-      [44, 110, w - 68].forEach(dx => {
+      [cRev1, cRev2, cRev3].forEach(dx => {
         c.beginPath(); c.moveTo(x + dx, y); c.lineTo(x + dx, y + 94); c.stroke();
       });
 
       // Barra grossa separadora
-      c.fillRect(x, y + 96, w, 3.5);
+      c.fillRect(x, y + 95, w, 3);
 
       // 2. TABELA DE REFERÊNCIAS DE ARQUIVOS
-      const refY = y + 102;
+      const refY = y + 100;
+      const refSplit = 132;
       const refs = [
-        ["REFERÊNCIA", "ARQUIVO"],
+        ["DISCIPLINA REF.", "ARQUIVO DE REFERÊNCIA"],
         ["AR CONDICIONADO", "1740_ARC_PE_109_TP3_R00"],
         ["ARQUITETURA", "1740_ARQ_PE_113_TP3-R02"],
         ["ESTRUTURA", "1740_EST_PE_651_TP3-R01"]
@@ -3796,144 +3932,143 @@
       refs.forEach((rf, i) => {
         const ry = refY + 14 + i * 16;
         c.beginPath(); c.moveTo(x, ry + 4); c.lineTo(x + w, ry + 4); c.stroke();
-        c.font = i === 0 ? "bold 7.5px 'Inter', sans-serif" : "7.5px 'JetBrains Mono', monospace";
+        c.font = i === 0 ? "bold 7.2px 'Inter', sans-serif" : "7.2px 'JetBrains Mono', monospace";
         c.textAlign = "center";
-        c.fillText(rf[0], x + 65, ry);
-        c.fillText(rf[1], x + 245, ry);
+        c.fillText(rf[0], x + refSplit / 2, ry);
+        c.fillText(rf[1], x + (refSplit + w) / 2, ry);
       });
-      c.beginPath(); c.moveTo(x + 130, refY); c.lineTo(x + 130, refY + 66); c.stroke();
-      c.fillRect(x, refY + 66, w, 3.5);
+      c.beginPath(); c.moveTo(x + refSplit, refY); c.lineTo(x + refSplit, refY + 66); c.stroke();
+      c.fillRect(x, refY + 66, w, 3);
 
-      // 3. EMPREENDIMENTO & ENDEREÇO
-      const empY = refY + 72;
+      // 3. EMPREENDIMENTO & ENDEREÇO (Campos em branco se o usuário ainda não preencheu)
+      const empY = refY + 71;
       c.textAlign = "left";
-      c.font = "8px 'Inter', sans-serif";
+      c.font = "bold 7.5px 'Inter', sans-serif";
       c.fillStyle = "#475569";
-      c.fillText("EMPREENDIMENTO:", x + 10, empY + 12);
-      c.font = "bold 15px 'Inter', sans-serif";
+      c.fillText("EMPREENDIMENTO / OBRA:", x + 10, empY + 12);
+      c.font = "bold 13px 'Inter', sans-serif";
       c.fillStyle = "#0f172a";
-      c.fillText(tb.client.slice(0, 32), x + 10, empY + 32);
-      c.beginPath(); c.moveTo(x, empY + 40); c.lineTo(x + w, empY + 40); c.stroke();
+      c.fillText((tb.client || "").slice(0, 34), x + 10, empY + 31);
+      c.beginPath(); c.moveTo(x, empY + 39); c.lineTo(x + w, empY + 39); c.stroke();
 
-      c.font = "7.5px 'Inter', sans-serif";
+      c.font = "bold 7.5px 'Inter', sans-serif";
       c.fillStyle = "#475569";
-      c.fillText("ENDEREÇO", x + 10, empY + 51);
-      c.font = "bold 10px 'Inter', sans-serif";
+      c.fillText("ENDEREÇO DA OBRA:", x + 10, empY + 51);
+      c.font = "bold 9.5px 'Inter', sans-serif";
       c.fillStyle = "#0f172a";
-      c.fillText(tb.address.slice(0, 46), x + 10, empY + 65);
-      c.beginPath(); c.moveTo(x, empY + 72); c.lineTo(x + w, empY + 72); c.stroke();
+      c.fillText((tb.address || "").slice(0, 46), x + 10, empY + 66);
+      c.beginPath(); c.moveTo(x, empY + 73); c.lineTo(x + w, empY + 73); c.stroke();
 
-      // 4. LOGOS DAS 3 EMPRESAS (INCORPORAÇÃO | PROJETISTA voltCAD | EMPREENDIMENTO)
-      const logoY = empY + 72;
-      c.font = "6.8px 'Inter', sans-serif";
+      // 4. QUADRO DE EMPRESAS (CONSTRUTORA | PROJETISTA | CLIENTE) com divisórias verticais exatas!
+      const logoY = empY + 73;
+      const lgCol1 = Math.round(w * 0.34);
+      const lgCol2 = Math.round(w * 0.67);
+      c.beginPath();
+      c.moveTo(x + lgCol1, logoY); c.lineTo(x + lgCol1, logoY + 58);
+      c.moveTo(x + lgCol2, logoY); c.lineTo(x + lgCol2, logoY + 58);
+      c.moveTo(x, logoY + 58); c.lineTo(x + w, logoY + 58);
+      c.stroke();
+
+      c.font = "bold 6.5px 'Inter', sans-serif";
       c.fillStyle = "#475569";
       c.textAlign = "center";
-      c.fillText("INCORPORAÇÃO E CONSTRUÇÃO", x + w * 0.18, logoY + 11);
-      c.fillText("PROJETISTA", x + w * 0.50, logoY + 11);
-      c.fillText("EMPREENDIMENTO", x + w * 0.82, logoY + 11);
+      c.fillText("CONSTRUTORA / CLIENTE", x + lgCol1 / 2, logoY + 11);
+      c.fillText("PROJETISTA / EMPRESA", x + (lgCol1 + lgCol2) / 2, logoY + 11);
+      c.fillText("EMPREENDIMENTO", x + (lgCol2 + w) / 2, logoY + 11);
 
       c.fillStyle = "#0f172a";
-      c.font = "bold 13px 'Inter', sans-serif";
-      c.fillText((tb.builder ? tb.builder.slice(0, 18) : ""), x + w * 0.18, logoY + 36);
-      c.font = "7.5px 'Inter', sans-serif";
-      if (tb.builder) c.fillText("INCORPORADORA", x + w * 0.18, logoY + 47);
-
+      c.font = "bold 10px 'Inter', sans-serif";
+      c.fillText((tb.builder || "").slice(0, 16), x + lgCol1 / 2, logoY + 34);
       c.fillStyle = "#0284c7";
-      c.font = "bold 12px 'Inter', sans-serif";
-      c.fillText((tb.company ? tb.company.slice(0, 20) : ""), x + w * 0.50, logoY + 34);
+      c.fillText((tb.company || "").slice(0, 16), x + (lgCol1 + lgCol2) / 2, logoY + 34);
       c.fillStyle = "#0f172a";
-      c.font = "bold 9px 'JetBrains Mono', monospace";
-      if (tb.company) c.fillText("ENGENHARIA", x + w * 0.50, logoY + 46);
-
-      c.font = "bold 12px 'Inter', sans-serif";
-      c.fillText((tb.client ? tb.client.slice(0, 18) : ""), x + w * 0.82, logoY + 36);
-      c.beginPath(); c.moveTo(x, logoY + 58); c.lineTo(x + w, logoY + 58); c.stroke();
+      c.fillText((tb.client || "").slice(0, 16), x + (lgCol2 + w) / 2, logoY + 34);
 
       // 5. CONTEÚDO | ESCALA | CÓD.
       const cntY = logoY + 58;
+      const rightSplit = w - 96;
       c.textAlign = "left";
-      c.font = "8px 'Inter', sans-serif";
+      c.font = "bold 7.5px 'Inter', sans-serif";
       c.fillStyle = "#475569";
-      c.fillText("CONTEÚDO", x + 10, cntY + 13);
-      c.font = "bold 14px 'Inter', sans-serif";
+      c.fillText("CONTEÚDO DA PRANCHA:", x + 10, cntY + 13);
+      c.font = "bold 12px 'Inter', sans-serif";
       c.fillStyle = "#0f172a";
-      c.fillText(tb.content.slice(0, 26), x + 10, cntY + 34);
-      c.font = "bold 11px 'Inter', sans-serif";
-      c.fillText("", x + 10, cntY + 52);
+      c.fillText((tb.content || "").slice(0, 28), x + 10, cntY + 36);
 
       c.beginPath();
-      c.moveTo(x + w - 95, cntY); c.lineTo(x + w - 95, cntY + 64);
-      c.moveTo(x + w - 95, cntY + 32); c.lineTo(x + w, cntY + 32);
+      c.moveTo(x + rightSplit, cntY); c.lineTo(x + rightSplit, cntY + 64);
+      c.moveTo(x + rightSplit, cntY + 32); c.lineTo(x + w, cntY + 32);
       c.moveTo(x, cntY + 64); c.lineTo(x + w, cntY + 64);
       c.stroke();
 
       c.textAlign = "center";
-      c.font = "7.5px 'Inter', sans-serif";
+      c.font = "bold 7px 'Inter', sans-serif";
       c.fillStyle = "#475569";
-      c.fillText("ESCALA", x + w - 47, cntY + 11);
-      c.fillText("CÓD.", x + w - 47, cntY + 43);
-      c.font = "bold 13px 'JetBrains Mono', monospace";
+      c.fillText("ESCALA", x + (rightSplit + w) / 2, cntY + 11);
+      c.fillText("CÓD.", x + (rightSplit + w) / 2, cntY + 43);
+      c.font = "bold 12px 'JetBrains Mono', monospace";
       c.fillStyle = "#0f172a";
-      c.fillText(tb.scale, x + w - 47, cntY + 27);
-      c.fillText("", x + w - 47, cntY + 59);
+      c.fillText(tb.scale || "", x + (rightSplit + w) / 2, cntY + 26);
 
       // 6. FASE | FOLHA e DISCIPLINA | REVISÃO
       const fasY = cntY + 64;
       c.beginPath();
-      c.moveTo(x + w - 95, fasY); c.lineTo(x + w - 95, fasY + 72);
+      c.moveTo(x + rightSplit, fasY); c.lineTo(x + rightSplit, fasY + 72);
       c.moveTo(x, fasY + 36); c.lineTo(x + w, fasY + 36);
       c.moveTo(x, fasY + 72); c.lineTo(x + w, fasY + 72);
       c.stroke();
 
       c.textAlign = "left";
-      c.font = "7.5px 'Inter', sans-serif";
+      c.font = "bold 7.5px 'Inter', sans-serif";
       c.fillStyle = "#475569";
-      c.fillText("FASE", x + 10, fasY + 11);
-      c.fillText("DISCIPLINA", x + 10, fasY + 47);
+      c.fillText("FASE DO PROJETO:", x + 10, fasY + 12);
+      c.fillText("DISCIPLINA:", x + 10, fasY + 48);
 
-      c.font = "bold 12px 'Inter', sans-serif";
+      c.font = "bold 11.5px 'Inter', sans-serif";
       c.fillStyle = "#0f172a";
-      c.fillText(tb.phase, x + 10, fasY + 28);
-      c.font = "bold 15px 'Inter', sans-serif";
-      c.fillText("ELÉTRICA", x + 10, fasY + 66);
+      c.fillText(tb.phase || "", x + 10, fasY + 29);
+      c.font = "bold 14px 'Inter', sans-serif";
+      c.fillText("ELÉTRICA / INSTALAÇÕES", x + 10, fasY + 66);
 
       c.textAlign = "center";
-      c.font = "7.5px 'Inter', sans-serif";
+      c.font = "bold 7px 'Inter', sans-serif";
       c.fillStyle = "#475569";
-      c.fillText("FOLHA", x + w - 47, fasY + 11);
-      c.fillText("REVISÃO", x + w - 47, fasY + 47);
-      c.font = "bold 14px 'JetBrains Mono', monospace";
+      c.fillText("FOLHA Nº", x + (rightSplit + w) / 2, fasY + 11);
+      c.fillText("REVISÃO", x + (rightSplit + w) / 2, fasY + 47);
+      c.font = "bold 13px 'JetBrains Mono', monospace";
       c.fillStyle = "#0f172a";
-      c.fillText((tb.sheetNum || tb.sheetTotal) ? `${tb.sheetNum}/${tb.sheetTotal}` : "", x + w - 47, fasY + 29);
-      c.fillText(tb.date ? "01" : "", x + w - 47, fasY + 66);
+      c.fillText((tb.sheetNum || tb.sheetTotal) ? `${tb.sheetNum}/${tb.sheetTotal}` : "", x + (rightSplit + w) / 2, fasY + 29);
+      c.fillText(tb.date ? "00" : "", x + (rightSplit + w) / 2, fasY + 65);
 
-      // 7. ARQUIVO & ASSINATURAS (RESPONSÁVEL | COORDENADOR | DESENHISTA)
+      // 7. ARQUIVO & ASSINATURAS (RESPONSÁVEL | COORDENADOR/REGISTRO | DESENHISTA)
       const botY = fasY + 72;
+      const sigCol1 = Math.round(w * 0.36);
+      const sigCol2 = Math.round(w * 0.70);
       c.beginPath();
       c.moveTo(x, botY + 24); c.lineTo(x + w, botY + 24);
-      c.moveTo(x + w * 0.38, botY + 24); c.lineTo(x + w * 0.38, y + h);
-      c.moveTo(x + w * 0.69, botY + 24); c.lineTo(x + w * 0.69, y + h);
+      c.moveTo(x + sigCol1, botY + 24); c.lineTo(x + sigCol1, y + h);
+      c.moveTo(x + sigCol2, botY + 24); c.lineTo(x + sigCol2, y + h);
       c.stroke();
 
       c.textAlign = "left";
-      c.font = "7px 'Inter', sans-serif";
+      c.font = "7px 'JetBrains Mono', monospace";
       c.fillStyle = "#475569";
-      c.fillText("ARQUIVO: 1740-ELE-LO-302-TIP-R03.dwg", x + 10, botY + 15);
+      c.fillText("ARQUIVO: VOLTCAD-ELE-2026.dwg", x + 10, botY + 15);
       c.textAlign = "right";
-      c.fillText(`EMISSÃO: ${tb.date}`, x + w - 10, botY + 15);
+      c.fillText(`DATA: ${tb.date || "___/___/_____"}`, x + w - 10, botY + 15);
 
       c.textAlign = "center";
-      c.font = "6.8px 'Inter', sans-serif";
+      c.font = "bold 6.5px 'Inter', sans-serif";
       c.fillStyle = "#475569";
-      c.fillText("RESPONSÁVEL / ELETRICISTA", x + w * 0.19, botY + 35);
-      c.fillText("COORDENADOR / REGISTRO", x + w * 0.535, botY + 35);
-      c.fillText("DESENHISTA", x + w * 0.845, botY + 35);
+      c.fillText("RESP. / ELETRICISTA", x + sigCol1 / 2, botY + 36);
+      c.fillText("COORDENADOR / CREA-CFT", x + (sigCol1 + sigCol2) / 2, botY + 36);
+      c.fillText("DESENHISTA", x + (sigCol2 + w) / 2, botY + 36);
 
-      c.font = "bold 9.5px 'Inter', sans-serif";
+      c.font = "bold 9px 'Inter', sans-serif";
       c.fillStyle = "#0f172a";
-      c.fillText(tb.electrician.slice(0, 20), x + w * 0.19, botY + 50);
-      c.fillText(tb.registry.slice(0, 18), x + w * 0.535, botY + 50);
-      c.fillText(tb.drafter.slice(0, 15), x + w * 0.845, botY + 50);
+      c.fillText((tb.electrician || "").slice(0, 18), x + sigCol1 / 2, botY + 54);
+      c.fillText((tb.registry || "").slice(0, 18), x + (sigCol1 + sigCol2) / 2, botY + 54);
+      c.fillText((tb.drafter || "").slice(0, 14), x + (sigCol2 + w) / 2, botY + 54);
 
       c.restore();
     }
@@ -3966,6 +4101,9 @@
       const W = pCanvas.width;
       const H = pCanvas.height;
 
+      pctx.save();
+      pctx.textAlign = "left";
+      pctx.textBaseline = "alphabetic";
       pctx.fillStyle = "#ffffff";
       pctx.fillRect(0, 0, W, H);
 
@@ -3977,13 +4115,6 @@
       pctx.strokeRect(30, 30, W - 60, H - 60);
 
       if (tpl === "a1_construtora") {
-        // =====================================================================
-        // PRANCHA EXECUTIVA COMPLETA (IGUAL ÀS 4 IMAGENS ENVIADAS PELO USUÁRIO!)
-        // Esquerda/Centro: Planta Baixa Executiva + Unifilar + Quadro de Cargas
-        // Coluna Central-Direita: Tabela "LEGENDA AUXILIAR (PADRÃO): ALTURA PONTOS ELÉTRICA" (90881.jpg)
-        // Coluna Direita Topo: Esquemático dos Níveis + Identificação Itens + Notas (90893.jpg)
-        // Coluna Direita Base: Carimbo Executivo Construtora Auten/Projecamp (90887.jpg)
-        // =====================================================================
         const planW = 900;
         const planH = 820;
 
@@ -4013,32 +4144,45 @@
         pctx.textAlign = "center";
         pctx.fillText("1", 65, 899);
         pctx.textAlign = "left";
-        pctx.fillText(`PLANTA BAIXA ELÉTRICA EXECUTIVA — ESCALA ${tb.scale}`, 88, 899);
+        pctx.fillText(`PLANTA BAIXA ELÉTRICA EXECUTIVA — ESCALA ${tb.scale || "1:50"}`, 88, 899);
         pctx.restore();
 
         // Rodapé Esquerdo: Esquema Unifilar + Quadro de Cargas
         drawUnifilarOnCanvas(pctx, 45, 920, 440, 305);
-        drawCircuitScheduleOnCanvas(pctx, 495, 920, 450, 305);
+        drawCircuitScheduleOnCanvas(pctx, 495, 920, 455, 305);
 
-        // Coluna Central-Direita: LEGENDA AUXILIAR (PADRÃO): ALTURA PONTOS ELÉTRICA (Idêntica à foto 90881.jpg!)
-        drawExecutiveLegendTableOnCanvas(pctx, 960, 62, 415, 760);
+        // Coluna Central-Direita Topo: LEGENDA AUXILIAR (PADRÃO) (100% alinhada desde y=42)
+        drawExecutiveLegendTableOnCanvas(pctx, 960, 42, 418, 780);
 
-        // Caixa de Notas / Observações Executivas abaixo da Legenda
+        // Coluna Central-Direita Base: Caixa de Notas / Observações Executivas (100% alinhada à esquerda e com quebra automática!)
         pctx.save();
+        pctx.beginPath();
+        pctx.rect(960, 832, 418, 393);
+        pctx.clip();
+        pctx.fillStyle = "#ffffff";
+        pctx.fillRect(960, 832, 418, 393);
+        pctx.fillStyle = "#f1f5f9";
+        pctx.fillRect(961, 833, 416, 24);
         pctx.strokeStyle = "#0f172a";
-        pctx.lineWidth = 1.2;
-        pctx.strokeRect(960, 835, 415, 390);
+        pctx.lineWidth = 1.4;
+        pctx.strokeRect(960, 832, 418, 393);
+        pctx.beginPath();
+        pctx.moveTo(960, 857);
+        pctx.lineTo(1378, 857);
+        pctx.stroke();
+
         pctx.fillStyle = "#0f172a";
-        pctx.font = "bold 10px 'Inter', sans-serif";
-        pctx.fillText("NOTAS / OBSERVAÇÕES EXECUTIVAS (NBR 5410):", 970, 854);
+        pctx.textAlign = "left";
+        pctx.textBaseline = "alphabetic";
+        pctx.font = "bold 9.5px 'Inter', sans-serif";
+        pctx.fillText("NOTAS / OBSERVAÇÕES EXECUTIVAS (ABNT NBR 5410):", 970, 849);
+
         const notesLines = (document.getElementById("inpPlantNotes")?.value || "").split("\n");
-        pctx.font = "8.2px 'Inter', sans-serif";
-        notesLines.slice(0, 14).forEach((ln, idx) => {
-          pctx.fillText(ln.slice(0, 68), 970, 874 + idx * 22);
-        });
+        pctx.font = "7.8px 'Inter', sans-serif";
+        drawWrappedLinesInBox(pctx, notesLines, 970, 874, 398, 15.5, 1216);
         pctx.restore();
 
-        // Coluna Extrema Direita: Topo = Esquemático dos Níveis + Itens (90893.jpg) | Base = Carimbo Construtora (90887.jpg)
+        // Coluna Extrema Direita: Topo = Esquemático dos Níveis + Itens | Base = Carimbo Construtora
         drawLevelsAndItemsOnCanvas(pctx, 1388, 42, 370, 275);
         drawConstructorTitleBlockOnCanvas(pctx, 1388, 325, 370, 900, tb);
       } else if (tpl === "a4_unifilar_quadro") {
@@ -4064,95 +4208,151 @@
         drawLevelsAndItemsOnCanvas(pctx, 1388, 42, 370, 275);
         drawConstructorTitleBlockOnCanvas(pctx, 1388, 325, 370, 900, tb);
       }
+      pctx.restore();
     }
 
     function drawUnifilarOnCanvas(c, x, y, w, h) {
       c.save();
+      c.beginPath();
+      c.rect(x, y, w, h);
+      c.clip();
+
+      c.fillStyle = "#ffffff";
+      c.fillRect(x, y, w, h);
+      c.fillStyle = "#f1f5f9";
+      c.fillRect(x + 1, y + 1, w - 2, 24);
       c.strokeStyle = "#0f172a";
       c.fillStyle = "#0f172a";
       c.lineWidth = 1.4;
       c.strokeRect(x, y, w, h);
-
-      c.font = "bold 11px 'Inter', sans-serif";
-      c.textAlign = "left";
-      c.fillText("ESQUEMA UNIFILAR — QDC", x + 12, y + 20);
-
-      const midY = y + h * 0.54;
-      c.font = "bold 9px 'JetBrains Mono', monospace";
-      c.textAlign = "center";
-      c.fillText("REDE", x + 38, midY - 14);
-      c.fillText("127/220V", x + 38, midY - 2);
-      c.fillText("60Hz", x + 38, midY + 14);
-
-      c.lineWidth = 1.6;
-      c.beginPath(); c.moveTo(x + 12, midY + 3); c.lineTo(x + 105, midY + 3); c.stroke();
-
-      c.fillText("QD", x + 122, midY - 12);
-      c.strokeRect(x + 105, midY - 7, 34, 20);
-      c.fillText(`BARR.${project.mainBreakerA}A`, x + 122, midY + 26);
-
-      c.beginPath(); c.moveTo(x + 139, midY + 3); c.lineTo(x + 190, midY + 3); c.stroke();
-
-      c.fillText("DR", x + 205, midY - 11);
       c.beginPath();
-      c.arc(x + 193, midY + 3, 2.5, 0, Math.PI * 2);
-      c.arc(x + 217, midY + 3, 2.5, 0, Math.PI * 2);
-      c.fill();
-      c.beginPath(); c.moveTo(x + 193, midY + 1); c.quadraticCurveTo(x + 205, midY - 9, x + 217, midY + 1); c.stroke();
-      c.fillText(`${project.drCurrentA}A/${project.drSensitivitymA}mA`, x + 205, midY + 24);
+      c.moveTo(x, y + 25);
+      c.lineTo(x + w, y + 25);
+      c.stroke();
 
-      c.beginPath(); c.moveTo(x + 220, midY + 3); c.lineTo(x + 248, midY + 3); c.stroke();
+      c.textBaseline = "alphabetic";
+      c.font = "bold 10px 'Inter', sans-serif";
+      c.textAlign = "left";
+      c.fillText("ESQUEMA UNIFILAR EXECUTIVO — QDC", x + 10, y + 17);
+
+      const midY = y + h * 0.56;
+      c.font = "bold 8px 'JetBrains Mono', monospace";
+      c.textAlign = "center";
+      c.fillText("REDE", x + 42, midY - 14);
+      c.fillText("127/220V", x + 42, midY - 3);
+      c.fillText("60Hz", x + 42, midY + 13);
+
+      c.lineWidth = 1.5;
+      c.beginPath(); c.moveTo(x + 14, midY + 2); c.lineTo(x + 98, midY + 2); c.stroke();
+
+      c.fillText("QD", x + 114, midY - 11);
+      c.strokeRect(x + 98, midY - 7, 32, 18);
+      c.fillText(`BARR.${project.mainBreakerA}A`, x + 114, midY + 23);
+
+      c.beginPath(); c.moveTo(x + 130, midY + 2); c.lineTo(x + 176, midY + 2); c.stroke();
+
+      c.fillText("DR", x + 190, midY - 11);
+      c.beginPath();
+      c.arc(x + 179, midY + 2, 2.3, 0, Math.PI * 2);
+      c.arc(x + 201, midY + 2, 2.3, 0, Math.PI * 2);
+      c.fill();
+      c.beginPath(); c.moveTo(x + 179, midY); c.quadraticCurveTo(x + 190, midY - 9, x + 201, midY); c.stroke();
+      c.fillText(`${project.drCurrentA}A/${project.drSensitivitymA}mA`, x + 190, midY + 22);
+
+      c.beginPath(); c.moveTo(x + 204, midY + 2); c.lineTo(x + 230, midY + 2); c.stroke();
 
       const count = project.circuits.length;
-      const startY = y + 36;
-      const stepY = Math.min(34, (h - 56) / Math.max(count - 1, 1));
+      const startY = y + 44;
+      const stepY = Math.min(34, (h - 60) / Math.max(count - 1, 1));
       project.circuits.forEach((ci, idx) => {
         const cy = startY + idx * stepY;
         c.beginPath();
-        c.moveTo(x + 248, midY + 3);
-        c.lineTo(x + 280, cy);
-        c.lineTo(x + 320, cy);
+        c.moveTo(x + 230, midY + 2);
+        c.lineTo(x + 258, cy);
+        c.lineTo(x + 292, cy);
         c.stroke();
-        c.beginPath(); c.arc(x + 320, cy, 2.2, 0, Math.PI * 2); c.fill();
+        c.beginPath(); c.arc(x + 292, cy, 2.2, 0, Math.PI * 2); c.fill();
         c.textAlign = "left";
-        c.font = "bold 8px 'JetBrains Mono', monospace";
-        c.fillText(`C${ci.id}: ${ci.breakerA}A (#${ci.wireMm2}mm²)`, x + 326, cy + 3);
+        c.font = "bold 7.8px 'JetBrains Mono', monospace";
+        const cDiam = ci.wireMm2 >= 4 ? 'Ø 1"' : 'Ø 3/4"';
+        c.fillText(`C${ci.id}: ${ci.breakerA}A | #${ci.wireMm2}mm² | ${cDiam}`, x + 298, cy + 3);
       });
       c.restore();
     }
 
     function drawCircuitScheduleOnCanvas(c, x, y, w, h) {
       c.save();
+      c.beginPath();
+      c.rect(x, y, w, h);
+      c.clip();
+
+      c.fillStyle = "#ffffff";
+      c.fillRect(x, y, w, h);
+      c.fillStyle = "#f1f5f9";
+      c.fillRect(x + 1, y + 1, w - 2, 43);
       c.strokeStyle = "#0f172a";
       c.fillStyle = "#0f172a";
       c.lineWidth = 1.4;
       c.strokeRect(x, y, w, h);
 
-      c.font = "bold 10.5px 'Inter', sans-serif";
+      c.textBaseline = "alphabetic";
+      c.font = "bold 9.5px 'Inter', sans-serif";
       c.textAlign = "left";
-      c.fillText(`QUADRO DE CARGAS — QD ${project.mainBreakerA}A | DR ${project.drCurrentA}A (${project.drSensitivitymA}mA)`, x + 10, y + 18);
+      c.fillText(`QUADRO DE CARGAS — QD ${project.mainBreakerA}A | DR ${project.drCurrentA}A (${project.drSensitivitymA}mA)`, x + 10, y + 16);
+
+      // Colunas da tabela do Quadro de Cargas: CIRC. | DESCRIÇÃO | V | CABO | DISJ. | CANDUÍTE
+      const c1 = x + 38;
+      const c2 = x + w - 210;
+      const c3 = x + w - 165;
+      const c4 = x + w - 110;
+      const c5 = x + w - 66;
+
+      c.beginPath();
+      c.moveTo(x, y + 24); c.lineTo(x + w, y + 24);
+      c.moveTo(x, y + 44); c.lineTo(x + w, y + 44);
+      [c1, c2, c3, c4, c5].forEach(cx => {
+        c.moveTo(cx, y + 24); c.lineTo(cx, y + h);
+      });
+      c.stroke();
+
+      c.font = "bold 7.5px 'Inter', sans-serif";
+      c.textAlign = "center";
+      c.fillText("CIRC.", (x + c1) / 2, y + 37);
+      c.textAlign = "left";
+      c.fillText("DESCRIÇÃO DO CIRCUITO", c1 + 6, y + 37);
+      c.textAlign = "center";
+      c.fillText("V", (c2 + c3) / 2, y + 37);
+      c.fillText("CABO", (c3 + c4) / 2, y + 37);
+      c.fillText("DISJ.", (c4 + c5) / 2, y + 37);
+      c.fillText("CANDUÍTE", (c5 + x + w) / 2, y + 37);
 
       const rowH = 26;
-      c.font = "bold 8.5px 'JetBrains Mono', monospace";
-      c.fillText("CIRC.", x + 10, y + 38);
-      c.fillText("DESCRIÇÃO", x + 52, y + 38);
-      c.fillText("V", x + w - 145, y + 38);
-      c.fillText("CABO", x + w - 105, y + 38);
-      c.fillText("DISJ.", x + w - 48, y + 38);
-
-      c.beginPath(); c.moveTo(x, y + 44); c.lineTo(x + w, y + 44); c.stroke();
-
       project.circuits.forEach((ci, idx) => {
-        const ry = y + 64 + idx * rowH;
-        if (ry > y + h - 8) return;
-        c.font = "bold 8.5px 'JetBrains Mono', monospace";
-        c.fillText(`C${ci.id}`, x + 10, ry);
-        c.font = "8.5px 'Inter', sans-serif";
-        c.fillText(ci.name.slice(0, 26), x + 52, ry);
-        c.font = "8.5px 'JetBrains Mono', monospace";
-        c.fillText(`${ci.voltage}V`, x + w - 145, ry);
-        c.fillText(`#${ci.wireMm2}mm²`, x + w - 105, ry);
-        c.fillText(`${ci.breakerA}A`, x + w - 48, ry);
+        const ry = y + 44 + (idx + 1) * rowH;
+        if (ry > y + h + 4) return;
+        c.beginPath();
+        c.strokeStyle = "#cbd5e1";
+        c.lineWidth = 0.8;
+        c.moveTo(x, ry); c.lineTo(x + w, ry);
+        c.stroke();
+
+        const ty = ry - 8;
+        c.fillStyle = "#0f172a";
+        c.font = "bold 8px 'JetBrains Mono', monospace";
+        c.textAlign = "center";
+        c.fillText(`C${ci.id}`, (x + c1) / 2, ty);
+
+        c.font = "7.8px 'Inter', sans-serif";
+        c.textAlign = "left";
+        c.fillText(String(ci.name || "").slice(0, 27), c1 + 6, ty);
+
+        c.font = "7.8px 'JetBrains Mono', monospace";
+        c.textAlign = "center";
+        c.fillText(`${ci.voltage}V`, (c2 + c3) / 2, ty);
+        c.fillText(`#${ci.wireMm2}mm²`, (c3 + c4) / 2, ty);
+        c.fillText(`${ci.breakerA}A`, (c4 + c5) / 2, ty);
+        const cDiam = ci.conduitDiam || (ci.wireMm2 >= 4 ? 'Ø 1"' : 'Ø 3/4"');
+        c.fillText(cDiam, (c5 + x + w) / 2, ty);
       });
       c.restore();
     }
@@ -4349,21 +4549,60 @@
                 </select>
               </div>
               <div>
-                <label class="block text-slate-400 text-[10px] mb-0.5">Diâmetro</label>
-                <select id="inpCdDiam" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 font-mono-tech text-white">
-                  <option value='Ø 20' ${cd.diameter === 'Ø 20' ? 'selected' : ''}>Ø 20mm (1/2")</option>
-                  <option value='Ø 25' ${(!cd.diameter || cd.diameter === 'Ø 25' || cd.diameter === 'Ø 3/4"') ? 'selected' : ''}>Ø 25mm (3/4")</option>
-                  <option value='Ø 32' ${cd.diameter === 'Ø 32' ? 'selected' : ''}>Ø 32mm (1")</option>
+                <label class="block text-amber-300 font-semibold text-[10px] mb-0.5">Bitola Canduíte</label>
+                <select id="inpCdDiam" class="w-full bg-slate-950 border border-amber-500/60 rounded px-1.5 py-1 font-mono-tech font-bold text-amber-300">
+                  <option value='Ø 1/2" (16mm)' ${String(cd.diameter).includes('1/2') || cd.diameter === 'Ø 20' ? 'selected' : ''}>Ø 1/2" (16mm)</option>
+                  <option value='Ø 3/4" (20mm)' ${cd.diameter === 'Ø 3/4" (20mm)' ? 'selected' : ''}>Ø 3/4" (20mm)</option>
+                  <option value='Ø 3/4" (25mm)' ${(!cd.diameter || cd.diameter === 'Ø 25' || cd.diameter === 'Ø 3/4"' || cd.diameter === 'Ø 3/4" (25mm)') ? 'selected' : ''}>Ø 3/4" (25mm) Padrão</option>
+                  <option value='Ø 1" (32mm)' ${(cd.diameter === 'Ø 32' || String(cd.diameter).startsWith('Ø 1"')) ? 'selected' : ''}>Ø 1" (32mm) Reforçado</option>
+                  <option value='Ø 1.1/4" (40mm)' ${String(cd.diameter).startsWith('Ø 1.1/4"') ? 'selected' : ''}>Ø 1.1/4" (40mm)</option>
+                  <option value='Ø 1.1/2" (50mm)' ${String(cd.diameter).startsWith('Ø 1.1/2"') ? 'selected' : ''}>Ø 1.1/2" (50mm)</option>
+                  <option value='Ø 2" (60mm)' ${String(cd.diameter).startsWith('Ø 2"') ? 'selected' : ''}>Ø 2" (60mm) Entrada</option>
+                  <option value='Ø 2.1/2" (75mm)' ${String(cd.diameter).startsWith('Ø 2.1/2"') ? 'selected' : ''}>Ø 2.1/2" (75mm)</option>
+                  <option value='Ø 3" (85mm)' ${String(cd.diameter).startsWith('Ø 3"') ? 'selected' : ''}>Ø 3" (85mm)</option>
+                  <option value='Ø 4" (110mm)' ${String(cd.diameter).startsWith('Ø 4"') ? 'selected' : ''}>Ø 4" (110mm)</option>
                 </select>
               </div>
             </div>
+
+            <!-- Botões Rápidos de Escolha de Bitola do Canduíte (1/2", 3/4", 1", 1.1/4", 1.1/2", 2") -->
+            <div class="p-2 rounded bg-amber-950/30 border border-amber-500/40 space-y-1">
+              <div class="text-[10px] font-bold text-amber-300">⚡ Escolha Rápida do Canduíte:</div>
+              <div class="grid grid-cols-3 gap-1 text-[10px] font-mono-tech">
+                <button data-quick-diam='Ø 1/2" (16mm)' class="py-1 px-1 rounded bg-slate-800 hover:bg-amber-600 text-amber-200 border border-slate-600">Ø 1/2"</button>
+                <button data-quick-diam='Ø 3/4" (25mm)' class="py-1 px-1 rounded bg-amber-600/30 hover:bg-amber-600 text-amber-200 font-bold border border-amber-500">Ø 3/4"</button>
+                <button data-quick-diam='Ø 1" (32mm)' class="py-1 px-1 rounded bg-amber-600/30 hover:bg-amber-600 text-amber-200 font-bold border border-amber-500">Ø 1"</button>
+                <button data-quick-diam='Ø 1.1/4" (40mm)' class="py-1 px-1 rounded bg-slate-800 hover:bg-amber-600 text-amber-200 border border-slate-600">Ø 1.1/4"</button>
+                <button data-quick-diam='Ø 1.1/2" (50mm)' class="py-1 px-1 rounded bg-slate-800 hover:bg-amber-600 text-amber-200 border border-slate-600">Ø 1.1/2"</button>
+                <button data-quick-diam='Ø 2" (60mm)' class="py-1 px-1 rounded bg-slate-800 hover:bg-amber-600 text-amber-200 border border-slate-600">Ø 2"</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sky-300 font-semibold text-[10px] mb-0.5">Tipo / Material do Canduíte</label>
+              <select id="inpCdConduitType" class="w-full bg-slate-950 border border-sky-500/50 rounded px-2 py-1 font-mono-tech text-[11px] text-sky-200">
+                ${[
+                  "Corrugado Flexível Amarelo",
+                  "Corrugado Laranja Reforçado",
+                  "PVC Rígido Roscável",
+                  "PVC Rígido Soldável",
+                  "Metálico Galvanizado",
+                  "Condulete Aparente",
+                  "PEAD Subterrâneo",
+                  "Sealtubo Flexível",
+                  "Eletrocalha / Perfilado"
+                ].map(tp => `<option value="${tp}" ${(cd.conduitType || "Corrugado Flexível Amarelo") === tp ? 'selected' : ''}>${tp}</option>`).join("")}
+              </select>
+            </div>
+
             <div class="grid grid-cols-2 gap-1.5">
               <div>
-                <label class="block text-slate-400 text-[10px] mb-0.5">Instalação</label>
+                <label class="block text-slate-400 text-[10px] mb-0.5">Traçado / Instalação</label>
                 <select id="inpCdStyle" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 font-mono-tech text-white">
-                  <option value="ceiling" ${(!cd.style || cd.style === 'ceiling') ? 'selected' : ''}>Forro / Laje</option>
-                  <option value="wall" ${cd.style === 'wall' ? 'selected' : ''}>Parede</option>
-                  <option value="floor" ${cd.style === 'floor' ? 'selected' : ''}>Piso</option>
+                  <option value="ceiling" ${(!cd.style || cd.style === 'ceiling') ? 'selected' : ''}>Forro / Laje (Contínuo)</option>
+                  <option value="wall" ${cd.style === 'wall' ? 'selected' : ''}>Parede (Tracejado)</option>
+                  <option value="floor" ${cd.style === 'floor' ? 'selected' : ''}>Piso / Subt. (Traço-Ponto)</option>
+                  <option value="exposed" ${cd.style === 'exposed' ? 'selected' : ''}>Aparente / Condulete</option>
                 </select>
               </div>
               <div>
@@ -4402,6 +4641,18 @@
           cd.leaderDy = 0;
           refreshAllViews();
         });
+        box.querySelectorAll("[data-quick-diam]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const dVal = btn.getAttribute("data-quick-diam");
+            cd.diameter = dVal;
+            const selEl = document.getElementById("inpCdDiam");
+            if (selEl) selEl.value = dVal;
+            const topSel = document.getElementById("selDefaultConduitDiam");
+            if (topSel) topSel.value = dVal;
+            refreshAllViews(false);
+            showToast(`Canduíte alterado para ${dVal}`);
+          });
+        });
         const bindCd = () => {
           cd.wireMm2 = parseFloat(document.getElementById("inpCdWireMm2").value) || 2.5;
           cd.style = document.getElementById("inpCdStyle").value;
@@ -4409,10 +4660,11 @@
           cd.circuitLabel = document.getElementById("inpCdCircuitLabel").value;
           cd.cmdLabel = document.getElementById("inpCdCmdLabel").value;
           cd.diameter = document.getElementById("inpCdDiam").value;
+          cd.conduitType = document.getElementById("inpCdConduitType")?.value || "Corrugado Flexível Amarelo";
           cd.curve = parseFloat(document.getElementById("inpCdCurve").value) || 0;
           refreshAllViews(false);
         };
-        ["inpCdWireMm2", "inpCdStyle", "inpCdWires", "inpCdCircuitLabel", "inpCdCmdLabel", "inpCdDiam", "inpCdCurve"].forEach(id => {
+        ["inpCdWireMm2", "inpCdStyle", "inpCdWires", "inpCdCircuitLabel", "inpCdCmdLabel", "inpCdDiam", "inpCdConduitType", "inpCdCurve"].forEach(id => {
           document.getElementById(id)?.addEventListener("input", bindCd);
           document.getElementById(id)?.addEventListener("change", bindCd);
         });
@@ -4756,9 +5008,14 @@
       window: "🪟 <b>JANELA:</b> Clique na parede para inserir uma janela de 1,20m.",
       dim: "📏 <b>COTA (DIM):</b> Clique no 1º ponto e no 2º ponto para cotar a medida.",
       note: "🔤 <b>TEXTO (MTEXT):</b> Clique na planta para inserir um texto.",
-      conduit: "〰️ <b>ELETRODUTO NO FORRO/LAJE:</b> 1º Clique na saída e 2º Clique na chegada.",
-      conduit_wall: "┄ <b>ELETRODUTO NA PAREDE:</b> 1º Clique na saída e 2º Clique na chegada.",
-      conduit_floor: "─·─ <b>ELETRODUTO NO PISO:</b> 1º Clique na saída e 2º Clique na chegada."
+      conduit: "〰️ <b>CANDUÍTE / ELETRODUTO (LAJE/FORRO):</b> 1º Clique na saída e 2º Clique na chegada (escolha 3/4\", 1\", etc. no topo).",
+      conduit_34: "〰️ <b>CANDUÍTE Ø 3/4\" (25mm):</b> 1º Clique na saída e 2º Clique na chegada.",
+      conduit_1pol: "〰️ <b>CANDUÍTE Ø 1\" (32mm REFORÇADO):</b> 1º Clique na saída e 2º Clique na chegada.",
+      conduit_114: "〰️ <b>CANDUÍTE Ø 1.1/4\" (40mm):</b> 1º Clique na saída e 2º Clique na chegada.",
+      conduit_2pol: "〰️ <b>CANDUÍTE Ø 2\" (60mm ENTRADA/QDC):</b> 1º Clique na saída e 2º Clique na chegada.",
+      conduit_wall: "┄ <b>CANDUÍTE EMBUTIDO NA PAREDE:</b> 1º Clique na saída e 2º Clique na chegada.",
+      conduit_floor: "─·─ <b>CANDUÍTE NO PISO / SUBTERRÂNEO:</b> 1º Clique na saída e 2º Clique na chegada.",
+      conduit_exposed: "═ <b>CANDUÍTE APARENTE / CONDULETE:</b> 1º Clique na saída e 2º Clique na chegada."
     };
 
     function activateToolByName(t) {
@@ -4886,6 +5143,32 @@
       } else if (sel.category === "opening") {
         const op = project.openings.find(x => x.id === sel.id);
         if (op) { op.orient = op.orient === "v" ? "h" : "v"; refreshAllViews(false); }
+      }
+    });
+
+    document.getElementById("selDefaultConduitDiam")?.addEventListener("change", (e) => {
+      const val = e.target.value;
+      const shortLbl = val.split("(")[0].trim();
+      const btnLbl = document.getElementById("lblRibbonConduitBtn");
+      if (btnLbl) btnLbl.textContent = `Canduíte ${shortLbl}`;
+      if (appState.selectedItem && appState.selectedItem.category === "conduit") {
+        const cd = project.conduits.find(x => x.id === appState.selectedItem.id);
+        if (cd) {
+          cd.diameter = val;
+          refreshAllViews();
+          showToast(`Bitola do canduíte atualizada para ${val}`);
+        }
+      }
+    });
+    document.getElementById("selDefaultConduitType")?.addEventListener("change", (e) => {
+      const val = e.target.value;
+      if (appState.selectedItem && appState.selectedItem.category === "conduit") {
+        const cd = project.conduits.find(x => x.id === appState.selectedItem.id);
+        if (cd) {
+          cd.conduitType = val;
+          refreshAllViews();
+          showToast(`Tipo de canduíte atualizado para ${val}`);
+        }
       }
     });
 
