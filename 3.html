@@ -146,6 +146,12 @@
         <option value="industrial">🏭 Galpão Industrial Trifásico</option>
       </select>
 
+      <button id="btnSaveUserProject" class="px-2.5 py-1 rounded bg-sky-600 hover:bg-sky-500 text-white text-[11px] font-bold transition shadow" title="Salvar o projeto atual no próprio site">
+        💾 Salvar Projeto
+      </button>
+      <button id="btnOpenSavedProjects" class="px-2.5 py-1 rounded bg-amber-500 hover:bg-amber-400 text-slate-950 text-[11px] font-bold transition shadow" title="Abrir área de Projetos Salvos do Usuário para Imprimir ou Modificar">
+        📂 Meus Projetos (<span id="savedCountBadge">3</span>)
+      </button>
       <button id="btnCompareOriginal" class="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[11px] font-medium transition" title="Guia de Recursos do voltCAD">
         Planta Original
       </button>
@@ -210,14 +216,36 @@
           <span class="text-sm leading-none">📐</span>
           <span class="text-[10px] font-semibold mt-0.5">Auto-Calcular m²</span>
         </button>
-        <button data-tool="door" class="tool-btn px-2 py-1 rounded border border-slate-700 bg-[#232b3a] hover:bg-slate-700 text-xs flex flex-col items-center min-w-[52px]">
+        <button data-tool="door" class="tool-btn px-2 py-1 rounded border border-slate-700 bg-[#232b3a] hover:bg-slate-700 text-xs flex flex-col items-center min-w-[52px]" title="Inserir Porta com a medida comercial selecionada ao lado">
           <span class="text-sm leading-none">🚪</span>
           <span class="text-[10px] font-medium mt-0.5">Porta (0,80m)</span>
         </button>
-        <button data-tool="window" class="tool-btn px-2 py-1 rounded border border-slate-700 bg-[#232b3a] hover:bg-slate-700 text-xs flex flex-col items-center min-w-[52px]">
+        <select id="selMarketDoorSize" aria-label="Tamanhos de Porta do Mercado" class="bg-[#12161f] border border-slate-700 text-[10px] rounded px-1.5 py-1 text-amber-300 font-mono-tech focus:outline-none" title="Escolha qualquer tamanho de porta comercial disponível no mercado">
+          <option value="0.60|1f">Porta 0,60×2,10m (Banho)</option>
+          <option value="0.70|1f">Porta 0,70×2,10m (Banho/Serv)</option>
+          <option value="0.80|1f" selected>Porta 0,80×2,10m (Quarto Padrão)</option>
+          <option value="0.90|1f">Porta 0,90×2,10m (Entrada/PCD)</option>
+          <option value="1.00|1f">Porta 1,00×2,10m (Social)</option>
+          <option value="1.20|piv">Porta 1,20×2,10m (Pivotante)</option>
+          <option value="1.40|2f">Porta Dupla 1,40×2,10m</option>
+          <option value="1.60|cor">Porta Correr 1,60×2,10m</option>
+          <option value="2.00|cor">Porta Correr 2,00×2,10m</option>
+          <option value="2.40|cor">Porta Correr 2,40×2,10m</option>
+        </select>
+        <button data-tool="window" class="tool-btn px-2 py-1 rounded border border-slate-700 bg-[#232b3a] hover:bg-slate-700 text-xs flex flex-col items-center min-w-[52px]" title="Inserir Janela com a medida comercial selecionada ao lado">
           <span class="text-sm leading-none">🪟</span>
           <span class="text-[10px] font-medium mt-0.5">Janela (1,20m)</span>
         </button>
+        <select id="selMarketWindowSize" aria-label="Tamanhos de Janela do Mercado" class="bg-[#12161f] border border-slate-700 text-[10px] rounded px-1.5 py-1 text-sky-300 font-mono-tech focus:outline-none" title="Escolha qualquer tamanho de janela comercial disponível no mercado">
+          <option value="0.60|0.60|1.50">Janela 0,60×0,60m (Banho)</option>
+          <option value="0.80|0.60|1.50">Janela 0,80×0,60m (Maxim-Ar)</option>
+          <option value="1.00|1.00|1.10">Janela 1,00×1,00m (Cozinha)</option>
+          <option value="1.20|1.00|1.10" selected>Janela 1,20×1,00m (Padrão)</option>
+          <option value="1.50|1.00|1.10">Janela 1,50×1,00m (Quarto)</option>
+          <option value="1.50|1.20|1.00">Janela 1,50×1,20m (Suíte/Sala)</option>
+          <option value="2.00|1.20|1.00">Janela 2,00×1,20m (Sala 4 Fls)</option>
+          <option value="2.40|1.20|1.00">Janela 2,40×1,20m (Panorâmica)</option>
+        </select>
         <button data-tool="dim" class="tool-btn px-2 py-1 rounded border border-slate-700 bg-[#232b3a] hover:bg-slate-700 text-xs flex flex-col items-center min-w-[48px]">
           <span class="text-sm leading-none">📏</span>
           <span class="text-[10px] font-medium mt-0.5">Cota (DIM)</span>
@@ -707,68 +735,72 @@
             <div class="pt-2 border-t border-slate-800 space-y-2">
               <div class="font-bold text-amber-400 text-[11px] uppercase font-mono-tech">Dados do Carimbo (Idêntico à Prancha Executiva)</div>
 
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] text-emerald-300">Campos em branco prontos para você preencher:</span>
+                <button id="btnClearTitleBlock" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-rose-300 border border-slate-700">🧹 Limpar Campos</button>
+              </div>
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block text-slate-400 text-[10px] mb-0.5">Empreendimento / Obra:</label>
-                  <input id="tbClient" type="text" value="TERRACE SERRA DO JAPI" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white font-bold" />
+                  <input id="tbClient" type="text" value="" placeholder="Preencha a Obra / Cliente..." class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white font-bold" />
                 </div>
                 <div>
                   <label class="block text-slate-400 text-[10px] mb-0.5">Incorporadora / Construtora:</label>
-                  <input id="tbBuilder" type="text" value="AUTEN INCORPORADORA" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white font-semibold" />
+                  <input id="tbBuilder" type="text" value="" placeholder="Preencha a Construtora..." class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white font-semibold" />
                 </div>
               </div>
 
               <div>
                 <label class="block text-slate-400 text-[10px] mb-0.5">Endereço da Obra:</label>
-                <input id="tbAddress" type="text" value="AV. DR ADILSON RODRIGUES - JUNDIAÍ - SP" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white" />
+                <input id="tbAddress" type="text" value="" placeholder="Preencha o Endereço da Obra..." class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white" />
               </div>
 
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block text-slate-400 text-[10px] mb-0.5">Projetista / Empresa Elétrica:</label>
-                  <input id="tbCompany" type="text" value="PROJECAMP ENGENHARIA / voltCAD" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-sky-300 font-semibold" />
+                  <input id="tbCompany" type="text" value="" placeholder="Preencha o Projetista / Empresa..." class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-sky-300 font-semibold" />
                 </div>
                 <div>
                   <label class="block text-slate-400 text-[10px] mb-0.5">Conteúdo da Prancha:</label>
-                  <input id="tbContent" type="text" value="PAV. TIPO - (x17) 1º AO 17º PAV." class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white" />
+                  <input id="tbContent" type="text" value="" placeholder="Ex: Planta Baixa Elétrica..." class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white" />
                 </div>
               </div>
 
               <div class="grid grid-cols-3 gap-1.5">
                 <div>
                   <label class="block text-slate-400 text-[10px] mb-0.5">Resp. / Eletricista:</label>
-                  <input id="tbElectrician" type="text" value="MARCELO FLORIANO" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white font-semibold" />
+                  <input id="tbElectrician" type="text" value="" placeholder="Nome do Eletricista..." class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white font-semibold" />
                 </div>
                 <div>
                   <label class="block text-slate-400 text-[10px] mb-0.5">Coordenador / Reg.:</label>
-                  <input id="tbRegistry" type="text" value="CREA/CFT 148.920" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 font-mono-tech text-white" />
+                  <input id="tbRegistry" type="text" value="" placeholder="CFT / CREA / Tel..." class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 font-mono-tech text-white" />
                 </div>
                 <div>
                   <label class="block text-slate-400 text-[10px] mb-0.5">Desenhista:</label>
-                  <input id="tbDrafter" type="text" value="NATHALIA" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white" />
+                  <input id="tbDrafter" type="text" value="" placeholder="Desenhista..." class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-white" />
                 </div>
               </div>
 
               <div class="grid grid-cols-5 gap-1.5">
                 <div>
                   <label class="block text-slate-400 text-[10px] mb-0.5">Fase</label>
-                  <input id="tbPhase" type="text" value="LIBERADO OBRA" class="w-full bg-slate-950 border border-slate-700 rounded px-1.5 py-1 font-mono-tech text-[10px] text-emerald-300" />
+                  <input id="tbPhase" type="text" value="" placeholder="Executivo" class="w-full bg-slate-950 border border-slate-700 rounded px-1.5 py-1 font-mono-tech text-[10px] text-emerald-300" />
                 </div>
                 <div>
                   <label class="block text-slate-400 text-[10px] mb-0.5">Folha Nº</label>
-                  <input id="tbSheetNum" type="number" min="1" max="999" value="302" class="w-full bg-slate-950 border border-slate-700 rounded px-1.5 py-1 font-mono-tech font-bold text-sky-300 text-center" />
+                  <input id="tbSheetNum" type="text" value="" placeholder="01" class="w-full bg-slate-950 border border-slate-700 rounded px-1.5 py-1 font-mono-tech font-bold text-sky-300 text-center" />
                 </div>
                 <div>
                   <label class="block text-slate-400 text-[10px] mb-0.5">Total Fls</label>
-                  <input id="tbSheetTotal" type="number" min="1" max="999" value="305" class="w-full bg-slate-950 border border-slate-700 rounded px-1.5 py-1 font-mono-tech font-bold text-emerald-300 text-center" />
+                  <input id="tbSheetTotal" type="text" value="" placeholder="02" class="w-full bg-slate-950 border border-slate-700 rounded px-1.5 py-1 font-mono-tech font-bold text-emerald-300 text-center" />
                 </div>
                 <div>
                   <label class="block text-slate-400 text-[10px] mb-0.5">Escala</label>
-                  <input id="tbScale" type="text" value="1:50" class="w-full bg-slate-950 border border-slate-700 rounded px-1.5 py-1 font-mono-tech text-white text-center" />
+                  <input id="tbScale" type="text" value="" placeholder="1:50" class="w-full bg-slate-950 border border-slate-700 rounded px-1.5 py-1 font-mono-tech text-white text-center" />
                 </div>
                 <div>
                   <label class="block text-slate-400 text-[10px] mb-0.5">Revisão / Data</label>
-                  <input id="tbDate" type="text" value="R03 - 04/11/26" class="w-full bg-slate-950 border border-slate-700 rounded px-1 py-1 font-mono-tech text-[10px] text-white text-center" />
+                  <input id="tbDate" type="text" value="" placeholder="Data/Rev" class="w-full bg-slate-950 border border-slate-700 rounded px-1 py-1 font-mono-tech text-[10px] text-white text-center" />
                 </div>
               </div>
             </div>
@@ -903,6 +935,32 @@
     </div>
   </div>
 
+
+  <!-- MODAL: CENTRAL DE PROJETOS SALVOS DO USUÁRIO (ITEM 2) -->
+  <div id="modalSavedProjects" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span>📂 Meus Projetos Salvos no voltCAD</span>
+            <span class="text-[10px] font-mono-tech px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Salvo Automaticamente no Navegador</span>
+          </h3>
+          <p class="text-xs text-slate-400">Salve seus projetos no próprio site, abra projetos já feitos para modificar ou envie direto para impressão com carimbo.</p>
+        </div>
+        <button id="btnCloseSavedProjects" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs">Fechar ✕</button>
+      </div>
+
+      <div class="p-4 border-b border-slate-800 bg-slate-900/60 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+        <input id="inpNewSaveName" type="text" placeholder="Digite o nome para salvar o projeto atual (ex: Casa Cliente João - 120m²)..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500" />
+        <button id="btnConfirmSaveNewProject" class="px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow flex items-center justify-center gap-1.5">
+          <span>💾 Salvar Projeto Atual na Lista</span>
+        </button>
+      </div>
+
+      <div id="savedProjectsGrid" class="p-4 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-3 flex-1"></div>
+    </div>
+  </div>
+
   <!-- MODAL: EXPORTAR / SALVAR -->
   <div id="modalExport" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full flex flex-col shadow-2xl overflow-hidden">
@@ -1033,19 +1091,19 @@
 
     function getDefaultTitleBlock() {
       return {
-        builder: "AUTEN INCORPORADORA",
-        company: "PROJECAMP ENGENHARIA / voltCAD",
-        client: "TERRACE SERRA DO JAPI",
-        address: "AV. DR ADILSON RODRIGUES - JUNDIAÍ - SP",
-        content: "PAV. TIPO - (x17) 1º AO 17º PAV.",
-        electrician: "MARCELO FLORIANO",
-        registry: "CREA/CFT 148.920",
-        drafter: "NATHALIA",
-        phase: "LIBERADO OBRA",
-        sheetNum: 302,
-        sheetTotal: 305,
-        scale: "1:50",
-        date: "R03 - 04/11/26"
+        builder: "",
+        company: "",
+        client: "",
+        address: "",
+        content: "",
+        electrician: "",
+        registry: "",
+        drafter: "",
+        phase: "",
+        sheetNum: "",
+        sheetTotal: "",
+        scale: "",
+        date: ""
       };
     }
 
@@ -1599,22 +1657,21 @@
         targetCtx.stroke();
         targetCtx.restore();
 
-        // Alças de esticar/encolher sempre visíveis na parede selecionada
+        // Alças de esticar/encolher APENAS NAS PONTAS da parede (SEM ponto no meio da parede, conforme solicitado!)
         if (isSel) {
           const mx = (p1.x + p2.x) / 2;
           const my = (p1.y + p2.y) / 2;
           drawGripHandle(targetCtx, p1.x, p1.y, "#0284c7", "A");
-          drawGripHandle(targetCtx, mx, my, "#f59e0b", "✥");
           drawGripHandle(targetCtx, p2.x, p2.y, "#0284c7", "B");
 
           const wLen = Math.hypot(w.x2 - w.x1, w.y2 - w.y1).toFixed(2);
           targetCtx.save();
           targetCtx.fillStyle = "#0f172a";
-          targetCtx.fillRect(mx - 34, my - 24, 68, 16);
+          targetCtx.fillRect(mx - 34, my - 22, 68, 15);
           targetCtx.fillStyle = "#38bdf8";
-          targetCtx.font = "bold 10px 'JetBrains Mono', monospace";
+          targetCtx.font = "bold 9.5px 'JetBrains Mono', monospace";
           targetCtx.textAlign = "center";
-          targetCtx.fillText(`◄ ${wLen}m ►`, mx, my - 12);
+          targetCtx.fillText(`◄ ${wLen}m ►`, mx, my - 11);
           targetCtx.restore();
         }
       });
@@ -1626,11 +1683,43 @@
         const isSel = !opts.forPrint && appState.selectedItem && appState.selectedItem.category === "opening" && appState.selectedItem.id === op.id;
         targetCtx.save();
         if (op.type === "door") {
-          targetCtx.strokeStyle = isSel ? "#0284c7" : (isWhite ? "#334155" : "#94a3b8");
-          targetCtx.lineWidth = isSel ? 2.2 : 1.2;
-          targetCtx.beginPath();
-          targetCtx.arc(p.x, p.y, wPx * 0.8, -Math.PI * 0.5, 0);
-          targetCtx.stroke();
+          targetCtx.strokeStyle = isSel ? "#0284c7" : (isWhite ? "#0f172a" : "#94a3b8");
+          targetCtx.lineWidth = isSel ? 2.2 : 1.3;
+          if (op.orient === "v") {
+            targetCtx.translate(p.x, p.y);
+            targetCtx.rotate(Math.PI / 2);
+            targetCtx.translate(-p.x, -p.y);
+          }
+          if (op.doorKind === "cor") {
+            // Porta de Correr (2 folhas sobrepostas)
+            targetCtx.fillStyle = isWhite ? "#ffffff" : "#0f172a";
+            targetCtx.fillRect(p.x - wPx / 2, p.y - 3, wPx, 6);
+            targetCtx.strokeRect(p.x - wPx / 2, p.y - 3, wPx * 0.55, 3);
+            targetCtx.strokeRect(p.x - wPx * 0.05, p.y, wPx * 0.55, 3);
+          } else if (op.doorKind === "2f") {
+            // Porta Dupla (2 arcos opostos)
+            targetCtx.beginPath();
+            targetCtx.moveTo(p.x - wPx / 2, p.y);
+            targetCtx.lineTo(p.x - wPx / 2, p.y - wPx * 0.45);
+            targetCtx.arc(p.x - wPx / 2, p.y, wPx * 0.45, -Math.PI * 0.5, 0);
+            targetCtx.moveTo(p.x + wPx / 2, p.y);
+            targetCtx.lineTo(p.x + wPx / 2, p.y - wPx * 0.45);
+            targetCtx.arc(p.x + wPx / 2, p.y, wPx * 0.45, -Math.PI, -Math.PI * 0.5, true);
+            targetCtx.stroke();
+          } else {
+            // Porta 1 Folha / Pivotante com folha + arco AutoCAD
+            targetCtx.beginPath();
+            targetCtx.moveTo(p.x, p.y);
+            targetCtx.lineTo(p.x, p.y - wPx * 0.85);
+            targetCtx.arc(p.x, p.y, wPx * 0.85, -Math.PI * 0.5, 0);
+            targetCtx.stroke();
+          }
+          if (appState.showLabels) {
+            targetCtx.font = "bold 7.5px 'JetBrains Mono', monospace";
+            targetCtx.fillStyle = isWhite ? "#334155" : "#bae6fd";
+            targetCtx.textAlign = "center";
+            targetCtx.fillText(`P ${(op.w || 0.8).toFixed(2)}×2.10`, p.x, p.y + 11);
+          }
         } else if (op.type === "window") {
           targetCtx.fillStyle = isWhite ? "#bae6fd" : "#0369a1";
           targetCtx.strokeStyle = isSel ? "#f59e0b" : (isWhite ? "#0f172a" : "#38bdf8");
@@ -1734,31 +1823,94 @@
         const bx = 0.25 * p1.x + 0.5 * cx + 0.25 * p2.x;
         const by = 0.25 * p1.y + 0.5 * cy + 0.25 * p2.y;
 
+        // Calcula posição dos traços transversais (em cima da linha do circuito OU na pequena linha lateral esticada pelo usuário!)
+        const ldxPx = (cd.leaderDx || 0) * scaleVal;
+        const ldyPx = (cd.leaderDy || 0) * scaleVal;
+        const hasSideLeader = Math.hypot(ldxPx, ldyPx) > 4;
+        const tx = bx + ldxPx;
+        const ty = by + ldyPx;
+
         if (!showUnderlayImg || underlayAlpha < 0.45 || isSel) {
-          targetCtx.save();
-          targetCtx.translate(bx, by);
-          const ang = Math.atan2(dy, dx);
-          targetCtx.rotate(ang);
-          targetCtx.strokeStyle = isWhite ? "#0f172a" : "#fbbf24";
-          targetCtx.lineWidth = 1.15;
-          [-3, 0, 3].forEach(off => {
+          const strokeCol = isWhite ? "#0f172a" : "#fbbf24";
+          // Parseia os símbolos de condutores: N (Neutro), F/2F/3F (Fases), R (Retorno simples), RP (Retorno Paralelo 2x), RI (Retorno Intermediário 3x), T (Terra)
+          const rawTokens = String(cd.wires || "F,N,T").split(",").map(s => s.trim().toUpperCase()).filter(Boolean);
+          const expanded = [];
+          rawTokens.forEach(tk => {
+            if (tk === "2F" || tk === "FF") { expanded.push("F", "F"); }
+            else if (tk === "3F" || tk === "FFF") { expanded.push("F", "F", "F"); }
+            else if (tk.startsWith("2R") || tk === "RP" || tk === "PARALELO") { expanded.push("RP", "RP"); }
+            else if (tk.startsWith("3R") || tk === "RI" || tk === "INTERMEDIARIO" || tk === "4W") { expanded.push("RI", "RI", "RI"); }
+            else if (tk.startsWith("R")) { expanded.push("R"); }
+            else if (tk.startsWith("N")) { expanded.push("N"); }
+            else if (tk.startsWith("T") || tk === "PE") { expanded.push("T"); }
+            else { expanded.push("F"); }
+          });
+          const spacing = 4.2;
+          const totalW = Math.max(12, (expanded.length - 1) * spacing);
+
+          if (hasSideLeader) {
+            // Desenha a pequena linha de chamada (Leader) + patamar horizontal ao lado do circuito!
+            targetCtx.save();
+            targetCtx.strokeStyle = isSel ? "#06b6d4" : strokeCol;
+            targetCtx.lineWidth = 1.15;
             targetCtx.beginPath();
-            targetCtx.moveTo(off, -4.5);
-            targetCtx.lineTo(off, 4.5);
+            targetCtx.moveTo(bx, by);
+            targetCtx.lineTo(tx - totalW / 2 - 4, ty);
+            targetCtx.lineTo(tx + totalW / 2 + 4, ty);
+            targetCtx.stroke();
+            targetCtx.restore();
+          }
+
+          targetCtx.save();
+          targetCtx.translate(tx, ty);
+          const ang = hasSideLeader ? 0 : Math.atan2(dy, dx);
+          targetCtx.rotate(ang);
+          targetCtx.strokeStyle = strokeCol;
+          targetCtx.lineWidth = 1.25;
+
+          expanded.forEach((sym, i) => {
+            const ox = -((expanded.length - 1) * spacing) / 2 + i * spacing;
+            targetCtx.beginPath();
+            if (sym === "N") {
+              // Neutro NBR 5410: haste vertical + dobra horizontal em L no topo (⌐)
+              targetCtx.moveTo(ox, 5.2);
+              targetCtx.lineTo(ox, -6.2);
+              targetCtx.lineTo(ox - 3.2, -6.2);
+            } else if (sym === "T") {
+              // Terra NBR 5410: haste vertical + T horizontal no topo (⊤)
+              targetCtx.moveTo(ox, 5.2);
+              targetCtx.lineTo(ox, -6.2);
+              targetCtx.moveTo(ox - 2.6, -6.2);
+              targetCtx.lineTo(ox + 2.6, -6.2);
+            } else if (sym === "R" || sym === "RP" || sym === "RI") {
+              // Retorno (Simples, Paralelo ou Intermediário): meio-traço apenas da linha para cima!
+              targetCtx.moveTo(ox, 0);
+              targetCtx.lineTo(ox, -6.8);
+            } else {
+              // Fase: traço completo atravessando a linha (|)
+              targetCtx.moveTo(ox, -5.8);
+              targetCtx.lineTo(ox, 5.8);
+            }
             targetCtx.stroke();
           });
           targetCtx.restore();
 
           if (appState.showLabels) {
+            const circNum = cd.circuitLabel || String(e2.circuit || e1.circuit || 1);
+            const cmdLet = cd.cmdLabel || e2.cmd || e1.cmd || "";
             targetCtx.font = "bold 7.5px 'JetBrains Mono', monospace";
-            targetCtx.fillStyle = isWhite ? "#1e293b" : "#fde68a";
+            targetCtx.fillStyle = isWhite ? "#0f172a" : "#fde68a";
             targetCtx.textAlign = "center";
-            targetCtx.fillText(`#${cd.wireMm2 || 2.5}mm²`, bx, by - 6);
+            if (cmdLet && expanded.some(x => x.startsWith("R"))) {
+              targetCtx.fillText(cmdLet, tx, ty - 8.5);
+            }
+            targetCtx.fillText(`-${circNum}- (#${cd.wireMm2 || 2.5})`, tx, ty + 13.5);
           }
         }
 
         if (isSel) {
-          drawGripHandle(targetCtx, bx, by, "#f59e0b");
+          drawGripHandle(targetCtx, bx, by, "#f59e0b", "⌒");
+          drawGripHandle(targetCtx, tx + (hasSideLeader ? 0 : 14), ty - (hasSideLeader ? 0 : 12), "#06b6d4", "┼");
         }
         targetCtx.restore();
       });
@@ -2087,8 +2239,32 @@
     function detectGripOrItemAtWorld(wx, wy) {
       const tol = Math.max(0.35, 16 / appState.cam2D.scale); // Raio amplo para facilitar toque no celular e clique no PC!
 
-      // 1. Se uma parede já está selecionada, verifica primeiro as pontas A e B para esticar/encolher!
-      if (appState.selectedItem && appState.selectedItem.category === "wall") {
+      // 0. Se um eletroduto está selecionado, verifica primeiro a alça ciano (┼) para esticar a pequena linha lateral de traços!
+      if (appState.selectedItem && appState.selectedItem.category === "conduit") {
+        const cd = project.conduits.find(x => x.id === appState.selectedItem.id);
+        if (cd) {
+          const e1 = project.electrical.find(e => e.id === cd.from);
+          const e2 = project.electrical.find(e => e.id === cd.to);
+          if (e1 && e2) {
+            const dx = e2.x - e1.x, dy = e2.y - e1.y;
+            const len = Math.hypot(dx, dy) || 1;
+            const nx = -dy / len, ny = dx / len;
+            const cx = (e1.x + e2.x) / 2 + nx * (cd.curve || 0.20) * len;
+            const cy = (e1.y + e2.y) / 2 + ny * (cd.curve || 0.20) * len;
+            const bx = 0.25 * e1.x + 0.5 * cx + 0.25 * e2.x;
+            const by = 0.25 * e1.y + 0.5 * cy + 0.25 * e2.y;
+            const hasSide = Math.hypot(cd.leaderDx || 0, cd.leaderDy || 0) > 0.08;
+            const gx = bx + (cd.leaderDx || 0) + (hasSide ? 0 : 14 / appState.cam2D.scale);
+            const gy = by + (cd.leaderDy || 0) - (hasSide ? 0 : 12 / appState.cam2D.scale);
+            if (Math.hypot(wx - gx, wy - gy) < tol) {
+              return { category: "conduit", id: cd.id, ref: cd, dragMode: "conduit_leader", baseBx: bx, baseBy: by };
+            }
+          }
+        }
+      }
+
+      // 1. Se uma parede já está selecionada (e o botão Selecionar está ativo), verifica as pontas A e B para esticar/encolher!
+      if (appState.activeTool === "select" && appState.selectedItem && appState.selectedItem.category === "wall") {
         const w = project.walls.find(x => x.id === appState.selectedItem.id);
         if (w) {
           if (Math.hypot(wx - w.x1, wy - w.y1) < tol) {
@@ -2096,10 +2272,6 @@
           }
           if (Math.hypot(wx - w.x2, wy - w.y2) < tol) {
             return { category: "wall", id: w.id, ref: w, dragMode: "wall_p2" };
-          }
-          const mx = (w.x1 + w.x2) / 2, my = (w.y1 + w.y2) / 2;
-          if (Math.hypot(wx - mx, wy - my) < tol) {
-            return { category: "wall", id: w.id, ref: w, dragMode: "wall_move" };
           }
         }
       }
@@ -2146,8 +2318,8 @@
         }
       }
 
-      // 5. Paredes (Clicar perto das pontas já estica/encolhe direto; clicar no meio seleciona e move!)
-      for (let i = project.walls.length - 1; i >= 0; i--) {
+      // 5. Paredes (SÓ permite selecionar/mover/esticar parede se o botão Selecionar ou Apagar estiver ativo!)
+      if (appState.activeTool === "select" || appState.activeTool === "delete") for (let i = project.walls.length - 1; i >= 0; i--) {
         const w = project.walls[i];
         if (Math.hypot(wx - w.x1, wy - w.y1) < tol) {
           return { category: "wall", id: w.id, ref: w, dragMode: "wall_p1" };
@@ -2391,17 +2563,35 @@
 
       saveUndoSnapshot();
       if (tool === "door" || tool === "window") {
+        let wVal = tool === "door" ? 0.80 : 1.20;
+        let hVal = tool === "door" ? 2.10 : 1.00;
+        let sillVal = tool === "door" ? 0.00 : 1.10;
+        let doorKind = "1f";
+        if (tool === "door") {
+          const dPreset = (document.getElementById("selMarketDoorSize")?.value || "0.80|1f").split("|");
+          wVal = parseFloat(dPreset[0]) || 0.80;
+          doorKind = dPreset[1] || "1f";
+        } else {
+          const wPreset = (document.getElementById("selMarketWindowSize")?.value || "1.20|1.00|1.10").split("|");
+          wVal = parseFloat(wPreset[0]) || 1.20;
+          hVal = parseFloat(wPreset[1]) || 1.00;
+          sillVal = parseFloat(wPreset[2]) || 1.10;
+        }
         const op = {
           id: "op_" + Date.now(),
           type: tool,
           x: wx,
           y: wy,
-          w: tool === "door" ? 0.80 : 1.20,
+          w: wVal,
+          h: hVal,
+          sill: sillVal,
+          doorKind: doorKind,
           orient: "h",
           dir: "up-left"
         };
         project.openings.push(op);
         appState.selectedItem = { category: "opening", id: op.id };
+        showToast(`${tool === "door" ? "Porta" : "Janela"} de ${wVal.toFixed(2)}×${hVal.toFixed(2)}m inserida!`);
       } else if (ELECTRICAL_COMPONENT_SPECS[tool]) {
         const spec = ELECTRICAL_COMPONENT_SPECS[tool];
         const ne = {
@@ -2520,6 +2710,9 @@
           drag.ref.y = Math.min(botEdge - 0.5, +curY.toFixed(2));
           drag.ref.h = +(botEdge - drag.ref.y).toFixed(2);
           drag.ref.area = +(drag.ref.w * drag.ref.h).toFixed(2);
+        } else if (drag.dragMode === "conduit_leader") {
+          drag.ref.leaderDx = +(curX - drag.baseBx).toFixed(2);
+          drag.ref.leaderDy = +(curY - drag.baseBy).toFixed(2);
         } else if (drag.dragMode === "conduit_curve") {
           const e1 = project.electrical.find(e => e.id === drag.ref.from);
           const e2 = project.electrical.find(e => e.id === drag.ref.to);
@@ -3568,10 +3761,10 @@
 
       // 1. TABELA DE REVISÕES (03, 02, 01, 00) no topo do carimbo
       const revRows = [
-        ["03", "04/11/2026", "REVISADO PROJETO EXECUTIVO voltCAD", "L.V."],
-        ["02", "15/09/2025", "COMPATIBILIZADO COM ARQUITETURA", "L.V."],
-        ["01", "11/06/2024", "COMENTÁRIOS COMPATIBILIZAÇÃO", tb.electrician.split(" ")[0]],
-        ["00", "23/02/2024", "EMISSÃO INICIAL", tb.drafter],
+        ["", "", "", ""],
+        ["", "", "", ""],
+        ["", "", "", ""],
+        [tb.date ? "00" : "", tb.date || "", tb.content ? "EMISSÃO DO PROJETO" : "", tb.electrician || ""],
         ["REVISÃO", "DATA", "MODIFICAÇÃO", "RESPONSÁVEL"]
       ];
       revRows.forEach((r, i) => {
@@ -3641,19 +3834,19 @@
 
       c.fillStyle = "#0f172a";
       c.font = "bold 13px 'Inter', sans-serif";
-      c.fillText(tb.builder.split(" ")[0] || "AUTEN", x + w * 0.18, logoY + 36);
+      c.fillText((tb.builder ? tb.builder.slice(0, 18) : ""), x + w * 0.18, logoY + 36);
       c.font = "7.5px 'Inter', sans-serif";
-      c.fillText("INCORPORADORA", x + w * 0.18, logoY + 47);
+      if (tb.builder) c.fillText("INCORPORADORA", x + w * 0.18, logoY + 47);
 
       c.fillStyle = "#0284c7";
       c.font = "bold 12px 'Inter', sans-serif";
-      c.fillText(tb.company.split("/")[0].trim() || "PROJECAMP", x + w * 0.50, logoY + 34);
+      c.fillText((tb.company ? tb.company.slice(0, 20) : ""), x + w * 0.50, logoY + 34);
       c.fillStyle = "#0f172a";
       c.font = "bold 9px 'JetBrains Mono', monospace";
-      c.fillText("voltCAD ENGENHARIA", x + w * 0.50, logoY + 46);
+      if (tb.company) c.fillText("ENGENHARIA", x + w * 0.50, logoY + 46);
 
       c.font = "bold 12px 'Inter', sans-serif";
-      c.fillText(tb.client.split(" ")[0] || "TERRACE", x + w * 0.82, logoY + 36);
+      c.fillText((tb.client ? tb.client.slice(0, 18) : ""), x + w * 0.82, logoY + 36);
       c.beginPath(); c.moveTo(x, logoY + 58); c.lineTo(x + w, logoY + 58); c.stroke();
 
       // 5. CONTEÚDO | ESCALA | CÓD.
@@ -3666,7 +3859,7 @@
       c.fillStyle = "#0f172a";
       c.fillText(tb.content.slice(0, 26), x + 10, cntY + 34);
       c.font = "bold 11px 'Inter', sans-serif";
-      c.fillText(project.title.slice(0, 30), x + 10, cntY + 52);
+      c.fillText("", x + 10, cntY + 52);
 
       c.beginPath();
       c.moveTo(x + w - 95, cntY); c.lineTo(x + w - 95, cntY + 64);
@@ -3682,7 +3875,7 @@
       c.font = "bold 13px 'JetBrains Mono', monospace";
       c.fillStyle = "#0f172a";
       c.fillText(tb.scale, x + w - 47, cntY + 27);
-      c.fillText("1740", x + w - 47, cntY + 59);
+      c.fillText("", x + w - 47, cntY + 59);
 
       // 6. FASE | FOLHA e DISCIPLINA | REVISÃO
       const fasY = cntY + 64;
@@ -3711,8 +3904,8 @@
       c.fillText("REVISÃO", x + w - 47, fasY + 47);
       c.font = "bold 14px 'JetBrains Mono', monospace";
       c.fillStyle = "#0f172a";
-      c.fillText(`${tb.sheetNum}/${tb.sheetTotal}`, x + w - 47, fasY + 29);
-      c.fillText("03", x + w - 47, fasY + 66);
+      c.fillText((tb.sheetNum || tb.sheetTotal) ? `${tb.sheetNum}/${tb.sheetTotal}` : "", x + w - 47, fasY + 29);
+      c.fillText(tb.date ? "01" : "", x + w - 47, fasY + 66);
 
       // 7. ARQUIVO & ASSINATURAS (RESPONSÁVEL | COORDENADOR | DESENHISTA)
       const botY = fasY + 72;
@@ -3756,19 +3949,19 @@
       const monochrome = plotStyle === "monochrome";
 
       const tb = project.titleBlock || getDefaultTitleBlock();
-      tb.builder = document.getElementById("tbBuilder")?.value || tb.builder;
-      tb.company = document.getElementById("tbCompany")?.value || tb.company;
-      tb.client = document.getElementById("tbClient")?.value || tb.client;
-      tb.address = document.getElementById("tbAddress")?.value || tb.address;
-      tb.content = document.getElementById("tbContent")?.value || tb.content;
-      tb.electrician = document.getElementById("tbElectrician")?.value || tb.electrician;
-      tb.registry = document.getElementById("tbRegistry")?.value || tb.registry;
-      tb.drafter = document.getElementById("tbDrafter")?.value || tb.drafter;
-      tb.phase = document.getElementById("tbPhase")?.value || tb.phase;
-      tb.sheetNum = document.getElementById("tbSheetNum")?.value || 302;
-      tb.sheetTotal = document.getElementById("tbSheetTotal")?.value || 305;
-      tb.scale = document.getElementById("tbScale")?.value || "1:50";
-      tb.date = document.getElementById("tbDate")?.value || "R03 - 04/11/26";
+      tb.builder = document.getElementById("tbBuilder")?.value ?? "";
+      tb.company = document.getElementById("tbCompany")?.value ?? "";
+      tb.client = document.getElementById("tbClient")?.value ?? "";
+      tb.address = document.getElementById("tbAddress")?.value ?? "";
+      tb.content = document.getElementById("tbContent")?.value ?? "";
+      tb.electrician = document.getElementById("tbElectrician")?.value ?? "";
+      tb.registry = document.getElementById("tbRegistry")?.value ?? "";
+      tb.drafter = document.getElementById("tbDrafter")?.value ?? "";
+      tb.phase = document.getElementById("tbPhase")?.value ?? "";
+      tb.sheetNum = document.getElementById("tbSheetNum")?.value ?? "";
+      tb.sheetTotal = document.getElementById("tbSheetTotal")?.value ?? "";
+      tb.scale = document.getElementById("tbScale")?.value ?? "";
+      tb.date = document.getElementById("tbDate")?.value ?? "";
 
       const W = pCanvas.width;
       const H = pCanvas.height;
@@ -4102,39 +4295,79 @@
       if (sel.category === "conduit") {
         const cd = project.conduits.find(x => x.id === sel.id);
         if (!cd) return;
-        badge.textContent = "ELETRODUTO";
+        badge.textContent = "TRAÇOS & CABO";
+        const hasSideLeader = Math.hypot(cd.leaderDx || 0, cd.leaderDy || 0) > 0.08;
         box.innerHTML = `
           <div class="space-y-2 text-xs">
-            <div class="font-bold text-amber-400">〰️ Eletroduto (Arraste o meio para curvar)</div>
-            <div>
-              <label class="block text-slate-400 text-[10px] mb-1">Bitola dos Cabos (mm²)</label>
-              <select id="inpCdWireMm2" class="w-full bg-slate-950 border border-sky-500/50 rounded px-2 py-1.5 font-mono-tech font-bold text-sky-300">
-                ${[1.5, 2.5, 4.0, 6.0, 10.0, 16.0, 25.0, 35.0].map(v => `<option value="${v}" ${Number(cd.wireMm2 || 2.5) === v ? 'selected' : ''}>#${v} mm²</option>`).join("")}
-              </select>
+            <div class="font-bold text-amber-400">〰️ Traços Transversais NBR 5410 & Circuito</div>
+
+            <!-- Botões Visuais para Montar os Traços Transversais (Fase, Neutro, Terra, Retornos Simples/Paralelo/Intermediário) -->
+            <div class="p-2 rounded bg-slate-900 border border-slate-700 space-y-1.5">
+              <div class="text-[10px] font-bold text-sky-300 uppercase">Adicionar Traços no Eletroduto:</div>
+              <div class="grid grid-cols-2 gap-1 text-[10px] font-mono-tech">
+                <button data-add-wire="F" class="px-1.5 py-1 rounded bg-slate-800 hover:bg-sky-700 text-white border border-slate-600">+ Fase ( | )</button>
+                <button data-add-wire="N" class="px-1.5 py-1 rounded bg-slate-800 hover:bg-sky-700 text-sky-300 border border-slate-600">+ Neutro ( ⌐ )</button>
+                <button data-add-wire="T" class="px-1.5 py-1 rounded bg-slate-800 hover:bg-emerald-700 text-emerald-300 border border-slate-600">+ Terra ( ⊤ )</button>
+                <button data-add-wire="R" class="px-1.5 py-1 rounded bg-slate-800 hover:bg-amber-700 text-amber-300 border border-slate-600">+ Retorno ( ╵ )</button>
+                <button data-add-wire="RP" class="px-1.5 py-1 rounded bg-slate-800 hover:bg-purple-700 text-purple-200 border border-slate-600">+ Paralelo ( ╵╵ )</button>
+                <button data-add-wire="RI" class="px-1.5 py-1 rounded bg-slate-800 hover:bg-rose-700 text-rose-200 border border-slate-600">+ Intermed. ( ╵╵╵ )</button>
+              </div>
+              <div class="flex gap-1 pt-1">
+                <input id="inpCdWires" type="text" value="${cd.wires || 'F,N,T'}" class="flex-1 bg-slate-950 border border-slate-700 rounded px-2 py-1 font-mono-tech text-[11px] text-white" title="Ex: N,F,T ou F,RP ou N,F,RI,T" />
+                <button id="btnClearWires" class="px-2 py-1 rounded bg-slate-800 hover:bg-rose-800 text-rose-200 text-[10px]">Limpar</button>
+              </div>
             </div>
-            <div>
-              <label class="block text-slate-400 text-[10px] mb-1">Instalação</label>
-              <select id="inpCdStyle" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 font-mono-tech text-white">
-                <option value="ceiling" ${(!cd.style || cd.style === 'ceiling') ? 'selected' : ''}>Embutido no Forro / Laje</option>
-                <option value="wall" ${cd.style === 'wall' ? 'selected' : ''}>Embutido na Parede</option>
-                <option value="floor" ${cd.style === 'floor' ? 'selected' : ''}>Embutido no Piso</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-slate-400 text-[10px] mb-1">Condutores</label>
-              <input id="inpCdWires" type="text" value="${cd.wires || 'F,N,T'}" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 font-mono-tech text-white" />
-            </div>
+
             <div class="grid grid-cols-2 gap-1.5">
               <div>
-                <label class="block text-slate-400 text-[10px] mb-1">Diâmetro</label>
+                <label class="block text-amber-300 font-semibold text-[10px] mb-0.5">Circuito(s) (Ex: 1, 2, 1/2)</label>
+                <input id="inpCdCircuitLabel" type="text" value="${cd.circuitLabel || '1'}" placeholder="Ex: 1 ou 1,2" class="w-full bg-slate-950 border border-amber-500/50 rounded px-2 py-1 font-mono-tech font-bold text-amber-300" />
+              </div>
+              <div>
+                <label class="block text-slate-400 text-[10px] mb-0.5">Letra Retorno (a, b, c)</label>
+                <input id="inpCdCmdLabel" type="text" value="${cd.cmdLabel || ''}" placeholder="Ex: a ou a,b" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 font-mono-tech text-white" />
+              </div>
+            </div>
+
+            <!-- Botão para Esticar a Pequena Linha Lateral para colocar os Traços Fora da Linha do Circuito! -->
+            <div class="p-2 rounded bg-cyan-950/40 border border-cyan-500/40 space-y-1.5">
+              <div class="text-[10px] font-bold text-cyan-300">📏 Linha Lateral p/ Traços (Leader):</div>
+              <p class="text-[10px] text-slate-300">Puxe a alça azul <b>┼</b> na planta ou clique abaixo para esticar uma pequena linha ao lado do circuito:</p>
+              <div class="flex gap-1">
+                <button id="btnPullSideLeader" class="flex-1 py-1.5 px-2 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-[10px]">
+                  ${hasSideLeader ? '↗ Esticar Mais p/ Lado' : '📏 Puxar Linha ao Lado do Circuito'}
+                </button>
+                ${hasSideLeader ? `<button id="btnResetSideLeader" class="py-1.5 px-2 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px]">Voltar</button>` : ''}
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-1.5">
+              <div>
+                <label class="block text-slate-400 text-[10px] mb-0.5">Bitola Cabo (mm²)</label>
+                <select id="inpCdWireMm2" class="w-full bg-slate-950 border border-sky-500/50 rounded px-2 py-1 font-mono-tech font-bold text-sky-300">
+                  ${[1.5, 2.5, 4.0, 6.0, 10.0, 16.0, 25.0, 35.0].map(v => `<option value="${v}" ${Number(cd.wireMm2 || 2.5) === v ? 'selected' : ''}>#${v} mm²</option>`).join("")}
+                </select>
+              </div>
+              <div>
+                <label class="block text-slate-400 text-[10px] mb-0.5">Diâmetro</label>
                 <select id="inpCdDiam" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 font-mono-tech text-white">
                   <option value='Ø 20' ${cd.diameter === 'Ø 20' ? 'selected' : ''}>Ø 20mm (1/2")</option>
                   <option value='Ø 25' ${(!cd.diameter || cd.diameter === 'Ø 25' || cd.diameter === 'Ø 3/4"') ? 'selected' : ''}>Ø 25mm (3/4")</option>
                   <option value='Ø 32' ${cd.diameter === 'Ø 32' ? 'selected' : ''}>Ø 32mm (1")</option>
                 </select>
               </div>
+            </div>
+            <div class="grid grid-cols-2 gap-1.5">
               <div>
-                <label class="block text-slate-400 text-[10px] mb-1">Curva</label>
+                <label class="block text-slate-400 text-[10px] mb-0.5">Instalação</label>
+                <select id="inpCdStyle" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 font-mono-tech text-white">
+                  <option value="ceiling" ${(!cd.style || cd.style === 'ceiling') ? 'selected' : ''}>Forro / Laje</option>
+                  <option value="wall" ${cd.style === 'wall' ? 'selected' : ''}>Parede</option>
+                  <option value="floor" ${cd.style === 'floor' ? 'selected' : ''}>Piso</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-slate-400 text-[10px] mb-0.5">Curva Arco</label>
                 <input id="inpCdCurve" type="number" step="0.05" min="-0.9" max="0.9" value="${cd.curve || 0.20}" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 font-mono-tech text-white" />
               </div>
             </div>
@@ -4143,15 +4376,43 @@
             </button>
           </div>
         `;
+        box.querySelectorAll("[data-add-wire]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const sym = btn.getAttribute("data-add-wire");
+            const cur = (document.getElementById("inpCdWires").value || "").split(",").map(x => x.trim()).filter(Boolean);
+            cur.push(sym);
+            cd.wires = cur.join(",");
+            document.getElementById("inpCdWires").value = cd.wires;
+            refreshAllViews(false);
+          });
+        });
+        document.getElementById("btnClearWires")?.addEventListener("click", () => {
+          cd.wires = "F";
+          document.getElementById("inpCdWires").value = "F";
+          refreshAllViews(false);
+        });
+        document.getElementById("btnPullSideLeader")?.addEventListener("click", () => {
+          cd.leaderDx = +((cd.leaderDx || 0) + 0.45).toFixed(2);
+          cd.leaderDy = +((cd.leaderDy || 0) - 0.35).toFixed(2);
+          refreshAllViews();
+          showToast("Linha lateral de traços esticada! Você também pode arrastar a alça azul ┼ com o mouse.");
+        });
+        document.getElementById("btnResetSideLeader")?.addEventListener("click", () => {
+          cd.leaderDx = 0;
+          cd.leaderDy = 0;
+          refreshAllViews();
+        });
         const bindCd = () => {
           cd.wireMm2 = parseFloat(document.getElementById("inpCdWireMm2").value) || 2.5;
           cd.style = document.getElementById("inpCdStyle").value;
           cd.wires = document.getElementById("inpCdWires").value;
+          cd.circuitLabel = document.getElementById("inpCdCircuitLabel").value;
+          cd.cmdLabel = document.getElementById("inpCdCmdLabel").value;
           cd.diameter = document.getElementById("inpCdDiam").value;
           cd.curve = parseFloat(document.getElementById("inpCdCurve").value) || 0;
           refreshAllViews(false);
         };
-        ["inpCdWireMm2", "inpCdStyle", "inpCdWires", "inpCdDiam", "inpCdCurve"].forEach(id => {
+        ["inpCdWireMm2", "inpCdStyle", "inpCdWires", "inpCdCircuitLabel", "inpCdCmdLabel", "inpCdDiam", "inpCdCurve"].forEach(id => {
           document.getElementById(id)?.addEventListener("input", bindCd);
           document.getElementById(id)?.addEventListener("change", bindCd);
         });
@@ -4359,8 +4620,88 @@
         return;
       }
 
-      if (sel.category === "furniture" || sel.category === "opening") {
-        badge.textContent = sel.category === "opening" ? "ESQUADRIA" : "BLOCO CAD";
+      if (sel.category === "opening") {
+        const op = project.openings.find(x => x.id === sel.id);
+        if (!op) return;
+        const isDoor = op.type === "door";
+        badge.textContent = isDoor ? "PORTA COMERCIAL" : "JANELA COMERCIAL";
+        box.innerHTML = `
+          <div class="space-y-2 text-xs">
+            <div class="font-bold text-amber-400">${isDoor ? '🚪 Tamanhos de Porta do Mercado' : '🪟 Tamanhos de Janela do Mercado'}</div>
+            <div>
+              <label class="block text-slate-400 text-[10px] mb-1">Escolher Medida Comercial Padrão:</label>
+              <select id="inpOpPreset" class="w-full bg-slate-950 border border-sky-500/50 rounded px-2 py-1.5 font-mono-tech text-sky-300 font-bold">
+                ${isDoor ? `
+                  <option value="0.60|2.10|1f" ${op.w === 0.60 ? 'selected' : ''}>0,60 × 2,10m (Banheiro/Lavabo)</option>
+                  <option value="0.70|2.10|1f" ${op.w === 0.70 ? 'selected' : ''}>0,70 × 2,10m (Banho/Serviço)</option>
+                  <option value="0.80|2.10|1f" ${op.w === 0.80 ? 'selected' : ''}>0,80 × 2,10m (Quarto Padrão)</option>
+                  <option value="0.90|2.10|1f" ${op.w === 0.90 ? 'selected' : ''}>0,90 × 2,10m (Entrada / PCD)</option>
+                  <option value="1.00|2.10|1f" ${op.w === 1.00 ? 'selected' : ''}>1,00 × 2,10m (Entrada Social)</option>
+                  <option value="1.20|2.10|piv" ${op.w === 1.20 ? 'selected' : ''}>1,20 × 2,10m (Pivotante)</option>
+                  <option value="1.40|2.10|2f" ${op.w === 1.40 ? 'selected' : ''}>1,40 × 2,10m (Dupla 2 Folhas)</option>
+                  <option value="1.60|2.10|cor" ${op.w === 1.60 ? 'selected' : ''}>1,60 × 2,10m (Correr 2 Folhas)</option>
+                  <option value="2.00|2.10|cor" ${op.w === 2.00 ? 'selected' : ''}>2,00 × 2,10m (Correr Varanda)</option>
+                  <option value="2.40|2.10|cor" ${op.w === 2.40 ? 'selected' : ''}>2,40 × 2,10m (Correr Salão)</option>
+                ` : `
+                  <option value="0.60|0.60|1.50" ${op.w === 0.60 ? 'selected' : ''}>0,60 × 0,60m (Banheiro h=1,50)</option>
+                  <option value="0.80|0.60|1.50" ${op.w === 0.80 ? 'selected' : ''}>0,80 × 0,60m (Maxim-Ar h=1,50)</option>
+                  <option value="1.00|1.00|1.10" ${op.w === 1.00 ? 'selected' : ''}>1,00 × 1,00m (Cozinha h=1,10)</option>
+                  <option value="1.20|1.00|1.10" ${op.w === 1.20 ? 'selected' : ''}>1,20 × 1,00m (Padrão h=1,10)</option>
+                  <option value="1.50|1.00|1.10" ${(op.w === 1.50 && op.h !== 1.20) ? 'selected' : ''}>1,50 × 1,00m (Quarto h=1,10)</option>
+                  <option value="1.50|1.20|1.00" ${(op.w === 1.50 && op.h === 1.20) ? 'selected' : ''}>1,50 × 1,20m (Suíte h=1,00)</option>
+                  <option value="2.00|1.20|1.00" ${op.w === 2.00 ? 'selected' : ''}>2,00 × 1,20m (Sala 4 Fls h=1,00)</option>
+                  <option value="2.40|1.20|1.00" ${op.w === 2.40 ? 'selected' : ''}>2,40 × 1,20m (Panorâmica h=1,00)</option>
+                `}
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-1.5">
+              <div>
+                <label class="block text-slate-400 text-[10px]">Largura (m)</label>
+                <input id="inpOpW" type="number" step="0.05" min="0.30" max="6.0" value="${op.w || 0.80}" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 font-mono-tech text-white" />
+              </div>
+              <div>
+                <label class="block text-slate-400 text-[10px]">Altura (m)</label>
+                <input id="inpOpH" type="number" step="0.05" min="0.30" max="3.0" value="${op.h || (isDoor ? 2.10 : 1.00)}" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 font-mono-tech text-white" />
+              </div>
+            </div>
+            <button id="btnRotateFurn" class="w-full py-1.5 rounded bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 font-medium">
+              🔄 Girar Horizontal / Vertical (90°)
+            </button>
+            <button id="btnDeleteGeneric" class="w-full py-1.5 rounded bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-medium">
+              🗑️ Apagar ${isDoor ? 'Porta' : 'Janela'}
+            </button>
+          </div>
+        `;
+        document.getElementById("inpOpPreset")?.addEventListener("change", (e) => {
+          const parts = e.target.value.split("|");
+          op.w = parseFloat(parts[0]) || 0.80;
+          op.h = parseFloat(parts[1]) || 2.10;
+          if (isDoor) op.doorKind = parts[2] || "1f";
+          else op.sill = parseFloat(parts[2]) || 1.10;
+          refreshAllViews();
+        });
+        ["inpOpW", "inpOpH"].forEach(id => {
+          document.getElementById(id)?.addEventListener("input", () => {
+            op.w = parseFloat(document.getElementById("inpOpW").value) || 0.80;
+            op.h = parseFloat(document.getElementById("inpOpH").value) || 1.00;
+            refreshAllViews(false);
+          });
+        });
+        document.getElementById("btnRotateFurn")?.addEventListener("click", () => {
+          op.orient = op.orient === "v" ? "h" : "v";
+          refreshAllViews(false);
+        });
+        document.getElementById("btnDeleteGeneric")?.addEventListener("click", () => {
+          saveUndoSnapshot();
+          project.openings = project.openings.filter(x => x.id !== op.id);
+          appState.selectedItem = null;
+          refreshAllViews();
+        });
+        return;
+      }
+
+      if (sel.category === "furniture") {
+        badge.textContent = "BLOCO CAD";
         box.innerHTML = `
           <div class="space-y-2 text-xs">
             <p class="text-slate-300">Item: <b>${sel.id}</b></p>
@@ -4393,6 +4734,7 @@
     }
 
     function refreshAllViews(rebuildInspector = true) {
+      try { autoSaveCurrentProjectToSite(); } catch (e) {}
       updateWallStretchToolbar();
       render2D();
       rebuild3DScene();
@@ -4974,6 +5316,204 @@
       }
     });
 
+
+    // ============================================================================
+    // SISTEMA DE SALVAMENTO NO SITE E GALERIA "MEUS PROJETOS SALVOS" (ITEM 2)
+    // ============================================================================
+    const STORAGE_KEY_PROJECTS = "voltCAD_user_saved_projects_v2";
+    const STORAGE_KEY_AUTOSAVE = "voltCAD_active_autosave_v2";
+
+    let memorySavedProjects = [
+      {
+        id: "proj_res_padrao",
+        name: "1. Residência 9,60m × 8,50m (Completa NBR 5410)",
+        updatedAt: "09/11/2026 18:30",
+        data: getOriginalBlueprintProject()
+      },
+      {
+        id: "proj_2comodos",
+        name: "2. Casa Compacta 2 Cômodos (8,00m × 6,00m)",
+        updatedAt: "09/11/2026 18:35",
+        data: getBlankTemplate()
+      },
+      {
+        id: "proj_comercial",
+        name: "3. Loja & Escritório Comercial (10,00m × 6,00m)",
+        updatedAt: "09/11/2026 18:40",
+        data: getCommercialTemplate()
+      }
+    ];
+
+    function getSavedProjectsList() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_PROJECTS);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            memorySavedProjects = parsed;
+          }
+        }
+      } catch (e) {}
+      return memorySavedProjects;
+    }
+
+    function persistSavedProjectsList(list) {
+      memorySavedProjects = list;
+      try {
+        localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(list));
+      } catch (e) {}
+      const badge = document.getElementById("savedCountBadge");
+      if (badge) badge.textContent = String(list.length);
+    }
+
+    function autoSaveCurrentProjectToSite() {
+      try {
+        localStorage.setItem(STORAGE_KEY_AUTOSAVE, JSON.stringify(project));
+      } catch (e) {}
+    }
+
+    function saveCurrentProjectToGallery(customName) {
+      const list = getSavedProjectsList();
+      const titleToUse = (customName || project.title || "Meu Projeto Elétrico").trim();
+      project.title = titleToUse;
+      const nowStr = new Date().toLocaleDateString("pt-BR") + " " + new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+      const newEntry = {
+        id: "usr_" + Date.now(),
+        name: titleToUse,
+        updatedAt: nowStr,
+        data: JSON.parse(JSON.stringify(project))
+      };
+      list.unshift(newEntry);
+      persistSavedProjectsList(list);
+      autoSaveCurrentProjectToSite();
+      renderSavedProjectsGallery();
+      refreshAllViews(false);
+      showToast(`✅ Projeto "${titleToUse}" salvo no voltCAD!`);
+    }
+
+    function renderSavedProjectsGallery() {
+      const grid = document.getElementById("savedProjectsGrid");
+      if (!grid) return;
+      const list = getSavedProjectsList();
+      const badge = document.getElementById("savedCountBadge");
+      if (badge) badge.textContent = String(list.length);
+
+      grid.innerHTML = list.map((item) => {
+        const d = item.data || {};
+        const area = (d.rooms || []).reduce((acc, r) => acc + Number(r.area || 0), 0).toFixed(2);
+        const pts = (d.electrical || []).length;
+        const wallsCount = (d.walls || []).length;
+        return `
+          <div class="bg-slate-950 border border-slate-800 hover:border-sky-500/50 rounded-xl p-3.5 flex flex-col justify-between gap-3 transition shadow">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <h4 class="font-bold text-white text-xs leading-snug">${item.name}</h4>
+                <span class="text-[10px] font-mono-tech text-slate-400 shrink-0">${item.updatedAt || 'Salvo'}</span>
+              </div>
+              <div class="flex items-center gap-3 mt-2 text-[11px] font-mono-tech text-slate-300">
+                <span class="text-emerald-400">📐 ${area} m²</span>
+                <span class="text-amber-300">⚡ ${pts} pontos</span>
+                <span class="text-sky-300">🧱 ${wallsCount} paredes</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-2 border-t border-slate-800/80 text-[11px]">
+              <button data-proj-open="${item.id}" class="py-1.5 px-2 rounded bg-sky-600 hover:bg-sky-500 text-white font-semibold">✏️ Modificar</button>
+              <button data-proj-print="${item.id}" class="py-1.5 px-2 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-semibold">🖨️ Imprimir</button>
+              <button data-proj-overwrite="${item.id}" class="py-1.5 px-2 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-medium">💾 Atualizar</button>
+              <button data-proj-delete="${item.id}" class="py-1.5 px-2 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-medium">🗑️ Excluir</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      grid.querySelectorAll("[data-proj-open]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-proj-open");
+          const found = getSavedProjectsList().find(x => x.id === id);
+          if (found && found.data) {
+            saveUndoSnapshot();
+            project = JSON.parse(JSON.stringify(found.data));
+            appState.selectedItem = null;
+            document.getElementById("modalSavedProjects").classList.add("hidden");
+            setViewMode("split");
+            fit2DView();
+            refreshAllViews();
+            showToast(`📂 Projeto "${found.name}" aberto para modificação!`);
+          }
+        });
+      });
+
+      grid.querySelectorAll("[data-proj-print]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-proj-print");
+          const found = getSavedProjectsList().find(x => x.id === id);
+          if (found && found.data) {
+            saveUndoSnapshot();
+            project = JSON.parse(JSON.stringify(found.data));
+            appState.selectedItem = null;
+            document.getElementById("modalSavedProjects").classList.add("hidden");
+            setViewMode("print");
+            refreshAllViews();
+            showToast(`🖨️ Projeto "${found.name}" carregado na Folha de Impressão!`);
+          }
+        });
+      });
+
+      grid.querySelectorAll("[data-proj-overwrite]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-proj-overwrite");
+          const list = getSavedProjectsList();
+          const idx = list.findIndex(x => x.id === id);
+          if (idx >= 0) {
+            list[idx].data = JSON.parse(JSON.stringify(project));
+            list[idx].updatedAt = new Date().toLocaleDateString("pt-BR") + " " + new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+            persistSavedProjectsList(list);
+            renderSavedProjectsGallery();
+            showToast(`💾 Projeto "${list[idx].name}" atualizado com o desenho atual!`);
+          }
+        });
+      });
+
+      grid.querySelectorAll("[data-proj-delete]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-proj-delete");
+          const list = getSavedProjectsList().filter(x => x.id !== id);
+          persistSavedProjectsList(list);
+          renderSavedProjectsGallery();
+          showToast("🗑️ Projeto removido da lista.");
+        });
+      });
+    }
+
+    document.getElementById("btnSaveUserProject").addEventListener("click", () => {
+      saveCurrentProjectToGallery(project.title);
+    });
+
+    document.getElementById("btnOpenSavedProjects").addEventListener("click", () => {
+      document.getElementById("inpNewSaveName").value = project.title || "";
+      renderSavedProjectsGallery();
+      document.getElementById("modalSavedProjects").classList.remove("hidden");
+    });
+
+    document.getElementById("btnCloseSavedProjects").addEventListener("click", () => {
+      document.getElementById("modalSavedProjects").classList.add("hidden");
+    });
+
+    document.getElementById("btnConfirmSaveNewProject").addEventListener("click", () => {
+      const customName = document.getElementById("inpNewSaveName").value;
+      saveCurrentProjectToGallery(customName);
+    });
+
+    document.getElementById("btnClearTitleBlock").addEventListener("click", () => {
+      ["tbBuilder", "tbCompany", "tbClient", "tbAddress", "tbContent", "tbElectrician", "tbRegistry", "tbDrafter", "tbPhase", "tbSheetNum", "tbSheetTotal", "tbScale", "tbDate"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+      });
+      project.titleBlock = getDefaultTitleBlock();
+      renderPrintSheet();
+      showToast("🧹 Todos os campos do carimbo foram limpos para você preencher!");
+    });
+
     window.addEventListener("resize", () => {
       fit2DView();
       resize3D();
@@ -4985,6 +5525,7 @@
     });
 
     window.onload = () => {
+      getSavedProjectsList();
       fit2DView();
       resize3D();
       refreshAllViews();
